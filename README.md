@@ -30,9 +30,9 @@ This repo is a collection of methods in BP which are moddable by replacing this 
 
 ### Tips
 1. Name your dll `pre_GameSource.dll` to inject it **infront** of the GameSource. Current invoke list is as follows:
-  1. `pre_GameSource.dll`
-  2. `GameSource.dll`
-  3. [A-z].dll
+-  1. `pre_GameSource.dll`
+-  2. `GameSource.dll`
+-  3. [A-z].dll
 2. Try to keep this dll alone as much as possible. This should only be used as a last option.
 3. Because `GameSource` will be loaded in just like any other `Resource`, you'll have to create a `Core` class which implements the `Resource` class. Because of this, you can use a lot of features like Group Manager, Command Handler, etc all within the GameSource. (This is not recommended, but still possible)
 
