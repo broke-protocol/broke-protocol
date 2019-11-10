@@ -14,7 +14,7 @@ namespace BrokeProtocol.GameSource
             Info = new ResourceInfo("GameSource", "game")
             {
                 Description = "Default game source used by BP. May be modified.",
-                Github = ""
+                Git = "https://github.com/broke-protocol/source"
             };
             RegisterEvents();
         }
