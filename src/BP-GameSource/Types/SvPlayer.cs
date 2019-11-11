@@ -1,7 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.API.ExtensionMethods;
 using BrokeProtocol.Entities;
-using BrokeProtocol.ExportScripts.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;

@@ -1,5 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
+using BrokeProtocol.Utility.Jobs;
 using System;
 
 namespace BrokeProtocol.CustomEvents
@@ -13,7 +14,10 @@ namespace BrokeProtocol.CustomEvents
 
         public void AreaWarning(ShPlayer player, string triggerID)
         {
-            player.svPlayer.SendGameMessage($"Warning! You are about to enter {triggerID}!");
+            if (player.job.info.groupIndex != GroupIndex.LawEnforcement)
+            {
+                player.svPlayer.SendGameMessage($"Warning! You are about to enter {triggerID}!");
+            }
         }
     }
 }
