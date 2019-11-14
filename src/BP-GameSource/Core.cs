@@ -7,11 +7,11 @@ using System.Reflection;
 
 namespace BrokeProtocol.GameSource
 {
-    public class Core : Resource
+    public class Core : Plugin
     {
         public Core()
         {
-            Info = new ResourceInfo("GameSource", "game")
+            Info = new PluginInfo("GameSource", "game")
             {
                 Description = "Default game source used by BP. May be modified.",
                 Git = "https://github.com/broke-protocol/source"
