@@ -171,20 +171,25 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnSellApartment)]
-        protected void OnSellApartment(ShPlayer player)
+        protected void OnSellApartment(ShPlayer player, ShApartment apartment)
         {
-            if (player.ownedApartment)
-                return;
-
-            if (player.InOwnApartment())
+            foreach(Place place in player.ownedPlaces)
             {
-                player.svPlayer.SvEnterPlace(player.GetPlace().mainDoor.ID, player);
+                if(place.mainDoor.svDoor.other == apartment)
+                {
+                    if (player.GetPlace() == place)
+                    {
+                        player.svPlayer.SvEnterPlace(place.mainDoor.ID, player);
+                    }
+
+                    player.TransferMoney(DeltaInv.AddToMe, apartment.value / 2, true);
+
+                    player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ApartmentOwner, apartment.ID, place.GetIndex(), false);
+                    player.svPlayer.CleanupApartment(place);
+
+                    return;
+                }
             }
-
-            player.TransferMoney(DeltaInv.AddToMe, player.ownedApartment.value / 2, true);
-
-            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ApartmentOwner, 0, 0);
-            player.svPlayer.CleanupApartment();
         }
 
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRespawn)]
