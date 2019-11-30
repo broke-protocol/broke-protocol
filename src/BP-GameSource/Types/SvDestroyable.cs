@@ -1,4 +1,5 @@
 ﻿using BrokeProtocol.Entities;
+using BrokeProtocol.Required;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
