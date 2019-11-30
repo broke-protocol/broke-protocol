@@ -42,6 +42,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDamage)]
         protected void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
+            // Store for usage in OnDeath
+            player.svPlayer.attacker = attacker;
+
             if (player.IsDead() || player.IsShielded(damageIndex, collider))
             {
                 return;
@@ -67,11 +70,6 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.IsDead())
             {
-                if (attacker && attacker != player)
-                {
-                    attacker.job.OnKillPlayer(player);
-                }
-
                 return;
             }
 
@@ -119,6 +117,43 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDeath)]
         protected void OnDeath(ShPlayer player)
         {
+            if (player.svPlayer.attacker && player.svPlayer.attacker != player)
+            {
+                player.svPlayer.attacker.job.OnKillPlayer(player);
+
+                // Only drop items if attacker present, to prevent AI suicide item farming
+                if (Physics.Raycast(
+                    player.GetPosition() + Vector3.up,
+                    Vector3.down,
+                    out RaycastHit hit,
+                    10f,
+                    MaskIndex.defaultMask))
+                {
+                    ShEntity briefcase = player.manager.svManager.AddNewEntity(
+                        player.manager.svManager.GetRandomBriefcase(),
+                        player.GetPlace(),
+                        hit.point,
+                        player.GetPositionT().rotation,
+                        false);
+
+                    if (briefcase)
+                    {
+                        foreach (KeyValuePair<int, InventoryItem> pair in player.myItems)
+                        {
+                            if (UnityEngine.Random.value < 0.8f)
+                            {
+                                InventoryItem i = new InventoryItem(
+                                    pair.Value.item,
+                                    Mathf.CeilToInt(pair.Value.count * UnityEngine.Random.Range(0.05f, 0.3f)));
+                                briefcase.myItems.Add(pair.Key, i);
+                            }
+                        }
+                    }
+                }
+
+                player.RemoveItemsDeath();
+            }
+
             player.svPlayer.ClearWitnessed();
 
             foreach (PlayerEffect e in player.effects)
@@ -135,37 +170,6 @@ namespace BrokeProtocol.GameSource.Types
                 Channel.Reliable,
                 ClPacket.ShowTimer,
                 player.svPlayer.GetRespawnDelay());
-
-            if (Physics.Raycast(
-                player.GetPosition() + Vector3.up,
-                Vector3.down,
-                out RaycastHit hit,
-                10f,
-                MaskIndex.defaultMask))
-            {
-                ShEntity briefcase = player.manager.svManager.AddNewEntity(
-                    player.manager.svManager.GetRandomBriefcase(),
-                    player.GetPlace(),
-                    hit.point,
-                    player.GetPositionT().rotation,
-                    false);
-
-                if (briefcase)
-                {
-                    foreach (KeyValuePair<int, InventoryItem> pair in player.myItems)
-                    {
-                        if (UnityEngine.Random.value < 0.8f)
-                        {
-                            InventoryItem i = new InventoryItem(
-                                pair.Value.item,
-                                Mathf.CeilToInt(pair.Value.count * UnityEngine.Random.Range(0.05f, 0.3f)));
-                            briefcase.myItems.Add(pair.Key, i);
-                        }
-                    }
-                }
-            }
-
-            player.RemoveItemsDeath();
 
             player.SetStance(StanceIndex.Dead, true);
         }
