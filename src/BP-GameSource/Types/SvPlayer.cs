@@ -42,9 +42,6 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDamage)]
         protected void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
-            // Store for usage in OnDeath
-            player.svPlayer.attacker = attacker;
-
             if (player.IsDead() || player.IsShielded(damageIndex, collider))
             {
                 return;
@@ -117,9 +114,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDeath)]
         protected void OnDeath(ShPlayer player)
         {
-            if (player.svPlayer.attacker && player.svPlayer.attacker != player)
+            if (player.svPlayer.lastAttacker && player.svPlayer.lastAttacker != player)
             {
-                player.svPlayer.attacker.job.OnKillPlayer(player);
+                player.svPlayer.lastAttacker.job.OnKillPlayer(player);
 
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(

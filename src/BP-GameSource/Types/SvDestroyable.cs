@@ -8,6 +8,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Destroyable), (int)API.Events.Destroyable.OnDamage)]
         protected void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
+            // Store for usage in OnDeath
+            destroyable.svDestroyable.lastAttacker = attacker;
+
             if (destroyable.IsDead())
             {
                 return;
