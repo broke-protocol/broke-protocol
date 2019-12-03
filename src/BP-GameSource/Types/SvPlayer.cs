@@ -128,7 +128,7 @@ namespace BrokeProtocol.GameSource.Types
                     MaskIndex.defaultMask))
                 {
                     ShEntity briefcase = player.manager.svManager.AddNewEntity(
-                        player.manager.svManager.GetRandomBriefcase(),
+                        player.manager.svManager.briefcasePrefabs.GetRandom(),
                         player.GetPlace(),
                         hit.point,
                         player.GetPositionT().rotation,
@@ -196,7 +196,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.isHuman)
             {
-                var newSpawn = player.svPlayer.svManager.GetRandomSpawn().transform;
+                var newSpawn = player.svPlayer.svManager.spawnLocations.GetRandom().transform;
                 player.originalPosition = newSpawn.position;
                 player.originalRotation = newSpawn.rotation;
                 player.originalParent = newSpawn.parent;
