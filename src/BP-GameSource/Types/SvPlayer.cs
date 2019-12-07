@@ -300,7 +300,7 @@ namespace BrokeProtocol.GameSource.Types
 
             Crime crime = player.manager.GetCrime(crimeIndex);
             ShPlayer witness = null;
-            if (crime.witness && !player.svPlayer.GetWitness(crime, victim, out witness))
+            if (crime.witness && !player.svPlayer.GetWitness(victim, out witness))
             {
                 return;
             }

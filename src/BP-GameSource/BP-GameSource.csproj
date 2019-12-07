@@ -37,8 +37,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Scripts">
-      <HintPath>..\..\..\broke-protocol-game\BrokeProtocol\BrokeProtocol_Data\Managed\Scripts.dll</HintPath>
+    <Reference Include="Scripts, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\broke-protocol-game\Library\ScriptAssemblies\Scripts.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
