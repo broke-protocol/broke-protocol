@@ -9,6 +9,7 @@ using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using System.Linq;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -352,6 +353,35 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRemoveItem)]
         protected void OnRemoveItem(ShPlayer player, int itemIndex, int amount, bool dispatch)
         {
+        }
+
+        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRemoveItemsDeath)]
+        protected void OnRemoveItemsDeath(ShPlayer player)
+        {
+            foreach (InventoryItem myItem in player.myItems.Values.ToArray())
+            {
+                int extra = player.GetExtraCount(myItem);
+
+                if (extra > 0)
+                {
+                    if (!(myItem.item is ShWearable w) || w.illegal || player.curWearables[(int)w.type].index != w.index)
+                    {
+                        player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra, true);
+                    }
+                }
+            }
+        }
+
+        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRemoveItemsJail)]
+        protected void OnRemoveItemsJail(ShPlayer player)
+        {
+            foreach (InventoryItem i in player.myItems.Values.ToArray())
+            {
+                if (i.item.illegal)
+                {
+                    player.TransferItem(DeltaInv.RemoveFromMe, i.item.index, i.count, true);
+                }
+            }
         }
     }
 }
