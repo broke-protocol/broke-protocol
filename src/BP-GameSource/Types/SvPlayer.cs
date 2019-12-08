@@ -358,9 +358,24 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRemoveItemsDeath)]
         protected void OnRemoveItemsDeath(ShPlayer player)
         {
+            // Allows players to keep items/rewards from job ranks
             foreach (InventoryItem myItem in player.myItems.Values.ToArray())
             {
-                int extra = player.GetExtraCount(myItem);
+                int extra = myItem.count;
+
+                if (player.job.info.rankItems.Length > player.rank)
+                {
+                    for (int rankIndex = player.rank; rankIndex >= 0; rankIndex--)
+                    {
+                        foreach (InventoryItem i in player.job.info.rankItems[rankIndex].items)
+                        {
+                            if (myItem.item.index == i.item.index)
+                            {
+                                extra = Mathf.Max(0, myItem.count - i.count);
+                            }
+                        }
+                    }
+                }
 
                 if (extra > 0)
                 {
