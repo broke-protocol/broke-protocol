@@ -148,9 +148,9 @@ namespace BrokeProtocol.GameSource.Types
                         }
                     }
                 }
-
-                player.RemoveItemsDeath();
             }
+
+            player.RemoveItemsDeath();
 
             player.svPlayer.ClearWitnessed();
 
