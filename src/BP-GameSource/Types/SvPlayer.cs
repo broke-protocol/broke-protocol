@@ -338,10 +338,7 @@ namespace BrokeProtocol.GameSource.Types
                 ClPacket.GameMessage,
                 $"{target.username} Banned: {reason}");
 
-            target.svPlayer.PlayerData.BanInfo.IsBanned = true;
-            target.svPlayer.PlayerData.BanInfo.Date = DateTime.Now;
-            target.svPlayer.PlayerData.BanInfo.Reason = reason;
-
+            target.svPlayer.PlayerData.Ban(reason);
             svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
         }
 

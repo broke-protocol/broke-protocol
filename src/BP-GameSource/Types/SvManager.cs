@@ -1,5 +1,4 @@
-﻿
-using BrokeProtocol.Server.LiteDB.Models;
+﻿using BrokeProtocol.Server.LiteDB.Models;
 using BrokeProtocol.Utility;
 
 namespace BrokeProtocol.GameSource.Types
