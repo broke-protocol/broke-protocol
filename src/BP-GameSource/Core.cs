@@ -14,7 +14,7 @@ namespace BrokeProtocol.GameSource
             Info = new PluginInfo("GameSource", "game")
             {
                 Description = "Default game source used by BP. May be modified.",
-                Git = "https://github.com/broke-protocol/source"
+                Website = "https://github.com/broke-protocol/source"
             };
             RegisterEvents();
         }

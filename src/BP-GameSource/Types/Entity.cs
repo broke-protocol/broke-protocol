@@ -2,7 +2,7 @@
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class SvEntity
+    public class Entity
     {
         [Target(typeof(API.Events.Entity), (int)API.Events.Entity.OnAddItem)]
         protected void OnAddItem(ShEntity entity, int itemIndex, int amount, bool dispatch)

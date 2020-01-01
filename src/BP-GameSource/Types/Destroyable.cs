@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class SvDestroyable : SvEntity
+    public class Destroyable : Entity
     {
         [Target(typeof(API.Events.Destroyable), (int)API.Events.Destroyable.OnDamage)]
         protected void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)

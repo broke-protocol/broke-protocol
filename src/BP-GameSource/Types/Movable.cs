@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class SvMovable : SvDestroyable
+    public class Movable : Destroyable
     {
         [Target(typeof(API.Events.Movable), (int)API.Events.Movable.OnDamage)]
         protected void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)

@@ -1,5 +1,4 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.API.ExtensionMethods;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
@@ -7,38 +6,51 @@ using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 using System.Linq;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class SvPlayer : SvMovable
+    public class Player : Movable
     {
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnGlobalChatMessage)]
         protected void OnGlobalChatMessage(ShPlayer player, string message)
         {
             if (player.manager.svManager.chatted.OverLimit(player))
+            {
                 return;
+            }
+
+            message = message.CleanMessage();
+            Debug.Log(message);
 
             if (CommandHandler.OnEvent(player, message)) // 'true' if message starts with command prefix
+            {
                 return;
+            }
 
             player.manager.svManager.chatted.Add(player);
-            player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GlobalChatMessage, player.ID, message.SanitizeString());
+            player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GlobalChatMessage, player.ID, message);
         }
 
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnLocalChatMessage)]
         protected void OnLocalChatMessage(ShPlayer player, string message)
         {
             if (player.manager.svManager.chatted.OverLimit(player))
+            {
                 return;
+            }
+
+            message = message.CleanMessage();
+            Debug.Log(message);
 
             if (CommandHandler.OnEvent(player, message)) // 'true' if message starts with command prefix
+            {
                 return;
+            }
 
             player.manager.svManager.chatted.Add(player);
-            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Unsequenced, ClPacket.LocalChatMessage, player.ID, message.SanitizeString());
+            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Unsequenced, ClPacket.LocalChatMessage, player.ID, message);
         }
 
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDamage)]
@@ -76,16 +88,12 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.stance.setable)
             {
-                if (player.health < 15f)
+                if (player.isHuman && player.health < 15f)
                 {
                     player.svPlayer.SvForceStance(StanceIndex.KnockedOut);
-
-                    if (!player.isHuman)
-                    {
-                        player.svPlayer.SetState(StateIndex.Null);
-                    }
+                    // If knockout AI, set AI state Null
                 }
-                else if (UnityEngine.Random.value < player.manager.damageTypes[(int)damageIndex].fallChance)
+                else if (Random.value < player.manager.damageTypes[(int)damageIndex].fallChance)
                 {
                     player.StartCoroutine(player.svPlayer.KnockedDown());
                 }
@@ -132,18 +140,18 @@ namespace BrokeProtocol.GameSource.Types
                         player.manager.svManager.briefcasePrefabs.GetRandom(),
                         player.GetPlace(),
                         hit.point,
-                        player.GetPositionT().rotation,
+                        Quaternion.LookRotation(player.GetPositionT().forward, Vector3.up),
                         false);
 
                     if (briefcase)
                     {
                         foreach (KeyValuePair<int, InventoryItem> pair in player.myItems)
                         {
-                            if (UnityEngine.Random.value < 0.8f)
+                            if (Random.value < 0.8f)
                             {
                                 InventoryItem i = new InventoryItem(
                                     pair.Value.item,
-                                    Mathf.CeilToInt(pair.Value.count * UnityEngine.Random.Range(0.05f, 0.3f)));
+                                    Mathf.CeilToInt(pair.Value.count * Random.Range(0.05f, 0.3f)));
                                 briefcase.myItems.Add(pair.Key, i);
                             }
                         }
@@ -180,7 +188,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (player.GetPlace() == place)
                 {
-                    player.svPlayer.SvEnterDoor(place.mainDoor.ID, player);
+                    player.svPlayer.SvEnterDoor(place.mainDoor.ID, player, true);
                 }
 
                 player.TransferMoney(DeltaInv.AddToMe, apartment.value / 2, true);
@@ -210,17 +218,19 @@ namespace BrokeProtocol.GameSource.Types
         protected void OnReward(ShPlayer player, int experienceDelta, int moneyDelta)
         {
             if (!player.isHuman || player.job.info.rankItems.Length <= 1)
+            {
                 return;
+            }
 
             var experience = player.experience + experienceDelta;
 
-            if (experience > player.maxExperience)
+            if (experience > Util.maxExperience)
             {
                 if (player.rank >= player.job.info.rankItems.Length - 1)
                 {
-                    if (player.experience != player.maxExperience)
+                    if (player.experience != Util.maxExperience)
                     {
-                        player.svPlayer.SetExperience(player.maxExperience, true);
+                        player.svPlayer.SetExperience(Util.maxExperience, true);
                     }
                 }
                 else
@@ -228,7 +238,7 @@ namespace BrokeProtocol.GameSource.Types
                     int newRank = player.rank + 1;
                     player.svPlayer.AddJobItems(player.job, player.rank, newRank, false);
                     player.svPlayer.SetRank(newRank);
-                    player.svPlayer.SetExperience(experience - player.maxExperience, false);
+                    player.svPlayer.SetExperience(experience - Util.maxExperience, false);
                 }
             }
             else if (experience <= 0)
@@ -241,7 +251,7 @@ namespace BrokeProtocol.GameSource.Types
                 else
                 {
                     player.svPlayer.SetRank(player.rank - 1);
-                    player.svPlayer.SetExperience(experience + player.maxExperience, false);
+                    player.svPlayer.SetExperience(experience + Util.maxExperience, false);
                 }
             }
             else
@@ -265,8 +275,11 @@ namespace BrokeProtocol.GameSource.Types
         protected void OnAcceptRequest(ShPlayer player, ShPlayer requester)
         {
             var requestItem = player.RequestGet(requester);
+
             if (requestItem == null)
+            {
                 return;
+            }
 
             if (!requester.svPlayer.BuyRequestItem(requestItem))
             {
@@ -284,8 +297,11 @@ namespace BrokeProtocol.GameSource.Types
         protected void OnDenyRequest(ShPlayer player, ShPlayer requester)
         {
             var requestItem = player.RequestGet(requester);
+
             if (requestItem == null)
+            {
                 return;
+            }
 
             requester.svPlayer.Send(SvSendType.Self, Channel.Unsequenced, ClPacket.GameMessage, "License Denied");
             player.RequestRemove(requester);
