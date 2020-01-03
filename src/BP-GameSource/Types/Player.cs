@@ -22,7 +22,7 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             message = message.CleanMessage();
-            Debug.Log(message);
+            Debug.Log(player.username + ':' + message);
 
             if (CommandHandler.OnEvent(player, message)) // 'true' if message starts with command prefix
             {
@@ -42,7 +42,7 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             message = message.CleanMessage();
-            Debug.Log(message);
+            Debug.Log(player.username + ':' + message);
 
             if (CommandHandler.OnEvent(player, message)) // 'true' if message starts with command prefix
             {
