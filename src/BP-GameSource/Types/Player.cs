@@ -390,12 +390,13 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
 
-                if (extra > 0)
+                // Remove everything except legal items currently worn
+                if (extra > 0 && 
+                    (myItem.item.illegal || 
+                    !(myItem.item is ShWearable w) || 
+                    player.curWearables[(int)w.type].index != w.index))
                 {
-                    if (!(myItem.item is ShWearable w) || w.illegal || player.curWearables[(int)w.type].index != w.index)
-                    {
-                        player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra, true);
-                    }
+                    player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra, true);
                 }
             }
         }
