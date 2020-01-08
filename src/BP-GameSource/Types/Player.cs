@@ -341,7 +341,7 @@ namespace BrokeProtocol.GameSource.Types
             svManager.SendToAll(
                 Channel.Unsequenced,
                 ClPacket.GameMessage,
-                $"{target.username} Kicked: {reason}");
+                $"{target.fullname} Kicked: {reason}");
 
             svManager.KickConnection(target.svPlayer.connection);
         }
@@ -352,7 +352,7 @@ namespace BrokeProtocol.GameSource.Types
             svManager.SendToAll(
                 Channel.Unsequenced,
                 ClPacket.GameMessage,
-                $"{target.username} Banned: {reason}");
+                $"{target.fullname} Banned: {reason}");
 
             target.svPlayer.PlayerData.Ban(reason);
             svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
