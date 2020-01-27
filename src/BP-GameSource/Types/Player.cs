@@ -184,7 +184,14 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnSellApartment)]
         protected void OnSellApartment(ShPlayer player, ShApartment apartment)
         {
-            if(player.ownedApartments.TryGetValue(apartment, out Place place))
+            if (!player.manager.svManager.trySell.OverLimit(player))
+            {
+                player.manager.svManager.trySell.Add(player);
+                player.svPlayer.SendGameMessage("Are you sure? Sell again to confirm..");
+                return;
+            }
+
+            if (player.ownedApartments.TryGetValue(apartment, out Place place))
             {
                 if (player.GetPlace() == place)
                 {
