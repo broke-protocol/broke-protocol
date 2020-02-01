@@ -56,7 +56,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDamage)]
         protected void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
-            if (player.IsDead() || player.IsShielded(damageIndex, collider))
+            if (player.IsDead || player.IsShielded(damageIndex, collider))
             {
                 return;
             }
@@ -79,7 +79,7 @@ namespace BrokeProtocol.GameSource.Types
 
             base.OnDamage(player, damageIndex, amount, attacker, collider);
 
-            if (player.IsDead())
+            if (player.IsDead)
             {
                 return;
             }
@@ -130,7 +130,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(
-                    player.GetPosition() + Vector3.up,
+                    player.GetPosition + Vector3.up,
                     Vector3.down,
                     out RaycastHit hit,
                     10f,
@@ -138,9 +138,9 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     ShEntity briefcase = player.manager.svManager.AddNewEntity(
                         player.manager.svManager.briefcasePrefabs.GetRandom(),
-                        player.GetPlace(),
+                        player.GetPlace,
                         hit.point,
-                        Quaternion.LookRotation(player.GetPositionT().forward, Vector3.up),
+                        Quaternion.LookRotation(player.GetPositionT.forward, Vector3.up),
                         false);
 
                     if (briefcase)
@@ -176,7 +176,7 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.Send(SvSendType.Self,
                 Channel.Reliable,
                 ClPacket.ShowTimer,
-                player.svPlayer.GetRespawnDelay());
+                player.svPlayer.RespawnTime);
 
             player.SetStance(StanceIndex.Dead, true);
         }
@@ -193,7 +193,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.ownedApartments.TryGetValue(apartment, out Place place))
             {
-                if (player.GetPlace() == place)
+                if (player.GetPlace == place)
                 {
                     player.svPlayer.SvEnterDoor(place.mainDoor.ID, player, true);
                 }

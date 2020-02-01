@@ -28,7 +28,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else
             {
-                movable.StartCoroutine(movable.DestroyDelay(movable.svMovable.GetRespawnDelay()));
+                movable.StartCoroutine(movable.DestroyDelay(movable.svMovable.RespawnTime));
             }
         }
 
@@ -39,13 +39,13 @@ namespace BrokeProtocol.GameSource.Types
             {
                 movable.svMovable.Despawn();
             }
-            else if (movable.IsDead())
+            else if (movable.IsDead)
             {
                 movable.svMovable.Send(SvSendType.Local, Channel.Reliable, ClPacket.Spawn,
                     movable.ID,
                     movable.originalPosition,
                     movable.originalRotation,
-                    movable.svMovable.GetOriginalParentIndex());
+                    movable.svMovable.GetOriginalParentIndex);
                 movable.Spawn(movable.originalPosition, movable.originalRotation, movable.originalParent);
             }
             else

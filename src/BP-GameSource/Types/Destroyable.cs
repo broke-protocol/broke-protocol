@@ -12,7 +12,7 @@ namespace BrokeProtocol.GameSource.Types
             // Store for usage in OnDeath
             destroyable.svDestroyable.lastAttacker = attacker;
 
-            if (destroyable.IsDead())
+            if (destroyable.IsDead)
             {
                 return;
             }
