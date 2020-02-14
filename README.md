@@ -1,9 +1,9 @@
 <p align="center">
-    <a href="http://brokeprotocol.com/">
+    <a href="https://brokeprotocol.com/">
         <img src="https://brokeprotocol.com/wp-content/uploads/Title.jpg" height="130" alt="Broke Protocol Website"></a>
 </p>
 <p align="center">
-    <a href="http://store.steampowered.com/app/696370/BROKE_PROTOCOL_Online_City_RPG/">
+    <a href="https://store.steampowered.com/app/696370/BROKE_PROTOCOL_Online_City_RPG/">
         <img src="https://img.shields.io/badge/Steam-$4.99USD-7289DA.svg" alt="Download the game"></a>
     <a href="https://github.com/broke-protocol/issues/issues">
         <img src="https://img.shields.io/badge/Post-Bugs and Suggestions-7289DA.svg" alt="Bugs and Suggestions"></a>
@@ -22,11 +22,11 @@ This repo is a collection of methods in BP which are moddable by replacing this 
 ### Installation
 1. Fork/Clone/Download repository.
 2. Open the just downloaded/cloned repository.
-3. Open the `src/BP-GameSource.sln` file using your favorite C# editor. (Suggested version is currently `VS IDE 2019`)
+3. Open the `BP-GameSource.sln` file using your favorite C# editor. (Suggested version is currently `VS IDE 2019`)
 4. Resolve references wherever needed. The `BrokeProtocol.*` namespace requires referencing Scripts.dll from the `BrokeProtocol_Data/Managed/` directory.
 5. Make changes where needed.
 6. Rebuild source code, and copy + replace the `.dll` from `YourServerFolder/Plugins/GameSource.dll` with your newly compiled dll.
 7. Done! When you run your server it will now invoke that dll.
 
 ### Exposed Methods
-Please check [this](https://github.com/broke-protocol/source/blob/master/src/BP-GameSource/Types/) directory for more info.
+Please check the [Offical API Reference](https://brokeprotocol.com/api/) for more info.
