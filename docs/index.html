@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Broke Protocol Documentation</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Official Broke Protocol modding documentation.">
+  <meta property="og:image" content="https://brokeprotocol.com/wp-content/uploads/LogoSmall.png">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="assets/style/themes/default.css" title="Simple" id="theme-id">
+  <link rel="stylesheet" href="assets/style/styles.css">
+  <script src="assets/js/themeSelector.js"></script>
+  <script src="assets/js/colSize.js"></script>
+
+  <link rel="apple-touch-icon" sizes="57x57" href="assets/img/favicon/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="assets/img/favicon/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="assets/img/favicon/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/img/favicon/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="assets/img/favicon/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="assets/img/favicon/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="assets/img/favicon/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/img/favicon/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="assets/img/favicon/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/img/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon/favicon-16x16.png">
+  <link rel="manifest" href="assets/img/favicon/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="assets/img/favicon/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+  <nav>
+    <a href="#" id="switch-theme">Switch Theme</a>
+    <a href="#" id="toggle-col">Toggle Columned Mode</a>
+  </nav>
+  <div id="app"></div>
+
+  <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
+  <script>
+    window.$docsify = {
+      name: 'Broke Protocol Documentation',
+      repo: 'https://github.com/broke-protocol/docs',
+      auto2top: true,
+      loadSidebar: true,
+      subMaxLevel: 10,
+      coverpage: true,
+      themeColor: '#F95738',
+      
+      plugins: [
+        EditOnGithubPlugin.create('https://github.com/broke-protocol/docs/blob/master/docs/')
+      ]
+    }
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.$themeSelector.loadStoredTheme();
+      window.$colSize.loadStoredMode();
+    })
+    document.getElementById('switch-theme').onclick = (e) => {
+      e.preventDefault();
+      window.$themeSelector.switchTheme();
+    }
+    document.getElementById('toggle-col').onclick = (e) => {
+      e.preventDefault();
+      window.$colSize.toggle();
+    }
+  </script>
+  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+  <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="//unpkg.com/docsify-copy-code"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-example-panels"></script>
+  <script src="//unpkg.com/prismjs/components/prism-csharp.min.js"></script>
+</body>
+</html>

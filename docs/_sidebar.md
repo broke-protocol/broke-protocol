@@ -1,0 +1,18 @@
+- [Homepage](/)
+- [Changelog](/BreakingChanges)
+- [API Reference](https://brokeprotocol.com/api/)
+- [Examples](/Examples/)
+  - Server
+    - [01: IScript And Plugin](/Examples/Server/01_IScript-And-Plugin)
+    - [02: Events](/Examples/Server/02_Events)
+    - [03: CommandHandler](/Examples/Server/03_CommandHandler)
+    - [04: AssetBundles](/Examples/Server/04_AssetBundles)
+    - [05: Group Manager](/Examples/Server/05_GroupManager)
+    - [06: Database](/Examples/Server/06_Database)
+
+  - Client
+    - [01: Getting Started](/Examples/Client/01_Getting-Started)
+    - [02: CEF](/Examples/Client/02_CEF)
+- [Events](/Events/)
+  - [Server](Events/Server/)
+  - [Client](/Events/Client/)
