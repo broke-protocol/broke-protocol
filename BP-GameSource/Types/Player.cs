@@ -330,11 +330,7 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             player.AddCrime(crime.index, witness);
-            player.svPlayer.Send(SvSendType.Self,
-                Channel.Reliable,
-                ClPacket.AddCrime,
-                crime.index,
-                witness ? witness.ID : 0);
+            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witness ? witness.ID : 0);
 
             if (player.job.info.groupIndex != GroupIndex.Criminal)
             {
@@ -345,10 +341,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnKick)]
         protected void OnKick(Managers.SvManager svManager, ShPlayer target, string reason)
         {
-            svManager.SendToAll(
-                Channel.Unsequenced,
-                ClPacket.GameMessage,
-                $"{target.fullname} Kicked: {reason}");
+            svManager.SendToAll(Channel.Unsequenced, ClPacket.GameMessage, $"{target.fullname} Kicked: {reason}");
 
             svManager.KickConnection(target.svPlayer.connection);
         }
@@ -356,10 +349,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnBan)]
         protected void OnBan(Managers.SvManager svManager, ShPlayer target, string reason)
         {
-            svManager.SendToAll(
-                Channel.Unsequenced,
-                ClPacket.GameMessage,
-                $"{target.fullname} Banned: {reason}");
+            svManager.SendToAll(Channel.Unsequenced, ClPacket.GameMessage, $"{target.fullname} Banned: {reason}");
 
             target.svPlayer.PlayerData.Ban(reason);
             svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
@@ -398,10 +388,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
 
                 // Remove everything except legal items currently worn
-                if (extra > 0 && 
-                    (myItem.item.illegal || 
-                    !(myItem.item is ShWearable w) || 
-                    player.curWearables[(int)w.type].index != w.index))
+                if (extra > 0 && (myItem.item.illegal || !(myItem.item is ShWearable w) || player.curWearables[(int)w.type].index != w.index))
                 {
                     player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra, true);
                 }
