@@ -214,6 +214,31 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
+        [Target(GameSourceEvent.PlayerInvite)]
+        protected void OnInvite(ShPlayer player, ShPlayer other)
+        {
+            if (other.isHuman && !other.IsDead && other.IsUp && other.IsOutside)
+            {
+                foreach (ShApartment apartment in player.ownedApartments.Keys)
+                {
+                    if (apartment.DistanceSqr(other) <= Util.inviteDistanceSqr)
+                    {
+                        other.svPlayer.SvEnterDoor(apartment.ID, player, true);
+                        return;
+                    }
+                }
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerKickOut)]
+        protected void OnKickOut(ShPlayer player, ShPlayer other)
+        {
+            if (other.isHuman && !other.IsDead && other.IsUp && player.InOwnApartment && other.GetPlace == player.GetPlace)
+            {
+                other.svPlayer.SvEnterDoor(other.GetPlace.mainDoor.ID, player, true);
+            }
+        }
+
         [Target(GameSourceEvent.PlayerRespawn)]
         protected void OnRespawn(ShPlayer player)
         {
