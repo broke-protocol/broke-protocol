@@ -1,16 +1,15 @@
 ﻿using System;
-using BrokeProtocol.API;
 
 namespace BrokeProtocol.GameSource
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false , Inherited = false)]
     public class TargetAttribute : Attribute
     {
-        public GameSourceEvent Event { get; }
+        public int EventID { get; }
 
-        public TargetAttribute(GameSourceEvent eventEnum)
+        public TargetAttribute(int eventID)
         {
-            Event = eventEnum;
+            EventID = eventID;
         }
     }
 }
