@@ -21,11 +21,6 @@ namespace BrokeProtocol.GameSource
 
         public List<object> Instances { get; } = new List<object>();
 
-        public Enum GetEnumType(Type enumType, int id)
-        {
-            return (Enum)Enum.ToObject(enumType, id);
-        }
-
         public void RegisterEvents()
         {
             var methods = GetType().Assembly.GetTypes()
@@ -44,9 +39,11 @@ namespace BrokeProtocol.GameSource
                     instance = Activator.CreateInstance(method.DeclaringType);
                     Instances.Add(instance);
                 }
-                var target = (TargetAttribute)method.GetCustomAttributes(typeof(TargetAttribute), false)[0];
+
+                var target = method.GetCustomAttribute<TargetAttribute>();
                 var types = method.GetParameters().Select(p => p.ParameterType);
-                GameSourceHandler.Add(GetEnumType(target.EnumType, target.Target),
+                GameSourceHandler.Add(
+                    (Enum)Enum.ToObject(target.EnumType, target.Target),
                     Delegate.CreateDelegate(Expression.GetActionType(types.ToArray()), instance, method.Name));
             }
         }

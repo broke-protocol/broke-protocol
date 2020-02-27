@@ -13,6 +13,22 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Player : Movable
     {
+        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnUpdate)]
+        protected void OnUpdate(ShPlayer player)
+        {
+            base.OnUpdate(player);
+        }
+
+        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnFixedUpdate)]
+        protected void OnFixedUpdate(ShPlayer player)
+        {
+            base.OnFixedUpdate(player);
+            if (player.IsUp)
+            {
+                player.SetBody();
+            }
+        }
+
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnGlobalChatMessage)]
         protected void OnGlobalChatMessage(ShPlayer player, string message)
         {
@@ -163,22 +179,29 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.ClearWitnessed();
 
-            foreach (PlayerEffect e in player.effects)
-            {
-                e.active = false;
-            }
+            player.DeactivateEffects();
 
             if (!player.isHuman)
             {
                 player.svPlayer.SetState(StateIndex.Null);
             }
 
-            player.svPlayer.Send(SvSendType.Self,
-                Channel.Reliable,
-                ClPacket.ShowTimer,
-                player.svPlayer.RespawnTime);
+            player.svPlayer.Send(SvSendType.Self,Channel.Reliable, ClPacket.ShowTimer, player.svPlayer.RespawnTime);
 
             player.SetStance(StanceIndex.Dead, true);
+        }
+
+        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnBuyApartment)]
+        protected void OnBuyApartment(ShPlayer player, ShApartment apartment)
+        {
+            if (player.ownedApartments.ContainsKey(apartment))
+            {
+                player.svPlayer.SendGameMessage("Already owned");
+            }
+            else if (apartment.svApartment.BuyEntity(player))
+            {
+                apartment.svApartment.SvSetApartmentOwner(player);
+            }
         }
 
         [Target(typeof(API.Events.Player), (int)API.Events.Player.OnSellApartment)]
