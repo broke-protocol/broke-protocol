@@ -8,18 +8,6 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Movable : Destroyable
     {
-        [Target(GameSourceEvent.MovableUpdate)]
-        protected void OnUpdate(ShMovable movable)
-        {
-            base.OnUpdate(movable);
-        }
-
-        [Target(GameSourceEvent.MovableFixedUpdate)]
-        protected void OnFixedUpdate(ShMovable movable)
-        {
-            base.OnFixedUpdate(movable);
-        }
-
         [Target(GameSourceEvent.MovableDamage)]
         protected void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {

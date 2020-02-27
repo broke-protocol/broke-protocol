@@ -7,18 +7,6 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Destroyable : Entity
     {
-        [Target(GameSourceEvent.DestroyableUpdate)]
-        protected void OnUpdate(ShDestroyable destroyable)
-        {
-            base.OnUpdate(destroyable);
-        }
-
-        [Target(GameSourceEvent.DestroyableFixedUpdate)]
-        protected void OnFixedUpdate(ShDestroyable destroyable)
-        {
-            base.OnFixedUpdate(destroyable);
-        }
-
         [Target(GameSourceEvent.DestroyableDamage)]
         protected void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
@@ -36,11 +24,6 @@ namespace BrokeProtocol.GameSource.Types
             {
                 destroyable.ShDie();
             }
-        }
-
-        [Target(GameSourceEvent.DestroyableDeath)]
-        protected void OnDeath(ShDestroyable destroyable)
-        {
         }
     }
 }

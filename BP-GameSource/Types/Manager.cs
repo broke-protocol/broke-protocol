@@ -10,11 +10,6 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Manager
     {
-        [Target(GameSourceEvent.Started)]
-        protected void OnStarted(SvManager svManager)
-        {
-        }
-
         private bool ValidateUser(SvManager svManager, AuthData authData)
         {
             if (!svManager.HandleWhitelist(authData.accountID))
@@ -36,7 +31,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Target(GameSourceEvent.TryLogin)]
+        [Target(GameSourceEvent.ManagerTryLogin)]
         protected void OnTryLogin(SvManager svManager, AuthData authData, ConnectData connectData)
         {
             if (ValidateUser(svManager, authData))
@@ -63,7 +58,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(GameSourceEvent.TryRegister)]
+        [Target(GameSourceEvent.ManagerTryRegister)]
         protected void OnTryRegister(SvManager svManager, AuthData authData, ConnectData connectData)
         {
             if (ValidateUser(svManager, authData))

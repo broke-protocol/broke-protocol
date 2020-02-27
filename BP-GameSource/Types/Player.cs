@@ -13,22 +13,6 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Player : Movable
     {
-        [Target(GameSourceEvent.PlayerUpdate)]
-        protected void OnUpdate(ShPlayer player)
-        {
-            base.OnUpdate(player);
-        }
-
-        [Target(GameSourceEvent.PlayerFixedUpdate)]
-        protected void OnFixedUpdate(ShPlayer player)
-        {
-            base.OnFixedUpdate(player);
-            if (player.IsUp)
-            {
-                player.SetBody();
-            }
-        }
-
         [Target(GameSourceEvent.PlayerGlobalChatMessage)]
         protected void OnGlobalChatMessage(ShPlayer player, string message)
         {
@@ -376,16 +360,6 @@ namespace BrokeProtocol.GameSource.Types
 
             target.svPlayer.PlayerData.Ban(reason);
             svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
-        }
-
-        [Target(GameSourceEvent.PlayerAddItem)]
-        protected void OnAddItem(ShPlayer player, int itemIndex, int amount, bool dispatch)
-        {
-        }
-
-        [Target(GameSourceEvent.PlayerRemoveItem)]
-        protected void OnRemoveItem(ShPlayer player, int itemIndex, int amount, bool dispatch)
-        {
         }
 
         [Target(GameSourceEvent.PlayerRemoveItemsDeath)]
