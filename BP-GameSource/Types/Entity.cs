@@ -1,25 +1,26 @@
 ﻿using BrokeProtocol.Entities;
+using BrokeProtocol.API;
 
 namespace BrokeProtocol.GameSource.Types
 {
     public class Entity
     {
-        [Target(typeof(API.Events.Entity), (int)API.Events.Entity.OnUpdate)]
+        [Target(GameSourceEvent.EntityUpdate)]
         protected void OnUpdate(ShEntity entity)
         {
         }
 
-        [Target(typeof(API.Events.Entity), (int)API.Events.Entity.OnFixedUpdate)]
+        [Target(GameSourceEvent.EntityFixedUpdate)]
         protected void OnFixedUpdate(ShEntity entity)
         {
         }
 
-        [Target(typeof(API.Events.Entity), (int)API.Events.Entity.OnAddItem)]
+        [Target(GameSourceEvent.EntityAddItem)]
         protected void OnAddItem(ShEntity entity, int itemIndex, int amount, bool dispatch)
         {
         }
 
-        [Target(typeof(API.Events.Entity), (int)API.Events.Entity.OnRemoveItem)]
+        [Target(GameSourceEvent.EntityRemoveItem)]
         protected void OnRemoveItem(ShEntity entity, int itemIndex, int amount, bool dispatch)
         {
         }

@@ -13,13 +13,13 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Player : Movable
     {
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnUpdate)]
+        [Target(GameSourceEvent.PlayerUpdate)]
         protected void OnUpdate(ShPlayer player)
         {
             base.OnUpdate(player);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnFixedUpdate)]
+        [Target(GameSourceEvent.PlayerFixedUpdate)]
         protected void OnFixedUpdate(ShPlayer player)
         {
             base.OnFixedUpdate(player);
@@ -29,7 +29,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnGlobalChatMessage)]
+        [Target(GameSourceEvent.PlayerGlobalChatMessage)]
         protected void OnGlobalChatMessage(ShPlayer player, string message)
         {
             if (player.manager.svManager.chatted.OverLimit(player))
@@ -49,7 +49,7 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GlobalChatMessage, player.ID, message);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnLocalChatMessage)]
+        [Target(GameSourceEvent.PlayerLocalChatMessage)]
         protected void OnLocalChatMessage(ShPlayer player, string message)
         {
             if (player.manager.svManager.chatted.OverLimit(player))
@@ -69,7 +69,7 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Unsequenced, ClPacket.LocalChatMessage, player.ID, message);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDamage)]
+        [Target(GameSourceEvent.PlayerDamage)]
         protected void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
             if (player.IsDead || player.IsShielded(damageIndex, collider))
@@ -137,7 +137,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDeath)]
+        [Target(GameSourceEvent.PlayerDeath)]
         protected void OnDeath(ShPlayer player)
         {
             if (player.svPlayer.lastAttacker && player.svPlayer.lastAttacker != player)
@@ -191,7 +191,7 @@ namespace BrokeProtocol.GameSource.Types
             player.SetStance(StanceIndex.Dead, true);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnBuyApartment)]
+        [Target(GameSourceEvent.PlayerBuyApartment)]
         protected void OnBuyApartment(ShPlayer player, ShApartment apartment)
         {
             if (player.ownedApartments.ContainsKey(apartment))
@@ -204,7 +204,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnSellApartment)]
+        [Target(GameSourceEvent.PlayerSellApartment)]
         protected void OnSellApartment(ShPlayer player, ShApartment apartment)
         {
             if (!player.manager.svManager.trySell.OverLimit(player))
@@ -230,7 +230,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRespawn)]
+        [Target(GameSourceEvent.PlayerRespawn)]
         protected void OnRespawn(ShPlayer player)
         {
             if (player.isHuman)
@@ -244,7 +244,7 @@ namespace BrokeProtocol.GameSource.Types
             base.OnRespawn(player);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnReward)]
+        [Target(GameSourceEvent.PlayerReward)]
         protected void OnReward(ShPlayer player, int experienceDelta, int moneyDelta)
         {
             if (!player.isHuman || player.job.info.rankItems.Length <= 1)
@@ -301,7 +301,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnAcceptRequest)]
+        [Target(GameSourceEvent.PlayerAcceptRequest)]
         protected void OnAcceptRequest(ShPlayer player, ShPlayer requester)
         {
             var requestItem = player.RequestGet(requester);
@@ -323,7 +323,7 @@ namespace BrokeProtocol.GameSource.Types
             player.RequestRemove(requester);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnDenyRequest)]
+        [Target(GameSourceEvent.PlayerDenyRequest)]
         protected void OnDenyRequest(ShPlayer player, ShPlayer requester)
         {
             var requestItem = player.RequestGet(requester);
@@ -337,7 +337,7 @@ namespace BrokeProtocol.GameSource.Types
             player.RequestRemove(requester);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnCrime)]
+        [Target(GameSourceEvent.PlayerCrime)]
         protected void OnCrime(ShPlayer player, byte crimeIndex, ShPlayer victim)
         {
             if (player.svPlayer.InvalidCrime(crimeIndex))
@@ -361,7 +361,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnKick)]
+        [Target(GameSourceEvent.PlayerKick)]
         protected void OnKick(Managers.SvManager svManager, ShPlayer target, string reason)
         {
             svManager.SendToAll(Channel.Unsequenced, ClPacket.GameMessage, $"{target.fullname} Kicked: {reason}");
@@ -369,7 +369,7 @@ namespace BrokeProtocol.GameSource.Types
             svManager.KickConnection(target.svPlayer.connection);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnBan)]
+        [Target(GameSourceEvent.PlayerBan)]
         protected void OnBan(Managers.SvManager svManager, ShPlayer target, string reason)
         {
             svManager.SendToAll(Channel.Unsequenced, ClPacket.GameMessage, $"{target.fullname} Banned: {reason}");
@@ -378,17 +378,17 @@ namespace BrokeProtocol.GameSource.Types
             svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnAddItem)]
+        [Target(GameSourceEvent.PlayerAddItem)]
         protected void OnAddItem(ShPlayer player, int itemIndex, int amount, bool dispatch)
         {
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRemoveItem)]
+        [Target(GameSourceEvent.PlayerRemoveItem)]
         protected void OnRemoveItem(ShPlayer player, int itemIndex, int amount, bool dispatch)
         {
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRemoveItemsDeath)]
+        [Target(GameSourceEvent.PlayerRemoveItemsDeath)]
         protected void OnRemoveItemsDeath(ShPlayer player)
         {
             // Allows players to keep items/rewards from job ranks
@@ -418,7 +418,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Player), (int)API.Events.Player.OnRemoveItemsJail)]
+        [Target(GameSourceEvent.PlayerRemoveItemsJail)]
         protected void OnRemoveItemsJail(ShPlayer player)
         {
             foreach (InventoryItem i in player.myItems.Values.ToArray())

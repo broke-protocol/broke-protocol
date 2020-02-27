@@ -1,4 +1,5 @@
-﻿using BrokeProtocol.Entities;
+﻿using BrokeProtocol.API;
+using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility.Networking;
 using UnityEngine;
@@ -7,19 +8,19 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Movable : Destroyable
     {
-        [Target(typeof(API.Events.Movable), (int)API.Events.Movable.OnUpdate)]
+        [Target(GameSourceEvent.MovableUpdate)]
         protected void OnUpdate(ShMovable movable)
         {
             base.OnUpdate(movable);
         }
 
-        [Target(typeof(API.Events.Movable), (int)API.Events.Movable.OnFixedUpdate)]
+        [Target(GameSourceEvent.MovableFixedUpdate)]
         protected void OnFixedUpdate(ShMovable movable)
         {
             base.OnFixedUpdate(movable);
         }
 
-        [Target(typeof(API.Events.Movable), (int)API.Events.Movable.OnDamage)]
+        [Target(GameSourceEvent.MovableDamage)]
         protected void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
             base.OnDamage(movable, damageIndex, amount, attacker, collider);
@@ -31,7 +32,7 @@ namespace BrokeProtocol.GameSource.Types
                 movable.health);
         }
 
-        [Target(typeof(API.Events.Movable), (int)API.Events.Movable.OnDeath)]
+        [Target(GameSourceEvent.MovableDeath)]
         protected void OnDeath(ShMovable movable)
         {
             if (movable.svMovable.respawnable)
@@ -44,7 +45,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Movable), (int)API.Events.Movable.OnRespawn)]
+        [Target(GameSourceEvent.MovableRespawn)]
         protected void OnRespawn(ShMovable movable)
         {
             if (movable.svMovable.randomSpawn)

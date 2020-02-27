@@ -42,9 +42,7 @@ namespace BrokeProtocol.GameSource
 
                 var target = method.GetCustomAttribute<TargetAttribute>();
                 var types = method.GetParameters().Select(p => p.ParameterType);
-                GameSourceHandler.Add(
-                    (Enum)Enum.ToObject(target.EnumType, target.Target),
-                    Delegate.CreateDelegate(Expression.GetActionType(types.ToArray()), instance, method.Name));
+                GameSourceHandler.Add(target.Event, Delegate.CreateDelegate(Expression.GetActionType(types.ToArray()), instance, method.Name));
             }
         }
     }

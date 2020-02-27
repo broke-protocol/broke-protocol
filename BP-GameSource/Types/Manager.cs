@@ -3,13 +3,14 @@ using BrokeProtocol.Utility;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Collections;
+using BrokeProtocol.API;
 
 
 namespace BrokeProtocol.GameSource.Types
 {
     public class Manager
     {
-        [Target(typeof(API.Events.Manager), (int)API.Events.Manager.OnStarted)]
+        [Target(GameSourceEvent.Started)]
         protected void OnStarted(SvManager svManager)
         {
         }
@@ -35,7 +36,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Target(typeof(API.Events.Manager), (int)API.Events.Manager.OnTryLogin)]
+        [Target(GameSourceEvent.TryLogin)]
         protected void OnTryLogin(SvManager svManager, AuthData authData, ConnectData connectData)
         {
             if (ValidateUser(svManager, authData))
@@ -62,7 +63,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Manager), (int)API.Events.Manager.OnTryRegister)]
+        [Target(GameSourceEvent.TryRegister)]
         protected void OnTryRegister(SvManager svManager, AuthData authData, ConnectData connectData)
         {
             if (ValidateUser(svManager, authData))

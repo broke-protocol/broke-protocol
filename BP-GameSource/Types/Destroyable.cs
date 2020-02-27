@@ -1,24 +1,25 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
+using BrokeProtocol.API;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
     public class Destroyable : Entity
     {
-        [Target(typeof(API.Events.Destroyable), (int)API.Events.Destroyable.OnUpdate)]
+        [Target(GameSourceEvent.DestroyableUpdate)]
         protected void OnUpdate(ShDestroyable destroyable)
         {
             base.OnUpdate(destroyable);
         }
 
-        [Target(typeof(API.Events.Destroyable), (int)API.Events.Destroyable.OnFixedUpdate)]
+        [Target(GameSourceEvent.DestroyableFixedUpdate)]
         protected void OnFixedUpdate(ShDestroyable destroyable)
         {
             base.OnFixedUpdate(destroyable);
         }
 
-        [Target(typeof(API.Events.Destroyable), (int)API.Events.Destroyable.OnDamage)]
+        [Target(GameSourceEvent.DestroyableDamage)]
         protected void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
             // Store for usage in OnDeath
@@ -37,7 +38,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(typeof(API.Events.Destroyable), (int)API.Events.Destroyable.OnDeath)]
+        [Target(GameSourceEvent.DestroyableDeath)]
         protected void OnDeath(ShDestroyable destroyable)
         {
         }
