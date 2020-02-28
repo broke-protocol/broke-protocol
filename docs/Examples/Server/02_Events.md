@@ -30,9 +30,13 @@ public void OnExampleEvent()
 
 ## Invoking custom events
 ```csharp
-EventsHandler.Call(key, arguments);
+EventsHandler.Exec(key, arguments);
 ```
 Yup. that's all.
+```csharp
+ReturnType returnValue = EventsHandler.Get<ReturnType>(key, arguments);
+```
+This if you need a return value from the function.
 ```csharp
 EventsHandler.Add("ExampleEvent", new Func<string, bool>(OnExampleEvent));
 
@@ -44,13 +48,13 @@ public bool OnExampleEvent(string test)
 
 
 // ... somewhere else
-EventsHandler.Call("ExampleEvent", "UserR00T"); // object[] with the return values of all event subscribers
+EventsHandler.Exec("ExampleEvent", "UserR00T"); // object[] with the return values of all event subscribers
 ```
 
 ## Subscribing to a game event
 Subscribing to a game event is almost the same as registering a custom one. You need to grab the value from the ``BrokeProtocol.API.Events`` namespace, and use `GameSourceHandler`.
 ```csharp
-GameSourceHandler.Add(Events.GlobalChatMessage, new Action<ShPlayer, string>(OnGlobalChatMessage));
+GameSourceHandler.Add(GameSourceEvents.PlayerGlobalChatMessage, new Action<ShPlayer, string>(OnGlobalChatMessage));
 
 public void OnGlobalChatMessage(ShPlayer player, string message)
 {
