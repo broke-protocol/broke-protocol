@@ -65,7 +65,7 @@ namespace ExampleNamespace
   {
     public ExampleClass()
     {
-      GameSourceHandler.Add(BrokeProtocol.API.Events.Player.OnIntialize, new Action<ShPlayer>(OnEvent));
+      GameSourceHandler.Add(GameSourceEvents.PlayerIntialize, new Action<ShPlayer>(OnEvent));
     }
     
     public void OnEvent(ShPlayer player)
@@ -107,7 +107,7 @@ namespace ExampleNamespace
       {
         Instance = this;
       }
-      GameSourceHandler.Add(BrokeProtocol.API.Events.Player.OnIntialize, new Action<ShPlayer>(OnEvent));
+      GameSourceHandler.Add(GameSourceEvents.PlayerIntialize, new Action<ShPlayer>(OnEvent));
     }
     
     public void OnEvent(ShPlayer player)
@@ -139,7 +139,7 @@ namespace ExampleNamespace
   {
     public ExampleClass()
     {
-      GameSourceHandler.Add(BrokeProtocol.API.Events.Player.OnIntialize, new Action<ShPlayer>(OnEvent));
+      GameSourceHandler.Add(GameSourceEvents.PlayerIntialize, new Action<ShPlayer>(OnEvent));
     }
     
     public void OnEvent(ShPlayer player)
@@ -176,15 +176,9 @@ public class Core : Plugin // Notice the Plugin here
 }
 ```
 
-This will be invoked at runtime. The following constructors are available:
+This will be invoked at runtime with the following constructor:
 ```csharp
 public PluginInfo(string name, string groupNamespace)
-```
-```csharp
-public PluginInfo(string name, string groupNamespace, PluginAuthor author) : this(name, groupNamespace)
-```
-```csharp
-public PluginInfo(string name, string groupNamespace, List<PluginAuthor> authors) : this(name, groupNamespace)
 ```
 
 `Name` is pretty straightforward. This is the `Plugin` name.
@@ -200,7 +194,7 @@ public Core()
     Info = new PluginInfo("ExamplePlugin", "eq")
     {
         Description = "A descrption for the plugin. This is optional, but recommended",
-        Git = "https://github.com/a-github-or-equivalent-link"
+        Website = "https://github.com/a-github-or-equivalent-link"
     };
     RegisterEvents();
 }
@@ -210,16 +204,13 @@ Now at the time of writing, we got a few more properties available at your dispo
 ```csharp
 string Name
 string GroupNamespace
-string TargetVersion 
 string Description
-string Website
 string Git
-List<PluginAuthor> Authors
 ```
 
-All but `TargetVersion` are not directly used by the API. The `TargetVersion` is used to set the target version of the **game**, so when that doesn't match it won't load in the plugin.
+Note that `GroupNamespace` is used for permissions. Any events here will use `GroupNamespace` as your prefix for permissions in the `groups.json` file. See the [Group Manager Docs](/Examples/Server/05_GroupManager#permissions) for more info.
 
-There is also a `ToString` override which outputs `Name: Description` or `Name` if `Description` is null.
+There is also a `ToString` override which outputs `Name`.
 
 ---
 
