@@ -87,5 +87,16 @@ namespace BrokeProtocol.GameSource.Types
                 svManager.AddNewPlayer(authData, connectData);
             }
         }
+
+        [Target(GameSourceEvent.ManagerSave)]
+        protected void OnSave(SvManager svManager)
+        {
+            ChatHandler.SendToAll("Saving server status..");
+            foreach (ShPlayer player in EntityCollections.Humans)
+            {
+                player.svPlayer.Save();
+            }
+            svManager.database.WriteOut();
+        }
     }
 }

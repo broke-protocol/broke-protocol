@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
+using BrokeProtocol.Managers;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;
@@ -93,7 +94,7 @@ namespace BrokeProtocol.GameSource.Types
                     player.svPlayer.SvForceStance(StanceIndex.KnockedOut);
                     // If knockout AI, set AI state Null
                 }
-                else if (Random.value < player.manager.damageTypes[(int)damageIndex].fallChance)
+                else if (UnityEngine.Random.value < player.manager.damageTypes[(int)damageIndex].fallChance)
                 {
                     player.StartCoroutine(player.svPlayer.KnockedDown());
                 }
@@ -147,11 +148,11 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         foreach (KeyValuePair<int, InventoryItem> pair in player.myItems)
                         {
-                            if (Random.value < 0.8f)
+                            if (UnityEngine.Random.value < 0.8f)
                             {
                                 InventoryItem i = new InventoryItem(
                                     pair.Value.item,
-                                    Mathf.CeilToInt(pair.Value.count * Random.Range(0.05f, 0.3f)));
+                                    Mathf.CeilToInt(pair.Value.count * UnityEngine.Random.Range(0.05f, 0.3f)));
                                 briefcase.myItems.Add(pair.Key, i);
                             }
                         }
@@ -249,8 +250,6 @@ namespace BrokeProtocol.GameSource.Types
                 player.originalRotation = newSpawn.rotation;
                 player.originalParent = newSpawn.parent;
             }
-
-            base.OnRespawn(player);
         }
 
         [Target(GameSourceEvent.PlayerReward)]
@@ -371,16 +370,20 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerKick)]
-        protected void OnKick(Managers.SvManager svManager, ShPlayer target, string reason)
+        protected void OnKick(ShPlayer player, ShPlayer target, string reason)
         {
+            SvManager svManager = player.manager.svManager;
+
             svManager.SendToAll(Channel.Unsequenced, ClPacket.GameMessage, $"{target.fullname} Kicked: {reason}");
 
             svManager.KickConnection(target.svPlayer.connection);
         }
 
         [Target(GameSourceEvent.PlayerBan)]
-        protected void OnBan(Managers.SvManager svManager, ShPlayer target, string reason)
+        protected void OnBan(ShPlayer player, ShPlayer target, string reason)
         {
+            SvManager svManager = player.manager.svManager;
+
             svManager.SendToAll(Channel.Unsequenced, ClPacket.GameMessage, $"{target.fullname} Banned: {reason}");
 
             target.svPlayer.PlayerData.Ban(reason);
