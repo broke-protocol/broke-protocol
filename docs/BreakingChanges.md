@@ -4,6 +4,22 @@
 `A` = Added  
 `R` = Removed  
 
+## 1.04
+!> Breaking change!
+
+?> Important Update: This version allows AssetBundle mods to work on any platform. Also, CEF can be enabled on both Steam and Classic auth.
+
+- (A) SvPlayer.platform
+- (C) EventHandler.Call -> EventHandler.Exec(), EventHandler.Get(), EventHandler.Get<>()
+- (R) BrokeProtocol.API.Events.General
+- (R) BrokeProtocol.API.Events.Manager
+- (R) BrokeProtocol.API.Events.Entity
+- (R) BrokeProtocol.API.Events.Movable
+- (R) BrokeProtocol.API.Events.Destroyable
+- (R) BrokeProtocol.API.Events.Player
+- (R) BrokeProtocol.API.Events.General
+- (A) BrokeProtocol.API.GameSourceEvents
+
 ## 1.03
 !> Breaking change!
 
