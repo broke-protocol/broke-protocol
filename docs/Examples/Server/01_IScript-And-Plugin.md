@@ -183,7 +183,8 @@ public PluginInfo(string name, string groupNamespace)
 
 `Name` is pretty straightforward. This is the `Plugin` name.
 `GroupNamespace` is used within the `GroupManager`. This will be explained in depth in another example.
-`Authors` is a list of plugin authors. You can set the author name and author function here.
+Please note that the dlls you place in the `Plugins` directory will be loaded in order by filename. Not the PluginInfo name here.
+Only one subscriber per event is allowed to prevent conflicting plugins and simpler return values, so authors must tune their plugin loading order with care.
 
 Normally the class that implements the `Plugin` class is named `Core`. **This is not an requirement**. This just makes it clearer to understand for other users reading your codebase.
 
@@ -205,7 +206,7 @@ Now at the time of writing, we got a few more properties available at your dispo
 string Name
 string GroupNamespace
 string Description
-string Git
+string Website
 ```
 
 Note that `GroupNamespace` is used for permissions. Any events here will use `GroupNamespace` as your prefix for permissions in the `groups.json` file. See the [Group Manager Docs](/Examples/Server/05_GroupManager#permissions) for more info.
