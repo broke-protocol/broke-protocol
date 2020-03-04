@@ -9,7 +9,7 @@ namespace BrokeProtocol.GameSource.Types
     public class Movable : Destroyable
     {
         [Target(GameSourceEvent.MovableDamage, ExecutionMode.Override)]
-        protected void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
+        public void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
         {
             base.OnDamage(movable, damageIndex, amount, attacker, collider);
 
@@ -21,7 +21,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.MovableDeath, ExecutionMode.Override)]
-        protected void OnDeath(ShMovable movable)
+        public void OnDeath(ShMovable movable)
         {
             if (movable.svMovable.respawnable)
             {
@@ -34,7 +34,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.MovableRespawn, ExecutionMode.Override)]
-        protected void OnRespawn(ShMovable movable)
+        public void OnRespawn(ShMovable movable)
         {
             if (movable.svMovable.randomSpawn)
             {
