@@ -32,7 +32,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
-        protected void OnTryLogin(SvManager svManager, AuthData authData, ConnectData connectData)
+        public void OnTryLogin(SvManager svManager, AuthData authData, ConnectData connectData)
         {
             if (ValidateUser(svManager, authData))
             {
@@ -59,7 +59,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.ManagerTryRegister, ExecutionMode.Override)]
-        protected void OnTryRegister(SvManager svManager, AuthData authData, ConnectData connectData)
+        public void OnTryRegister(SvManager svManager, AuthData authData, ConnectData connectData)
         {
             if (ValidateUser(svManager, authData))
             {
@@ -89,7 +89,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
-        protected void OnSave(SvManager svManager)
+        public void OnSave(SvManager svManager)
         {
             ChatHandler.SendToAll("Saving server status..");
             foreach (ShPlayer player in EntityCollections.Humans)
