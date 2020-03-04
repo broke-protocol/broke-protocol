@@ -7,7 +7,7 @@
     <ProjectGuid>{C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>BrokeProtocol.GameSource</RootNamespace>
-    <AssemblyName>GameSource</AssemblyName>
+    <AssemblyName>zGameSource</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -64,12 +64,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core.cs" />
-    <Compile Include="TargetAttribute.cs" />
+    <Compile Include="ExampleCommand.cs" />
     <Compile Include="Types\Entity.cs" />
     <Compile Include="Types\Manager.cs" />
     <Compile Include="Types\Destroyable.cs" />
     <Compile Include="Types\Movable.cs" />
-    <Compile Include="Types\CustomEvents.cs" />
+    <Compile Include="CustomEvents.cs" />
     <Compile Include="Types\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
