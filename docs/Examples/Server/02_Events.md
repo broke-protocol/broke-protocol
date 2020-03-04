@@ -70,6 +70,7 @@ protected void OnSave(SvManager svManager)
 ```
 
 ``ExecutionMode.Event`` -> Means other subscribers to this event will be called
+
 ``ExecutionMode.Override`` -> Means any further registered subscribers to this event will not be called
 
 ```csharp
