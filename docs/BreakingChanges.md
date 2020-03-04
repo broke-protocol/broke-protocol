@@ -9,6 +9,7 @@
 
 ?> Important Update: This version allows AssetBundle mods to work on any platform. Also, CEF can be enabled on both Steam and Classic auth.
 
+- (C) https://broke-protocol.github.io/broke-protocol/#/Examples/Server/02_Events?id=subscribing-to-a-game-event
 - (A) SvPlayer.platform
 - (C) EventHandler.Call -> EventHandler.Exec(), EventHandler.Get(), EventHandler.Get<>()
 - (R) BrokeProtocol.API.Events.General
