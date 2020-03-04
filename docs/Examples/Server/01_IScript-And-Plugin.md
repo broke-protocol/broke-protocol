@@ -65,12 +65,12 @@ namespace ExampleNamespace
   {
     public ExampleClass()
     {
-      GameSourceHandler.Add(GameSourceEvents.PlayerIntialize, new Action<ShPlayer>(OnEvent));
+      EventsHandler.Add("WelcomeMessage", new Action<ShPlayer>(OnEvent));
     }
     
     public void OnEvent(ShPlayer player)
     {
-      player.SendChatMessage("Welcome to the server!");
+      player.svPlayer.SendGameMessage("Welcome to the server!");
     }
   }
 }
@@ -107,12 +107,12 @@ namespace ExampleNamespace
       {
         Instance = this;
       }
-      GameSourceHandler.Add(GameSourceEvents.PlayerIntialize, new Action<ShPlayer>(OnEvent));
+      EventsHandler.Add("WelcomeMessage", new Action<ShPlayer>(OnEvent));
     }
     
     public void OnEvent(ShPlayer player)
     {
-      player.SendChatMessage("Welcome to the server!");
+      player.svPlayer.SendGameMessage("Welcome to the server!");
     }
   }
 }
@@ -139,12 +139,12 @@ namespace ExampleNamespace
   {
     public ExampleClass()
     {
-      GameSourceHandler.Add(GameSourceEvents.PlayerIntialize, new Action<ShPlayer>(OnEvent));
+      EventsHandler.Add("WelcomeMessage", new Action<ShPlayer>(OnEvent));
     }
     
     public void OnEvent(ShPlayer player)
     {
-      player.SendChatMessage("Welcome to the server!");
+      player.svPlayer.SendGameMessage("Welcome to the server!");
     }
   }
 }
