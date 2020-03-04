@@ -52,10 +52,28 @@ EventsHandler.Exec("ExampleEvent", "UserR00T"); // object[] with the return valu
 ```
 
 ## Subscribing to a game event
-Subscribing to a game event is almost the same as registering a custom one. You need to grab the value from the ``BrokeProtocol.API.Events`` namespace, and use `GameSourceHandler`.
-```csharp
-GameSourceHandler.Add(GameSourceEvents.PlayerGlobalChatMessage, new Action<ShPlayer, string>(OnGlobalChatMessage));
+Subscribing to a game event is quite different. Any method with a ``Target`` Attribute will be automatically added to the chain of subscribers to the event. No need to call any Add function for the event.
 
+Events are listed in ``BrokeProtocol.API.GameSourceEvents`` and the ``Target`` Attribute must have the EventID and ExecutionMode as arguments as such:
+
+```csharp
+[Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
+protected void OnSave(SvManager svManager)
+{
+    ChatHandler.SendToAll("Saving server status..");
+    foreach (ShPlayer player in EntityCollections.Humans)
+    {
+        player.svPlayer.Save();
+    }
+    svManager.database.WriteOut();
+}
+```
+
+``ExecutionMode.Event`` -> Means other subscribers to this event will be called
+``ExecutionMode.Override`` -> Means any further registered subscribers to this event will not be called
+
+```csharp
+[Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Event)]
 public void OnGlobalChatMessage(ShPlayer player, string message)
 {
   if (player.health <= 20f) 
@@ -64,5 +82,3 @@ public void OnGlobalChatMessage(ShPlayer player, string message)
   }
 }
 ```
-
-!> You cannot block execution of the event by changing it to a `Func`. If you need to do that take a look at the GameSource, and modify that.
