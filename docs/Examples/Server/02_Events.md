@@ -56,7 +56,22 @@ Subscribing to a game event is quite different. Any method with a ``Target`` Att
 
 Events are listed in ``BrokeProtocol.API.GameSourceEvents`` and the ``Target`` Attribute must have the EventID and ExecutionMode as arguments as such:
 
+``[Target(GameSourceEvent.Example, ExecutionMode.Event)]`` -> Means other subscribers to this event will be called
+
+``[Target(GameSourceEvent.Example, ExecutionMode.Override)]`` -> Means any further registered subscribers to this event will not be called
+
 ```csharp
+// Any other plugins targeting PlayerGlobalChatMessage will be executed
+[Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Event)]
+public void OnGlobalChatMessage(ShPlayer player, string message)
+{
+  if (player.health <= 20f) 
+  {
+    player.SendChatMessage("No chit chat, you're low on health!");
+  }
+}
+
+// ExecutionMode.Override -> This is the final stop - Any plugins loaded after (including zGameSource.dll) won't be executed
 [Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
 protected void OnSave(SvManager svManager)
 {
@@ -66,20 +81,5 @@ protected void OnSave(SvManager svManager)
         player.svPlayer.Save();
     }
     svManager.database.WriteOut();
-}
-```
-
-``ExecutionMode.Event`` -> Means other subscribers to this event will be called
-
-``ExecutionMode.Override`` -> Means any further registered subscribers to this event will not be called
-
-```csharp
-[Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Event)]
-public void OnGlobalChatMessage(ShPlayer player, string message)
-{
-  if (player.health <= 20f) 
-  {
-    player.SendChatMessage("No chit chat, you're low on health!");
-  }
 }
 ```
