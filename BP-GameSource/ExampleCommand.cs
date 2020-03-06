@@ -20,7 +20,9 @@ namespace BrokeProtocol.CustomEvents
             });
         }
 
-        public void OnCommandInvoke(ShPlayer player, ShPlayer target, string string1, string string2, byte byte1, int int1, float float1)
+
+        // Any optional parameters here will be optional with in-game commands too
+        public void OnCommandInvoke(ShPlayer player, ShPlayer target, string string1 = "default1", string string2 = "default2", byte byte1 = 1, int int1 = 2, float float1 = 3f)
         {
             player.svPlayer.SendGameMessage($"'{target.username}' '{string1}' '{string2}' '{byte1}' '{int1}' '{float1}'");
         }

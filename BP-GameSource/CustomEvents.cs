@@ -6,6 +6,7 @@ namespace BrokeProtocol.CustomEvents
 {
     public class CustomEvents : IScript
     {
+        // Can be called either via an in-game Trigger map object or CEF/JavaScript events
         [CustomTarget]
         public void AreaWarning(ShPlayer player, string triggerID)
         {
