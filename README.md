@@ -12,7 +12,7 @@
     <a href="https://discord.gg/WpdNCDw">
         <img src="https://discordapp.com/api/guilds/312436123278376961/embed.png" alt="Chat on Discord"></a>
     <br>
-    <a href="https://broke-protocol.github.io/broke-protocol"><font size="6">Official Documentation</font></a>
+    <a href="https://broke-protocol.github.io/broke-protocol">Official Documentation</a>
 </p>
 
 # GameSource
