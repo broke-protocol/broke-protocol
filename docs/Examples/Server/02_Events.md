@@ -37,8 +37,8 @@ ReturnType returnValue = EventsHandler.Get<ReturnType>(eventID, arguments);
 ```
 This if you need a return value from the function.
 ```csharp
-[CustomTarget]
 // .. in some IScript implementation
+[CustomTarget]
 public bool OnExampleEvent(string test)
 {
   Logger.LogInfo($"ExampleEvent got called, with the argument test: {test}");
