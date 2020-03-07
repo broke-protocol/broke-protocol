@@ -1,6 +1,6 @@
 # 01: IScript and Plugin
 
-> These are the core classes and interfaces for plugins. These can be used to automatically instanciate classes, and the main entry point of the plugin.
+> These are the core classes and interfaces for plugins. These can be used to automatically instantiate classes, and the main entry point of the plugin.
 
 ## IScript
 
@@ -30,7 +30,7 @@ With only this (and a `Plugin` class, which I will explain after this), you'll g
 ```
 
 ```
-Yup, nothing. That's why we added `IScript`. You don't need to do anything, because all `IScript` implementations will get called at runtime.
+Yup, nothing. That's why we added `IScript`. You don't need to do anything, because all `IScript` constructors will get called at runtime.
 
 The following will work just fine:
 
@@ -52,54 +52,16 @@ namespace ExampleNamespace
 ```
 This will output: `ExampleClass .ctor got invoked`, as expected.  
 :tada: Now, you may ask; how is this useful?  
-Well, take for example the following:
+Well, take for example the following simplified example where you want to set up a singleton:
 ```csharp
 using System;
 using UnityEngine;
-using BrokeProtocol.API;
-using BrokeProtocol;
 
 namespace ExampleNamespace
 {
   public class ExampleClass
   {
-    public ExampleClass()
-    {
-      EventsHandler.Add("WelcomeMessage", new Action<ShPlayer>(OnEvent));
-    }
-    
-    public void OnEvent(ShPlayer player)
-    {
-      player.svPlayer.SendGameMessage("Welcome to the server!");
-    }
-  }
-}
-```
-
-Now within your `Plugin` class, you need to create a instance of this class:
-
-```csharp
-// Your Plugin class
-public ExampleClass ExampleClass { get; set; }
-
-public ExamplePlugin()
-{
-  ExampleClass = new ExampleClass();
-}
-```
-
-This is fine for just one class, but when you get a lot of classes, this can get really messy. That's why `IScript` is useful, so that the full code will be:
-```csharp
-using System;
-using UnityEngine;
-using BrokeProtocol.API;
-using BrokeProtocol;
-
-namespace ExampleNamespace
-{
-  public class ExampleClass : IScript
-  {
-    public ExampleClass Instance { get; private set; }
+    public static ExampleClass Instance { get; private set; }
 
     public ExampleClass()
     {
@@ -107,48 +69,27 @@ namespace ExampleNamespace
       {
         Instance = this;
       }
-      EventsHandler.Add("WelcomeMessage", new Action<ShPlayer>(OnEvent));
-    }
-    
-    public void OnEvent(ShPlayer player)
-    {
-      player.svPlayer.SendGameMessage("Welcome to the server!");
+      Debug.Log("ExampleClass .ctor got invoked");
     }
   }
 }
-
-// Your plugin class
-public ExampleClass ExampleClass { get; set; }
-
-public ExamplePlugin()
-{
-  ExampleClass = ExampleNamespace.ExampleClass.Instance;
-}
 ```
 
-Yeah, that looks better. Now, in most cases you don't need a reference to the type, as they should be self contained. When that's the case, you can just only set the type like so:
+You would normally need to instantiate this class to call the constructor within your `Plugin` class:
+
 ```csharp
-using System;
-using UnityEngine;
 using BrokeProtocol.API;
-using BrokeProtocol;
 
-namespace ExampleNamespace
+public class ExamplePlugin : Plugin
 {
-  public class ExampleClass : IScript
-  {
-    public ExampleClass()
+    public ExamplePlugin()
     {
-      EventsHandler.Add("WelcomeMessage", new Action<ShPlayer>(OnEvent));
+        ExampleClass example = new ExampleClass();
     }
-    
-    public void OnEvent(ShPlayer player)
-    {
-      player.svPlayer.SendGameMessage("Welcome to the server!");
-    }
-  }
 }
 ```
+
+This is fine for just one class, but when you get a lot of classes, this can get really messy. That's why `IScript` is useful, so that you don't need to manually call your class constructors individually.
 
 :tada:! Cool, so let's recap:
 - `IScript` Is an type used to instanciate classes.
