@@ -7,9 +7,9 @@
 - C# Programming knowledge  
 
 
-1. Create a new class library for .NET Framework version `4.7.2`.
+1. Create a new class library for .NET Framework version `4.7.2` or start with [GameSource](https://github.com/broke-protocol/broke-protocol) as a basis.
 2. Add references to ``UnityEngine.dll``, ``UnityEngine.CoreModule.dll``, ``UnityEngine.PhysicsModule.dll``, and ``Scripts.dll`` from the ``BrokeProtocol_Data/Managed/`` directory. These are the only *required* dll's, but you might need to import more later.
-3. Create a new class to implement the ``Plugin`` class. Most of the time this class is called ``Core.cs``, but you can call it whatever you want.
+3. Create a new class to implement the ``Plugin`` class. In GameSource, this class is called ``Core.cs``, but you can call it whatever you want.
 
 !> You must have a class that implements the ``Plugin`` class. Without one, your resource will not be loaded in.
 
@@ -18,7 +18,8 @@ public class ExamplePlugin : Plugin
 {
     public ExamplePlugin()
     {
-        Info = new PluginInfo("Example Plugin", "ep", new PluginAuthor("My Name"));
+        // Example Plugin is the name and "ep" is the namespace prefix for command permissions defined in this plugin
+        Info = new PluginInfo("Example Plugin", "ep");
     }
 }
 ```
