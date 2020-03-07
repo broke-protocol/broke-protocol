@@ -1,7 +1,7 @@
 # Entity List
 
 Can use just items with /give and /take commands. Case-sensitive.
-
+```
 ATM
 ATMShop
 ATMWall1
@@ -1112,3 +1112,4 @@ TerritoryGreen
 TerritoryRed
 VaultDoor
 VendingMachine
+```
