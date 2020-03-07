@@ -23,6 +23,12 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             message = message.CleanMessage();
+
+            if(string.IsNullOrWhiteSpace(message))
+            {
+                return;
+            }
+
             Debug.Log($"[CHAT] {player.username}:{message}");
 
             if (CommandHandler.OnEvent(player, message)) // 'true' if message starts with command prefix
@@ -43,6 +49,12 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             message = message.CleanMessage();
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return;
+            }
+
             Debug.Log($"[CHAT] {player.username}:{message}");
 
             if (CommandHandler.OnEvent(player, message)) // 'true' if message starts with command prefix
