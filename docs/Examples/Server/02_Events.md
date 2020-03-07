@@ -41,12 +41,12 @@ This if you need a return value from the function.
 [CustomTarget]
 public bool OnExampleEvent(string test)
 {
-  Logger.LogInfo($"ExampleEvent got called, with the argument test: {test}");
-  return test == "UserR00T";
+  Debug.Log($"ExampleEvent got called, with the argument test: {test}");
+  return test == "ExampleArg";
 }
 
 // .. somewhere else
-bool isTrue = EventsHandler.Get<bool>("ExampleEvent", "UserR00T"); // bool with the event return value
+bool isTrue = EventsHandler.Get<bool>("ExampleEvent", "ExampleArg"); // bool with the event return value
 ```
 
 ## Subscribing to a game event
