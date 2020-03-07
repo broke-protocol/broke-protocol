@@ -6,7 +6,7 @@
 
 _What is `IScript`?_
 
-`IScript` is a (empty) interface used to instanciate any class within the plugin dll. It will enumerate over all types within the dll and invoke all types that implement the `IScript` interface. So for each type you want to automatically instanciate, use `IScript`.
+`IScript` is an (empty) interface used to instantiate any class within the plugin dll. It will enumerate over all types within the dll and invoke all types that implement the `IScript` interface. So for each type you want to automatically instantiate, use `IScript`.
 
 Take the following for example:
 
@@ -92,8 +92,8 @@ public class ExamplePlugin : Plugin
 This is fine for just one class, but when you get a lot of classes, this can get really messy. That's why `IScript` is useful, so that you don't need to manually call your class constructors individually.
 
 :tada:! Cool, so let's recap:
-- `IScript` Is an type used to instanciate classes.
-- `IScript` Can be used to make self contained classes and have no external instanciations.
+- `IScript` Is an type used to instantiate classes.
+- `IScript` Can be used to make self-contained classes and have no external instantiations.
 - `IScript` **must** have a `public`, parameterless constructor.
 - Your type must be contained within the dll of the `Plugin` implementation.
 
