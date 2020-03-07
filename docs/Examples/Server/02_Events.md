@@ -54,9 +54,9 @@ Subscribing to a game event is quite different. Any method with a ``Target`` Att
 
 Events are listed in ``BrokeProtocol.API.GameSourceEvents`` and the ``Target`` Attribute must have the EventID and ExecutionMode as arguments as such:
 
-``[Target(GameSourceEvent.Example, ExecutionMode.Event)]`` -> Means all other subscribers to this event will be called
+``[Target(GameSourceEvent.Example, ExecutionMode.Event)]`` -> This method will always be called on this event
 
-``[Target(GameSourceEvent.Example, ExecutionMode.Override)]`` -> Means any further subscribers with ExecutionMode.Override will not be called
+``[Target(GameSourceEvent.Example, ExecutionMode.Override)]`` -> Any further subscribers with ExecutionMode.Override will not be called
 
 ```csharp
 // Any other plugins targeting PlayerGlobalChatMessage will be executed
