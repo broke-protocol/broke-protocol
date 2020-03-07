@@ -11,6 +11,8 @@
         <img src="https://img.shields.io/badge/Docs-Wiki-7289DA.svg" alt="Read the wiki"></a>
     <a href="https://discord.gg/WpdNCDw">
         <img src="https://discordapp.com/api/guilds/312436123278376961/embed.png" alt="Chat on Discord"></a>
+    <br>
+    <a href="https://broke-protocol.github.io/broke-protocol" style="font-size:32px;">Official Documentation</a>
 </p>
 
 # GameSource
