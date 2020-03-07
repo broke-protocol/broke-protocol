@@ -13,6 +13,4 @@
   - Client
     - [01: Getting Started](/Examples/Client/01_Getting-Started)
     - [02: CEF](/Examples/Client/02_CEF)
-- [Events](/Events/)
-  - [Server](Events/Server/)
-  - [Client](/Events/Client/)
+- [Entity List](/EntityList)
