@@ -4,7 +4,7 @@ This document will explain how to create a command, register one, and use it alo
 
 See `CustomEvents.cs` in [GameSource](https://github.com/broke-protocol/source/blob/master/BP-GameSource/Types/CustomEvents.cs) for an example.
 
-Define your custom commands within an IScript class. The first input parameter must be an ShPlayer type (since the command will always send the calling player as a parameter). Any string parameters with spaces should start and end with double-quotes when called: `/ban "John Smith" "Some Reason"`.
+Define your custom commands within an IScript class. The first input parameter must be an ShPlayer type (since the command will always send the calling player as a parameter). Optional/Default parameters you define will also be optional in-game. Any string parameters with spaces should start and end with double-quotes when called: `/ban "John Smith" "Some Reason"`.
 
 ```csharp
  public class ExampleCommand : IScript
@@ -23,7 +23,8 @@ Define your custom commands within an IScript class. The first input parameter m
             });
         }
 
-        public void OnCommandInvoke(ShPlayer player, ShPlayer target, string string1, string string2, byte byte1, int int1, float float1)
+        // Any optional parameters here will be optional with in-game commands too
+        public void OnCommandInvoke(ShPlayer player, ShPlayer target, string string1 = "default1", string string2 = "default2", byte byte1 = 1, int int1 = 2, float float1 = 3f)
         {
             player.svPlayer.SendGameMessage($"'{target.username}' '{string1}' '{string2}' '{byte1}' '{int1}' '{float1}'");
         }
