@@ -3,7 +3,7 @@
 > This example will cover the basics of the ``EventsHandler``. This class is used for a lot of things including game events, CEF events, and custom events.
 
 ## What is the ``EventsHandler`` class?
-The ``EventsHandler`` class is a class that allows resources to communicate with eachother, CEF events to be sent from cef to resource, and game events to be handled with.  
+The ``EventsHandler`` class is a class that allows resources to communicate with each other, CEF events to Plugins, and game events (Map Trigger objects for example) to callback to your Plugins.  
 In this example we are going to show you how to do the following:
 - Register Custom Events & Call them
 - Subscribe to existing events
@@ -18,11 +18,10 @@ EventsHandler.Add("ExampleEvent", new Action(() =>
   Logger.LogInfo("ExampleEvent got called!"); // The 'Logger' instance is a class from BP-CoreLib. Using 'Debug.Log()' here will work just fine too.
 }));
 ```
-
+Or there's also a shorthand method where you can use the ``[CustomTarget]`` Attribute. Methods with this attribute will be automatically added to the EventsHandler as long as they're defined within an IScript implementation.
 ```csharp
-EventsHandler.Add("ExampleEvent", new Action(OnExampleEvent));
-
-public void OnExampleEvent()
+[CustomTarget]
+public void ExampleEvent()
 {
   Logger.LogInfo("ExampleEvent got called!");
 }
@@ -34,21 +33,20 @@ EventsHandler.Exec(key, arguments);
 ```
 Yup. that's all.
 ```csharp
-ReturnType returnValue = EventsHandler.Get<ReturnType>(key, arguments);
+ReturnType returnValue = EventsHandler.Get<ReturnType>(eventID, arguments);
 ```
 This if you need a return value from the function.
 ```csharp
-EventsHandler.Add("ExampleEvent", new Func<string, bool>(OnExampleEvent));
-
+[CustomTarget]
+// .. in some IScript implementation
 public bool OnExampleEvent(string test)
 {
   Logger.LogInfo($"ExampleEvent got called, with the argument test: {test}");
   return test == "UserR00T";
 }
 
-
-// ... somewhere else
-EventsHandler.Exec("ExampleEvent", "UserR00T"); // object[] with the return values of all event subscribers
+// .. somewhere else
+bool isTrue = EventsHandler.Get<bool>("ExampleEvent", "UserR00T"); // bool with the event return value
 ```
 
 ## Subscribing to a game event
@@ -56,9 +54,9 @@ Subscribing to a game event is quite different. Any method with a ``Target`` Att
 
 Events are listed in ``BrokeProtocol.API.GameSourceEvents`` and the ``Target`` Attribute must have the EventID and ExecutionMode as arguments as such:
 
-``[Target(GameSourceEvent.Example, ExecutionMode.Event)]`` -> Means other subscribers to this event will be called
+``[Target(GameSourceEvent.Example, ExecutionMode.Event)]`` -> Means all other subscribers to this event will be called
 
-``[Target(GameSourceEvent.Example, ExecutionMode.Override)]`` -> Means any further registered subscribers to this event will not be called
+``[Target(GameSourceEvent.Example, ExecutionMode.Override)]`` -> Means any further subscribers with ExecutionMode.Override will not be called
 
 ```csharp
 // Any other plugins targeting PlayerGlobalChatMessage will be executed
