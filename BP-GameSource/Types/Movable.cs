@@ -9,9 +9,9 @@ namespace BrokeProtocol.GameSource.Types
     public class Movable : Destroyable
     {
         [Target(GameSourceEvent.MovableDamage, ExecutionMode.Override)]
-        public void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
+        public void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
         {
-            base.OnDamage(movable, damageIndex, amount, attacker, collider);
+            base.OnDamage(movable, damageIndex, amount, attacker, collider, hitY);
 
             movable.svMovable.Send(SvSendType.Local,
                 Channel.Reliable,

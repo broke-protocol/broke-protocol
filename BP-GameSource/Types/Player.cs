@@ -67,20 +67,77 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerDamage, ExecutionMode.Override)]
-        public void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider)
+        public void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
         {
             if (player.IsDead || player.IsShielded(damageIndex, collider))
             {
                 return;
             }
 
+            BodyEffect effect;
+            
+            if(damageIndex == DamageIndex.Collision)
+            {
+                float random = Random.value;
+
+                if (random < 0.6f)
+                    effect = BodyEffect.Null;
+                else if (random < 0.85f)
+                    effect = BodyEffect.Pain;
+                else
+                    effect = BodyEffect.Fracture;
+            }
+            else if (damageIndex == DamageIndex.Gun || damageIndex == DamageIndex.Melee || damageIndex == DamageIndex.Explosion)
+            {
+                float random = Random.value;
+
+                if (random < 0.6f)
+                    effect = BodyEffect.Null;
+                else if (random < 0.85f)
+                    effect = BodyEffect.Pain;
+                else
+                    effect = BodyEffect.Bloodloss;
+            }
+            else
+            {
+                effect = BodyEffect.Null;
+            }
+
+            BodyPart part;
+
             if (player.IsBlocking(damageIndex))
             {
+                part = BodyPart.Arms;
                 amount *= 0.3f;
             }
             else if (collider == player.headCollider) // Headshot
             {
+                part = BodyPart.Head;
                 amount *= 2f;
+            }
+            else if (effect != BodyEffect.Null)
+            {
+                if (hitY >= player.capsule.height * 0.8f)
+                {
+                    part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
+                }
+                else if (hitY >= player.capsule.height * 0.6f)
+                {
+                    part = BodyPart.Abdomen;
+                }
+                else
+                {
+                    part = BodyPart.Legs;
+                }
+            }
+            else
+            {
+                part = BodyPart.Null;
+            }
+
+            if(part != BodyPart.Null && effect != BodyEffect.Null)
+            {
+                player.AddInjury(part, effect, Random.Range(0.1f, 0.5f));
             }
 
             if (!player.isHuman)
@@ -90,7 +147,7 @@ namespace BrokeProtocol.GameSource.Types
 
             amount -= amount * (player.armorLevel / player.maxStat * 0.5f);
 
-            base.OnDamage(player, damageIndex, amount, attacker, collider);
+            base.OnDamage(player, damageIndex, amount, attacker, collider, hitY);
 
             if (player.IsDead)
             {
@@ -379,6 +436,13 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.svPlayer.Reward(-crime.experiencePenalty, -crime.fine);
             }
+        }
+
+        [Target(GameSourceEvent.PlayerInjury, ExecutionMode.Override)]
+        public void OnInjury(ShPlayer player, BodyPart part, BodyEffect effect, float amount)
+        {
+            player.AddInjury(part, effect, amount);
+            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddInjury, (byte)part, (byte)effect, amount);
         }
 
         [Target(GameSourceEvent.PlayerKick, ExecutionMode.Override)]
