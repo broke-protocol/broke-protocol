@@ -137,7 +137,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if(part != BodyPart.Null && effect != BodyEffect.Null)
             {
-                player.AddInjury(part, effect, Random.Range(0.1f, 0.5f));
+                player.AddInjury(part, effect, (byte)Random.Range(10, 50));
             }
 
             if (!player.isHuman)
@@ -439,7 +439,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerInjury, ExecutionMode.Override)]
-        public void OnInjury(ShPlayer player, BodyPart part, BodyEffect effect, float amount)
+        public void OnInjury(ShPlayer player, BodyPart part, BodyEffect effect, byte amount)
         {
             player.AddInjury(part, effect, amount);
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddInjury, (byte)part, (byte)effect, amount);
