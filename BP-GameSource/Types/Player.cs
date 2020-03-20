@@ -158,7 +158,7 @@ namespace BrokeProtocol.GameSource.Types
                     player.svPlayer.SvForceStance(StanceIndex.KnockedOut);
                     // If knockout AI, set AI state Null
                 }
-                else if (UnityEngine.Random.value < player.manager.damageTypes[(int)damageIndex].fallChance)
+                else if (Random.value < player.manager.damageTypes[(int)damageIndex].fallChance)
                 {
                     player.StartCoroutine(player.svPlayer.KnockedDown());
                 }
@@ -212,11 +212,11 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         foreach (KeyValuePair<int, InventoryItem> pair in player.myItems)
                         {
-                            if (UnityEngine.Random.value < 0.8f)
+                            if (Random.value < 0.8f)
                             {
                                 InventoryItem i = new InventoryItem(
                                     pair.Value.item,
-                                    Mathf.CeilToInt(pair.Value.count * UnityEngine.Random.Range(0.05f, 0.3f)));
+                                    Mathf.CeilToInt(pair.Value.count * Random.Range(0.05f, 0.3f)));
                                 briefcase.myItems.Add(pair.Key, i);
                             }
                         }
