@@ -115,24 +115,19 @@ namespace BrokeProtocol.GameSource.Types
                 part = BodyPart.Head;
                 amount *= 2f;
             }
-            else if (effect != BodyEffect.Null)
+            else if (hitY >= player.capsule.height * 0.8f)
             {
-                if (hitY >= player.capsule.height * 0.8f)
-                {
-                    part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
-                }
-                else if (hitY >= player.capsule.height * 0.6f)
-                {
-                    part = BodyPart.Abdomen;
-                }
-                else
-                {
-                    part = BodyPart.Legs;
-                }
+                part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
+            }
+            else if (hitY >= player.capsule.height * 0.6f)
+            {
+                part = BodyPart.Abdomen;
+                amount *= 0.8f;
             }
             else
             {
-                part = BodyPart.Null;
+                part = BodyPart.Legs;
+                amount *= 0.5f;
             }
 
             if(part != BodyPart.Null && effect != BodyEffect.Null)
