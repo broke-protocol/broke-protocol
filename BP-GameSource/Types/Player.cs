@@ -228,8 +228,6 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.ClearWitnessed();
 
-            player.DeactivateEffects();
-
             if (!player.isHuman)
             {
                 player.svPlayer.SetState(StateIndex.Null);
