@@ -17,7 +17,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]
         public void OnGlobalChatMessage(ShPlayer player, string message)
         {
-            if (player.manager.svManager.chatted.OverLimit(player))
+            if (player.manager.svManager.chatted.Limit(player))
             {
                 return;
             }
@@ -36,14 +36,13 @@ namespace BrokeProtocol.GameSource.Types
                 return;
             }
 
-            player.manager.svManager.chatted.Add(player);
             player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GlobalChatMessage, player.ID, message);
         }
 
         [Target(GameSourceEvent.PlayerLocalChatMessage, ExecutionMode.Override)]
         public void OnLocalChatMessage(ShPlayer player, string message)
         {
-            if (player.manager.svManager.chatted.OverLimit(player))
+            if (player.manager.svManager.chatted.Limit(player))
             {
                 return;
             }
@@ -62,7 +61,6 @@ namespace BrokeProtocol.GameSource.Types
                 return;
             }
 
-            player.manager.svManager.chatted.Add(player);
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Unsequenced, ClPacket.LocalChatMessage, player.ID, message);
         }
 
@@ -254,9 +252,8 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerSellApartment, ExecutionMode.Override)]
         public void OnSellApartment(ShPlayer player, ShApartment apartment)
         {
-            if (!player.manager.svManager.trySell.OverLimit(player))
+            if (!player.manager.svManager.trySell.Limit(player))
             {
-                player.manager.svManager.trySell.Add(player);
                 player.svPlayer.SendGameMessage("Are you sure? Sell again to confirm..");
                 return;
             }
