@@ -10,26 +10,19 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Manager
     {
-        private bool ValidateUser(SvManager svManager, AuthData authData)
-        {
-            if (!svManager.HandleWhitelist(authData.accountID))
-            {
-                svManager.RegisterFail(authData.connection, "Account not whitelisted");
-                return false;
-            }
+        //[Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
+        //public void OnStart(SvManager svManager) { }
 
-            // Don't allow multi-boxing, WebAPI doesn't prevent this
-            foreach (ShPlayer p in EntityCollections.Humans)
-            {
-                if (p.accountID == authData.accountID)
-                {
-                    svManager.RegisterFail(authData.connection, "Account still logged in");
-                    return false;
-                }
-            }
+        //[Target(GameSourceEvent.ManagerUpdate, ExecutionMode.Override)]
+        //public void OnUpdate(SvManager svManager) { }
 
-            return true;
-        }
+        //[Target(GameSourceEvent.ManagerFixedUpdate, ExecutionMode.Override)]
+        //public void OnFixedUpdate(SvManager svManager) { }
+
+        //[Target(GameSourceEvent.ManagerConsoleInput, ExecutionMode.Override)]
+        //public void OnConsoleInput(SvManager svManager, string cmd) { }
+
+
 
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
         public void OnTryLogin(SvManager svManager, AuthData authData, ConnectData connectData)
@@ -97,6 +90,27 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.Save();
             }
             svManager.database.WriteOut();
+        }
+
+        private bool ValidateUser(SvManager svManager, AuthData authData)
+        {
+            if (!svManager.HandleWhitelist(authData.accountID))
+            {
+                svManager.RegisterFail(authData.connection, "Account not whitelisted");
+                return false;
+            }
+
+            // Don't allow multi-boxing, WebAPI doesn't prevent this
+            foreach (ShPlayer p in EntityCollections.Humans)
+            {
+                if (p.accountID == authData.accountID)
+                {
+                    svManager.RegisterFail(authData.connection, "Account still logged in");
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

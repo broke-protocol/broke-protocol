@@ -5,5 +5,16 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Entity
     {
+        //[Target(GameSourceEvent.EntityInitialize, ExecutionMode.Override)]
+        //public void OnInitialize(ShEntity entity) { }
+
+        //[Target(GameSourceEvent.EntityDestroy, ExecutionMode.Override)]
+        //public void OnDestroy(ShEntity entity) { }
+
+        //[Target(GameSourceEvent.EntityAddItem, ExecutionMode.Override)]
+        //public void OnAddItem(ShEntity entity, int itemIndex, int amount, bool dispatch) { }
+
+        //[Target(GameSourceEvent.EntityRemoveItem, ExecutionMode.Override)]
+        //public void OnRemoveItem(ShEntity entity, int itemIndex, int amount, bool dispatch) { }
     }
 }

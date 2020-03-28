@@ -7,6 +7,9 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Destroyable : Entity
     {
+        //[Target(GameSourceEvent.DestroyableDeath, ExecutionMode.Override)]
+        //public void OnDeath(ShDestroyable destroyable) { }
+
         [Target(GameSourceEvent.DestroyableDamage, ExecutionMode.Override)]
         public void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
         {

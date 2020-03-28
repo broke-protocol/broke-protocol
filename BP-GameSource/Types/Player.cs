@@ -14,6 +14,27 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Player : Movable
     {
+        //[Target(GameSourceEvent.PlayerInitialize, ExecutionMode.Override)]
+        //public void OnInitialize(ShPlayer player) { }
+
+        //[Target(GameSourceEvent.PlayerDestroy, ExecutionMode.Override)]
+        //public void OnDestroy(ShPlayer player) { }
+
+        //[Target(GameSourceEvent.PlayerAddItem, ExecutionMode.Override)]
+        //public void OnAddItem(ShPlayer player, int itemIndex, int amount, bool dispatch) { }
+
+        //[Target(GameSourceEvent.PlayerRemoveItem, ExecutionMode.Override)]
+        //public void OnRemoveItem(ShPlayer player, int itemIndex, int amount, bool dispatch) { }
+
+        //[Target(GameSourceEvent.PlayerCommand, ExecutionMode.Override)]
+        //public void OnCommand(ShPlayer player, string message) { }
+
+        //[Target(GameSourceEvent.PlayerFunctionKey, ExecutionMode.Override)]
+        //public void OnFunctionKey(ShPlayer player, byte key) { }
+
+        //[Target(GameSourceEvent.PlayerSave, ExecutionMode.Override)]
+        //public void OnSave(ShPlayer player) { }
+
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]
         public void OnGlobalChatMessage(ShPlayer player, string message)
         {
