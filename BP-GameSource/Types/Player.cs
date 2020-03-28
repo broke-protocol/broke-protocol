@@ -151,7 +151,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if(part != BodyPart.Null && effect != BodyEffect.Null)
             {
-                player.AddInjury(part, effect, (byte)Random.Range(10, 50));
+                player.svPlayer.SvAddInjury(part, effect, (byte)Random.Range(10, 50));
             }
 
             if (!player.isHuman)
