@@ -88,7 +88,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerDamage, ExecutionMode.Override)]
         public void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
         {
-            if (player.IsDead || player.IsShielded(damageIndex, collider))
+            if (player.svPlayer.godMode || player.IsDead || player.IsShielded(damageIndex, collider))
             {
                 return;
             }
@@ -522,6 +522,11 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerRestrain, ExecutionMode.Override)]
         public void OnRestrain(ShPlayer player, ShRestrained restrained)
         {
+            if(player.svPlayer.godMode)
+            {
+                return;
+            }
+
             if (player.curMount)
             {
                 player.svPlayer.SvDismount();
