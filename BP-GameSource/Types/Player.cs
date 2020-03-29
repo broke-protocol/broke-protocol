@@ -518,5 +518,25 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
         }
+
+        [Target(GameSourceEvent.PlayerRestrain, ExecutionMode.Override)]
+        public void OnRestrain(ShPlayer player, ShRestrained restrained)
+        {
+            if (player.curMount)
+            {
+                player.svPlayer.SvDismount();
+            }
+
+            player.svPlayer.SvSetEquipable(restrained.index);
+
+            if (!player.isHuman)
+            {
+                player.svPlayer.SetState(StateIndex.Restrained);
+            }
+            else
+            {
+                player.svPlayer.SendGameMessage("You've been restrained");
+            }
+        }
     }
 }

@@ -22,8 +22,6 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.ManagerConsoleInput, ExecutionMode.Override)]
         //public void OnConsoleInput(SvManager svManager, string cmd) { }
 
-
-
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
         public void OnTryLogin(SvManager svManager, AuthData authData, ConnectData connectData)
         {
