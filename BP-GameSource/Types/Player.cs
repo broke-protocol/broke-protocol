@@ -93,65 +93,54 @@ namespace BrokeProtocol.GameSource.Types
                 return;
             }
 
-            BodyEffect effect;
-            
-            if(damageIndex == DamageIndex.Collision)
+            if (damageIndex != DamageIndex.Null)
             {
+                BodyEffect effect;
                 float random = Random.value;
 
                 if (random < 0.6f)
                     effect = BodyEffect.Null;
-                else if (random < 0.85f)
+                else if (random < 0.8f)
                     effect = BodyEffect.Pain;
+                else if (random < 0.925f)
+                    effect = BodyEffect.Bloodloss;
                 else
                     effect = BodyEffect.Fracture;
-            }
-            else if (damageIndex == DamageIndex.Gun || damageIndex == DamageIndex.Melee || damageIndex == DamageIndex.Explosion)
-            {
-                float random = Random.value;
 
-                if (random < 0.6f)
-                    effect = BodyEffect.Null;
-                else if (random < 0.85f)
-                    effect = BodyEffect.Pain;
-                else
-                    effect = BodyEffect.Bloodloss;
-            }
-            else
-            {
-                effect = BodyEffect.Null;
-            }
+                if(collider)
+                {
+                    BodyPart part;
 
-            BodyPart part;
+                    if (damageIndex == DamageIndex.Melee && player.IsBlocking(damageIndex))
+                    {
+                        part = BodyPart.Arms;
+                        amount *= 0.3f;
+                    }
+                    else if (collider == player.headCollider) // Headshot
+                    {
+                        part = BodyPart.Head;
+                        amount *= 2f;
+                    }
+                    else if (hitY >= player.capsule.height * 0.75f)
+                    {
+                        part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
+                    }
+                    else if (hitY >= player.capsule.height * 0.5f)
+                    {
+                        part = BodyPart.Abdomen;
+                        amount *= 0.8f;
+                    }
+                    else
+                    {
+                        part = BodyPart.Legs;
+                        amount *= 0.5f;
+                    }
 
-            if (player.IsBlocking(damageIndex))
-            {
-                part = BodyPart.Arms;
-                amount *= 0.3f;
-            }
-            else if (collider == player.headCollider) // Headshot
-            {
-                part = BodyPart.Head;
-                amount *= 2f;
-            }
-            else if (hitY >= player.capsule.height * 0.8f)
-            {
-                part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
-            }
-            else if (hitY >= player.capsule.height * 0.6f)
-            {
-                part = BodyPart.Abdomen;
-                amount *= 0.8f;
-            }
-            else
-            {
-                part = BodyPart.Legs;
-                amount *= 0.5f;
-            }
-
-            if(part != BodyPart.Null && effect != BodyEffect.Null)
-            {
-                player.svPlayer.SvAddInjury(part, effect, (byte)Random.Range(10, 50));
+                    if (effect != BodyEffect.Null)
+                    {
+                        player.svPlayer.SvAddInjury(part, effect, (byte)Random.Range(10, 50));
+                    }
+                }
             }
 
             if (!player.isHuman)
