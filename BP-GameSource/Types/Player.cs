@@ -57,7 +57,7 @@ namespace BrokeProtocol.GameSource.Types
                 return;
             }
 
-            player.svPlayer.Send(SvSendType.All, Channel.Unsequenced, ClPacket.GlobalChatMessage, player.ID, message);
+            player.svPlayer.Send(SvSendType.All, Channel.Reliable, ClPacket.GlobalChatMessage, player.ID, message);
         }
 
         [Target(GameSourceEvent.PlayerLocalChatMessage, ExecutionMode.Override)]
@@ -82,7 +82,7 @@ namespace BrokeProtocol.GameSource.Types
                 return;
             }
 
-            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Unsequenced, ClPacket.LocalChatMessage, player.ID, message);
+            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.LocalChatMessage, player.ID, message);
         }
 
         [Target(GameSourceEvent.PlayerDamage, ExecutionMode.Override)]
@@ -241,7 +241,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.SetState(StateIndex.Null);
             }
 
-            player.svPlayer.Send(SvSendType.Self,Channel.Reliable, ClPacket.ShowTimer, player.svPlayer.RespawnTime);
+            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, player.svPlayer.RespawnTime);
 
             player.SetStance(StanceIndex.Dead, true);
         }
@@ -352,7 +352,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (player.rank <= 0)
                 {
-                    player.svPlayer.Send(SvSendType.Self, Channel.Unsequenced, ClPacket.GameMessage, "You lost your job");
+                    player.svPlayer.SendGameMessage("You lost your job");
                     player.svPlayer.SvResetJob(false);
                 }
                 else
@@ -390,7 +390,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (!requester.svPlayer.BuyRequestItem(requestItem))
             {
-                requester.svPlayer.Send(SvSendType.Self, Channel.Unsequenced, ClPacket.GameMessage, "No funds for license");
+                requester.svPlayer.SendGameMessage("No funds for license");
             }
             else
             {
@@ -410,7 +410,7 @@ namespace BrokeProtocol.GameSource.Types
                 return;
             }
 
-            requester.svPlayer.Send(SvSendType.Self, Channel.Unsequenced, ClPacket.GameMessage, "License Denied");
+            requester.svPlayer.SendGameMessage("License Denied");
             player.RequestRemove(requester);
         }
 
@@ -448,22 +448,18 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerKick, ExecutionMode.Override)]
         public void OnKick(ShPlayer player, ShPlayer target, string reason)
         {
-            SvManager svManager = player.manager.svManager;
+            ChatHandler.SendToAll($"{target.fullname} Kicked: {reason}");
 
-            svManager.SendToAll(Channel.Unsequenced, ClPacket.GameMessage, $"{target.fullname} Kicked: {reason}");
-
-            svManager.KickConnection(target.svPlayer.connection);
+            player.manager.svManager.KickConnection(target.svPlayer.connection);
         }
 
         [Target(GameSourceEvent.PlayerBan, ExecutionMode.Override)]
         public void OnBan(ShPlayer player, ShPlayer target, string reason)
         {
-            SvManager svManager = player.manager.svManager;
-
-            svManager.SendToAll(Channel.Unsequenced, ClPacket.GameMessage, $"{target.fullname} Banned: {reason}");
+            ChatHandler.SendToAll($"{target.fullname} Banned: {reason}");
 
             target.svPlayer.PlayerData.Ban(reason);
-            svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
+            player.manager.svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
         }
 
         [Target(GameSourceEvent.PlayerRemoveItemsDeath, ExecutionMode.Override)]
