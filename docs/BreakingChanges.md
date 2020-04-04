@@ -1,11 +1,15 @@
 # Changelog
 `C` = Changed
+
 `A` = Added
+
 `R` = Removed
 
 ## 1.05
 !> Breaking change!
+
 ?> Most additions are related to the new injury system
+
 - (A) GameSource Event: OnRestrain(ShPlayer player, ShRestrained restrained)
 - (C) GameSource Event: OnDamage -> new `float hitY` parameter for locational damage
 - (C) Recommend to use Channel.Reliable for all Game Messages 
@@ -15,7 +19,9 @@
 
 ## 1.04
 !> Breaking change!
+
 ?> Important Update: This version allows AssetBundle mods to work on any platform. Also, CEF can be enabled on both Steam and Classic auth.
+
 - (C) https://broke-protocol.github.io/broke-protocol/#/Examples/Server/02_Events?id=subscribing-to-a-game-event
 - (A) SvPlayer.platform
 - (C) EventHandler.Call -> EventHandler.Exec(), EventHandler.Get(), EventHandler.Get<>()
@@ -30,6 +36,7 @@
 
 ## 1.03
 !> Breaking change!
+
 ?> This version changes many getter functions to Properties. This allows helpful inspection in debug tools and signals the property has no side effects.
 
 ### Misc
