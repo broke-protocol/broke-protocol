@@ -107,39 +107,40 @@ namespace BrokeProtocol.GameSource.Types
                 else
                     effect = BodyEffect.Fracture;
 
-                if(collider)
+                BodyPart part;
+
+                if(damageIndex == DamageIndex.Random)
                 {
-                    BodyPart part;
+                    part = (BodyPart)Random.Range(0, (int)BodyPart.Count);
+                }
+                else if (damageIndex == DamageIndex.Melee && player.IsBlocking(damageIndex))
+                {
+                    part = BodyPart.Arms;
+                    amount *= 0.3f;
+                }
+                else if (collider == player.headCollider) // Headshot
+                {
+                    part = BodyPart.Head;
+                    amount *= 2f;
+                }
+                else if (hitY >= player.capsule.height * 0.75f)
+                {
+                    part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
+                }
+                else if (hitY >= player.capsule.height * 0.5f)
+                {
+                    part = BodyPart.Abdomen;
+                    amount *= 0.8f;
+                }
+                else
+                {
+                    part = BodyPart.Legs;
+                    amount *= 0.5f;
+                }
 
-                    if (damageIndex == DamageIndex.Melee && player.IsBlocking(damageIndex))
-                    {
-                        part = BodyPart.Arms;
-                        amount *= 0.3f;
-                    }
-                    else if (collider == player.headCollider) // Headshot
-                    {
-                        part = BodyPart.Head;
-                        amount *= 2f;
-                    }
-                    else if (hitY >= player.capsule.height * 0.75f)
-                    {
-                        part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
-                    }
-                    else if (hitY >= player.capsule.height * 0.5f)
-                    {
-                        part = BodyPart.Abdomen;
-                        amount *= 0.8f;
-                    }
-                    else
-                    {
-                        part = BodyPart.Legs;
-                        amount *= 0.5f;
-                    }
-
-                    if (effect != BodyEffect.Null)
-                    {
-                        player.svPlayer.SvAddInjury(part, effect, (byte)Random.Range(10, 50));
-                    }
+                if (effect != BodyEffect.Null)
+                {
+                    player.svPlayer.SvAddInjury(part, effect, (byte)Random.Range(10, 50));
                 }
             }
 
