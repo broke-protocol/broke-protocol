@@ -208,7 +208,7 @@ namespace BrokeProtocol.GameSource.Types
                     Vector3.down,
                     out RaycastHit hit,
                     10f,
-                    MaskIndex.defaultMask))
+                    MaskIndex.world))
                 {
                     ShEntity briefcase = player.manager.svManager.AddNewEntity(
                         player.manager.svManager.briefcasePrefabs.GetRandom(),
