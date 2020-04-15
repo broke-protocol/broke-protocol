@@ -12,9 +12,11 @@ You can create game interfaces using HTML, CSS, and JavaScript just like you wou
 interface. There are some injected methods explained in [01 - Getting Started] that help you connect with the
 game client and even server (via triggers).
 
-There are also function on the server that let you execute either JavaScript or C# on the client. Don't need to
+There are also functions on the server that let you execute either JavaScript or C# on the client. Don't need to
 worry since the code is validated to be safe on clients before execution. This is a useful way to change UI
 elements dynamically based on server events, or even change client state directly via C#.
+
+Some examples below. Refer to the [BP API Reference](https://brokeprotocol.com/api/) for all available methods on server and client.
 
 SvPlayer.ExecuteJS(string expression)
 ex. svPlayer.ExecuteJS("window.cursorHide();")
