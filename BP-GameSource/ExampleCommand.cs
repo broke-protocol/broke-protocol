@@ -8,7 +8,7 @@ namespace BrokeProtocol.CustomEvents
     {
         public ExampleCommand()
         {
-            CommandHandler.RegisterCommand("Example", new Action<ShPlayer, ShPlayer, string, string, byte, int, float>(OnCommandInvoke), (player, command) =>
+            CommandHandler.RegisterCommand("Example", new Action<ShPlayer, ShPlayer, byte, int, float, string, string>(OnCommandInvoke), (player, command) =>
             {
                 // Silly example
                 if (player.health < 50)
@@ -22,9 +22,9 @@ namespace BrokeProtocol.CustomEvents
 
 
         // Any optional parameters here will be optional with in-game commands too
-        public void OnCommandInvoke(ShPlayer player, ShPlayer target, string string1 = "default1", string string2 = "default2", byte byte1 = 1, int int1 = 2, float float1 = 3f)
+        public void OnCommandInvoke(ShPlayer player, ShPlayer target, byte byte1 = 1, int int1 = 2, float float1 = 3f, string string1 = "default1", string string2 = "default2")
         {
-            player.svPlayer.SendGameMessage($"'{target.username}' '{string1}' '{string2}' '{byte1}' '{int1}' '{float1}'");
+            player.svPlayer.SendGameMessage($"'{target.username}' '{byte1}' '{int1}' '{float1}' '{string1}' '{string2}'");
         }
     }
 }
