@@ -4,6 +4,6 @@
 
 > Documentation for the Broke Protocol API.
 
-[Getting Started](#Quickstart)
+[Getting Started](#getting-started)
 [Examples](/Examples/)
-[Events](/Events/)
+[Entity List](/EntityList/)
