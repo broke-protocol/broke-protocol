@@ -5,5 +5,5 @@
 > Documentation for the Broke Protocol API.
 
 [Getting Started](#getting-started)
-[Examples](/Examples/)
-[Entity List](/EntityList/)
+[Examples](/Examples)
+[Entity List](/EntityList)

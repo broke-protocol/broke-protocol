@@ -1,7 +1,7 @@
 - [Homepage](/)
 - [Changelog](/BreakingChanges)
 - [API Reference](https://brokeprotocol.com/api/)
-- [Examples](/Examples/)
+- [Examples](/Examples)
   - Server
     - [01: IScript And Plugin](/Examples/Server/01_IScript-And-Plugin)
     - [02: Events](/Examples/Server/02_Events)
