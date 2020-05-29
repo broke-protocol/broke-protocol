@@ -18,6 +18,10 @@ namespace BrokeProtocol.CustomEvents
                 }
                 return true;
             });
+
+            CommandHandler.RegisterCommand("ExampleInt", new Action<ShPlayer, int>(OnCommandInvoke), null, "example.int");
+            CommandHandler.RegisterCommand("ExampleString", new Action<ShPlayer, string>(OnCommandInvoke), null, "example.string");
+            CommandHandler.RegisterCommand("ExamplePlayer", new Action<ShPlayer, ShPlayer>(OnCommandInvoke), null, "example.player");
         }
 
 
@@ -25,6 +29,21 @@ namespace BrokeProtocol.CustomEvents
         public void OnCommandInvoke(ShPlayer player, ShPlayer target, byte byte1 = 1, int int1 = 2, float float1 = 3f, string string1 = "default1", string string2 = "default2")
         {
             player.svPlayer.SendGameMessage($"'{target.username}' '{byte1}' '{int1}' '{float1}' '{string1}' '{string2}'");
+        }
+
+        public void OnCommandInvoke(ShPlayer player, int i = 1)
+        {
+            player.svPlayer.SendGameMessage("int : " + i);
+        }
+
+        public void OnCommandInvoke(ShPlayer player, string s = "testString")
+        {
+            player.svPlayer.SendGameMessage("string : " + s);
+        }
+
+        public void OnCommandInvoke(ShPlayer player, ShPlayer p)
+        {
+            player.svPlayer.SendGameMessage("player : " + p.username);
         }
     }
 }
