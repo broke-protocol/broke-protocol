@@ -529,5 +529,11 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.SendGameMessage("You've been restrained");
             }
         }
+
+        [Target(GameSourceEvent.PlayerServerInfo, ExecutionMode.Override)]
+        public void OnServerInfo(ShPlayer player)
+        {
+            player.svPlayer.Send(SvSendType.Self, Channel.Fragmented, ClPacket.ServerInfo, player.svPlayer.svManager.serverDescription);
+        }
     }
 }
