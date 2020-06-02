@@ -1,8 +1,8 @@
 ![](https://brokeprotocol.com/wp-content/uploads/LogoSmall.png)
 
-# Broke Protocol Documentation <small>for v1.0+</small>
+# Broke Protocol Docs
 
-> Documentation for the Broke Protocol API.
+> Documentation for the Broke Protocol scripting API.
 
 [Getting Started](#getting-started)
 [Examples](/Examples)
