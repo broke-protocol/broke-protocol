@@ -1,6 +1,6 @@
 ![](https://brokeprotocol.com/wp-content/uploads/LogoSmall.png)
 
-# Broke Protocol Docs
+# Broke Protocol API Docs
 
 > Documentation for the Broke Protocol scripting API.
 
