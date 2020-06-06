@@ -50,3 +50,15 @@ copy /Y "$(TargetFileName)" "D:\BrokeProtocolServer\Plugins"
 Now every time you build your class library your target file will automatically be copied.
 6. Make sure your dll gets copied correctly after building. If everything seems correctly then every time your run your server from that folder your plugin will be loaded in.
 7. Once you're ready for the next step, go to the Examples page and start with the first one.
+
+## Tips
+- Check the [Official Unity3D Manual](https://docs.unity3d.com/Manual/index.html) for Unity specific documentation.
+- Stay away from multi-threading (System.Threading & System.Timers) since much of BP and Unity code is not thread-safe. Use Unity Coroutines or InvokeRepeating instead to keep things on the main thread.
+- Don't forget to Upsert changes back into the database when finished editing. Typical usage:
+```cs
+if(svManager.TryGetUserData(accountID, out var playerData)))
+{
+    DoWhatever(playerData);
+    mannager.database.Users.Upsert(playerData);
+}
+```
