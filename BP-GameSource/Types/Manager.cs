@@ -25,9 +25,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
         public void OnTryLogin(SvManager svManager, AuthData authData, ConnectData connectData)
         {
-            if (ValidateUser(svManager, authData))
+            if (ValidateUser(svManager, authData, connectData))
             {
-                if (!svManager.TryGetUserData(authData.accountID, out User playerData))
+                if (!svManager.TryGetUserData(connectData.username, out User playerData))
                 {
                     svManager.RegisterFail(authData.connection, "Account not found - Please Register");
                     return;
@@ -35,7 +35,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (playerData.PasswordHash != connectData.passwordHash)
                 {
-                    svManager.RegisterFail(authData.connection, $"Invalid credentials");
+                    svManager.RegisterFail(authData.connection, "Invalid credentials");
                     return;
                 }
 
@@ -46,13 +46,13 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.ManagerTryRegister, ExecutionMode.Override)]
         public void OnTryRegister(SvManager svManager, AuthData authData, ConnectData connectData)
         {
-            if (ValidateUser(svManager, authData))
+            if (ValidateUser(svManager, authData, connectData))
             {
-                if (svManager.TryGetUserData(authData.accountID, out User playerData))
+                if (svManager.TryGetUserData(connectData.username, out User playerData))
                 {
                     if (playerData.PasswordHash != connectData.passwordHash)
                     {
-                        svManager.RegisterFail(authData.connection, $"Invalid credentials");
+                        svManager.RegisterFail(authData.connection, "Invalid credentials");
                         return;
                     }
                 }
@@ -78,9 +78,9 @@ namespace BrokeProtocol.GameSource.Types
             svManager.database.WriteOut();
         }
 
-        private bool ValidateUser(SvManager svManager, AuthData authData)
+        private bool ValidateUser(SvManager svManager, AuthData authData, ConnectData connectData)
         {
-            if (!svManager.HandleWhitelist(authData.accountID))
+            if (!svManager.HandleWhitelist(connectData.username))
             {
                 svManager.RegisterFail(authData.connection, "Account not whitelisted");
                 return false;
@@ -89,7 +89,7 @@ namespace BrokeProtocol.GameSource.Types
             // Don't allow multi-boxing, WebAPI doesn't prevent this
             foreach (ShPlayer p in EntityCollections.Humans)
             {
-                if (p.accountID == authData.accountID)
+                if (p.username == connectData.username)
                 {
                     svManager.RegisterFail(authData.connection, "Account still logged in");
                     return false;
