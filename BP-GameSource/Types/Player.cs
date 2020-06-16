@@ -459,7 +459,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             ChatHandler.SendToAll($"{target.fullname} Banned: {reason}");
 
-            target.svPlayer.PlayerData.Ban(reason);
+            player.svPlayer.SvBanDatabase(target.accountID, reason);
             player.manager.svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
         }
 

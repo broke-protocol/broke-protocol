@@ -33,13 +33,7 @@ namespace BrokeProtocol.GameSource.Types
                     return;
                 }
 
-                if (playerData.BanInfo.IsBanned)
-                {
-                    svManager.RegisterFail(authData.connection, $"Account banned: {playerData.BanInfo.Reason}");
-                    return;
-                }
-
-                if (!svManager.settings.auth.steam && playerData.PasswordHash != connectData.passwordHash)
+                if (playerData.PasswordHash != connectData.passwordHash)
                 {
                     svManager.RegisterFail(authData.connection, $"Invalid credentials");
                     return;
@@ -56,13 +50,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (svManager.TryGetUserData(authData.accountID, out User playerData))
                 {
-                    if (playerData.BanInfo.IsBanned)
-                    {
-                        svManager.RegisterFail(authData.connection, $"Account banned: {playerData.BanInfo.Reason}");
-                        return;
-                    }
-
-                    if (!svManager.settings.auth.steam && playerData.PasswordHash != connectData.passwordHash)
+                    if (playerData.PasswordHash != connectData.passwordHash)
                     {
                         svManager.RegisterFail(authData.connection, $"Invalid credentials");
                         return;
