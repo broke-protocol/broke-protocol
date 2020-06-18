@@ -23,47 +23,47 @@ namespace BrokeProtocol.GameSource.Types
         //public void OnConsoleInput(SvManager svManager, string cmd) { }
 
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
-        public void OnTryLogin(SvManager svManager, AuthData authData, ConnectData connectData)
+        public void OnTryLogin(SvManager svManager, ConnectionData connectionData)
         {
-            if (ValidateUser(svManager, authData, connectData))
+            if (ValidateUser(svManager, connectionData))
             {
-                if (!svManager.TryGetUserData(connectData.username, out User playerData))
+                if (!svManager.TryGetUserData(connectionData.username, out User playerData))
                 {
-                    svManager.RegisterFail(authData.connection, "Account not found - Please Register");
+                    svManager.RegisterFail(connectionData.connection, "Account not found - Please Register");
                     return;
                 }
 
-                if (playerData.PasswordHash != connectData.passwordHash)
+                if (playerData.PasswordHash != connectionData.passwordHash)
                 {
-                    svManager.RegisterFail(authData.connection, "Invalid credentials");
+                    svManager.RegisterFail(connectionData.connection, "Invalid credentials");
                     return;
                 }
 
-                svManager.LoadSavedPlayer(playerData, authData, connectData);
+                svManager.LoadSavedPlayer(playerData, connectionData);
             }
         }
 
         [Target(GameSourceEvent.ManagerTryRegister, ExecutionMode.Override)]
-        public void OnTryRegister(SvManager svManager, AuthData authData, ConnectData connectData)
+        public void OnTryRegister(SvManager svManager, ConnectionData connectionData)
         {
-            if (ValidateUser(svManager, authData, connectData))
+            if (ValidateUser(svManager, connectionData))
             {
-                if (svManager.TryGetUserData(connectData.username, out User playerData))
+                if (svManager.TryGetUserData(connectionData.username, out User playerData))
                 {
-                    if (playerData.PasswordHash != connectData.passwordHash)
+                    if (playerData.PasswordHash != connectionData.passwordHash)
                     {
-                        svManager.RegisterFail(authData.connection, "Invalid credentials");
+                        svManager.RegisterFail(connectionData.connection, "Invalid credentials");
                         return;
                     }
                 }
 
-                if (!connectData.username.ValidCredential())
+                if (!connectionData.username.ValidCredential())
                 {
-                    svManager.RegisterFail(authData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
+                    svManager.RegisterFail(connectionData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
                     return;
                 }
 
-                svManager.AddNewPlayer(authData, connectData);
+                svManager.AddNewPlayer(connectionData);
             }
         }
 
@@ -78,20 +78,20 @@ namespace BrokeProtocol.GameSource.Types
             svManager.database.WriteOut();
         }
 
-        private bool ValidateUser(SvManager svManager, AuthData authData, ConnectData connectData)
+        private bool ValidateUser(SvManager svManager, ConnectionData connectionData)
         {
-            if (!svManager.HandleWhitelist(connectData.username))
+            if (!svManager.HandleWhitelist(connectionData.username))
             {
-                svManager.RegisterFail(authData.connection, "Account not whitelisted");
+                svManager.RegisterFail(connectionData.connection, "Account not whitelisted");
                 return false;
             }
 
             // Don't allow multi-boxing, WebAPI doesn't prevent this
             foreach (ShPlayer p in EntityCollections.Humans)
             {
-                if (p.username == connectData.username)
+                if (p.username == connectionData.username)
                 {
-                    svManager.RegisterFail(authData.connection, "Account still logged in");
+                    svManager.RegisterFail(connectionData.connection, "Account still logged in");
                     return false;
                 }
             }
