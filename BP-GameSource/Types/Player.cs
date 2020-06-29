@@ -354,7 +354,7 @@ namespace BrokeProtocol.GameSource.Types
                 if (player.rank <= 0)
                 {
                     player.svPlayer.SendGameMessage("You lost your job");
-                    player.svPlayer.SvResetJob(false);
+                    player.svPlayer.SvResetJob();
                 }
                 else
                 {
