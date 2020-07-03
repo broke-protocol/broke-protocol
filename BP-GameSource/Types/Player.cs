@@ -198,9 +198,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerDeath, ExecutionMode.Override)]
         public void OnDeath(ShPlayer player)
         {
-            if (player.svPlayer.lastAttacker && player.svPlayer.lastAttacker != player)
+            if (player.svPlayer.thrower && player.svPlayer.thrower != player)
             {
-                player.svPlayer.lastAttacker.job.OnKillPlayer(player);
+                player.svPlayer.thrower.job.OnKillPlayer(player);
 
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(

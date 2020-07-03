@@ -13,9 +13,6 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.DestroyableDamage, ExecutionMode.Override)]
         public void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
         {
-            // Store for usage in OnDeath
-            destroyable.svDestroyable.lastAttacker = attacker;
-
             if (destroyable.IsDead)
             {
                 return;
@@ -25,6 +22,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (destroyable.health <= 0f)
             {
+                destroyable.svDestroyable.thrower = attacker;
                 destroyable.ShDie();
             }
         }
