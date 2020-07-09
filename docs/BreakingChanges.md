@@ -1,3 +1,19 @@
+## 1.07
+?> Biggest breaker might be the update to LiteDB V5. Game will attempt to backup and upgrade your V4 database on server start. If you get errors with CustomData, you may try to repair things with these GUI editors and try to upgrade again: [V4 DB Editor](https://github.com/julianpaulozzi/LiteDbExplorer) or [V5 DB Editor](https://github.com/mbdavid/LiteDB.Studio)
+
+### API
+- Steam Authentication removed: AuthData and ConnectData merged into ConnectionData class
+- ShPlayer.accountID removed: Use ShPlayer.username for the database index now
+- SvPlayer.SvResetJob() always adds required job items now
+- Added SvContact.spawnFires if you want a thrown item to leave a fire on contact
+
+### MODDING
+- Added `skins.txt` for modding available skins during registration (custom skins allowed)
+= Game supports apartments within interiors again (as long as apartments aren't nested in apartments)
+
+### Misc
+= All ban functionality is now stored and tied to IP addresses, not accounts
+
 ## 1.06
 ?> Most additions are related to the new attachments and asset modding
 
