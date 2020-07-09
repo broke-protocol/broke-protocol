@@ -9,10 +9,10 @@
 
 ### MODDING
 - Added `skins.txt` for modding available skins during registration (custom skins allowed)
-= Game supports apartments within interiors again (as long as apartments aren't nested in apartments)
+- Game supports apartments within interiors again (as long as apartments aren't nested in apartments)
 
 ### Misc
-= All ban functionality is now stored and tied to IP addresses, not accounts
+- All ban functionality is now stored and tied to IP addresses, not accounts
 
 ## 1.06
 ?> Most additions are related to the new attachments and asset modding
