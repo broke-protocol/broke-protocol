@@ -8,9 +8,9 @@ namespace BrokeProtocol.CustomEvents
     {
         // Can be called either via an in-game Trigger map object or CEF/JavaScript events
         [CustomTarget]
-        public void AreaWarning(ShPlayer player, string triggerID)
+        public void AreaWarning(ShPhysical physical, string triggerID)
         {
-            if (player.job.info.groupIndex != GroupIndex.LawEnforcement)
+            if (physical is ShPlayer player && player.job.info.groupIndex != GroupIndex.LawEnforcement)
             {
                 player.svPlayer.SendGameMessage($"Warning! You are about to enter {triggerID}!");
 
