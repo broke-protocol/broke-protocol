@@ -1,4 +1,4 @@
-﻿using BrokeProtocol.Server.LiteDB.Models;
+﻿using BrokeProtocol.LiteDB;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Entities;
