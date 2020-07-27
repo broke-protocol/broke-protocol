@@ -4,6 +4,7 @@
 ### API
 - ShPlayer.currentTrigger => ShPlayer.currentTriggers (HashSet<ShTrigger> of all triggers in case of trigger nesting)
 - ClManager.handler and SvManager.handler packet handlers converted from Dictionary to Lists
+- BrokeProtocol.Server.LiteDB + Models namespaces => BrokeProtocol.LiteDB (used on client now for some things too)
 
 ### MODDING
 - Processors must be updated to the new multi-process support (see ShProcessor.processOptions)
