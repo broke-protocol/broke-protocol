@@ -1,3 +1,18 @@
+## 1.07a
+?> Update to Unity 2020.1f1. Big engine update but minimal API changes. [Full 2020.1 Release Notes](https://unity3d.com/unity/whats-new/2020.1.0)
+
+### API
+- ShPlayer.currentTrigger => ShPlayer.currentTriggers (HashSet<ShTrigger> of all triggers in case of trigger nesting)
+- ClManager.handler and SvManager.handler packet handlers converted from Dictionary to Lists
+
+### MODDING
+- Processors must be updated to the new multi-process support (see ShProcessor.processOptions)
+- Added ShProcessor.processDuration for process duration modding
+
+### Misc
+- groups.json: JobIndex and JobGroupIndex Types now use the string job/class names instead of ints (documented in groups.json)
+- groups.json: ScriptableTrigger Type removed for now (due to more complex trigger handling)
+
 ## 1.07
 ?> Biggest breaker might be the update to LiteDB V5. Game will attempt to backup and upgrade your V4 database on server start. If you get errors with CustomData, you may try to repair things with these GUI editors and try to upgrade again: [V4 DB Editor](https://github.com/julianpaulozzi/LiteDbExplorer) or [V5 DB Editor](https://github.com/mbdavid/LiteDB.Studio)
 
@@ -54,28 +69,3 @@
 - Removed BrokeProtocol.API.Events.Player
 - Removed BrokeProtocol.API.Events.General
 - Removed BrokeProtocol.API.GameSourceEvents
-
-## 1.03
-?> This version changes many getter functions to Properties. This allows helpful inspection in debug tools and signals the property has no side effects.
-
-### Misc
-- ActiveMount() -> GetMount
-- ActiveControlled() -> GetControlled
-- GetStanceIndex() -> GetStanceIndex
-- IsSeatedFirst() -> IsSeatedFirst
-- IsDriving() -> IsDriving
-- IsPassenger() -> IsPassenger
-- IsUp() -> IsUp
-- IsMobile() -> IsMobile
-- IsRestrained() -> IsRestrained
-- IsUnrestricted() -> IsUnrestricted
-- IsRestricted() -> IsRestricted
-- IsSurrendered() -> IsSurrendered
-- IsOutside() -> IsOutside
-- GetOrigin() -> GetOrigin
-- GetPlace() -> GetPlace
-- GetPlaceIndex() -> GetPlaceIndex
-- GetPosition() -> GetPosition
-- GetPositionT() -> GetPositionT
-- GetRotation() -> GetRotation
-- GetRotationT() -> GetRotationT
