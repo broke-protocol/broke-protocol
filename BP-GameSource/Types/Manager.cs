@@ -86,13 +86,10 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             // Don't allow multi-boxing, WebAPI doesn't prevent this
-            foreach (ShPlayer p in EntityCollections.Humans)
+            if (EntityCollections.Accounts.Contains(connectionData.username))
             {
-                if (p.username == connectionData.username)
-                {
-                    svManager.RegisterFail(connectionData.connection, "Account still logged in");
-                    return false;
-                }
+                svManager.RegisterFail(connectionData.connection, "Account still logged in");
+                return false;
             }
 
             return true;
