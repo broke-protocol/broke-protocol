@@ -62,7 +62,7 @@ namespace BrokeProtocol.GameSource.Types
                     return;
                 }
 
-                svManager.AddNewPlayer(connectionData, playerData.Persistent);
+                svManager.AddNewPlayer(connectionData, playerData?.Persistent);
             }
         }
 
