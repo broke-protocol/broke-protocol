@@ -288,7 +288,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerInvite, ExecutionMode.Override)]
         public void OnInvite(ShPlayer player, ShPlayer other)
         {
-            if (other.isHuman && !other.IsDead && other.IsUp && other.IsOutside)
+            if (other.isHuman && other.IsUp)
             {
                 foreach (ShApartment apartment in player.ownedApartments.Keys)
                 {
