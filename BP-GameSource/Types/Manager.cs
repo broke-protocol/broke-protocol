@@ -62,7 +62,7 @@ namespace BrokeProtocol.GameSource.Types
                     return;
                 }
 
-                svManager.AddNewPlayer(connectionData);
+                svManager.AddNewPlayer(connectionData, playerData.Persistent);
             }
         }
 
@@ -86,7 +86,7 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             // Don't allow multi-boxing, WebAPI doesn't prevent this
-            if (EntityCollections.Accounts.Contains(connectionData.username))
+            if (EntityCollections.Accounts.ContainsKey(connectionData.username))
             {
                 svManager.RegisterFail(connectionData.connection, "Account still logged in");
                 return false;
