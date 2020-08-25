@@ -1,3 +1,19 @@
+## 1.08
+?> The Apps Update. Biggest changes based around new Apps for messaging, calls, and banking. Old ATM system replaced.
+
+### API
+- Added ExecutionMode.Test and ExecutionMode.PostEvent to EventHandler [Explained here](https://broke-protocol.github.io/broke-protocol/#/Examples/Server/02_Events?id=subscribing-to-a-game-event)
+- Added EntityCollections.Accounts (HashSet<string>) for fast login lookups
+- All Cl/SvPacket types changed to enums
+- Replace ServerInfo with generic TextPanel and helper function svPlayer.SendTextPanel(string title, string text)
+
+### MODDING
+- ATM class of items removed
+- ATMs, phones, and other electronic device mods must have AvailableApps property set
+
+### Misc
+- Added /clearwanted and /deleteaccount commands (updated groups.json)
+
 ## 1.07a
 ?> Update to Unity 2020.1f1. Big engine update but minimal API changes. [Full 2020.1 Release Notes](https://unity3d.com/unity/whats-new/2020.1.0)
 
