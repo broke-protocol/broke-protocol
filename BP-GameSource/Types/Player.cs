@@ -244,7 +244,7 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, player.svPlayer.RespawnTime);
 
-            player.SetStance(StanceIndex.Dead, true);
+            player.SetStance(StanceIndex.Dead);
         }
 
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]
