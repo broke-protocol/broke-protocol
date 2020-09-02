@@ -288,7 +288,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerInvite, ExecutionMode.Override)]
         public void OnInvite(ShPlayer player, ShPlayer other)
         {
-            if (other.isHuman && other.IsUp)
+            if (other.isHuman && other.IsUp && !player.IsRestrained)
             {
                 foreach (ShApartment apartment in player.ownedApartments.Keys)
                 {
@@ -304,7 +304,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerKickOut, ExecutionMode.Override)]
         public void OnKickOut(ShPlayer player, ShPlayer other)
         {
-            if (other.isHuman && !other.IsDead && other.IsUp && player.InOwnApartment && other.GetPlace == player.GetPlace)
+            if (other.isHuman && !other.IsDead && other.IsUp && player.InOwnApartment && !player.IsRestrained && other.GetPlace == player.GetPlace)
             {
                 other.svPlayer.SvEnterDoor(other.GetPlace.mainDoor.ID, player, true);
             }
