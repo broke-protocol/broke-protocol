@@ -10,6 +10,15 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.DestroyableDeath, ExecutionMode.Override)]
         //public void OnDeath(ShDestroyable destroyable) { }
 
+        [Target(GameSourceEvent.DestroyableDeath, ExecutionMode.Override)]
+        public void OnDeath(ShDestroyable destroyable)
+        {
+            if (destroyable.svDestroyable.thrower && destroyable.svDestroyable.thrower != destroyable)
+            {
+                destroyable.svDestroyable.thrower.job.OnDestroyEntity(destroyable);
+            }
+        }
+
         [Target(GameSourceEvent.DestroyableDamage, ExecutionMode.Override)]
         public void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
         {

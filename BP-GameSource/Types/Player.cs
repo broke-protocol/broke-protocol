@@ -29,9 +29,6 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.PlayerCommand, ExecutionMode.Override)]
         //public void OnCommand(ShPlayer player, string message) { }
 
-        //[Target(GameSourceEvent.PlayerFunctionKey, ExecutionMode.Override)]
-        //public void OnFunctionKey(ShPlayer player, byte key) { }
-
         //[Target(GameSourceEvent.PlayerSave, ExecutionMode.Override)]
         //public void OnSave(ShPlayer player) { }
 
@@ -200,7 +197,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.svPlayer.thrower && player.svPlayer.thrower != player)
             {
-                player.svPlayer.thrower.job.OnKillPlayer(player);
+                player.svPlayer.thrower.job.OnDestroyEntity(player);
 
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(
