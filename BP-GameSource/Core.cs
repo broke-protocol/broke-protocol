@@ -42,8 +42,9 @@ namespace BrokeProtocol.GameSource
                 });
             */
 
-            JobInfo citizen = new JobInfo(
-                0, typeof(Citizen), "Citizen", 
+            JobInfo[] jobsInfo = new JobInfo[] {
+            new JobInfo(
+                0, typeof(Citizen), "Citizen",
                 "Get money by robbing, looting, and trading with NPCs and players or get a job by visiting map icons",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(0.75f, 0.75f, 0.75f), 1f, 28,
                 new Transports[] {
@@ -93,27 +94,32 @@ namespace BrokeProtocol.GameSource
                         "Boat2",
                         "Boat3"})
                 },
-                new Upgrades[0]);
-
-            JobInfo prisoner = new JobInfo(
+                new Upgrades[0]),
+            new JobInfo(
                 1, typeof(Prisoner), "Prisoner",
                 "The prison door can be bombed and the guard might have a key",
                 0, GroupIndex.Prisoner, false, false, false, false, 0, new Color(1f, 0.5f, 0f), 0f, 0,
-                new Transports[3],
+                new Transports[] {
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0])
+                },
                 new Upgrades[] {
                     new Upgrades(
                         new InventoryStruct[] {
                             new InventoryStruct("TopPrisoner", 1),
-                            new InventoryStruct("PantsPrisoner", 1)})});
-
-            JobInfo hitman = new JobInfo(
+                            new InventoryStruct("PantsPrisoner", 1)})}),
+            new JobInfo(
                 2, typeof(Hitman), "Hitman",
                 "Assasinate hit contract targets to earn bounty rewards",
                 0, GroupIndex.Criminal, false, false, true, true, 0, new Color(0f, 0f, 0f), 0.02f, 5,
-                new Transports[0],
-                new Upgrades[0]);
-
-            JobInfo police = new JobInfo(
+                new Transports[] {
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0])
+                },
+                new Upgrades[0]),
+            new JobInfo(
                 3, typeof(Police), "Police",
                 "Search others for illegal items, arrest criminals, put the them in your car, and bring to jail for cash rewards",
                 0, GroupIndex.LawEnforcement, false, false, false, false, 0, new Color(0f, 1f, 1f), 0.03f, 8,
@@ -147,9 +153,8 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Colt", 1),
                             new InventoryStruct("GlovesDark", 1),
                             new InventoryStruct("KeyPrison", 1)})
-                });
-
-            JobInfo paramedic = new JobInfo(
+                }),
+            new JobInfo(
                 4, typeof(Paramedic), "Paramedic",
                 "Use map to find hurt and knocked out players to heal and revive",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(1f, 0.75f, 0.75f), 0.02f, 5,
@@ -176,9 +181,8 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("PantsDoctor", 1),
                             new InventoryStruct("Morphine", 6),
                             new InventoryStruct("Bandage", 6)})
-                });
-
-            JobInfo firefighter = new JobInfo(
+                }),
+            new JobInfo(
                 5, typeof(Firefighter), "Firefighter",
                 "Use map to find fires to extinguish",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(1f, 1f, 0f), 0.01f, 3,
@@ -204,9 +208,8 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("JacketFireBlack", 1),
                             new InventoryStruct("PantsFireBlack", 1),
                             new InventoryStruct("FireHose", 1)})
-                });
-
-            JobInfo gang1 = new JobInfo(
+                }),
+            new JobInfo(
                 6, typeof(Gangster), "Rojo Loco",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 0, GroupIndex.Criminal, true, false, false, false, 0, new Color(1f, 0f, 0f), 0.1f, 8,
@@ -230,9 +233,8 @@ namespace BrokeProtocol.GameSource
                         new InventoryStruct[] {
                             new InventoryStruct("Mac", 1),
                             new InventoryStruct("AmmoSMG", 90)})
-                });
-
-            JobInfo gang2 = new JobInfo(
+                }),
+            new JobInfo(
                 7, typeof(Gangster), "Green St. Fam",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 0, GroupIndex.Criminal, true, false, false, false, 0, new Color(0f, 1f, 0f), 0.1f, 8,
@@ -256,9 +258,8 @@ namespace BrokeProtocol.GameSource
                         new InventoryStruct[] {
                             new InventoryStruct("MP5SD", 1),
                             new InventoryStruct("AmmoSMG", 60)})
-                });
-
-            JobInfo gang3 = new JobInfo(
+                }),
+            new JobInfo(
                 8, typeof(Gangster), "Borgata Blu",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 0, GroupIndex.Criminal, true, false, false, false, 0, new Color(0f, 0f, 1f), 0.1f, 8,
@@ -284,13 +285,16 @@ namespace BrokeProtocol.GameSource
                         new InventoryStruct[] {
                             new InventoryStruct("Shotgun", 1),
                             new InventoryStruct("AmmoShotgun", 32)})
-                });
-
-            JobInfo mayor = new JobInfo(
+                }),
+            new JobInfo(
                 9, typeof(Mayor), "Job Name",
                 "You're the Mayor: Accept or reject license requests",
                 1, GroupIndex.Citizen, false, false, true, true, 0, new Color(1f, 0f, 1f), 0f, 0,
-                new Transports[0],
+                new Transports[] {
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0])
+                },
                 new Upgrades[] {
                     new Upgrades(
                         new InventoryStruct[] {
@@ -302,13 +306,16 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("LicenseBoating", 1),
                             new InventoryStruct("LicensePilots", 1),
                             new InventoryStruct("LicenseGun", 1)})
-                });
-
-            JobInfo deliveryMan = new JobInfo(
+                }),
+            new JobInfo(
                 10, typeof(DeliveryMan), "Delivery Man",
                 "Deliver food to hungry players and NPCs on your map (M) for rewards",
                 0, GroupIndex.Citizen, true, false, false, false, 0, new Color(0.5f, 0.25f, 0f), 0f, 0,
-                new Transports[0],
+                new Transports[] {
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0])
+                },
                 new Upgrades[] {
                     new Upgrades(
                         new InventoryStruct[] {
@@ -323,9 +330,8 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("PantsRacerRed", 1),
                             new InventoryStruct("CapRacerRed", 1),
                             new InventoryStruct("GlovesFingerlessWhite", 1)})
-                });
-
-            JobInfo taxiDriver = new JobInfo(
+                }),
+            new JobInfo(
                 11, typeof(TaxiDriver), "Taxi Driver",
                 "Bring NPCs to destinations on your map (M) for rewards",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(0f, 0f, 0.5f), 0f, 0,
@@ -345,9 +351,8 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("TopChauffeur", 1),
                             new InventoryStruct("PantsChauffeur", 1),
                             new InventoryStruct("CapChauffeur", 1)})
-                });
-
-            JobInfo specOps = new JobInfo(
+                }),
+            new JobInfo(
                 12, typeof(SpecOps), "SpecOps",
                 "Hunt down the most wanted players on the server for rewards",
                 0, GroupIndex.LawEnforcement, false, false, false, false, 0, new Color(0.75f, 0.75f, 0.25f), 0.01f, 3,
@@ -380,24 +385,7 @@ namespace BrokeProtocol.GameSource
                         new InventoryStruct[] {
                             new InventoryStruct("M4", 1),
                             new InventoryStruct("AmmoRifle", 60)})
-                });
-
-
-
-            Job[] jobs = new Job[] {
-                new Citizen(),
-                new Hitman(),
-                new Prisoner(),
-                new Police(),
-                new Paramedic(),
-                new Firefighter(),
-                new Gangster(),
-                new Gangster(),
-                new Gangster(),
-                new Mayor(),
-                new DeliveryMan(),
-                new TaxiDriver(),
-                new SpecOps()
+                })
             };
 
 
