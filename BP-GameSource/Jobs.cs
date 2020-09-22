@@ -25,7 +25,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class Criminal : Job
+    public class Hitman : Job
     {
         public override void ServerCoroutine()
         {
@@ -388,7 +388,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class DeliveryDriver : TargetPlayerJob
+    public class DeliveryMan : TargetPlayerJob
     {
         [NonSerialized]
         public ShConsumable deliveryItem;
