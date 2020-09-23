@@ -10,7 +10,7 @@ namespace BrokeProtocol.CustomEvents
         [CustomTarget]
         public void AreaWarning(ShPhysical physical, string triggerID)
         {
-            if (physical is ShPlayer player && player.job.info.groupIndex != GroupIndex.LawEnforcement)
+            if (physical is ShPlayer player && player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement)
             {
                 player.svPlayer.SendGameMessage($"Warning! You are about to enter {triggerID}!");
 

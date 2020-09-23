@@ -197,7 +197,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.svPlayer.thrower && player.svPlayer.thrower != player)
             {
-                player.svPlayer.thrower.job.OnDestroyEntity(player);
+                player.svPlayer.thrower.svPlayer.job.OnDestroyEntity(player);
 
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(
@@ -322,7 +322,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerReward, ExecutionMode.Override)]
         public void OnReward(ShPlayer player, int experienceDelta, int moneyDelta)
         {
-            if (!player.isHuman || player.job.info.rankItems.Length <= 1)
+            if (!player.isHuman || player.svPlayer.job.info.upgrades.Length <= 1)
             {
                 return;
             }
@@ -331,7 +331,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (experience > Util.maxExperience)
             {
-                if (player.rank >= player.job.info.rankItems.Length - 1)
+                if (player.rank >= player.svPlayer.job.info.upgrades.Length - 1)
                 {
                     if (player.experience != Util.maxExperience)
                     {
@@ -341,7 +341,7 @@ namespace BrokeProtocol.GameSource.Types
                 else
                 {
                     int newRank = player.rank + 1;
-                    player.svPlayer.AddJobItems(player.job, player.rank, newRank, false);
+                    player.svPlayer.AddJobItems(player.svPlayer.job.info, player.rank, newRank, false);
                     player.svPlayer.SetRank(newRank);
                     player.svPlayer.SetExperience(experience - Util.maxExperience, false);
                 }
@@ -430,7 +430,7 @@ namespace BrokeProtocol.GameSource.Types
             player.AddCrime(crime.index, witness);
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witness ? witness.ID : 0);
 
-            if (player.job.info.groupIndex != GroupIndex.Criminal)
+            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Criminal)
             {
                 player.svPlayer.Reward(-crime.experiencePenalty, -crime.fine);
             }
@@ -468,13 +468,13 @@ namespace BrokeProtocol.GameSource.Types
             {
                 int extra = myItem.count;
 
-                if (player.job.info.rankItems.Length > player.rank)
+                if (player.svPlayer.job.info.upgrades.Length > player.rank)
                 {
                     for (int rankIndex = player.rank; rankIndex >= 0; rankIndex--)
                     {
-                        foreach (InventoryItem i in player.job.info.rankItems[rankIndex].items)
+                        foreach (InventoryStruct i in player.svPlayer.job.info.upgrades[rankIndex].items)
                         {
-                            if (myItem.item.index == i.item.index)
+                            if (myItem.item.itemName== i.itemName)
                             {
                                 extra = Mathf.Max(0, myItem.count - i.count);
                             }

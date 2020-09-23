@@ -15,7 +15,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (destroyable.svDestroyable.thrower && destroyable.svDestroyable.thrower != destroyable)
             {
-                destroyable.svDestroyable.thrower.job.OnDestroyEntity(destroyable);
+                destroyable.svDestroyable.thrower.svPlayer.job.OnDestroyEntity(destroyable);
             }
         }
 
