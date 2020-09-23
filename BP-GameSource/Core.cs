@@ -10,9 +10,18 @@ namespace BrokeProtocol.GameSource
     {
         public Core()
         {
-            /*
-            JobInfo citizen = new JobInfo(
-                0, typeof(Citizen), "Job Name",
+            Jobs = GetJobs;
+
+            Info = new PluginInfo("GameSource", "game")
+            {
+                Description = "Default game source used by BP. May be modified.",
+                Website = "https://github.com/broke-protocol/broke-protocol"
+            };
+        }
+
+        /*
+            new JobInfo(
+                typeof(Citizen), "Job Name",
                 "Job Description",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(0.75f, 0.75f, 0.75f), 1f, 28,
                 new Transports[] {
@@ -20,11 +29,11 @@ namespace BrokeProtocol.GameSource
                         "Car1",
                         "Car2" }),
                     new Transports(new string[] {
-                        "Car1",
-                        "Car2" }),
+                        "Aircraft1",
+                        "Aircraft2" }),
                     new Transports(new string[] {
-                        "Car1",
-                        "Car2" })
+                        "Boat1",
+                        "Boat2" })
                 },
                 new Upgrades[] {
                     new Upgrades(
@@ -42,9 +51,9 @@ namespace BrokeProtocol.GameSource
                 });
             */
 
-            JobInfo[] jobsInfo = new JobInfo[] {
+        private JobInfo[] GetJobs => new JobInfo[] {
             new JobInfo(
-                0, typeof(Citizen), "Citizen",
+                typeof(Citizen), "Citizen",
                 "Get money by robbing, looting, and trading with NPCs and players or get a job by visiting map icons",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(0.75f, 0.75f, 0.75f), 1f, 28,
                 new Transports[] {
@@ -96,7 +105,7 @@ namespace BrokeProtocol.GameSource
                 },
                 new Upgrades[0]),
             new JobInfo(
-                1, typeof(Prisoner), "Prisoner",
+                typeof(Prisoner), "Prisoner",
                 "The prison door can be bombed and the guard might have a key",
                 0, GroupIndex.Prisoner, false, false, false, false, 0, new Color(1f, 0.5f, 0f), 0f, 0,
                 new Transports[] {
@@ -110,7 +119,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("TopPrisoner", 1),
                             new InventoryStruct("PantsPrisoner", 1)})}),
             new JobInfo(
-                2, typeof(Hitman), "Hitman",
+                typeof(Hitman), "Hitman",
                 "Assasinate hit contract targets to earn bounty rewards",
                 0, GroupIndex.Criminal, false, false, true, true, 0, new Color(0f, 0f, 0f), 0.02f, 5,
                 new Transports[] {
@@ -120,7 +129,7 @@ namespace BrokeProtocol.GameSource
                 },
                 new Upgrades[0]),
             new JobInfo(
-                3, typeof(Police), "Police",
+                typeof(Police), "Police",
                 "Search others for illegal items, arrest criminals, put the them in your car, and bring to jail for cash rewards",
                 0, GroupIndex.LawEnforcement, false, false, false, false, 0, new Color(0f, 1f, 1f), 0.03f, 8,
                 new Transports[] {
@@ -155,7 +164,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("KeyPrison", 1)})
                 }),
             new JobInfo(
-                4, typeof(Paramedic), "Paramedic",
+                typeof(Paramedic), "Paramedic",
                 "Use map to find hurt and knocked out players to heal and revive",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(1f, 0.75f, 0.75f), 0.02f, 5,
                 new Transports[] {
@@ -183,7 +192,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Bandage", 6)})
                 }),
             new JobInfo(
-                5, typeof(Firefighter), "Firefighter",
+                typeof(Firefighter), "Firefighter",
                 "Use map to find fires to extinguish",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(1f, 1f, 0f), 0.01f, 3,
                 new Transports[] {
@@ -210,7 +219,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("FireHose", 1)})
                 }),
             new JobInfo(
-                6, typeof(Gangster), "Rojo Loco",
+                typeof(Gangster), "Rojo Loco",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 0, GroupIndex.Criminal, true, false, false, false, 0, new Color(1f, 0f, 0f), 0.1f, 8,
                 new Transports[] {
@@ -235,7 +244,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("AmmoSMG", 90)})
                 }),
             new JobInfo(
-                7, typeof(Gangster), "Green St. Fam",
+                typeof(Gangster), "Green St. Fam",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 0, GroupIndex.Criminal, true, false, false, false, 0, new Color(0f, 1f, 0f), 0.1f, 8,
                 new Transports[] {
@@ -260,7 +269,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("AmmoSMG", 60)})
                 }),
             new JobInfo(
-                8, typeof(Gangster), "Borgata Blu",
+                typeof(Gangster), "Borgata Blu",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 0, GroupIndex.Criminal, true, false, false, false, 0, new Color(0f, 0f, 1f), 0.1f, 8,
                 new Transports[] {
@@ -287,7 +296,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("AmmoShotgun", 32)})
                 }),
             new JobInfo(
-                9, typeof(Mayor), "Job Name",
+                typeof(Mayor), "Mayor",
                 "You're the Mayor: Accept or reject license requests",
                 1, GroupIndex.Citizen, false, false, true, true, 0, new Color(1f, 0f, 1f), 0f, 0,
                 new Transports[] {
@@ -308,7 +317,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("LicenseGun", 1)})
                 }),
             new JobInfo(
-                10, typeof(DeliveryMan), "Delivery Man",
+                typeof(DeliveryMan), "Delivery Man",
                 "Deliver food to hungry players and NPCs on your map (M) for rewards",
                 0, GroupIndex.Citizen, true, false, false, false, 0, new Color(0.5f, 0.25f, 0f), 0f, 0,
                 new Transports[] {
@@ -332,7 +341,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("GlovesFingerlessWhite", 1)})
                 }),
             new JobInfo(
-                11, typeof(TaxiDriver), "Taxi Driver",
+                typeof(TaxiDriver), "Taxi Driver",
                 "Bring NPCs to destinations on your map (M) for rewards",
                 0, GroupIndex.Citizen, false, false, false, false, 0, new Color(0f, 0f, 0.5f), 0f, 0,
                 new Transports[0],
@@ -353,7 +362,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("CapChauffeur", 1)})
                 }),
             new JobInfo(
-                12, typeof(SpecOps), "SpecOps",
+                typeof(SpecOps), "SpecOps",
                 "Hunt down the most wanted players on the server for rewards",
                 0, GroupIndex.LawEnforcement, false, false, false, false, 0, new Color(0.75f, 0.75f, 0.25f), 0.01f, 3,
                 new Transports[] {
@@ -387,13 +396,5 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("AmmoRifle", 60)})
                 })
             };
-
-
-            Info = new PluginInfo("GameSource", "game")
-            {
-                Description = "Default game source used by BP. May be modified.",
-                Website = "https://github.com/broke-protocol/broke-protocol"
-            };
-        }
     }
 }
