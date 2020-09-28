@@ -244,6 +244,12 @@ namespace BrokeProtocol.GameSource.Types
             player.SetStance(StanceIndex.Dead);
         }
 
+        [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
+        public void OnDeath(ShPlayer player, string menuID, string optionID)
+        {
+            player.svPlayer.job.OnOptionMenuAction(menuID, optionID);
+        }
+
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]
         public void OnBuyApartment(ShPlayer player, ShApartment apartment)
         {
@@ -376,41 +382,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(GameSourceEvent.PlayerAcceptRequest, ExecutionMode.Override)]
-        public void OnAcceptRequest(ShPlayer player, ShPlayer requester)
-        {
-            var requestItem = player.RequestGet(requester);
-
-            if (requestItem == null)
-            {
-                return;
-            }
-
-            if (!requester.svPlayer.BuyRequestItem(requestItem))
-            {
-                requester.svPlayer.SendGameMessage("No funds for license");
-            }
-            else
-            {
-                player.TransferMoney(DeltaInv.AddToMe, requestItem.item.value, true);
-            }
-
-            player.RequestRemove(requester);
-        }
-
-        [Target(GameSourceEvent.PlayerDenyRequest, ExecutionMode.Override)]
-        public void OnDenyRequest(ShPlayer player, ShPlayer requester)
-        {
-            var requestItem = player.RequestGet(requester);
-
-            if (requestItem == null)
-            {
-                return;
-            }
-
-            requester.svPlayer.SendGameMessage("License Denied");
-            player.RequestRemove(requester);
-        }
+        
 
         [Target(GameSourceEvent.PlayerCrime, ExecutionMode.Override)]
         public void OnCrime(ShPlayer player, byte crimeIndex, ShPlayer victim)

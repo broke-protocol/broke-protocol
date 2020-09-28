@@ -263,6 +263,293 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void SetJobServer() => player.manager.svManager.mayor = player;
 
         public override void RemoveJobServer() => player.manager.svManager.mayor = null;
+
+
+        /*
+        requestItems = new RequestItem[requestableItems.Length];
+        for (int i = 0; i < requestableItems.Length; i++)
+        {
+            requestItems[i] = new RequestItem(this, i);
+        }
+        
+        public class ClRequestItemButton : ClButton
+        {
+            [SerializeField]
+            private Text requestItemLabel = null;
+            [SerializeField]
+            private Text requestPriceLabel = null;
+
+            [NonSerialized]
+            public RequestItemInfo requestItemInfo;
+
+            public override void RefreshActions()
+            {
+                actions.Add(new ActionInfo(ButtonIndex.RequestItemButton, null, RequestAddAction));
+                base.RefreshActions();
+            }
+
+            public override void Initialize(ButtonInfo buttonInfo)
+            {
+                base.Initialize(buttonInfo);
+
+                requestItemInfo = (RequestItemInfo)buttonInfo;
+                requestItemLabel.text = requestItemInfo.requestItem.item.itemName;
+                requestPriceLabel.text = "$" + requestItemInfo.requestItem.item.value.ToString();
+            }
+
+            protected void RequestAddAction()
+            {
+                if (requestItemInfo.manager.clManager.myPlayer.HasItem(requestItemInfo.requestItem.item))
+                {
+                    requestItemInfo.manager.clManager.ShowGameMessage("Have item already");
+                }
+                else if (requestItemInfo.manager.clManager.myPlayer.MyMoneyCount < requestItemInfo.requestItem.item.value)
+                {
+                    requestItemInfo.manager.clManager.ShowGameMessage("Insufficient funds");
+                }
+                else
+                {
+                    requestItemInfo.requestItem.RequestAdd();
+                }
+            }
+        }
+        
+
+        public class ClRequestButton : ClButton
+        {
+            [SerializeField]
+            private Text itemLabel = null;
+            [SerializeField]
+            private Text playerLabel = null;
+            [SerializeField]
+            private Text jobLabel = null;
+
+            [NonSerialized]
+            public RequestInfo requestInfo;
+
+            public override void RefreshActions()
+            {
+                actions.Add(new ActionInfo(ButtonIndex.RequestButton, null, AcceptAction));
+                actions.Add(new ActionInfo(ButtonIndex.RequestButton, null, DenyAction));
+                base.RefreshActions();
+            }
+
+            public override void Initialize(ButtonInfo buttonInfo)
+            {
+                base.Initialize(buttonInfo);
+
+                requestInfo = (RequestInfo)buttonInfo;
+                itemLabel.text = requestInfo.requestItem.item.itemName;
+                playerLabel.text = requestInfo.player.username;
+                jobLabel.text = requestInfo.player.clPlayer.job.jobName;
+            }
+
+            protected void AcceptAction()
+            {
+                ShPlayer requester = ((RequestInfo)buttonInfo).player;
+
+                buttonInfo.manager.clManager.SendToServer(Channel.Reliable, SvPacket.AcceptRequest, requester.ID);
+
+                buttonInfo.manager.clManager.myPlayer.RequestRemove(requester);
+            }
+
+            protected void DenyAction()
+            {
+                ShPlayer requester = ((RequestInfo)buttonInfo).player;
+
+                buttonInfo.manager.clManager.SendToServer(Channel.Reliable, SvPacket.DenyRequest, requester.ID);
+
+                buttonInfo.manager.clManager.myPlayer.RequestRemove(requester);
+            }
+        }
+        
+
+
+        public class RequestItemsMenu : ListMenu
+        {
+            public override void FillButtons(params object[] args)
+            {
+                foreach (RequestItem requestItem in manager.requestItems)
+                {
+                    CreateButton(new RequestItemInfo(manager, contentPanel, requestItem));
+                }
+                base.FillButtons(args);
+            }
+        }
+
+        public class RequestsMenu : ListMenu
+        {
+            public override void FillButtons(params object[] args)
+            {
+                foreach (KeyValuePair<ShPlayer, RequestItem> pair in manager.clManager.myPlayer.requests)
+                {
+                    CreateButton(new RequestInfo(manager, contentPanel, pair.Key, pair.Value));
+                }
+                base.FillButtons(args);
+            }
+        }
+
+
+        public sealed class RequestItem
+        {
+            private readonly ShManager manager;
+            public int index;
+            public ShItem item;
+
+            public RequestItem(ShManager manager, int index)
+            {
+                this.manager = manager;
+                this.index = index;
+                item = manager.requestableItems[index];
+            }
+
+            public void RequestAdd() => manager.clManager.SendToServer(Channel.Reliable, SvPacket.RequestAdd, index);
+        }
+
+
+
+        public void RequestAdd(int requestItemIndex)
+        {
+            if (requestItemIndex >= 0 && requestItemIndex < player.manager.requestableItems.Length)
+            {
+                RequestItem requestItem = player.manager.requestItems[requestItemIndex];
+
+                if (!player.HasItem(requestItem.item))
+                {
+                    if (svManager.mayor)
+                    {
+                        if (player.MyMoneyCount< requestItem.item.value)
+                        {
+                            SendGameMessage("Not enough money");
+                        }
+                        else if (svManager.mayor.requests.ContainsKey(player))
+                        {
+                            SendGameMessage("Previous request still pending");
+                        }
+                        else
+                        {
+                            svManager.mayor.RequestAdd(player, requestItem);
+                            svManager.mayor.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.RequestAdd, player.ID, requestItemIndex);
+
+                            SendGameMessage("Request successfully sent");
+                        }
+                    }
+                    else
+                    {
+                        BuyRequestItem(requestItem);
+                    }
+                }
+                else
+                {
+                    SendGameMessage("Already own item");
+                }
+            }
+        }
+
+        public bool BuyRequestItem(RequestItem requestItem)
+        {
+            if (player.MyMoneyCount>= requestItem.item.value)
+            {
+                player.TransferMoney(DeltaInv.RemoveFromMe, requestItem.item.value, true);
+
+                player.TransferItem(DeltaInv.AddToMe, requestItem.item);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public void SvAcceptRequest(int playerID)
+        {
+            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(playerID);
+            if (requester)
+            {
+                var requestItem = player.RequestGet(requester);
+
+                if (requestItem == null)
+                {
+                    return;
+                }
+
+                if (!requester.svPlayer.BuyRequestItem(requestItem))
+                {
+                    requester.svPlayer.SendGameMessage("No funds for license");
+                }
+                else
+                {
+                    player.TransferMoney(DeltaInv.AddToMe, requestItem.item.value, true);
+                }
+
+                player.RequestRemove(requester);
+            }
+        }
+
+        public void SvDenyRequest(int playerID)
+        {
+            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(playerID);
+            if (requester)
+            {
+                var requestItem = player.RequestGet(requester);
+
+                if (requestItem == null)
+                {
+                    return;
+                }
+
+                requester.svPlayer.SendGameMessage("License Denied");
+                player.RequestRemove(requester);
+            }
+        }
+
+        public RequestItem RequestGet(ShPlayer player)
+        {
+            requests.TryGetValue(player, out RequestItem requestItem);
+
+            return requestItem;
+        }
+
+        public void RequestRemove(ShPlayer player)
+        {
+            if (requests.ContainsKey(player))
+            {
+                requests.Remove(player);
+                if (ShManager.isClient)
+                {
+                    manager.clManager.RefreshListMenu<OptionMenu>();
+                }
+            }
+        }
+
+        public void RequestAdd(ShPlayer player, RequestItem requestItem)
+        {
+            requests.Add(player, requestItem);
+            if (ShManager.isClient)
+            {
+                manager.clManager.ShowGameMessage(player.username + " requesting a " + requestItem.item.itemName);
+                manager.clManager.RefreshListMenu<OptionMenu>();
+            }
+        }
+
+        private void RequestAdd(MyReader reader)
+        {
+            ShPlayer player = EntityCollections.FindByID<ShPlayer>(reader.ReadInt32());
+            if (player)
+            {
+                RequestItem requestItem = manager.requestItems[reader.ReadInt32()];
+                myPlayer.RequestAdd(player, requestItem);
+            }
+        }
+
+        private void RequestRemove(MyReader reader)
+        {
+            ShPlayer player = EntityCollections.FindByID<ShPlayer>(reader.ReadInt32());
+            if (player) myPlayer.RequestRemove(player);
+        }
+
+         */
+
+
     }
 
     public abstract class TargetEntityJob : Job
