@@ -11,12 +11,13 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Prefabs;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using BrokeProtocol.API;
 
 namespace BrokeProtocol.GameSource.Jobs
 {
     public class Citizen : Job
     {
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (!player.isHuman && Random.value < 0.005f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
@@ -27,7 +28,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Hitman : Job
     {
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (!player.isHuman && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
@@ -43,7 +44,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Police : Job
     {
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (!player.isHuman && !player.svPlayer.targetEntity && player.IsMobile &&
                 player.HasItem(player.manager.handcuffs) &&
@@ -64,7 +65,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Paramedic : TargetPlayerJob
     {
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (!player.isHuman)
             {
@@ -105,7 +106,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Firefighter : TargetEntityJob
     {
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (!player.isHuman)
             {
@@ -148,7 +149,7 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         protected int gangstersKilled;
 
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (!player.isHuman && Random.value < 0.01f && player.IsMobile
                 && player.svPlayer.currentState.index == StateIndex.Waypoint)
@@ -260,9 +261,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Mayor : Job
     {
-        public override void SetJobServer() => player.manager.svManager.mayor = player;
+        public override void SetJobServer() => ChatHandler.SendToAll("New Mayor: " + player.username);
 
-        public override void RemoveJobServer() => player.manager.svManager.mayor = null;
+        public override void RemoveJobServer() => ChatHandler.SendToAll("Mayor Left: " + player.username);
 
 
         /*
@@ -638,7 +639,7 @@ namespace BrokeProtocol.GameSource.Jobs
             targetPlayer.svPlayer.SendGameMessage("SpecOps dispatched!");
         }
 
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (!player.isHuman)
             {
@@ -707,7 +708,7 @@ namespace BrokeProtocol.GameSource.Jobs
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
         }
 
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (player.isHuman)
             {
@@ -800,7 +801,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected override GetEntityCallback GetTargetHandler() => () => player.svPlayer.svManager.RandomAIPlayer;
 
-        public override void ServerCoroutine()
+        public override void Loop()
         {
             if (player.isHuman)
             {

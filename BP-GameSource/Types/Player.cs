@@ -382,8 +382,6 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        
-
         [Target(GameSourceEvent.PlayerCrime, ExecutionMode.Override)]
         public void OnCrime(ShPlayer player, byte crimeIndex, ShPlayer victim)
         {
