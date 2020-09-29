@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Utility.Networking;
 using BrokeProtocol.Entities;
@@ -9,6 +10,7 @@ using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Required;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Prefabs;
+using ENet;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using BrokeProtocol.API;
@@ -261,10 +263,42 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Mayor : Job
     {
+        private readonly string itemMenu = "items";
+        private readonly string requestMenu = "requests";
+
+        private readonly string[] requestItems = new string[]{
+            "LicenseGun",
+            "LicenseDrivers",
+            "LicensePilots",
+            "LicenseBoating"
+        };
+
         public override void SetJobServer() => ChatHandler.SendToAll("New Mayor: " + player.username);
 
         public override void RemoveJobServer() => ChatHandler.SendToAll("Mayor Left: " + player.username);
 
+
+        public override void OnEmployeeAction(ShPlayer target)
+        {
+            List<LabelID> options = new List<LabelID>();
+
+            foreach (string s in requestItems)
+            {
+                ShItem i = SceneManager.Instance.GetEntity<ShItem>(s.GetPrefabIndex());
+
+                if (i)
+                {
+                    options.Add(new LabelID(s, i.itemName + ": $" + i.value));
+                }
+            }
+
+
+            target.svPlayer.SendOptionMenu(itemMenu, "Items", options.ToArray(), new LabelID[] { new LabelID("Request", "request") }); 
+        }
+
+        public override void OnSelfAction()
+        {
+        }
 
         /*
         requestItems = new RequestItem[requestableItems.Length];
