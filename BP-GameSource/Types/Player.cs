@@ -245,9 +245,9 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
-        public void OnDeath(ShPlayer player, string menuID, string optionID, string actionID)
+        public void OnDeath(ShPlayer player, string targetPlayer, string menuID, string optionID, string actionID)
         {
-            player.svPlayer.job.OnOptionMenuAction(menuID, optionID, actionID);
+            player.svPlayer.job.OnOptionMenuAction(targetPlayer, menuID, optionID, actionID);
         }
 
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]
