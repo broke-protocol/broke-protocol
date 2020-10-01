@@ -87,16 +87,34 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void ResetJobAI() => player.svPlayer.SetState(StateIndex.Waypoint);
     }
 
-    public class Police : Job
+    public class Police : TargetPlayerJob
     {
+        protected override void FoundTarget()
+        {
+            base.FoundTarget();
+            player.svPlayer.SendGameMessage("Criminal target: " + targetPlayer.username);
+            targetPlayer.svPlayer.SendGameMessage("Police dispatched!");
+        }
+
         public override void Loop()
         {
-            if (!player.isHuman && !player.svPlayer.targetEntity && player.IsMobile &&
-                player.HasItem(player.manager.handcuffs) &&
-                Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
+            if (!player.isHuman)
             {
-                player.svPlayer.TryFindCriminal();
+                if (!player.svPlayer.targetEntity && player.IsMobile &&
+                    Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
+                {
+                    TryFindCriminal();
+                }
             }
+            else if (!ValidTarget(targetPlayer))
+            {
+                SetTarget();
+            }
+        }
+
+        public override void OnJailCriminal(ShPlayer criminal, int fine)
+        {
+            player.svPlayer.Reward(3, fine);
         }
 
         public override void ResetJobAI()
@@ -566,6 +584,23 @@ namespace BrokeProtocol.GameSource.Jobs
         [NonSerialized]
         public ShPlayer targetPlayer;
 
+        protected void TryFindCriminal()
+        {
+            foreach (Sector s in player.svPlayer.localSectors.Values)
+            {
+                foreach (ShEntity e in s.centered)
+                {
+                    if (e != player && e is ShPlayer p && !p.IsDead && !p.IsRestrained &&
+                        p.wantedLevel >= info.attackLevel && player.CanSeeEntity(p))
+                    {
+                        player.svPlayer.targetEntity = p;
+                        player.svPlayer.SetState(StateIndex.Attack);
+                        return;
+                    }
+                }
+            }
+        }
+
         protected override void FoundTarget()
         {
             base.FoundTarget();
@@ -612,7 +647,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 if (!player.svPlayer.targetEntity && player.IsMobile &&
                     Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
                 {
-                    player.svPlayer.TryFindCriminal();
+                    TryFindCriminal();
                 }
             }
             else if (!ValidTarget(targetPlayer))

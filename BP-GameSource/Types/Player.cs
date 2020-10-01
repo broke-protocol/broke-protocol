@@ -245,7 +245,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
-        public void OnDeath(ShPlayer player, string targetPlayer, string menuID, string optionID, string actionID)
+        public void OnOptionAction(ShPlayer player, int targetPlayer, string menuID, string optionID, string actionID)
         {
             player.svPlayer.job.OnOptionMenuAction(targetPlayer, menuID, optionID, actionID);
         }
@@ -380,6 +380,31 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.TransferMoney(DeltaInv.RemoveFromMe, -moneyDelta, true);
             }
+        }
+
+        [Target(GameSourceEvent.PlayerJailCriminal, ExecutionMode.Override)]
+        public void OnJailCriminal(ShPlayer player, ShPlayer criminal)
+        {
+            if (player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+            {
+                int fine = criminal.svPlayer.SvGoToJail();
+
+                if (fine > 0) player.svPlayer.job.OnJailCriminal(criminal, fine);
+                else player.svPlayer.SendGameMessage("Confirm criminal is cuffed and has crimes");
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerGoToJail, ExecutionMode.Override)]
+        public void OnGoToJail(ShPlayer player, float time, int fine)
+        {
+            player.svPlayer.SvTrySetJob(BPAPI.Instance.PrisonerIndex, true, false);
+            Transform jailSpawn = SceneManager.Instance.jail.mainT;
+            player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
+
+            player.svPlayer.SvClearCrimes();
+            player.RemoveItemsJail();
+            player.StartCoroutine(player.svPlayer.JailTimer(time));
+            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, time);
         }
 
         [Target(GameSourceEvent.PlayerCrime, ExecutionMode.Override)]
