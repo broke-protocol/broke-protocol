@@ -19,11 +19,54 @@ namespace BrokeProtocol.GameSource.Jobs
 {
     public class Citizen : Job
     {
+        protected void TryFindInnocent()
+        {
+            foreach (Sector s in player.svPlayer.localSectors.Values)
+            {
+                foreach (ShEntity e in s.centered)
+                {
+                    if (e != player && e is ShPlayer p && !p.curMount && !p.IsDead &&
+                        p.IsRestrained && p.wantedLevel == 0 && player.CanSeeEntity(p))
+                    {
+                        player.svPlayer.targetEntity = p;
+                        player.svPlayer.SetState(StateIndex.Free);
+                        return;
+                    }
+                }
+            }
+        }
+
+        public void TryFindVictim()
+        {
+            foreach (Sector s in player.svPlayer.localSectors.Values)
+            {
+                foreach (ShEntity e in s.centered)
+                {
+                    if (e != player && e is ShPlayer p && !p.curMount && !p.IsDead &&
+                        !p.IsRestrained && player.CanSeeEntity(p))
+                    {
+                        player.svPlayer.targetEntity = p;
+                        player.svPlayer.SetState(StateIndex.Rob);
+                        return;
+                    }
+                }
+            }
+        }
+
         public override void Loop()
         {
-            if (!player.isHuman && Random.value < 0.005f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if (!player.isHuman && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
-                player.svPlayer.TryFindInnocent();
+                float rand = Random.value;
+
+                if (rand < 0.01f)
+                {
+                    TryFindInnocent();
+                }
+                else if(rand < 0.005f)
+                {
+                    TryFindVictim();
+                }
             }
         }
     }
@@ -34,7 +77,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (!player.isHuman && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
-                player.svPlayer.TryFindVictim();
+                TryFindVictim();
             }
         }
     }
@@ -67,6 +110,22 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Paramedic : TargetPlayerJob
     {
+        protected void TryFindKnockedOut()
+        {
+            foreach (Sector s in player.svPlayer.localSectors.Values)
+            {
+                foreach (ShEntity e in s.centered)
+                {
+                    if (e != player && e is ShPlayer p && p.IsKnockedOut)
+                    {
+                        player.svPlayer.targetEntity = p;
+                        player.svPlayer.SetState(StateIndex.Revive);
+                        return;
+                    }
+                }
+            }
+        }
+
         public override void Loop()
         {
             if (!player.isHuman)
@@ -74,7 +133,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 if (Random.value < 0.1f && player.IsMobile && !player.svPlayer.targetEntity &&
                     player.HasItem(player.manager.defibrillator))
                 {
-                    player.svPlayer.TryFindKnockedOut();
+                    TryFindKnockedOut();
                 }
             }
             else if (!ValidTarget(target))
@@ -108,6 +167,22 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Firefighter : TargetEntityJob
     {
+        public void TryFindFire()
+        {
+            foreach (Sector s in player.svPlayer.localSectors.Values)
+            {
+                foreach (ShEntity e in s.centered)
+                {
+                    if (e.gameObject.layer == LayerIndex.fire)
+                    {
+                        player.svPlayer.targetEntity = e;
+                        player.svPlayer.SetState(StateIndex.Extinguish);
+                        return;
+                    }
+                }
+            }
+        }
+
         public override void Loop()
         {
             if (!player.isHuman)
@@ -115,7 +190,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 if (Random.value < 0.1f && player.IsMobile && !player.svPlayer.targetEntity &&
                     player.HasItem(player.manager.extinguisher))
                 {
-                    player.svPlayer.TryFindFire();
+                    TryFindFire();
                 }
             }
             else if (!ValidTarget(target))
@@ -151,12 +226,29 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         protected int gangstersKilled;
 
+        public void TryFindEnemyGang()
+        {
+            foreach (Sector s in player.svPlayer.localSectors.Values)
+            {
+                foreach (ShEntity e in s.centered)
+                {
+                    if (e != player && e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.gang &&
+                        p.svPlayer.job != this && !p.IsRestrained && player.CanSeeEntity(p))
+                    {
+                        player.svPlayer.targetEntity = p;
+                        player.svPlayer.SetState(StateIndex.Attack);
+                        return;
+                    }
+                }
+            }
+        }
+
         public override void Loop()
         {
             if (!player.isHuman && Random.value < 0.01f && player.IsMobile
                 && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
-                player.svPlayer.TryFindEnemyGang();
+                TryFindEnemyGang();
             }
         }
 
