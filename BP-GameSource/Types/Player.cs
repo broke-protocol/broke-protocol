@@ -522,6 +522,22 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
+        [Target(GameSourceEvent.PlayerUnrestrain, ExecutionMode.Override)]
+        public void OnUnrestrain(ShPlayer player)
+        {
+            player.svPlayer.SvSetEquipable(player.manager.hands.index);
+
+            if (!player.isHuman)
+            {
+                player.svPlayer.SvDismount();
+                player.svPlayer.ResetAI();
+            }
+            else
+            {
+                player.svPlayer.SendGameMessage("You've been freed");
+            }
+        }
+
         [Target(GameSourceEvent.PlayerServerInfo, ExecutionMode.Override)]
         public void OnServerInfo(ShPlayer player)
         {
