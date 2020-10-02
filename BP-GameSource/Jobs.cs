@@ -73,11 +73,161 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Hitman : Job
     {
+        private readonly Dictionary<string, DateTimeOffset> contracts = new Dictionary<string, DateTimeOffset>();
+
+        private const string playersMenu = "players";
+        private const string contractsMenu = "contracts";
+
+        private const string place = "place";
+        private const string cancel = "cancel";
+
+        private const int placeCost = 2000;
+        private const int cancelCost = 3000;
+
+        private const float contractLimitHours = 100f;
+
+        protected void TryFindHitContract()
+        {
+            foreach (Sector s in player.svPlayer.localSectors.Values)
+            {
+                foreach (ShEntity e in s.centered)
+                {
+                    if (e != player && e is ShPlayer p && contracts.ContainsKey(p.username))
+                    {
+                        player.svPlayer.targetEntity = p;
+                        player.svPlayer.SetState(StateIndex.Attack);
+                        return;
+                    }
+                }
+            }
+        }
+
+        public override void OnDestroyEntity(ShEntity entity)
+        {
+            base.OnDestroyEntity(entity);
+            if (entity is ShPlayer victim && contracts.ContainsKey(victim.username))
+            {
+                player.svPlayer.Reward(3, 300);
+                contracts.Remove(victim.username);
+                MessageAllEmployees(victim.username + " Hit Target Eliminated");
+            }
+        }
+
         public override void Loop()
         {
+            List<string> removeKeys = new List<string>();
+
+            foreach (KeyValuePair<string, DateTimeOffset> pair in contracts)
+            {
+                if ((Util.CurrentTime - pair.Value).Hours >= contractLimitHours)
+                {
+                    removeKeys.Add(pair.Key);
+                }
+            }
+
+            foreach (string s in removeKeys)
+            {
+                contracts.Remove(s);
+            }
+
             if (!player.isHuman && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
-                TryFindVictim();
+                TryFindHitContract();
+            }
+        }
+
+        public override void OnEmployeeAction(ShPlayer target)
+        {
+            List<LabelID> options = new List<LabelID>();
+
+            foreach (ShPlayer p in EntityCollections.Humans)
+            {
+                if (contracts.TryGetValue(p.username, out var hitTime))
+                {
+                    options.Add(new LabelID(p.username, $"{p.username}: {contractLimitHours - (Util.CurrentTime - hitTime).Hours} Hours"));
+                }
+                else
+                {
+                    options.Add(new LabelID(p.username, $"{p.username}:  Available"));
+                }    
+            }
+
+            target.svPlayer.SendOptionMenu(playersMenu, player.ID, "Players", options.ToArray(), new LabelID[] { new LabelID($"Place Hit ${placeCost}", place), new LabelID($"Cancel Hit ${cancelCost}", cancel) });
+        }
+
+        public override void OnSelfAction()
+        {
+            List<LabelID> options = new List<LabelID>();
+
+            foreach (KeyValuePair<string, DateTimeOffset> pair in contracts)
+            {
+                string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " (Online)" : "";
+
+                options.Add(new LabelID(pair.Key, $"{pair.Key}{online}: {contractLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours"));
+            }
+
+            player.svPlayer.SendOptionMenu(contractsMenu, player.ID, "Hit Contracts", options.ToArray(), new LabelID[0]);
+        }
+
+
+        public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
+        {
+            if(menuID == playersMenu)
+            {
+                if(actionID == place) PlaceHit(targetID, optionID);
+                else if(actionID == cancel) CancelHit(targetID, optionID);
+            }
+        }
+
+        public void PlaceHit(int sourceID, string hitName)
+        {
+            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(sourceID);
+            if (!requester)
+            {
+                Debug.LogError("[SVR] Requester not found");
+                return;
+            }
+
+            if (contracts.ContainsKey(hitName))
+            {
+                requester.svPlayer.SendGameMessage("Hit already exists for " + hitName);
+            }
+            else if (player.MyMoneyCount < placeCost)
+            {
+                requester.svPlayer.SendGameMessage("Not enough money");
+            }
+            else
+            {
+                contracts[hitName] = Util.CurrentTime;
+                requester.TransferMoney(DeltaInv.RemoveFromMe, placeCost, true);
+                MessageAllEmployees("Hit Contract Placed on " + hitName);
+                OnEmployeeAction(requester);
+            }
+        }
+
+        public void CancelHit(int sourceID, string hitName)
+        {
+            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(sourceID);
+            if (!requester)
+            {
+                Debug.LogError("[SVR] Requester not found");
+                return;
+            }
+
+            if (!contracts.ContainsKey(hitName))
+            {
+                requester.svPlayer.SendGameMessage("No Contract for " + hitName);
+            }
+            else if (player.MyMoneyCount < cancelCost)
+            {
+                requester.svPlayer.SendGameMessage("Not enough money");
+            }
+            else
+            {
+                contracts.Remove(hitName);
+                requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost, true);
+                MessageAllEmployees("Hit Contract Canceled on " + hitName);
+                OnEmployeeAction(requester);
             }
         }
     }
@@ -424,7 +574,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
             }
 
-            target.svPlayer.SendOptionMenu(itemMenu, target.ID, "Items", options.ToArray(), new LabelID[] { new LabelID("Request", "req") }); 
+            target.svPlayer.SendOptionMenu(itemMenu, player.ID, "Items", options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
         }
 
         public override void OnSelfAction()
@@ -445,7 +595,7 @@ namespace BrokeProtocol.GameSource.Jobs
             switch(menuID)
             {
                 case itemMenu:
-                    RequestAdd(targetID, optionID); // actionID can only be 'req' (request)
+                    RequestAdd(targetID, optionID); // actionID doesn't matter here
                     break;
                 case requestMenu:
                     ResultHandle(optionID, actionID); // targetID can only be self here
