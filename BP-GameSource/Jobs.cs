@@ -400,7 +400,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 foreach (ShEntity e in s.centered)
                 {
-                    if (e != player && e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.gang &&
+                    if (e != player && e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.groupIndex == GroupIndex.Gang &&
                         p.svPlayer.job != this && !p.IsRestrained && player.CanSeeEntity(p))
                     {
                         player.svPlayer.targetEntity = p;
