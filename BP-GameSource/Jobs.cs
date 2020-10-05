@@ -136,7 +136,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
-        public override void OnEmployeeAction(ShPlayer target)
+        public override void OnEmployeeAction(ShPlayer target, string actionID)
         {
             List<LabelID> options = new List<LabelID>();
 
@@ -155,7 +155,7 @@ namespace BrokeProtocol.GameSource.Jobs
             target.svPlayer.SendOptionMenu(playersMenu, player.ID, "Players", options.ToArray(), new LabelID[] { new LabelID($"Place Hit ${placeCost}", place), new LabelID($"Cancel Hit ${cancelCost}", cancel) });
         }
 
-        public override void OnSelfAction()
+        public override void OnSelfAction(string actionID)
         {
             List<LabelID> options = new List<LabelID>();
 
@@ -201,7 +201,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 contracts[hitName] = Util.CurrentTime;
                 requester.TransferMoney(DeltaInv.RemoveFromMe, placeCost, true);
                 MessageAllEmployees("Hit Contract Placed on " + hitName);
-                OnEmployeeAction(requester);
+                OnEmployeeAction(requester, null);
             }
         }
 
@@ -227,7 +227,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 contracts.Remove(hitName);
                 requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost, true);
                 MessageAllEmployees("Hit Contract Canceled on " + hitName);
-                OnEmployeeAction(requester);
+                OnEmployeeAction(requester, null);
             }
         }
     }
@@ -560,7 +560,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
-        public override void OnEmployeeAction(ShPlayer target)
+        public override void OnEmployeeAction(ShPlayer target, string actionID)
         {
             List<LabelID> options = new List<LabelID>();
 
@@ -577,7 +577,7 @@ namespace BrokeProtocol.GameSource.Jobs
             target.svPlayer.SendOptionMenu(itemMenu, player.ID, "Items", options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
         }
 
-        public override void OnSelfAction()
+        public override void OnSelfAction(string actionID)
         {
             List<LabelID> options = new List<LabelID>();
 
@@ -683,7 +683,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
 
             requests.Remove(requesterName);
-            OnSelfAction();
+            OnSelfAction(null);
         }
     }
 
@@ -880,9 +880,9 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
-        public override void OnSpecialAction(ShPlayer target)
+        public override void OnSpecialAction(ShEntity target, string actionID)
         {
-            if (!target || target.IsDead || !(player.svPlayer.job.info.shared.specialAction) || !player.InActionRange(target))
+            if (!target || target.IsDead || (player.svPlayer.job.info.shared.specialActions == null) || !player.InActionRange(target))
             {
                 return;
             }
