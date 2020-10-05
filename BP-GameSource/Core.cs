@@ -128,7 +128,25 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0]),
                     new Transports(new string[0])
                 },
-                new Upgrades[0]),
+                new Upgrades[] {
+                    new Upgrades(
+                        new InventoryStruct[] {
+                            new InventoryStruct("TopStriped", 1),
+                            new InventoryStruct("SkiMaskDark", 1),
+                            new InventoryStruct("GlovesFingerlessDark", 1),
+                            new InventoryStruct("Knife", 1)}),
+                    new Upgrades(
+                        new InventoryStruct[] {
+                            new InventoryStruct("SkiMaskLight", 1),
+                            new InventoryStruct("Winchester", 1),
+                            new InventoryStruct("AmmoRifle", 30)})
+                    ,
+                    new Upgrades(
+                        new InventoryStruct[] {
+                            new InventoryStruct("SkiMaskPattern", 1),
+                            new InventoryStruct("LaserRed", 1),
+                            new InventoryStruct("Silencer", 1)})
+                }),
             new JobInfo(
                 typeof(Police), "Police",
                 "Search others for illegal items, arrest criminals, put the them in your car, and bring to jail for cash rewards",
