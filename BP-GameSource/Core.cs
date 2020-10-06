@@ -363,7 +363,11 @@ namespace BrokeProtocol.GameSource
                 typeof(TaxiDriver), "Taxi Driver",
                 "Bring NPCs to destinations on your map (M) for rewards",
                 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0f, 0f, 0.5f), 0f, 0,
-                new Transports[0],
+                new Transports[] {
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0])
+                },
                 new Upgrades[] {
                     new Upgrades(
                         new InventoryStruct[] {
