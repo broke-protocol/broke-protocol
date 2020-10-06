@@ -73,7 +73,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Hitman : Job
     {
-        private readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
+        private static readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
 
         private const string playersMenu = "players";
         private const string bountiesMenu = "bounties";
@@ -523,7 +523,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Mayor : Job
     {
-        private readonly Dictionary<string, string> requests = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> requests = new Dictionary<string, string>();
 
         private readonly HashSet<string> requestItems = new HashSet<string>{
             "LicenseGun",
