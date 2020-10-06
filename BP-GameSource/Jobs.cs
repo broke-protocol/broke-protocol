@@ -369,8 +369,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected override GetEntityCallback GetTargetHandler() => () =>
         {
-            if (player.svPlayer.svManager.fires.Count > 0)
-                return player.svPlayer.svManager.fires.ToArray().GetRandom();
+            if (svManager.fires.Count > 0)
+                return svManager.fires.ToArray().GetRandom();
             else
                 return null;
         };
@@ -440,7 +440,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void SetJob()
         {
             gangstersKilled = 0;
-            foreach (ShTerritory territory in player.manager.svManager.territories.Values)
+            foreach (ShTerritory territory in svManager.territories.Values)
             {
                 territory.svEntity.AddSubscribedPlayer(player);
             }
@@ -448,7 +448,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void RemoveJob()
         {
-            foreach (ShTerritory territory in player.manager.svManager.territories.Values)
+            foreach (ShTerritory territory in svManager.territories.Values)
             {
                 territory.svEntity.RemoveSubscribedPlayer(player, true);
             }
@@ -460,7 +460,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (entity is ShPlayer victim)
             {
-                if (!player.svPlayer.svManager.gangWar)
+                if (!svManager.gangWar)
                 {
                     if (player.isHuman && victim.svPlayer.job is Gangster && this != victim.svPlayer.job)
                     {
@@ -782,11 +782,11 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (EntityCollections.Humans.Count >= 3)
             {
-                return () => player.svPlayer.svManager.RandomHuman;
+                return () => svManager.RandomHuman;
             }
             else
             {
-                return () => player.svPlayer.svManager.RandomAIPlayer;
+                return () => svManager.RandomAIPlayer;
             }
         }
 
@@ -966,7 +966,7 @@ namespace BrokeProtocol.GameSource.Jobs
             base.ResetTarget();
         }
 
-        protected override GetEntityCallback GetTargetHandler() => () => player.svPlayer.svManager.RandomAIPlayer;
+        protected override GetEntityCallback GetTargetHandler() => () => svManager.RandomAIPlayer;
 
         public override void Loop()
         {
@@ -999,10 +999,10 @@ namespace BrokeProtocol.GameSource.Jobs
                 {
                     player.svPlayer.DestroyGoalMarker();
 
-                    SpawnLocation destination = player.manager.svManager.spawnLocations.GetRandom();
+                    SpawnLocation destination = svManager.spawnLocations.GetRandom();
 
-                    destinationMarker = player.manager.svManager.AddNewEntity(
-                        player.manager.svManager.markerGoalPrefab,
+                    destinationMarker = svManager.AddNewEntity(
+                        svManager.markerGoalPrefab,
                         SceneManager.Instance.ExteriorPlace,
                         destination.transform.position,
                         Quaternion.identity,
