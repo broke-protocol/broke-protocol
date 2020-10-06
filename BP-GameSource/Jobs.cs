@@ -734,6 +734,22 @@ namespace BrokeProtocol.GameSource.Jobs
         [NonSerialized]
         public ShPlayer targetPlayer;
 
+        protected bool SetSpawnTarget()
+        {
+            ShPlayer target = player.svPlayer.spawner;
+
+            if (target && target.IsOutside && target.wantedLevel >= info.attackLevel &&
+                Random.value < target.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
+            {
+                player.svPlayer.targetEntity = target;
+                if (player.svPlayer.SetState(StateIndex.Attack))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         protected void TryFindCriminal()
         {
             foreach (Sector s in player.svPlayer.localSectors.Values)
