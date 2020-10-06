@@ -121,8 +121,8 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("PantsPrisoner", 1)})}),
             new JobInfo(
                 typeof(Hitman), "Hitman",
-                "Assasinate hit contract targets to earn bounty rewards",
-                0, GroupIndex.Criminal, null, new LabelID[]{ new LabelID("Place Hit", "placeHit") }, new LabelID[]{ new LabelID("Hit Contracts", "hitContracts") }, 0, new ColorStruct(0f, 0f, 0f), 0.02f, 5,
+                "Assasinate designated targets to earn bounty rewards",
+                0, GroupIndex.Criminal, null, new LabelID[]{ new LabelID("Place Bounty", "") }, new LabelID[]{ new LabelID("Bounties", "") }, 0, new ColorStruct(0f, 0f, 0f), 0.02f, 5,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),

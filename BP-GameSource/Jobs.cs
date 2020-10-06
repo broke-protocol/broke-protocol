@@ -73,10 +73,10 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Hitman : Job
     {
-        private readonly Dictionary<string, DateTimeOffset> contracts = new Dictionary<string, DateTimeOffset>();
+        private readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
 
         private const string playersMenu = "players";
-        private const string contractsMenu = "contracts";
+        private const string bountiesMenu = "bounties";
 
         private const string place = "place";
         private const string cancel = "cancel";
@@ -84,15 +84,15 @@ namespace BrokeProtocol.GameSource.Jobs
         private const int placeCost = 2000;
         private const int cancelCost = 3000;
 
-        private const float contractLimitHours = 100f;
+        private const float bountyLimitHours = 100f;
 
-        protected void TryFindHitContract()
+        protected void TryFindBounty()
         {
             foreach (Sector s in player.svPlayer.localSectors.Values)
             {
                 foreach (ShEntity e in s.centered)
                 {
-                    if (e != player && e is ShPlayer p && contracts.ContainsKey(p.username))
+                    if (e != player && e is ShPlayer p && bounties.ContainsKey(p.username))
                     {
                         player.svPlayer.targetEntity = p;
                         player.svPlayer.SetState(StateIndex.Attack);
@@ -105,11 +105,11 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void OnDestroyEntity(ShEntity entity)
         {
             base.OnDestroyEntity(entity);
-            if (entity is ShPlayer victim && contracts.ContainsKey(victim.username))
+            if (entity is ShPlayer victim && bounties.ContainsKey(victim.username))
             {
                 player.svPlayer.Reward(3, 300);
-                contracts.Remove(victim.username);
-                MessageAllEmployees(victim.username + " Hit Target Eliminated");
+                bounties.Remove(victim.username);
+                MessageAllEmployees(victim.username + " Bounty Eliminated");
             }
         }
 
@@ -117,9 +117,9 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             List<string> removeKeys = new List<string>();
 
-            foreach (KeyValuePair<string, DateTimeOffset> pair in contracts)
+            foreach (KeyValuePair<string, DateTimeOffset> pair in bounties)
             {
-                if ((Util.CurrentTime - pair.Value).Hours >= contractLimitHours)
+                if ((Util.CurrentTime - pair.Value).Hours >= bountyLimitHours)
                 {
                     removeKeys.Add(pair.Key);
                 }
@@ -127,12 +127,12 @@ namespace BrokeProtocol.GameSource.Jobs
 
             foreach (string s in removeKeys)
             {
-                contracts.Remove(s);
+                bounties.Remove(s);
             }
 
             if (!player.isHuman && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
-                TryFindHitContract();
+                TryFindBounty();
             }
         }
 
@@ -142,9 +142,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
             foreach (ShPlayer p in EntityCollections.Humans)
             {
-                if (contracts.TryGetValue(p.username, out var hitTime))
+                if (bounties.TryGetValue(p.username, out var bountyTime))
                 {
-                    options.Add(new LabelID(p.username, $"{p.username}: {contractLimitHours - (Util.CurrentTime - hitTime).Hours} Hours"));
+                    options.Add(new LabelID(p.username, $"{p.username}: {bountyLimitHours - (Util.CurrentTime - bountyTime).Hours} Hours"));
                 }
                 else
                 {
@@ -152,21 +152,21 @@ namespace BrokeProtocol.GameSource.Jobs
                 }    
             }
 
-            target.svPlayer.SendOptionMenu(playersMenu, player.ID, "Players", options.ToArray(), new LabelID[] { new LabelID($"Place Hit ${placeCost}", place), new LabelID($"Cancel Hit ${cancelCost}", cancel) });
+            target.svPlayer.SendOptionMenu(playersMenu, player.ID, "Players", options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
         }
 
         public override void OnSelfAction(string actionID)
         {
             List<LabelID> options = new List<LabelID>();
 
-            foreach (KeyValuePair<string, DateTimeOffset> pair in contracts)
+            foreach (KeyValuePair<string, DateTimeOffset> pair in bounties)
             {
                 string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " (Online)" : "";
 
-                options.Add(new LabelID(pair.Key, $"{pair.Key}{online}: {contractLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours"));
+                options.Add(new LabelID(pair.Key, $"{pair.Key}{online}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours"));
             }
 
-            player.svPlayer.SendOptionMenu(contractsMenu, player.ID, "Hit Contracts", options.ToArray(), new LabelID[0]);
+            player.svPlayer.SendOptionMenu(bountiesMenu, player.ID, "Bounties", options.ToArray(), new LabelID[0]);
         }
 
 
@@ -174,12 +174,12 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if(menuID == playersMenu)
             {
-                if(actionID == place) PlaceHit(targetID, optionID);
-                else if(actionID == cancel) CancelHit(targetID, optionID);
+                if(actionID == place) PlaceBounty(targetID, optionID);
+                else if(actionID == cancel) CancelBounty(targetID, optionID);
             }
         }
 
-        public void PlaceHit(int sourceID, string hitName)
+        public void PlaceBounty(int sourceID, string bountyName)
         {
             ShPlayer requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if (!requester)
@@ -188,9 +188,9 @@ namespace BrokeProtocol.GameSource.Jobs
                 return;
             }
 
-            if (contracts.ContainsKey(hitName))
+            if (bounties.ContainsKey(bountyName))
             {
-                requester.svPlayer.SendGameMessage("Hit already exists for " + hitName);
+                requester.svPlayer.SendGameMessage("Bounty already exists for " + bountyName);
             }
             else if (player.MyMoneyCount < placeCost)
             {
@@ -198,14 +198,14 @@ namespace BrokeProtocol.GameSource.Jobs
             }
             else
             {
-                contracts[hitName] = Util.CurrentTime;
+                bounties[bountyName] = Util.CurrentTime;
                 requester.TransferMoney(DeltaInv.RemoveFromMe, placeCost, true);
-                MessageAllEmployees("Hit Contract Placed on " + hitName);
+                MessageAllEmployees("Bounty Placed on " + bountyName);
                 OnEmployeeAction(requester, null);
             }
         }
 
-        public void CancelHit(int sourceID, string hitName)
+        public void CancelBounty(int sourceID, string bountyName)
         {
             ShPlayer requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if (!requester)
@@ -214,9 +214,9 @@ namespace BrokeProtocol.GameSource.Jobs
                 return;
             }
 
-            if (!contracts.ContainsKey(hitName))
+            if (!bounties.ContainsKey(bountyName))
             {
-                requester.svPlayer.SendGameMessage("No Contract for " + hitName);
+                requester.svPlayer.SendGameMessage("No Bounty for " + bountyName);
             }
             else if (player.MyMoneyCount < cancelCost)
             {
@@ -224,9 +224,9 @@ namespace BrokeProtocol.GameSource.Jobs
             }
             else
             {
-                contracts.Remove(hitName);
+                bounties.Remove(bountyName);
                 requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost, true);
-                MessageAllEmployees("Hit Contract Canceled on " + hitName);
+                MessageAllEmployees("Bounty Canceled on " + bountyName);
                 OnEmployeeAction(requester, null);
             }
         }
