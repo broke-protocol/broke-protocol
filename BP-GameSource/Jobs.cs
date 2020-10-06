@@ -144,11 +144,11 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 if (bounties.TryGetValue(p.username, out var bountyTime))
                 {
-                    options.Add(new LabelID(p.username, $"{p.username}: {bountyLimitHours - (Util.CurrentTime - bountyTime).Hours} Hours"));
+                    options.Add(new LabelID($"{p.username}: {bountyLimitHours - (Util.CurrentTime - bountyTime).Hours} Hours", p.username));
                 }
                 else
                 {
-                    options.Add(new LabelID(p.username, $"{p.username}:  Available"));
+                    options.Add(new LabelID($"{p.username}:  Available", p.username));
                 }    
             }
 
@@ -163,7 +163,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " (Online)" : "";
 
-                options.Add(new LabelID(pair.Key, $"{pair.Key}{online}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours"));
+                options.Add(new LabelID($"{pair.Key}{online}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours", pair.Key));
             }
 
             player.svPlayer.SendOptionMenu("Bounties", player.ID, bountiesMenu, options.ToArray(), new LabelID[0]);
@@ -532,8 +532,8 @@ namespace BrokeProtocol.GameSource.Jobs
             "LicenseBoating"
         };
 
-        private const string itemMenu = "items";
         private const string requestMenu = "requests";
+        private const string itemMenu = "items";
 
         private const string accept = "accept";
         private const string deny = "deny";
@@ -570,7 +570,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
                 if (item)
                 {
-                    options.Add(new LabelID(s, item.itemName + ": $" + item.value));
+                    options.Add(new LabelID(item.itemName + ": $" + item.value, s));
                 }
             }
 
@@ -583,7 +583,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             foreach (KeyValuePair<string, string> pair in requests)
             {
-                options.Add(new LabelID(pair.Key, pair.Key + " : " + pair.Value));
+                options.Add(new LabelID(pair.Key + " : " + pair.Value, pair.Key));
             }
 
             player.svPlayer.SendOptionMenu("Requests", player.ID, requestMenu, options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });

@@ -122,7 +122,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Hitman), "Hitman",
                 "Assasinate designated targets to earn bounty rewards",
-                0, GroupIndex.Criminal, null, new LabelID[]{ new LabelID("Place Bounty", "") }, new LabelID[]{ new LabelID("Bounties", "") }, 0, new ColorStruct(0f, 0f, 0f), 0.02f, 5,
+                0, GroupIndex.Criminal, null, new LabelID[]{ new LabelID("Place Bounty", string.Empty) }, new LabelID[]{ new LabelID("Bounties", string.Empty) }, 0, new ColorStruct(0f, 0f, 0f), 0.02f, 5,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -317,7 +317,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Mayor), "Mayor",
                 "You're the Mayor: Accept or reject license requests",
-                1, GroupIndex.Citizen, null, new LabelID[]{ new LabelID("Request Item", "requestItem") }, new LabelID[]{ new LabelID("Requests", "requests") }, 0, new ColorStruct(1f, 0f, 1f), 0f, 0,
+                1, GroupIndex.Citizen, null, new LabelID[]{ new LabelID("Request Item", string.Empty) }, new LabelID[]{ new LabelID("Requests", string.Empty) }, 0, new ColorStruct(1f, 0f, 1f), 0f, 0,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
