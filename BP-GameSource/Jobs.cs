@@ -152,7 +152,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }    
             }
 
-            target.svPlayer.SendOptionMenu(playersMenu, player.ID, "Players", options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
+            target.svPlayer.SendOptionMenu("Players", player.ID, playersMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
         }
 
         public override void OnSelfAction(string actionID)
@@ -166,7 +166,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 options.Add(new LabelID(pair.Key, $"{pair.Key}{online}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours"));
             }
 
-            player.svPlayer.SendOptionMenu(bountiesMenu, player.ID, "Bounties", options.ToArray(), new LabelID[0]);
+            player.svPlayer.SendOptionMenu("Bounties", player.ID, bountiesMenu, options.ToArray(), new LabelID[0]);
         }
 
 
@@ -574,7 +574,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
             }
 
-            target.svPlayer.SendOptionMenu(itemMenu, player.ID, "Items", options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
+            target.svPlayer.SendOptionMenu("Items", player.ID, itemMenu, options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
         }
 
         public override void OnSelfAction(string actionID)
@@ -586,7 +586,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 options.Add(new LabelID(pair.Key, pair.Key + " : " + pair.Value));
             }
 
-            player.svPlayer.SendOptionMenu(requestMenu, player.ID, "Requests", options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });
+            player.svPlayer.SendOptionMenu("Requests", player.ID, requestMenu, options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });
         }
 
 
