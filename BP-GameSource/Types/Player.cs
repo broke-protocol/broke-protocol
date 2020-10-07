@@ -9,6 +9,7 @@ using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using BrokeProtocol.Collections;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -247,7 +248,18 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
         public void OnOptionAction(ShPlayer player, int targetID, string menuID, string optionID, string actionID)
         {
-            player.svPlayer.job.OnOptionMenuAction(targetID, menuID, optionID, actionID);
+            if (targetID >= 0)
+            {
+                player.svPlayer.job.OnOptionMenuAction(targetID, menuID, optionID, actionID);
+                return;
+            }
+
+            ShPlayer target = EntityCollections.FindByID<ShPlayer>(-targetID);
+
+            if(target)
+            {
+                target.svPlayer.job.OnOptionMenuAction(player.ID, menuID, optionID, actionID);
+            }    
         }
 
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]

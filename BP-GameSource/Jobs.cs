@@ -152,7 +152,8 @@ namespace BrokeProtocol.GameSource.Jobs
                 }    
             }
 
-            target.svPlayer.SendOptionMenu("Players", player.ID, playersMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
+            // Negative playerID means job action is called on the employer with that ID, not self
+            target.svPlayer.SendOptionMenu("Players", -player.ID, playersMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
         }
 
         public override void OnSelfAction(string actionID)
@@ -161,7 +162,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             foreach (KeyValuePair<string, DateTimeOffset> pair in bounties)
             {
-                string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " (Online)" : "";
+                string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " (Online)" : string.Empty;
 
                 options.Add(new LabelID($"{pair.Key}{online}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours", pair.Key));
             }
@@ -574,7 +575,8 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
             }
 
-            target.svPlayer.SendOptionMenu("Items", player.ID, itemMenu, options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
+            // Negative playerID means job action is called on the employer with that ID, not self
+            target.svPlayer.SendOptionMenu("Items", -player.ID, itemMenu, options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
         }
 
         public override void OnSelfAction(string actionID)
@@ -606,7 +608,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         }
 
-        public void RequestAdd(int targetID, string itemName)
+        public void RequestAdd(int sourceID, string itemName)
         {
             if (!requestItems.Contains(itemName))
             {
@@ -621,7 +623,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 return;
             }
 
-            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(targetID);
+            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if(!requester)
             {
                 Debug.LogError("[SVR] Requester not found");
@@ -632,7 +634,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 requester.svPlayer.SendGameMessage("Already own item");
             }
-            else if (player.MyMoneyCount < item.value)
+            else if (requester.MyMoneyCount < item.value)
             {
                 requester.svPlayer.SendGameMessage("Not enough money");
             }
@@ -898,7 +900,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void OnSpecialAction(ShEntity target, string actionID)
         {
-            if (!target || target.IsDead || (player.svPlayer.job.info.shared.specialActions == null) || !player.InActionRange(target))
+            if (!target || target.IsDead || !player.InActionRange(target))
             {
                 return;
             }
