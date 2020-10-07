@@ -193,7 +193,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 requester.svPlayer.SendGameMessage("Bounty already exists for " + bountyName);
             }
-            else if (player.MyMoneyCount < placeCost)
+            else if (requester.MyMoneyCount < placeCost)
             {
                 requester.svPlayer.SendGameMessage("Not enough money");
             }
@@ -219,7 +219,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 requester.svPlayer.SendGameMessage("No Bounty for " + bountyName);
             }
-            else if (player.MyMoneyCount < cancelCost)
+            else if (requester.MyMoneyCount < cancelCost)
             {
                 requester.svPlayer.SendGameMessage("Not enough money");
             }
@@ -547,11 +547,15 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             List<string> removeKeys = new List<string>();
 
-            foreach(string name in requests.Keys)
+            foreach(string requesterName in requests.Keys)
             {
-                if (!EntityCollections.Accounts.ContainsKey(name))
+                if (!EntityCollections.Accounts.ContainsKey(requesterName))
                 {
-                    removeKeys.Add(name);
+                    removeKeys.Add(requesterName);
+                }
+                else if (!player.isHuman) // AI will accept all item requests
+                {
+                    ResultHandle(requesterName, accept);
                 }    
             }
 
