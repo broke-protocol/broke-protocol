@@ -92,8 +92,9 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 foreach (ShEntity e in s.centered)
                 {
-                    if (e != player && e is ShPlayer p && bounties.ContainsKey(p.username))
+                    if (e != player && e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)))
                     {
+                        player.AddCrime(CrimeIndex.Murder, p);
                         player.svPlayer.targetEntity = p;
                         player.svPlayer.SetState(StateIndex.Attack);
                         return;
@@ -132,12 +133,14 @@ namespace BrokeProtocol.GameSource.Jobs
                 bounties.Remove(s);
             }
 
-            if (!player.isHuman && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if (!player.isHuman)
             {
-                TryFindBounty();
+                if (Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+                {
+                    TryFindBounty();
+                }
             }
-
-            if(!aiTarget)
+            else if(!aiTarget)
             {
                 aiTarget = EntityCollections.RandomAIPlayer;
                 AddBounty(aiTarget.username);
@@ -615,7 +618,6 @@ namespace BrokeProtocol.GameSource.Jobs
                 default:
                     break;
             }
-
         }
 
         public void RequestAdd(int sourceID, string itemName)
@@ -718,7 +720,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected abstract GetEntityCallback GetTargetHandler();
 
-        protected void SetTarget()
+        protected bool SetTarget()
         {
             ResetTarget();
 
@@ -733,9 +735,11 @@ namespace BrokeProtocol.GameSource.Jobs
                     Debug.Log("Found target");
                     target = e;
                     FoundTarget();
-                    return;
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public override void RemoveJob() => ResetTarget();
@@ -754,10 +758,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 Random.value < target.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 player.svPlayer.targetEntity = target;
-                if (player.svPlayer.SetState(StateIndex.Attack))
-                {
-                    return true;
-                }
+                return (player.svPlayer.SetState(StateIndex.Attack));
             }
             return false;
         }
