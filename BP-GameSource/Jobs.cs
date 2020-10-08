@@ -10,7 +10,6 @@ using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Required;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Prefabs;
-using ENet;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using BrokeProtocol.API;
@@ -74,6 +73,7 @@ namespace BrokeProtocol.GameSource.Jobs
     public class Hitman : Job
     {
         private static readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
+        private ShPlayer aiTarget;
 
         private const string playersMenu = "players";
         private const string bountiesMenu = "bounties";
@@ -110,6 +110,8 @@ namespace BrokeProtocol.GameSource.Jobs
                 player.svPlayer.Reward(3, 300);
                 bounties.Remove(victim.username);
                 MessageAllEmployees(victim.username + " Bounty Eliminated");
+
+                if (victim == aiTarget) aiTarget = null;
             }
         }
 
@@ -133,6 +135,12 @@ namespace BrokeProtocol.GameSource.Jobs
             if (!player.isHuman && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
                 TryFindBounty();
+            }
+
+            if(!aiTarget)
+            {
+                aiTarget = EntityCollections.RandomAIPlayer;
+                AddBounty(aiTarget.username);
             }
         }
 
@@ -163,13 +171,11 @@ namespace BrokeProtocol.GameSource.Jobs
             foreach (KeyValuePair<string, DateTimeOffset> pair in bounties)
             {
                 string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " (Online)" : string.Empty;
-
                 options.Add(new LabelID($"{pair.Key}{online}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours", pair.Key));
             }
 
             player.svPlayer.SendOptionMenu("Bounties", player.ID, bountiesMenu, options.ToArray(), new LabelID[0]);
         }
-
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
         {
@@ -199,11 +205,16 @@ namespace BrokeProtocol.GameSource.Jobs
             }
             else
             {
-                bounties[bountyName] = Util.CurrentTime;
+                AddBounty(bountyName);
                 requester.TransferMoney(DeltaInv.RemoveFromMe, placeCost, true);
-                MessageAllEmployees("Bounty Placed on " + bountyName);
                 OnEmployeeAction(requester, null);
             }
+        }
+
+        public void AddBounty(string bountyName)
+        {
+            bounties[bountyName] = Util.CurrentTime;
+            MessageAllEmployees("Bounty Placed on " + bountyName);
         }
 
         public void CancelBounty(int sourceID, string bountyName)
@@ -226,9 +237,11 @@ namespace BrokeProtocol.GameSource.Jobs
             else
             {
                 bounties.Remove(bountyName);
-                requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost, true);
                 MessageAllEmployees("Bounty Canceled on " + bountyName);
+                requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost, true);
                 OnEmployeeAction(requester, null);
+
+                if (bountyName == aiTarget.username) aiTarget = null;
             }
         }
     }
@@ -426,14 +439,7 @@ namespace BrokeProtocol.GameSource.Jobs
             ShTerritory territory = player.svPlayer.GetTerritory;
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
-                if (territory.attackerIndex != Util.InvalidByte)
-                {
-                    return 1f;
-                }
-                else
-                {
-                    return info.spawnRate;
-                }
+                return (territory.attackerIndex != Util.InvalidByte) ? 1f : info.spawnRate;
             }
             return 0f;
         }
@@ -788,11 +794,11 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (EntityCollections.Humans.Count >= 3)
             {
-                return () => svManager.RandomHuman;
+                return () => EntityCollections.RandomHuman;
             }
             else
             {
-                return () => svManager.RandomAIPlayer;
+                return () => EntityCollections.RandomAIPlayer;
             }
         }
 
@@ -972,7 +978,7 @@ namespace BrokeProtocol.GameSource.Jobs
             base.ResetTarget();
         }
 
-        protected override GetEntityCallback GetTargetHandler() => () => svManager.RandomAIPlayer;
+        protected override GetEntityCallback GetTargetHandler() => () => EntityCollections.RandomAIPlayer;
 
         public override void Loop()
         {
