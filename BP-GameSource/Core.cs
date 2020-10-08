@@ -13,11 +13,11 @@ namespace BrokeProtocol.GameSource
         {
             Jobs = GetJobs;
 
-            Info = new PluginInfo("GameSource", "game")
-            {
-                Description = "Default game source used by BP. May be modified.",
-                Website = "https://github.com/broke-protocol/broke-protocol"
-            };
+            Info = new PluginInfo(
+                "GameSource",
+                "game",
+                "Default game source used by BP. May be modified.",
+                "https://github.com/broke-protocol/broke-protocol");
         }
 
         /*
