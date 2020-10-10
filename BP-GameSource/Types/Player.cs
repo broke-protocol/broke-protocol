@@ -553,7 +553,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerServerInfo, ExecutionMode.Override)]
         public void OnServerInfo(ShPlayer player)
         {
-            player.svPlayer.SendTextPanel("Server Info", player.svPlayer.svManager.serverDescription);
+            player.svPlayer.SendTextMenu("Server Info", player.svPlayer.svManager.serverDescription);
         }
     }
 }
