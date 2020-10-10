@@ -95,6 +95,8 @@ namespace BrokeProtocol.GameSource.Jobs
                     if (e != player && e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)))
                     {
                         player.AddCrime(CrimeIndex.Murder, p);
+                        player.AddCrime(CrimeIndex.Murder, p);
+                        // Add double murder to ensure high wanted level
                         player.svPlayer.targetEntity = p;
                         player.svPlayer.SetState(StateIndex.Attack);
                         return;
@@ -135,7 +137,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+                if (Random.value < 0.1f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
                 {
                     TryFindBounty();
                 }
