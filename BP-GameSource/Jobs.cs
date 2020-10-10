@@ -145,7 +145,8 @@ namespace BrokeProtocol.GameSource.Jobs
             else if(!aiTarget)
             {
                 aiTarget = EntityCollections.RandomAIPlayer;
-                AddBounty(aiTarget.username);
+
+                if (aiTarget) AddBounty(aiTarget.username);
             }
         }
 
@@ -559,14 +560,15 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             List<string> removeKeys = new List<string>();
 
-            foreach(string requesterName in requests.Keys)
+            foreach(string requesterName in requests.Keys.ToArray())
             {
                 if (!EntityCollections.Accounts.ContainsKey(requesterName))
                 {
                     removeKeys.Add(requesterName);
                 }
-                else if (!player.isHuman) // AI will accept all item requests
+                else if (!player.isHuman && svManager.jobCount[info.shared.jobIndex] == 0) 
                 {
+                    // AI will accept all item requests if no human Mayor present
                     ResultHandle(requesterName, accept);
                 }    
             }
@@ -729,7 +731,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             GetEntityCallback handler = GetTargetHandler();
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 20; i++)
             {
                 ShEntity e = handler();
 
