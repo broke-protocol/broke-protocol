@@ -481,7 +481,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         foreach (InventoryStruct i in player.svPlayer.job.info.upgrades[rankIndex].items)
                         {
-                            if (myItem.item.itemName== i.itemName)
+                            if (myItem.item.name == i.itemName)
                             {
                                 extra = Mathf.Max(0, myItem.count - i.count);
                             }

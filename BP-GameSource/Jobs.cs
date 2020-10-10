@@ -442,9 +442,10 @@ namespace BrokeProtocol.GameSource.Jobs
         public override float GetSpawnRate()
         {
             ShTerritory territory = player.svPlayer.GetTerritory;
+
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
-                return (territory.attackerIndex != Util.InvalidByte) ? 1f : info.spawnRate;
+                return (territory.attackerIndex == Util.InvalidByte) ? info.spawnRate : 1f;
             }
             return 0f;
         }
@@ -734,7 +735,6 @@ namespace BrokeProtocol.GameSource.Jobs
 
                 if (ValidTarget(e))
                 {
-                    Debug.Log("Found target");
                     target = e;
                     FoundTarget();
                     return true;
