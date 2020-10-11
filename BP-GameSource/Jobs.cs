@@ -50,7 +50,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 yield return delay;
                 Loop();
-                if (loopCount != 1) Debug.LogError("[SVR] Job loops count off: " + loopCount);
+                if (loopCount != 1) Debug.LogError($"[SVR] {this} loopCount (should = 1): {loopCount}");
             } while (true);
         }
 
