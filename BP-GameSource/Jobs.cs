@@ -72,8 +72,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Hitman : Job
     {
-        private static readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
-        private ShPlayer aiTarget;
+        public const string bountiesKey = "bounties";
+        public static readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
+        public static ShPlayer aiTarget;
 
         private const string playersMenu = "players";
         private const string bountiesMenu = "bounties";

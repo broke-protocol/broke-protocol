@@ -4,6 +4,10 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Collections;
 using BrokeProtocol.API;
+using BrokeProtocol.GameSource.Jobs;
+using Newtonsoft.Json;
+using System;
+using BrokeProtocol.API.Types;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -69,12 +73,38 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
         public void OnSave(SvManager svManager)
         {
+            Data bountyData = new Data();
+            bountyData.ID = Hitman.bountiesKey;
+            foreach(var bounty in Hitman.bounties)
+            {
+                // Only save bounties targeting Humans
+                if (!Hitman.aiTarget || Hitman.aiTarget.username != bounty.Key)
+                {
+                    bountyData.CustomData[bounty.Key] = bounty.Value;
+                }
+            }
+            svManager.database.Data.Upsert(bountyData);
+
             ChatHandler.SendToAll("Saving server status..");
             foreach (ShPlayer player in EntityCollections.Humans)
             {
                 player.svPlayer.Save();
             }
             svManager.database.WriteOut();
+        }
+
+        [Target(GameSourceEvent.ManagerLoad, ExecutionMode.Override)]
+        public void OnLoad(SvManager svManager)
+        {
+            Data bountyData = svManager.database.Data.FindById(Hitman.bountiesKey);
+
+            if (bountyData != null)
+            {
+                foreach (var bounty in bountyData.CustomData.Data)
+                {
+                    Hitman.bounties.Add(bounty.Key, CustomData.ConvertData<DateTimeOffset>(bounty.Value));
+                }
+            }
         }
 
         private bool ValidateUser(SvManager svManager, ConnectionData connectionData)
