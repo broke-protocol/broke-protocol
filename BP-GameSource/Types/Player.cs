@@ -437,7 +437,7 @@ namespace BrokeProtocol.GameSource.Types
             player.AddCrime(crime.index, witness);
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witness ? witness.ID : 0);
 
-            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Criminal)
+            if (!player.svPlayer.job.IsCriminal)
             {
                 player.svPlayer.Reward(-crime.experiencePenalty, -crime.fine);
             }
