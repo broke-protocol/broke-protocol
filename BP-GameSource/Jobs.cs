@@ -1,22 +1,62 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
+﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
-using BrokeProtocol.Utility.Networking;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Utility;
-using BrokeProtocol.Utility.Jobs;
-using BrokeProtocol.Utility.AI;
-using BrokeProtocol.Required;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Prefabs;
+using BrokeProtocol.Required;
+using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.AI;
+using BrokeProtocol.Utility.Jobs;
+using BrokeProtocol.Utility.Networking;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
-using BrokeProtocol.API;
 
 namespace BrokeProtocol.GameSource.Jobs
 {
-    public class Citizen : Job
+    public class LoopJob : Job
+    {
+        private Coroutine loop;
+
+        private int loopCount;
+
+        public override void SetJob()
+        {
+            if (loop == null && player.isActiveAndEnabled)
+            {
+                loop = player.StartCoroutine(JobCoroutine());
+                loopCount++;
+            }
+        }
+
+        public override void RemoveJob()
+        {
+            if (loop != null)
+            {
+                player.StopCoroutine(loop);
+                loopCount--;
+            }
+        }
+
+        private IEnumerator JobCoroutine()
+        {
+            WaitForSeconds delay = new WaitForSeconds(1f);
+            do
+            {
+                yield return delay;
+                Loop();
+                if (loopCount != 1) Debug.LogError("[SVR] Job loops count off: " + loopCount);
+            } while (true);
+        }
+
+        public virtual void Loop() { }
+    }
+
+
+    public class Citizen : LoopJob
     {
         protected void TryFindInnocent()
         {
@@ -54,7 +94,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if (!player.isHuman && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if(!player.isHuman && !player.IsDead && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
                 float rand = Random.value;
 
@@ -70,7 +110,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class Hitman : Job
+    public class Hitman : LoopJob
     {
         public const string bountiesKey = "bounties";
         public static readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
@@ -135,6 +175,8 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 bounties.Remove(s);
             }
+
+            if (player.IsDead) return;
 
             if (!player.isHuman)
             {
@@ -253,7 +295,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class Prisoner : Job
+    public class Prisoner : LoopJob
     {
         public override void ResetJobAI() => player.svPlayer.SetState(StateIndex.Waypoint);
     }
@@ -269,6 +311,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
+            if (player.IsDead) return;
+
             if (!player.isHuman)
             {
                 if (!player.svPlayer.targetEntity && player.IsMobile &&
@@ -317,6 +361,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
+            if (player.IsDead) return;
+
             if (!player.isHuman)
             {
                 if (Random.value < 0.1f && player.IsMobile && !player.svPlayer.targetEntity &&
@@ -374,6 +420,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
+            if (player.IsDead) return;
+
             if (!player.isHuman)
             {
                 if (Random.value < 0.1f && player.IsMobile && !player.svPlayer.targetEntity &&
@@ -411,7 +459,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class Gangster : Job
+    public class Gangster : LoopJob
     {
         protected int gangstersKilled;
 
@@ -434,7 +482,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if (!player.isHuman && Random.value < 0.01f && player.IsMobile
+            if (!player.isHuman && !player.IsDead && Random.value < 0.01f && player.IsMobile
                 && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
                 TryFindEnemyGang();
@@ -454,19 +502,27 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void SetJob()
         {
-            gangstersKilled = 0;
-            foreach (ShTerritory territory in svManager.territories.Values)
+            if (player.isHuman)
             {
-                territory.svEntity.AddSubscribedPlayer(player);
+                gangstersKilled = 0;
+                foreach (ShTerritory territory in svManager.territories.Values)
+                {
+                    territory.svEntity.AddSubscribedPlayer(player);
+                }
             }
+            base.SetJob();
         }
 
         public override void RemoveJob()
         {
-            foreach (ShTerritory territory in svManager.territories.Values)
+            if (player.isHuman)
             {
-                territory.svEntity.RemoveSubscribedPlayer(player, true);
+                foreach (ShTerritory territory in svManager.territories.Values)
+                {
+                    territory.svEntity.RemoveSubscribedPlayer(player, true);
+                }
             }
+            base.RemoveJob();
         }
 
         public override void OnDestroyEntity(ShEntity entity)
@@ -536,7 +592,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class Mayor : Job
+    public class Mayor : LoopJob
     {
         private static readonly Dictionary<string, string> requests = new Dictionary<string, string>();
 
@@ -553,9 +609,17 @@ namespace BrokeProtocol.GameSource.Jobs
         private const string accept = "accept";
         private const string deny = "deny";
 
-        public override void SetJob() => ChatHandler.SendToAll("New Mayor: " + player.username);
+        public override void SetJob()
+        {
+            if (player.isHuman) ChatHandler.SendToAll("New Mayor: " + player.username);
+            base.SetJob();
+        }
 
-        public override void RemoveJob() => ChatHandler.SendToAll("Mayor Left: " + player.username);
+        public override void RemoveJob()
+        {
+            if (player.isHuman) ChatHandler.SendToAll("Mayor Left: " + player.username);
+            base.RemoveJob();
+        }
 
         public override void Loop()
         {
@@ -707,7 +771,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public abstract class TargetEntityJob : Job
+    public abstract class TargetEntityJob : LoopJob
     {
         [NonSerialized]
         public ShEntity target;
@@ -747,7 +811,11 @@ namespace BrokeProtocol.GameSource.Jobs
             return false;
         }
 
-        public override void RemoveJob() => ResetTarget();
+        public override void RemoveJob()
+        {
+            if(player.isHuman) ResetTarget();
+            base.RemoveJob();
+        }
     }
 
     public abstract class TargetPlayerJob : TargetEntityJob
@@ -826,6 +894,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
+            if (player.IsDead) return;
+
             if (!player.isHuman)
             {
                 if (!player.svPlayer.targetEntity && player.IsMobile &&
@@ -895,7 +965,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if (player.isHuman)
+            if (player.isHuman && !player.IsDead)
             {
                 if (!ValidTarget(targetPlayer))
                 {
@@ -988,7 +1058,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if (player.isHuman)
+            if (player.isHuman && !player.IsDead)
             {
                 if (!player.IsDriving)
                 {

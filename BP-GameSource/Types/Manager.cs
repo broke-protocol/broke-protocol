@@ -5,7 +5,6 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Collections;
 using BrokeProtocol.API;
 using BrokeProtocol.GameSource.Jobs;
-using Newtonsoft.Json;
 using System;
 using BrokeProtocol.API.Types;
 
