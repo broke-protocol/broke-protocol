@@ -30,6 +30,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 loop = player.StartCoroutine(JobCoroutine());
                 loopCount++;
             }
+            base.SetJob();
         }
 
         public override void RemoveJob()
@@ -39,6 +40,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 player.StopCoroutine(loop);
                 loopCount--;
             }
+            base.RemoveJob();
         }
 
         private IEnumerator JobCoroutine()
@@ -151,7 +153,7 @@ namespace BrokeProtocol.GameSource.Jobs
             base.OnDestroyEntity(entity);
             if (entity is ShPlayer victim && bounties.ContainsKey(victim.username))
             {
-                player.svPlayer.Reward(3, 300);
+                player.svPlayer.Reward(3, 1000);
                 bounties.Remove(victim.username);
                 MessageAllEmployees(victim.username + " Bounty Eliminated");
 
@@ -290,7 +292,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost, true);
                 OnEmployeeAction(requester, null);
 
-                if (bountyName == aiTarget.username) aiTarget = null;
+                if (aiTarget && bountyName == aiTarget.username) aiTarget = null;
             }
         }
     }
@@ -631,7 +633,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 {
                     removeKeys.Add(requesterName);
                 }
-                else if (!player.isHuman && svManager.jobCount[info.shared.jobIndex] == 0) 
+                else if (!player.isHuman && info.members.Count == 0) 
                 {
                     // AI will accept all item requests if no human Mayor present
                     ResultHandle(requesterName, accept);
@@ -668,7 +670,11 @@ namespace BrokeProtocol.GameSource.Jobs
 
             foreach (KeyValuePair<string, string> pair in requests)
             {
-                options.Add(new LabelID(pair.Key + " : " + pair.Value, pair.Key));
+                ShItem i = SceneManager.Instance.GetEntity<ShItem>(pair.Value);
+                if (i)
+                {
+                    options.Add(new LabelID(pair.Key + " : " + i.itemName, pair.Key));
+                }
             }
 
             player.svPlayer.SendOptionMenu("Requests", player.ID, requestMenu, options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });
@@ -728,7 +734,11 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 requests[requester.username] = itemName;
                 requester.svPlayer.SendGameMessage("Request successfully sent");
-                player.svPlayer.SendGameMessage(requester.username + " requesting a " + item.itemName);
+                ShPlayer mayor = info.members.FirstOrDefault();
+                if (mayor)
+                {
+                    mayor.svPlayer.SendGameMessage(requester.username + " requesting a " + item.itemName);
+                }
             }
         }
 
