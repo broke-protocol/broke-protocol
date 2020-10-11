@@ -155,7 +155,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 player.svPlayer.Reward(3, 1000);
                 bounties.Remove(victim.username);
-                MessageAllEmployees(victim.username + " Bounty Eliminated");
+                ChatHandler.SendToAll($"{player.username} assassinated {victim.username}");
 
                 if (victim == aiTarget) aiTarget = null;
             }
@@ -265,7 +265,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public void AddBounty(string bountyName)
         {
             bounties[bountyName] = Util.CurrentTime;
-            MessageAllEmployees("Bounty Placed on " + bountyName);
+            ChatHandler.SendToAll("Bounty Placed on " + bountyName);
         }
 
         public void CancelBounty(int sourceID, string bountyName)
@@ -288,7 +288,7 @@ namespace BrokeProtocol.GameSource.Jobs
             else
             {
                 bounties.Remove(bountyName);
-                MessageAllEmployees("Bounty Canceled on " + bountyName);
+                ChatHandler.SendToAll("Bounty Canceled on " + bountyName);
                 requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost, true);
                 OnEmployeeAction(requester, null);
 
@@ -898,7 +898,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected override void FoundTarget()
         {
             base.FoundTarget();
-            player.svPlayer.SendGameMessage("Assassination target: " + targetPlayer.username);
+            player.svPlayer.SendGameMessage("High-value target: " + targetPlayer.username);
             targetPlayer.svPlayer.SendGameMessage("SpecOps dispatched!");
         }
 
