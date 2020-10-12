@@ -3,7 +3,7 @@ using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Required;
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace BrokeProtocol.GameSource
 {
@@ -122,7 +122,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Hitman), "Hitman",
                 "Assasinate designated targets to earn bounty rewards",
-                0, GroupIndex.Criminal, null, new LabelID[]{ new LabelID("Place Bounty", string.Empty) }, new LabelID[]{ new LabelID("Bounties", string.Empty) }, 0, new ColorStruct(0f, 0f, 0f), 0.01f, 3,
+                0, GroupIndex.Criminal, null, new List<LabelID>{ new LabelID("Place Bounty", string.Empty) }, new List<LabelID>{ new LabelID("Bounties", string.Empty) }, 0, new ColorStruct(0f, 0f, 0f), 0.01f, 3,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -317,7 +317,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Mayor), "Mayor",
                 "You're the Mayor: Accept or reject license requests",
-                1, GroupIndex.Citizen, null, new LabelID[]{ new LabelID("Request Item", string.Empty) }, new LabelID[]{ new LabelID("Requests", string.Empty) }, 0, new ColorStruct(1f, 0f, 1f), 0f, 0,
+                1, GroupIndex.Citizen, null, new List<LabelID>{ new LabelID("Request Item", string.Empty) }, new List<LabelID>{ new LabelID("Requests", string.Empty) }, 0, new ColorStruct(1f, 0f, 1f), 0f, 0,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -338,7 +338,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(DeliveryMan), "Delivery Man",
                 "Deliver food to hungry players and NPCs on your map (M) for rewards",
-                0, GroupIndex.Citizen, new TypeLabelID[]{ new TypeLabelID("ShPlayer", "Deliver Item", "deliver") }, null, null, 0, new ColorStruct(0.5f, 0.25f, 0f), 0f, 0,
+                0, GroupIndex.Citizen, new List<TypeLabelID>{ new TypeLabelID("ShPlayer", "Deliver Item", "deliver") }, null, null, 0, new ColorStruct(0.5f, 0.25f, 0f), 0f, 0,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
