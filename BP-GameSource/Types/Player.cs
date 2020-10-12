@@ -291,7 +291,7 @@ namespace BrokeProtocol.GameSource.Types
                     player.svPlayer.SvEnterDoor(place.mainDoor.ID, player, true);
                 }
 
-                player.TransferMoney(DeltaInv.AddToMe, apartment.value / 2, true);
+                player.TransferMoney(DeltaInv.AddToMe, apartment.value / 2);
 
                 player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.SellApartment, apartment.ID);
                 player.svPlayer.CleanupApartment(place);
@@ -386,11 +386,11 @@ namespace BrokeProtocol.GameSource.Types
 
             if (moneyDelta > 0)
             {
-                player.TransferMoney(DeltaInv.AddToMe, moneyDelta, true);
+                player.TransferMoney(DeltaInv.AddToMe, moneyDelta);
             }
             else if (moneyDelta < 0)
             {
-                player.TransferMoney(DeltaInv.RemoveFromMe, -moneyDelta, true);
+                player.TransferMoney(DeltaInv.RemoveFromMe, -moneyDelta);
             }
         }
 

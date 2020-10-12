@@ -189,7 +189,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
             else if(!aiTarget)
             {
-                aiTarget = EntityCollections.RandomAIPlayer;
+                aiTarget = EntityCollections.RandomNPC;
 
                 if (aiTarget) AddBounty(aiTarget.username);
             }
@@ -257,7 +257,7 @@ namespace BrokeProtocol.GameSource.Jobs
             else
             {
                 AddBounty(bountyName);
-                requester.TransferMoney(DeltaInv.RemoveFromMe, placeCost, true);
+                requester.TransferMoney(DeltaInv.RemoveFromMe, placeCost);
                 OnEmployeeAction(requester, null);
             }
         }
@@ -289,7 +289,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 bounties.Remove(bountyName);
                 ChatHandler.SendToAll("Bounty Canceled on " + bountyName);
-                requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost, true);
+                requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost);
                 OnEmployeeAction(requester, null);
 
                 if (aiTarget && bountyName == aiTarget.username) aiTarget = null;
@@ -759,9 +759,9 @@ namespace BrokeProtocol.GameSource.Jobs
                     {
                         if (requester.MyMoneyCount >= item.value)
                         {
-                            requester.TransferMoney(DeltaInv.RemoveFromMe, item.value, true);
+                            requester.TransferMoney(DeltaInv.RemoveFromMe, item.value);
                             requester.TransferItem(DeltaInv.AddToMe, item);
-                            player.TransferMoney(DeltaInv.AddToMe, item.value, true);
+                            player.TransferMoney(DeltaInv.AddToMe, item.value);
                         }
                         else
                         {
@@ -882,7 +882,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
             else
             {
-                return () => EntityCollections.RandomAIPlayer;
+                return () => EntityCollections.RandomNPC;
             }
         }
 
@@ -1064,7 +1064,7 @@ namespace BrokeProtocol.GameSource.Jobs
             base.ResetTarget();
         }
 
-        protected override GetEntityCallback GetTargetHandler() => () => EntityCollections.RandomAIPlayer;
+        protected override GetEntityCallback GetTargetHandler() => () => EntityCollections.RandomNPC;
 
         public override void Loop()
         {
