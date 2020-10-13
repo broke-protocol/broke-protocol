@@ -13,11 +13,20 @@ This collection will contain all the user information. All accounts are stored h
 **Collection Name:** `users`  
 **Model:** [`BrokeProtocol.Server.LiteDB.Models.User`](https://brokeprotocol.com/api/class_broke_protocol_1_1_server_1_1_lite_d_b_1_1_models_1_1_user.html) & [`Character`](https://brokeprotocol.com/api/class_broke_protocol_1_1_server_1_1_lite_d_b_1_1_models_1_1_character.html)
 
+### `Bans`
+This collection will contain all the ban information keyed by IP address (string format). If a ban is lifted, the record here is removed.  
+**Collection Name:** `bans`  
+**Model:** [`BrokeProtocol.Server.LiteDB.Models.Ban`](https://brokeprotocol.com/api/class_broke_protocol_1_1_server_1_1_lite_d_b_1_1_models_1_1_ban.html)
 
 ### `Settings`
 Currently only used for database version.  
 **Collection Name:** `setting`  
 **Model:** [`BrokeProtocol.Server.LiteDB.Models.Setting`](https://brokeprotocol.com/api/class_broke_protocol_1_1_server_1_1_lite_d_b_1_1_models_1_1_setting.html)
+
+### `Data`
+Storing CustomData related to your plugins. Can be used to save data for persistence even after server shutdown. The Hitman Job in GameSource uses this to save Bounties as an example.
+**Collection Name:** `data`  
+**Model:** [`BrokeProtocol.Server.LiteDB.Models.Data`](https://brokeprotocol.com/api/class_broke_protocol_1_1_server_1_1_lite_d_b_1_1_models_1_1_data.html)
 
 ## Driver class
 This class contains all the `LiteCollections` and `LiteDatabase` references. This is so we can have a strongly typed list of collections in the code base. This class can be found in the `SvManager` instance, as `Database`. 
@@ -30,36 +39,22 @@ For all these examples we assume `svManager` is your `SvManager` instance.
 ### Get database version number  
 - _Note, this is the actual database file, not the driver version. If you need the driver version, type `Driver.Version`._  
 ```csharp
-var setting = svManager.Database.Settings.FindOne(x => x.Key == "version");
+var setting = svManager.Database.Settings.FindById("version");
 setting.Key // (string) "version"
 setting.Value // (string) "1.0" 
 ```
 
-### Get player by SteamID  
-- _Note, after doing various testing we noticed that `FindById` did not give the results we expected. Hence, we're using `FindOne` here._  
+### Get player by Username  
 ```csharp
-var user = svManager.Database.Users.FindOne(x => x.ID == "76561198088598550");
-user.Character.Username // (string) "UserR00T"
+var user = svManager.Database.Users.FindById("NongBenz");
+user.ID // (string) "NongBenz"
 user.Character.BankBalance // (int) 7
 ```
 
-### Check if player is banned by SteamID
+### Check if a user is banned
 ```csharp
-var user = svManager.Database.Users.FindOne(x => x.ID == "76561198088598550");
-if (user.BanInfo.IsBanned)
-{
-  // The user is banned, do something cool
-  user.BanInfo.Reason // (string) "get out >:)"  
-}
-```
-You could also write it as such, but less performant: [(see here why)](https://github.com/mbdavid/LiteDB/wiki/Indexes#changes-in-v4)
-```csharp
-var user = svManager.Database.Users.FindOne(x => x.ID == "76561198088598550" && x.BanInfo.IsBanned);
-if (user != null)
-{
-  // The user is banned, do something cool
-  user.BanInfo.Reason // (string) "get out >:)"  
-}
+var ban = svManager.Database.Bans.FindOne(x => x.Username == "NongBenz");
+ban.Reason // (string) "get out >:)"  
 ```
 
 ### Get Collection
