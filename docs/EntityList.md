@@ -9,6 +9,7 @@ ATMWall2
 Briefcase1
 Briefcase2
 Briefcase3
+Button
 CheckpointGreen
 CheckpointRed
 DeathZone
@@ -22,6 +23,7 @@ BossBlueGang
 BossDeliveryDriver
 BossFirefighter
 BossGreenGang
+BossHitman
 BossMayor
 BossParamedic
 BossPolice
@@ -162,6 +164,7 @@ BasketballThrown
 BulletThrown
 FlashbangThrown
 GrenadeCartridgeThrown
+MolotovThrown
 RocketThrown
 ShellThrown
 GrenadeThrown
@@ -482,6 +485,9 @@ ComputerKeyboardOffice
 ComputerKeyboardOld
 ComputerMouseModern
 ComputerMouseOld
+ParachutePackBrown
+ParachutePackGray
+ParachutePackGreen
 DeskLamp
 Ephedrin
 Ethanol
@@ -760,9 +766,6 @@ Notepad
 Opium
 Paper
 PaperTray
-ParachutePackBrown
-ParachutePackGray
-ParachutePackGreen
 Pen
 Pencil
 PhoneOffice
@@ -838,12 +841,11 @@ Flashbang
 Grenade
 MineAP
 MineAT
+Molotov
 SatchelCharge
 Smoke
 Restrained
 RestrainedFurry
-Restricted
-RestrictedFurry
 BackpackBrown
 BackpackCombat
 BackpackPurple
@@ -1064,6 +1066,9 @@ ShoesGray
 ShoesHipster
 ShortsBlue
 ShortsBrown
+SkiMaskDark
+SkiMaskLight
+SkiMaskPattern
 SkirtBlue
 SkirtNavy
 SkirtTeal
@@ -1102,6 +1107,7 @@ TopPrisoner
 TopRiot
 TopSafetyVest
 TopSheriff
+TopStriped
 Safe
 DoorMetalApartment
 DoorWood1Apartment
