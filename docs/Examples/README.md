@@ -25,7 +25,7 @@ How to query data and where to find the LiteDB instance, and more.
 
 ## Client
 
-!> **You should always use client code for tasks like CEF and sending a lot of packets from server to client/peer.**
+!> **You should always use client code for tasks like CEF UI or client code that would require too many packets being sent.**
 
 ### [Getting Started](/Examples/Client/Getting-Started)
 Refer to this page to get an base understanding on how the client can be modified.
