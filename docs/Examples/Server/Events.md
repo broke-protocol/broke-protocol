@@ -3,7 +3,8 @@
 > This example will cover the basics of the ``EventsHandler``. This class is used for a lot of things including game events, CEF events, and custom events.
 
 ## What is the ``EventsHandler`` class?
-The ``EventsHandler`` class is a class that allows resources to communicate with each other, CEF events to Plugins, and game events (Map Trigger objects for example) to callback to your Plugins.  
+The ``EventsHandler`` class is a class that allows resources to communicate with each other. CEF UI events, and game events can all callback to your plugin methods tagged with [CustomTarget]. Game events include Map Trigger objects or Custom Entity actions (see 'Custom Entity Actions' on the [Modding Guide](https://brokeprotocol.com/modding-guide)).  
+
 In this example we are going to show you how to do the following:
 - Register Custom Events & Call them
 - Subscribe to existing events
