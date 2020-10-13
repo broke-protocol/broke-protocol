@@ -1,6 +1,6 @@
 # Entity List
 
-Can use just items with /give and /take commands. Case-sensitive.
+Can use just ShItem types with /give and /take commands. Case-sensitive.
 ```
 ATM
 ATMShop
