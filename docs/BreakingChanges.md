@@ -1,3 +1,31 @@
+## 1.1
+?> The Hitman Update. Reworks basically all of the API around Jobs to support modding. Custom Jobs can now be defined in Plugins.
+
+### API
+- Added BPAPI.Instance.Jobs -> Stores all Job metadata
+- Added JobInfoShared class -> Contains Job metadata that is sent to clients
+- ShPlayer.job -> Split into SvPlayer.job (Server Job info) and ClPlayer.job (Client Job info)
+- Added EntityCollections.RandomPlayer and RandomNPC
+- Added SendOptionMenu() UI helper function
+- FunctionMenu replaced with TextPanel (use OptionMenu for input handling)
+- Old TextPanel functions renamed to TextMenu across API
+- Updated SendTextMenu() with optional window size parameters
+- More GetEntity() overloads to use entity names directly
+- Added ManagerLoad, Unrestrain, JailCriminal, and GoToJail events to GameSource
+- Persistent server storage now available in svManager.database.Data collection
+- Session server storage now available at svManager.sessionData
+- Added CustomData.ConvertData<T> helper static function
+
+### MODDING
+- Asset Mods can have eventActions defined for custom Action Menu options
+- Added Button entity as an example (new custom ButtonPush event defined in GameSource)
+- Added 'entity.svEntity.data' string field for custom storage (set in World Builder or via code)
+- Removed 'identifier' field from Triggers, use data field instead
+
+### Misc
+- JobName and JobGroup type name changes in groups.json
+- Apartments can have custom furniture limited set now (in World Builder)
+
 ## 1.08
 ?> The Apps Update. Biggest changes based around new Apps for messaging, calls, and banking. Old ATM system replaced.
 
@@ -71,18 +99,3 @@
 - Recommend to use Channel.Reliable for all Game Messages 
 - Removed BrokeProtocol.Collections.LimitQueue.Add(T item);
 - Changed BrokeProtocol.Collections.LimitQueue.OverLimit(T item) -> Limit(T item, bool add = true)
-
-## 1.04
-?> Important Update: This version allows AssetBundle mods to work on any platform. Also, CEF can be enabled on both Steam and Classic auth.
-
-- Changed EventHandler Registration https://broke-protocol.github.io/broke-protocol/#/Examples/Server/02_Events?id=subscribing-to-a-game-event
-- Added SvPlayer.platform
-- Changed EventHandler.Call -> EventHandler.Exec(), EventHandler.Get(), EventHandler.Get<>()
-- Removed BrokeProtocol.API.Events.General
-- Removed BrokeProtocol.API.Events.Manager
-- Removed BrokeProtocol.API.Events.Entity
-- Removed BrokeProtocol.API.Events.Movable
-- Removed BrokeProtocol.API.Events.Destroyable
-- Removed BrokeProtocol.API.Events.Player
-- Removed BrokeProtocol.API.Events.General
-- Removed BrokeProtocol.API.GameSourceEvents
