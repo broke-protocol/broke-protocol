@@ -30,7 +30,7 @@
 ?> The Apps Update. Biggest changes based around new Apps for messaging, calls, and banking. Old ATM system replaced.
 
 ### API
-- Added ExecutionMode.Test and ExecutionMode.PostEvent to EventHandler [Explained here](https://broke-protocol.github.io/broke-protocol/#/Examples/Server/02_Events?id=subscribing-to-a-game-event)
+- Added ExecutionMode.Test and ExecutionMode.PostEvent to EventHandler [Explained here](https://broke-protocol.github.io/broke-protocol/#/Examples/Server/Events?id=subscribing-to-a-game-event)
 - Added EntityCollections.Accounts (HashSet<string>) for fast login lookups
 - All Cl/SvPacket types changed to enums
 - Replace ServerInfo with generic TextPanel and helper function svPlayer.SendTextPanel(string title, string text)
