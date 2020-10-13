@@ -1,4 +1,4 @@
-# 01: IScript and Plugin
+# Plugin Basics
 
 > These are the core classes and interfaces for plugins. These can be used to automatically instantiate classes, and the main entry point of the plugin.
 

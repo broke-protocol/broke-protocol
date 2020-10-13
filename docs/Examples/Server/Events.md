@@ -1,4 +1,4 @@
-# 02: Events
+# Events
 
 > This example will cover the basics of the ``EventsHandler``. This class is used for a lot of things including game events, CEF events, and custom events.
 

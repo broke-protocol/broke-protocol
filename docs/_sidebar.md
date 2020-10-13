@@ -3,12 +3,13 @@
 - [API Reference](https://brokeprotocol.com/api/)
 - [Examples](/Examples)
   - Server
-    - [01: IScript And Plugin](/Examples/Server/01_IScript-And-Plugin)
-    - [02: Events](/Examples/Server/02_Events)
-    - [03: CommandHandler](/Examples/Server/03_CommandHandler)
-    - [04: AssetBundles](/Examples/Server/04_AssetBundles)
-    - [05: Group Manager](/Examples/Server/05_GroupManager)
-    - [06: Database](/Examples/Server/06_Database)
+    - [01: Plugin Basics](/Examples/Server/Plugin-Basics)
+    - [02: Events](/Examples/Server/Events)
+    - [03: Jobs](/Examples/Server/Jobs)
+    - [04: CommandHandler](/Examples/Server/CommandHandler)
+    - [05: AssetBundles](/Examples/Server/AssetBundles)
+    - [06: GroupManager](/Examples/Server/GroupManager)
+    - [07: Database](/Examples/Server/Database)
 
   - Client
     - [01: Getting Started](/Examples/Client/01_Getting-Started)

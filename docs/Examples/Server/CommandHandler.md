@@ -1,4 +1,4 @@
-# 03: CommandHandler
+# CommandHandler
 
 This document will explain how to create a command, register one, and use it along with the GroupManager to only allow it for specific groups.
 

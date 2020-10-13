@@ -1,4 +1,4 @@
-# 05: Group Manager
+# GroupManager
 
 > The group manager is a type used in the API for permissions and groups.
 

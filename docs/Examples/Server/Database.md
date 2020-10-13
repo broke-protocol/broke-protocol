@@ -1,4 +1,4 @@
-# 06: Database
+# Database
 
 > This will cover on how to access the database, request user data, add new collections, and more.
 
