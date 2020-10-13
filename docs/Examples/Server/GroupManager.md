@@ -3,74 +3,27 @@
 > The group manager is a type used in the API for permissions and groups.
 
 ## groups.json
-First, read the `groups.json` file. This will explain each type within the JSON context.
-
-If you ever need a template, it's here!
-```js
-{
-  "Type": "",
-  "Name": "",
-  "Permissions": [
-  ],
-  "CustomData": {
-    "Data": {
-    }
-  },
-  "Members": [
-  ],
-  "Inherits": [
-  ]
-},
-```
+First, read the `groups.json` file. This will explain each type within the JSON context including a default setup.
 
 ### Type
-This field is used to set the group member type.
 The following types are allowed (Defined in "BrokeProtocol.API.GroupTypes"
-- UserSteamID
-    - The user steam64id.
-      - Selector: `player.steamID`
-      - Example: `76561198088598550`
-- UserIP
-    - The user IPv4.
-      - Selector: `player.svPlayer.connection.IP`
-      - Example: `127.0.0.1`
-- JobIndex
-    - The user JobID.
-      - Selector: `player.job.jobIndex`
-      - Example: `3`
-- JobName
-    - The user job name.
-      - Selector: `player.job.info.jobName`
-      - Example: `Police`
-- JobGroupIndex
-    - The user job group index. `0 = Citizen, 1 = Criminal, 2 = LawEnforcement`
-      - Selector: `player.job.info.groupIndex`
-      - Example: `2`
-- ScriptableTrigger
-    - The identifier of the scriptable trigger the user is currently in. (if any)
-      - Selector: `"player.svPlayer.currentTrigger.identifier`
-      - Example: `SomeStringIdentifier`
 
-```js
-"Type": "UserSteamID",
-"Members": [
-  "76561198088598550"
-]
-
-// Or
-"Type": "UserIP",
-"Members": [
-  "127.0.0.1"
-]
-
-// Or
-"Type": "JobName",
-"Members": [
-  "Police"
-]
-
-// etc. etc.
-```
+AccountID
+  - The registered username.
+    - Selector: "player.username"
+    - Example: "NongBenz"
+ConnectionIP
+  - The user IPv4 address.
+    - Selector: "player.svPlayer.connection.IP"
+    - Example: "127.0.0.1"
+  JobName
+  - The user Job Name: "Citizen", "Prisoner", "Hitman", "Police", "Paramedic", "Firefighter", "Rojo Loco", "Green St. Fam", "Borgata Blu", "Mayor", "Delivery Man", "Taxi Driver", "SpecOps"
+    - Selector: "player.svPlayer.job.info.shared.jobName"
+    - Example: "Prisoner"
+JobGroup
+  - The user Job Group/Type: "Citizen" (Most Jobs), "Criminal" (Gang Member), "LawEnforcement" (SpecOps, Police), "Prisoner"
+    - Selector: "player.svPlayer.job.info.shared.groupIndex"
+    - Example: "LawEnforcement"
 
 ### Name
 Name can be used to differentiate the group from other groups. For example `Admins` and `Mods`. You name it.
@@ -119,17 +72,17 @@ Here you'll define everyone who has permission to this group. This is to be prov
 ```
 Will allow any member, and
 ```js
-"Type": "UserSteamID",
+"Type": "AccountID",
 "Members": [
-  "76561198088598550"
+  "NongBenz"
 ],
 ```
-will only allow the member with the steam id `76561198088598550`.
+will only allow the member with the username `NongBenz`.
 
 ### Inherits
 This field is used to inherit the permissions from the groups in it. This uses recursion, so you can have nested inherits.
 ```js
-"Type": "UserSteamID",
+"Type": "AccountID",
 "Name": "Owner",
 "Inherits": [
   "Admin"
