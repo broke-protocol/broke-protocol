@@ -96,7 +96,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if(!player.isHuman && !player.IsDead && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if(!player.isHuman && !player.svPlayer.targetEntity && !player.IsDead && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
                 float rand = Random.value;
 
@@ -182,7 +182,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (Random.value < 0.1f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+                if (!player.svPlayer.targetEntity && Random.value < 0.1f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
                 {
                     TryFindBounty();
                 }
@@ -484,7 +484,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if (!player.isHuman && !player.IsDead && Random.value < 0.01f && player.IsMobile
+            if (!player.isHuman && !player.svPlayer.targetEntity && !player.IsDead && Random.value < 0.01f && player.IsMobile
                 && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
                 TryFindEnemyGang();
@@ -497,7 +497,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
-                return (territory.attackerIndex == Util.InvalidByte) ? info.spawnRate : 1f;
+                return (territory.attackerIndex == Util.InvalidByte) ? info.spawnRate : 4f;
             }
             return 0f;
         }
