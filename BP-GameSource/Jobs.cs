@@ -38,6 +38,7 @@ namespace BrokeProtocol.GameSource.Jobs
             if (loop != null)
             {
                 player.StopCoroutine(loop);
+                loop = null;
                 loopCount--;
             }
             base.RemoveJob();
@@ -472,7 +473,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 foreach (ShEntity e in s.centered)
                 {
                     if (e != player && e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.groupIndex == GroupIndex.Gang &&
-                        p.svPlayer.job != this && !p.IsRestrained && player.CanSeeEntity(p))
+                        p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(p))
                     {
                         player.svPlayer.targetEntity = p;
                         player.svPlayer.SetState(StateIndex.Attack);
