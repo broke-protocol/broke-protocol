@@ -19,29 +19,14 @@ namespace BrokeProtocol.GameSource.Jobs
 {
     public class LoopJob : Job
     {
-        private Coroutine loop;
-
-        private int loopCount;
-
         public override void SetJob()
         {
-            if (loop == null && player.isActiveAndEnabled)
-            {
-                loop = player.StartCoroutine(JobCoroutine());
-                loopCount++;
-            }
             base.SetJob();
-        }
-
-        public override void RemoveJob()
-        {
-            if (loop != null)
+            if (player.isActiveAndEnabled)
             {
-                player.StopCoroutine(loop);
-                loop = null;
-                loopCount--;
+                if (player.jobCoroutine != null) player.StopCoroutine(player.jobCoroutine);
+                player.jobCoroutine = player.StartCoroutine(JobCoroutine());
             }
-            base.RemoveJob();
         }
 
         private IEnumerator JobCoroutine()
@@ -51,7 +36,6 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 yield return delay;
                 Loop();
-                if (loopCount != 1) Debug.LogError($"[SVR] {this} loopCount (should = 1): {loopCount}");
             } while (true);
         }
 
