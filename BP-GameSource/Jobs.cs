@@ -1051,6 +1051,12 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected override GetEntityCallback GetTargetHandler() => () => EntityCollections.RandomNPC;
 
+        protected bool MountWithinReach(ShEntity e)
+        {
+            ShMountable m = player.GetMount;
+            return m.GetVelocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
+        }
+
         public override void Loop()
         {
             if (player.isHuman && !player.IsDead)
@@ -1070,14 +1076,14 @@ namespace BrokeProtocol.GameSource.Jobs
                         player.svPlayer.SendGameMessage("Out of Time");
                         SetTarget();
                     }
-                    else if (player.TransportWithinReach(destinationMarker))
+                    else if (MountWithinReach(destinationMarker))
                     {
                         player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
                         SetTarget();
                     }
                 }
                 else if (
-                    targetPlayer && player.TransportWithinReach(targetPlayer) &&
+                    targetPlayer && MountWithinReach(targetPlayer) &&
                     targetPlayer.svPlayer.SvMountBack(player.curMount.ID, false))
                 {
                     player.svPlayer.DestroyGoalMarker();
