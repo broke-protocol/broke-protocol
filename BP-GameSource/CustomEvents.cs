@@ -3,6 +3,7 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using UnityEngine;
 
@@ -25,6 +26,13 @@ namespace BrokeProtocol.CustomEvents
                 /* Note inner quote is escaped twice due to being unwrapped across 2 languages */
                 //player.svPlayer.ExecuteJS("exec(\"clManager.SendToServer(Channel.Unsequenced, SvPacket.GlobalMessage, \\\"ExecuteJS Test\\\");\");");
             }
+        }
+
+        // Example call from CEF used in www/cef/index2.html -> "window.trigger("YourEventName", {argument : YourArgs});"
+        [CustomTarget]
+        public void OnPressedKey(ShPlayer caller, JToken args)
+        {
+            caller.svPlayer.SendGameMessage((string)args["argument"]);
         }
 
         [CustomTarget]
