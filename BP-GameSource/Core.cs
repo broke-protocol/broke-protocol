@@ -152,9 +152,9 @@ namespace BrokeProtocol.GameSource
                 "Search others for illegal items, arrest criminals, put the them in your car, and bring to jail for cash rewards",
                 0, GroupIndex.LawEnforcement, null, null, null, 1, new ColorStruct(0f, 1f, 1f), 0.03f, 8,
                 new Transports[] {
-                    new Transports(new string[] {"CarPolice"}),
+                    new Transports(new string[] { "CarPolice" }),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[] { "PoliceBoat" })
                 },
                 new Upgrades[] {
                     new Upgrades(
@@ -390,13 +390,21 @@ namespace BrokeProtocol.GameSource
                 0, GroupIndex.LawEnforcement, null, null, null, 3, new ColorStruct(0.75f, 0.75f, 0.25f), 0.01f, 3,
                 new Transports[] {
                     new Transports(new string[] {
+                        "TroopCar1",
+                        "TroopCar2",
+                        "TroopCar3",
+                        "ArmyFuel1",
+                        "ArmyFuel2",
+                        "ArmyFuel3",
                         "ArmoredCar1",
                         "ArmoredCar2",
                         "ArmoredCar3" }),
                      new Transports(new string[] {
                         "Apache1",
                         "Apache2",
-                        "Apache3" }),
+                        "Apache3",
+                        "Fighter1",
+                        "Fighter2" }),
                     new Transports(new string[0])
                 },
                 new Upgrades[] {

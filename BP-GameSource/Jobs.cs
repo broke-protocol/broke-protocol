@@ -549,10 +549,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex != Util.InvalidByte)
                 {
                     player.svPlayer.targetEntity = target;
-                    if (player.svPlayer.SetState(StateIndex.Attack))
-                    {
-                        return;
-                    }
+                    if (player.svPlayer.SetState(StateIndex.Attack)) return;
                 }
             }
             base.ResetJobAI();
