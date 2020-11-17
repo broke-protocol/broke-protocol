@@ -36,24 +36,16 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]
         public void OnGlobalChatMessage(ShPlayer player, string message)
         {
-            if (player.manager.svManager.chatted.Limit(player))
-            {
-                return;
-            }
+            if (player.manager.svManager.chatted.Limit(player)) return;
 
             message = message.CleanMessage();
 
-            if(string.IsNullOrWhiteSpace(message))
-            {
-                return;
-            }
+            if(string.IsNullOrWhiteSpace(message)) return;
 
             Debug.Log($"[CHAT] {player.username}:{message}");
 
-            if (CommandHandler.OnEvent(player, message)) // 'true' if message starts with command prefix
-            {
-                return;
-            }
+            // 'true' if message starts with command prefix
+            if (CommandHandler.OnEvent(player, message)) return;
 
             player.svPlayer.Send(SvSendType.All, Channel.Reliable, ClPacket.GlobalChatMessage, player.ID, message);
         }
@@ -61,24 +53,16 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerLocalChatMessage, ExecutionMode.Override)]
         public void OnLocalChatMessage(ShPlayer player, string message)
         {
-            if (player.manager.svManager.chatted.Limit(player))
-            {
-                return;
-            }
+            if (player.manager.svManager.chatted.Limit(player)) return;
 
             message = message.CleanMessage();
 
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(message)) return;
 
             Debug.Log($"[CHAT] {player.username}:{message}");
 
-            if (CommandHandler.OnEvent(player, message)) // 'true' if message starts with command prefix
-            {
-                return;
-            }
+            // 'true' if message starts with command prefix
+            if (CommandHandler.OnEvent(player, message)) return;
 
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.LocalChatMessage, player.ID, message);
         }
@@ -86,10 +70,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerDamage, ExecutionMode.Override)]
         public void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
         {
-            if (player.svPlayer.godMode || player.IsDead || player.IsShielded(damageIndex, collider))
-            {
-                return;
-            }
+            if (player.svPlayer.godMode || player.IsDead || player.IsShielded(damageIndex, collider)) return;
 
             if (damageIndex != DamageIndex.Null)
             {
@@ -151,10 +132,7 @@ namespace BrokeProtocol.GameSource.Types
 
             base.OnDamage(player, damageIndex, amount, attacker, collider, hitY);
 
-            if (player.IsDead)
-            {
-                return;
-            }
+            if (player.IsDead) return;
 
             // Still alive, do knockdown and Assault crimes
 
@@ -212,7 +190,7 @@ namespace BrokeProtocol.GameSource.Types
                         player.manager.svManager.briefcasePrefabs.GetRandom(),
                         player.GetPlace,
                         hit.point,
-                        Quaternion.LookRotation(player.GetPositionT.forward, Vector3.up),
+                        Quaternion.LookRotation(player.GetPositionT.forward),
                         false);
 
                     if (briefcase)
@@ -235,10 +213,7 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.ClearWitnessed();
 
-            if (!player.isHuman)
-            {
-                player.svPlayer.SetState(StateIndex.Null);
-            }
+            if (!player.isHuman) player.svPlayer.SetState(StateIndex.Null);
 
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, player.svPlayer.RespawnTime);
 
@@ -259,7 +234,7 @@ namespace BrokeProtocol.GameSource.Types
             if(target)
             {
                 target.svPlayer.job.OnOptionMenuAction(player.ID, menuID, optionID, actionID);
-            }    
+            }
         }
 
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]
@@ -295,8 +270,6 @@ namespace BrokeProtocol.GameSource.Types
 
                 player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.SellApartment, apartment.ID);
                 player.svPlayer.CleanupApartment(place);
-
-                return;
             }
         }
 
@@ -340,10 +313,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerReward, ExecutionMode.Override)]
         public void OnReward(ShPlayer player, int experienceDelta, int moneyDelta)
         {
-            if (!player.isHuman || player.svPlayer.job.info.upgrades.Length <= 1)
-            {
-                return;
-            }
+            if (!player.isHuman || player.svPlayer.job.info.upgrades.Length <= 1) return;
 
             var experience = player.experience + experienceDelta;
 
@@ -422,17 +392,12 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerCrime, ExecutionMode.Override)]
         public void OnCrime(ShPlayer player, byte crimeIndex, ShPlayer victim)
         {
-            if (player.svPlayer.InvalidCrime(crimeIndex))
-            {
-                return;
-            }
+            if (player.svPlayer.InvalidCrime(crimeIndex)) return;
 
             Crime crime = player.manager.GetCrime(crimeIndex);
             ShPlayer witness = null;
-            if (crime.witness && !player.svPlayer.GetWitness(victim, out witness))
-            {
-                return;
-            }
+
+            if (crime.witness && !player.svPlayer.GetWitness(victim, out witness)) return;
 
             player.AddCrime(crime.index, witness);
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witness ? witness.ID : 0);
@@ -512,15 +477,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerRestrain, ExecutionMode.Override)]
         public void OnRestrain(ShPlayer player, ShRestrained restrained)
         {
-            if(player.svPlayer.godMode)
-            {
-                return;
-            }
+            if(player.svPlayer.godMode) return;
 
-            if (player.curMount)
-            {
-                player.svPlayer.SvDismount();
-            }
+            if (player.curMount) player.svPlayer.SvDismount();
 
             player.svPlayer.SvSetEquipable(restrained.index);
 

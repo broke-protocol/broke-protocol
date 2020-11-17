@@ -36,6 +36,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.MovableRespawn, ExecutionMode.Override)]
         public void OnRespawn(ShMovable movable)
         {
+            movable.svMovable.thrower = null; // So players aren't charged with Murder crimes after vehicles reset
             if (movable.svMovable.randomSpawn)
             {
                 movable.svMovable.Despawn();

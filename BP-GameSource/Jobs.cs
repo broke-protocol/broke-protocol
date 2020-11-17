@@ -85,14 +85,8 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 float rand = Random.value;
 
-                if (rand < 0.01f)
-                {
-                    TryFindInnocent();
-                }
-                else if(rand < 0.005f)
-                {
-                    TryFindVictim();
-                }
+                if (rand < 0.01f) TryFindInnocent();
+                else if(rand < 0.005f) TryFindVictim();
             }
         }
     }
@@ -158,10 +152,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
             }
 
-            foreach (string s in removeKeys)
-            {
-                bounties.Remove(s);
-            }
+            foreach (string s in removeKeys) bounties.Remove(s);
 
             if (player.IsDead) return;
 
@@ -314,10 +305,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
-        public override void OnJailCriminal(ShPlayer criminal, int fine)
-        {
-            player.svPlayer.Reward(3, fine);
-        }
+        public override void OnJailCriminal(ShPlayer criminal, int fine) => player.svPlayer.Reward(3, fine);
 
         public override void ResetJobAI()
         {
@@ -371,20 +359,12 @@ namespace BrokeProtocol.GameSource.Jobs
             targetPlayer.svPlayer.SendGameMessage("Paramedic alerted to your location");
         }
 
-        protected override bool ValidTarget(ShEntity target)
-        {
-            return base.ValidTarget(target) && (target as ShPlayer).IsKnockedOut;
-        }
+        protected override bool ValidTarget(ShEntity target) => 
+            base.ValidTarget(target) && (target as ShPlayer).IsKnockedOut;
 
-        public override void OnHealEntity(ShEntity entity)
-        {
-            player.svPlayer.Reward(2, 100);
-        }
+        public override void OnHealEntity(ShEntity entity) => player.svPlayer.Reward(2, 100);
 
-        public override void OnRevivePlayer(ShPlayer entity)
-        {
-            player.svPlayer.Reward(3, 250);
-        }
+        public override void OnRevivePlayer(ShPlayer entity) => player.svPlayer.Reward(3, 250);
     }
 
     public class Firefighter : TargetEntityJob
@@ -625,10 +605,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }    
             }
 
-            foreach(string s in removeKeys)
-            {
-                requests.Remove(s);
-            }
+            foreach(string s in removeKeys) requests.Remove(s);
         }
 
         public override void OnEmployeeAction(ShPlayer target, string actionID)
@@ -773,7 +750,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected delegate ShEntity GetEntityCallback();
 
-        protected virtual bool ValidTarget(ShEntity target) => target && target != player && target.isActiveAndEnabled && !target.IsDead;
+        protected virtual bool ValidTarget(ShEntity target) => 
+            target && target != player && target.isActiveAndEnabled && !target.IsDead;
 
         public virtual void ResetTarget()
         {
@@ -854,10 +832,8 @@ namespace BrokeProtocol.GameSource.Jobs
             targetPlayer = target as ShPlayer;
         }
 
-        protected override bool ValidTarget(ShEntity target)
-        {
-            return base.ValidTarget(target) && (target as ShPlayer).wantedLevel >= info.attackLevel;
-        }
+        protected override bool ValidTarget(ShEntity target) => 
+            base.ValidTarget(target) && (target as ShPlayer).wantedLevel >= info.attackLevel;
 
         protected override GetEntityCallback GetTargetHandler()
         {
@@ -931,7 +907,8 @@ namespace BrokeProtocol.GameSource.Jobs
         [NonSerialized]
         public float timeDeadline;
 
-        protected override bool ValidTarget(ShEntity target) => base.ValidTarget(target) && (target is ShPlayer p) && !p.curMount && !(p.svPlayer.job is Prisoner);
+        protected override bool ValidTarget(ShEntity target) => 
+            base.ValidTarget(target) && (target is ShPlayer p) && !p.curMount && !(p.svPlayer.job is Prisoner);
 
         public override void ResetTarget()
         {
@@ -981,10 +958,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void OnSpecialAction(ShEntity target, string actionID)
         {
-            if (!target || target.IsDead || !player.InActionRange(target))
-            {
-                return;
-            }
+            if (!target || target.IsDead || !player.InActionRange(target)) return;
 
             if (targetPlayer != target)
             {
@@ -1054,7 +1028,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected bool MountWithinReach(ShEntity e)
         {
             ShMountable m = player.GetMount;
-            return m.GetVelocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
+            return m.GetVelocity().sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
         }
 
         public override void Loop()

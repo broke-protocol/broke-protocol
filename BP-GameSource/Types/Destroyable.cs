@@ -22,10 +22,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.DestroyableDamage, ExecutionMode.Override)]
         public void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
         {
-            if (destroyable.IsDead)
-            {
-                return;
-            }
+            if (destroyable.IsDead) return;
 
             destroyable.health -= amount;
 

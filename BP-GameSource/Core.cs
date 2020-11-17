@@ -390,13 +390,13 @@ namespace BrokeProtocol.GameSource
                 0, GroupIndex.LawEnforcement, null, null, null, 3, new ColorStruct(0.75f, 0.75f, 0.25f), 0.01f, 3,
                 new Transports[] {
                     new Transports(new string[] {
-                        "TroopCar1",
-                        "TroopCar2",
-                        "TroopCar3",
-                        "ArmyFuel1",
-                        "ArmyFuel2",
-                        "ArmyFuel3" }),
-                    new Transports(new string[0]),
+                        "ArmoredCar1",
+                        "ArmoredCar2",
+                        "ArmoredCar3" }),
+                     new Transports(new string[] {
+                        "Apache1",
+                        "Apache2",
+                        "Apache3" }),
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
@@ -407,6 +407,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("HelmetCombat", 1),
                             new InventoryStruct("Sig", 1),
                             new InventoryStruct("AmmoPistol", 49),
+                            new InventoryStruct("Smoke", 1),
                             new InventoryStruct("LicenseGun", 1)}),
                     new Upgrades(
                         new InventoryStruct[] {
