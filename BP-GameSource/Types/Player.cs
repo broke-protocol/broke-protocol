@@ -165,8 +165,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (!player.isHuman)
                 {
-                    player.svPlayer.targetEntity = attacker;
-                    player.svPlayer.SetState(StateIndex.Attack);
+                    player.svPlayer.SetAttackState(attacker);
                 }
             }
         }

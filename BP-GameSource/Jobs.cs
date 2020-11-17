@@ -119,9 +119,7 @@ namespace BrokeProtocol.GameSource.Jobs
                         player.AddCrime(CrimeIndex.Murder, p);
                         player.AddCrime(CrimeIndex.Murder, p);
                         // Add double murder to ensure high wanted level
-                        player.svPlayer.targetEntity = p;
-                        player.svPlayer.SetState(StateIndex.Attack);
-                        return;
+                        if(player.svPlayer.SetAttackState(p)) return;
                     }
                 }
             }
@@ -439,9 +437,7 @@ namespace BrokeProtocol.GameSource.Jobs
                     if (e != player && e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.groupIndex == GroupIndex.Gang &&
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(p))
                     {
-                        player.svPlayer.targetEntity = p;
-                        player.svPlayer.SetState(StateIndex.Attack);
-                        return;
+                        if(player.svPlayer.SetAttackState(p)) return;
                     }
                 }
             }
@@ -548,8 +544,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 ShTerritory territory = target.svPlayer.GetTerritory;
                 if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex != Util.InvalidByte)
                 {
-                    player.svPlayer.targetEntity = target;
-                    if (player.svPlayer.SetState(StateIndex.Attack)) return;
+                    if (player.svPlayer.SetAttackState(target)) return;
                 }
             }
             base.ResetJobAI();
@@ -800,8 +795,7 @@ namespace BrokeProtocol.GameSource.Jobs
             if (target && target.IsOutside && target.wantedLevel >= info.attackLevel &&
                 Random.value < target.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
-                player.svPlayer.targetEntity = target;
-                return (player.svPlayer.SetState(StateIndex.Attack));
+                return player.svPlayer.SetAttackState(target);
             }
             return false;
         }
@@ -815,9 +809,7 @@ namespace BrokeProtocol.GameSource.Jobs
                     if (e != player && e is ShPlayer p && !p.IsDead && !p.IsRestrained &&
                         p.wantedLevel >= info.attackLevel && player.CanSeeEntity(p))
                     {
-                        player.svPlayer.targetEntity = p;
-                        player.svPlayer.SetState(StateIndex.Attack);
-                        return;
+                        if(player.svPlayer.SetAttackState(p)) return;
                     }
                 }
             }
