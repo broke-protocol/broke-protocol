@@ -114,7 +114,8 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 foreach (ShEntity e in s.centered)
                 {
-                    if (e != player && e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)))
+                    if (e != player && e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username))
+                        && player.CanSeeEntity(p))
                     {
                         player.AddCrime(CrimeIndex.Murder, p);
                         player.AddCrime(CrimeIndex.Murder, p);
