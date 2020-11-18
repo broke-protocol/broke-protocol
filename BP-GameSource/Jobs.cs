@@ -39,6 +39,21 @@ namespace BrokeProtocol.GameSource.Jobs
             } while (true);
         }
 
+        protected void TryFindEntity(Func<ShEntity, bool> Test, Action<ShEntity> Action)
+        {
+            foreach (Sector s in player.svPlayer.localSectors.Values)
+            {
+                foreach (ShEntity e in s.centered)
+                {
+                    if (e != player && Test(e) && player.CanSeeEntity(e))
+                    {
+                        Action(e);
+                        return;
+                    }
+                }
+            }
+        }
+
         public virtual void Loop() { }
     }
 
@@ -47,36 +62,24 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         protected void TryFindInnocent()
         {
-            foreach (Sector s in player.svPlayer.localSectors.Values)
-            {
-                foreach (ShEntity e in s.centered)
+            TryFindEntity(
+                (e) => (e is ShPlayer p) && !p.curMount && !p.IsDead && p.IsRestrained && p.wantedLevel == 0,
+                (e) =>
                 {
-                    if (e != player && e is ShPlayer p && !p.curMount && !p.IsDead &&
-                        p.IsRestrained && p.wantedLevel == 0 && player.CanSeeEntity(p))
-                    {
-                        player.svPlayer.targetEntity = p;
-                        player.svPlayer.SetState(StateIndex.Free);
-                        return;
-                    }
-                }
-            }
+                    player.svPlayer.targetEntity = e;
+                    player.svPlayer.SetState(StateIndex.Free);
+                });
         }
 
         public void TryFindVictim()
         {
-            foreach (Sector s in player.svPlayer.localSectors.Values)
-            {
-                foreach (ShEntity e in s.centered)
+            TryFindEntity(
+                (e) => e is ShPlayer p && !p.curMount && !p.IsDead && !p.IsRestrained,
+                (e) =>
                 {
-                    if (e != player && e is ShPlayer p && !p.curMount && !p.IsDead &&
-                        !p.IsRestrained && player.CanSeeEntity(p))
-                    {
-                        player.svPlayer.targetEntity = p;
-                        player.svPlayer.SetState(StateIndex.Rob);
-                        return;
-                    }
-                }
-            }
+                    player.svPlayer.targetEntity = e;
+                    player.svPlayer.SetState(StateIndex.Rob);
+                });
         }
 
         public override void Loop()
@@ -110,20 +113,14 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected void TryFindBounty()
         {
-            foreach (Sector s in player.svPlayer.localSectors.Values)
-            {
-                foreach (ShEntity e in s.centered)
+            TryFindEntity(
+                (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)),
+                (e) =>
                 {
-                    if (e != player && e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username))
-                        && player.CanSeeEntity(p))
-                    {
-                        player.AddCrime(CrimeIndex.Murder, p);
-                        player.AddCrime(CrimeIndex.Murder, p);
-                        // Add double murder to ensure high wanted level
-                        if(player.svPlayer.SetAttackState(p)) return;
-                    }
-                }
-            }
+                    player.AddCrime(CrimeIndex.Murder, e as ShPlayer);
+                    // Add double murder to ensure high wanted level
+                    player.svPlayer.SetAttackState(e);
+                });
         }
 
         public override void OnDestroyEntity(ShEntity entity)
@@ -319,18 +316,13 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         protected void TryFindKnockedOut()
         {
-            foreach (Sector s in player.svPlayer.localSectors.Values)
-            {
-                foreach (ShEntity e in s.centered)
+            TryFindEntity(
+                (e) => e is ShPlayer p && p.IsKnockedOut,
+                (e) =>
                 {
-                    if (e != player && e is ShPlayer p && p.IsKnockedOut)
-                    {
-                        player.svPlayer.targetEntity = p;
-                        player.svPlayer.SetState(StateIndex.Revive);
-                        return;
-                    }
-                }
-            }
+                    player.svPlayer.targetEntity = e;
+                    player.svPlayer.SetState(StateIndex.Revive);
+                });
         }
 
         public override void Loop()
@@ -370,18 +362,13 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         public void TryFindFire()
         {
-            foreach (Sector s in player.svPlayer.localSectors.Values)
-            {
-                foreach (ShEntity e in s.centered)
+            TryFindEntity(
+                (e) => e.gameObject.layer == LayerIndex.fire,
+                (e) =>
                 {
-                    if (e.gameObject.layer == LayerIndex.fire)
-                    {
-                        player.svPlayer.targetEntity = e;
-                        player.svPlayer.SetState(StateIndex.Extinguish);
-                        return;
-                    }
-                }
-            }
+                    player.svPlayer.targetEntity = e;
+                    player.svPlayer.SetState(StateIndex.Extinguish);
+                });
         }
 
         public override void Loop()
@@ -431,17 +418,10 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public void TryFindEnemyGang()
         {
-            foreach (Sector s in player.svPlayer.localSectors.Values)
-            {
-                foreach (ShEntity e in s.centered)
-                {
-                    if (e != player && e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.groupIndex == GroupIndex.Gang &&
-                        p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(p))
-                    {
-                        if(player.svPlayer.SetAttackState(p)) return;
-                    }
-                }
-            }
+            TryFindEntity(
+                (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.groupIndex == GroupIndex.Gang &&
+                        p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained,
+                (e) => player.svPlayer.SetAttackState(e));
         }
 
         public override void Loop()
@@ -803,17 +783,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected void TryFindCriminal()
         {
-            foreach (Sector s in player.svPlayer.localSectors.Values)
-            {
-                foreach (ShEntity e in s.centered)
-                {
-                    if (e != player && e is ShPlayer p && !p.IsDead && !p.IsRestrained &&
-                        p.wantedLevel >= info.attackLevel && player.CanSeeEntity(p))
-                    {
-                        if(player.svPlayer.SetAttackState(p)) return;
-                    }
-                }
-            }
+            TryFindEntity(
+                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && p.wantedLevel >= info.attackLevel,
+                (e) => player.svPlayer.SetAttackState(e));
         }
 
         protected override void FoundTarget()
