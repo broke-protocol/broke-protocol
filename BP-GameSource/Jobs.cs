@@ -439,7 +439,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
-                return (territory.attackerIndex == Util.InvalidByte) ? info.spawnRate : 4f;
+                return (territory.attackerIndex == Util.invalidByte) ? info.spawnRate : 4f;
             }
             return 0f;
         }
@@ -496,7 +496,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 else if (victim.svPlayer.job is Gangster)
                 {
                     ShTerritory t = player.svPlayer.GetTerritory;
-                    if (t && t.attackerIndex != Util.InvalidByte)
+                    if (t && t.attackerIndex != Util.invalidByte)
                     {
                         if (victim.svPlayer.job.info.shared.jobIndex == t.ownerIndex)
                         {
@@ -523,7 +523,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 ShTerritory territory = target.svPlayer.GetTerritory;
-                if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex != Util.InvalidByte)
+                if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex != Util.invalidByte)
                 {
                     if (player.svPlayer.SetAttackState(target)) return;
                 }
@@ -990,7 +990,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected bool MountWithinReach(ShEntity e)
         {
             ShMountable m = player.GetMount;
-            return m.GetVelocity().sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
+            return m.Velocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
         }
 
         public override void Loop()
