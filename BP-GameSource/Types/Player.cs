@@ -417,7 +417,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerKick, ExecutionMode.Override)]
         public void OnKick(ShPlayer player, ShPlayer target, string reason)
         {
-            ChatHandler.SendToAll($"{target.fullname} Kicked: {reason}");
+            ChatHandler.SendToAll($"{target.displayName} Kicked: {reason}");
 
             player.manager.svManager.KickConnection(target.svPlayer.connection);
         }
@@ -425,7 +425,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerBan, ExecutionMode.Override)]
         public void OnBan(ShPlayer player, ShPlayer target, string reason)
         {
-            ChatHandler.SendToAll($"{target.fullname} Banned: {reason}");
+            ChatHandler.SendToAll($"{target.displayName} Banned: {reason}");
 
             player.svPlayer.SvBanDatabase(target.username, reason);
             player.manager.svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
