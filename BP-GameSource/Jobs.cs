@@ -39,21 +39,6 @@ namespace BrokeProtocol.GameSource.Jobs
             } while (true);
         }
 
-        protected void TryFindEntity(Func<ShEntity, bool> Test, Action<ShEntity> Action)
-        {
-            foreach (Sector s in player.svPlayer.localSectors.Values)
-            {
-                foreach (ShEntity e in s.centered)
-                {
-                    if (e != player && Test(e) && player.CanSeeEntity(e))
-                    {
-                        Action(e);
-                        return;
-                    }
-                }
-            }
-        }
-
         public virtual void Loop() { }
     }
 
@@ -62,8 +47,8 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         protected void TryFindInnocent()
         {
-            TryFindEntity(
-                (e) => (e is ShPlayer p) && !p.curMount && !p.IsDead && p.IsRestrained && p.wantedLevel == 0,
+            player.svPlayer.LocalEntitiesOne(
+                (e) => (e is ShPlayer p) && !p.curMount && !p.IsDead && p.IsRestrained && p.wantedLevel == 0 && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
@@ -73,8 +58,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public void TryFindVictim()
         {
-            TryFindEntity(
-                (e) => e is ShPlayer p && !p.curMount && !p.IsDead && !p.IsRestrained,
+            player.svPlayer.LocalEntitiesOne(
+                (e) => e is ShPlayer p && !p.curMount && !p.IsDead && !p.IsRestrained && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
@@ -113,8 +98,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected void TryFindBounty()
         {
-            TryFindEntity(
-                (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)),
+            player.svPlayer.LocalEntitiesOne(
+                (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.AddCrime(CrimeIndex.Murder, e as ShPlayer);
@@ -316,7 +301,7 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         protected void TryFindKnockedOut()
         {
-            TryFindEntity(
+            player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && p.IsKnockedOut,
                 (e) =>
                 {
@@ -362,8 +347,8 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         public void TryFindFire()
         {
-            TryFindEntity(
-                (e) => e.gameObject.layer == LayerIndex.fire,
+            player.svPlayer.LocalEntitiesOne(
+                (e) => e.gameObject.layer == LayerIndex.fire && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
@@ -418,9 +403,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public void TryFindEnemyGang()
         {
-            TryFindEntity(
+            player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.groupIndex == GroupIndex.Gang &&
-                        p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained,
+                        p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
                 (e) => player.svPlayer.SetAttackState(e));
         }
 
@@ -783,8 +768,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected void TryFindCriminal()
         {
-            TryFindEntity(
-                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && p.wantedLevel >= info.attackLevel,
+            player.svPlayer.LocalEntitiesOne(
+                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && p.wantedLevel >= info.attackLevel && player.CanSeeEntity(e),
                 (e) => player.svPlayer.SetAttackState(e));
         }
 
