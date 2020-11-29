@@ -167,6 +167,15 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     player.svPlayer.SetAttackState(attacker);
                 }
+                else if (player.svPlayer.follower)
+                {
+                    player.svPlayer.follower.svPlayer.SetAttackState(attacker);
+                }
+
+                if(attacker.svPlayer.follower)
+                {
+                    attacker.svPlayer.follower.svPlayer.SetAttackState(player);
+                }
             }
         }
 
