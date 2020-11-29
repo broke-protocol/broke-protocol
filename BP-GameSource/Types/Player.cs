@@ -513,5 +513,22 @@ namespace BrokeProtocol.GameSource.Types
         {
             player.svPlayer.SendTextMenu("Server Info", player.svPlayer.svManager.serverDescription);
         }
+
+        [Target(GameSourceEvent.PlayerDisplayName, ExecutionMode.Override)]
+        public void OnDisplayName(ShPlayer player, string username)
+        {
+            player.username = username;
+
+            if (player.isHuman)
+            {
+                player.svPlayer.tagname = player.svPlayer.PrimaryGroup?.Tag ?? string.Empty;
+            }
+            else
+            {
+                player.svPlayer.tagname = string.Empty;
+            }
+
+            player.displayName = player.username + player.svPlayer.tagname;
+        }
     }
 }
