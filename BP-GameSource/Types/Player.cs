@@ -163,18 +163,22 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
 
+                ShPlayer playerFollower = player.svPlayer.follower;
+
                 if (!player.isHuman)
                 {
                     player.svPlayer.SetAttackState(attacker);
                 }
-                else if (player.svPlayer.follower)
+                else if (playerFollower && playerFollower.svPlayer.currentState.index == StateIndex.Follow)
                 {
-                    player.svPlayer.follower.svPlayer.SetAttackState(attacker);
+                    playerFollower.svPlayer.SetAttackState(attacker);
                 }
 
-                if(attacker.svPlayer.follower)
+                ShPlayer attackerFollower = attacker.svPlayer.follower;
+
+                if (attackerFollower && attackerFollower.svPlayer.currentState.index == StateIndex.Follow)
                 {
-                    attacker.svPlayer.follower.svPlayer.SetAttackState(player);
+                    attackerFollower.svPlayer.SetAttackState(player);
                 }
             }
         }
