@@ -102,8 +102,9 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e),
                 (e) =>
                 {
+                    // Add double murder to ensure high wanted level (targetable by SpecOps)
                     player.AddCrime(CrimeIndex.Murder, e as ShPlayer);
-                    // Add double murder to ensure high wanted level
+                    player.AddCrime(CrimeIndex.Murder, e as ShPlayer);
                     player.svPlayer.SetAttackState(e);
                 });
         }
