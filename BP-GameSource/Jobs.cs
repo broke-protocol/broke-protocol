@@ -577,7 +577,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
                 if (item)
                 {
-                    options.Add(new LabelID("${item.itemName} &6{item.value}", s));
+                    options.Add(new LabelID($"{item.itemName} &6{item.value}", s));
                 }
             }
 
