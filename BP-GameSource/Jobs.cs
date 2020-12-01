@@ -165,12 +165,12 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
                 else
                 {
-                    options.Add(new LabelID($"{p.username}:  Available", p.username));
+                    options.Add(new LabelID($"{p.username} &aAvailable", p.username));
                 }    
             }
 
             // Negative playerID means job action is called on the employer with that ID, not self
-            target.svPlayer.SendOptionMenu("Players", -player.ID, playersMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
+            target.svPlayer.SendOptionMenu("&6Players", -player.ID, playersMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
         }
 
         public override void OnSelfAction(string actionID)
@@ -179,11 +179,11 @@ namespace BrokeProtocol.GameSource.Jobs
 
             foreach (KeyValuePair<string, DateTimeOffset> pair in bounties)
             {
-                string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " (Online)" : string.Empty;
-                options.Add(new LabelID($"{pair.Key}{online}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours", pair.Key));
+                string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " &aOnline" : string.Empty;
+                options.Add(new LabelID($"{pair.Key}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours{online}", pair.Key));
             }
 
-            player.svPlayer.SendOptionMenu("Bounties", player.ID, bountiesMenu, options.ToArray(), new LabelID[0]);
+            player.svPlayer.SendOptionMenu("&6Bounties", player.ID, bountiesMenu, options.ToArray(), new LabelID[0]);
         }
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)

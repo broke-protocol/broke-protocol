@@ -524,7 +524,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerServerInfo, ExecutionMode.Override)]
         public void OnServerInfo(ShPlayer player)
         {
-            player.svPlayer.SendTextMenu("Server Info", player.svPlayer.svManager.serverDescription);
+            player.svPlayer.SendTextMenu("&7Server Info", player.svPlayer.svManager.serverDescription);
         }
 
         [Target(GameSourceEvent.PlayerDisplayName, ExecutionMode.Override)]
