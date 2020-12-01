@@ -577,12 +577,12 @@ namespace BrokeProtocol.GameSource.Jobs
 
                 if (item)
                 {
-                    options.Add(new LabelID(item.itemName + ": $" + item.value, s));
+                    options.Add(new LabelID("${item.itemName} &6{item.value}", s));
                 }
             }
 
             // Negative playerID means job action is called on the employer with that ID, not self
-            target.svPlayer.SendOptionMenu("Items", -player.ID, itemMenu, options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
+            target.svPlayer.SendOptionMenu("&7Items", -player.ID, itemMenu, options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
         }
 
         public override void OnSelfAction(string actionID)
@@ -594,11 +594,11 @@ namespace BrokeProtocol.GameSource.Jobs
                 ShItem i = SceneManager.Instance.GetEntity<ShItem>(pair.Value);
                 if (i)
                 {
-                    options.Add(new LabelID(pair.Key + " : " + i.itemName, pair.Key));
+                    options.Add(new LabelID($"{pair.Key}: &6{i.itemName}", pair.Key));
                 }
             }
 
-            player.svPlayer.SendOptionMenu("Requests", player.ID, requestMenu, options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });
+            player.svPlayer.SendOptionMenu("&7Requests", player.ID, requestMenu, options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });
         }
 
 
