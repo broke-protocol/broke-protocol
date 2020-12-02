@@ -48,7 +48,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected void TryFindInnocent()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => (e is ShPlayer p) && !p.curMount && !p.IsDead && p.IsRestrained && p.wantedLevel == 0 && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && !p.curMount && !p.IsDead && p.IsRestrained && p.wantedLevel == 0 && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
@@ -69,12 +69,12 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if(!player.isHuman && !player.svPlayer.targetEntity && !player.IsDead && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if(!player.isHuman && !player.svPlayer.targetEntity && !player.curMount && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
                 float rand = Random.value;
 
-                if (rand < 0.01f) TryFindInnocent();
-                else if(rand < 0.005f) TryFindVictim();
+                if(rand < 0.005f) TryFindVictim();
+                else if (rand < 0.02f) TryFindInnocent();
             }
         }
     }
@@ -140,7 +140,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (!player.svPlayer.targetEntity && Random.value < 0.1f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+                if (!player.svPlayer.targetEntity && Random.value < 0.02f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
                 {
                     TryFindBounty();
                 }
@@ -275,8 +275,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (!player.svPlayer.targetEntity && player.IsMobile &&
-                    Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
+                if (!player.svPlayer.targetEntity && player.IsMobile && Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
                 {
                     TryFindCriminal();
                 }
@@ -317,8 +316,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (Random.value < 0.1f && player.IsMobile && !player.svPlayer.targetEntity &&
-                    player.HasItem(player.manager.defibrillator))
+                if (Random.value < 0.02f && player.IsMobile && !player.svPlayer.targetEntity && player.HasItem(player.manager.defibrillator))
                 {
                     TryFindKnockedOut();
                 }
@@ -363,8 +361,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (Random.value < 0.1f && player.IsMobile && !player.svPlayer.targetEntity &&
-                    player.HasItem(player.manager.extinguisher))
+                if (Random.value < 0.02f && player.IsMobile && !player.svPlayer.targetEntity && player.HasItem(player.manager.extinguisher))
                 {
                     TryFindFire();
                 }
@@ -412,8 +409,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if (!player.isHuman && !player.svPlayer.targetEntity && !player.IsDead && Random.value < 0.01f && player.IsMobile
-                && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if (!player.isHuman && !player.svPlayer.targetEntity && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
                 TryFindEnemyGang();
             }
@@ -817,8 +813,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (!player.svPlayer.targetEntity && player.IsMobile &&
-                    Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
+                if (!player.svPlayer.targetEntity && player.IsMobile && Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
                 {
                     TryFindCriminal();
                 }
