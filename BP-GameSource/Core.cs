@@ -387,7 +387,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(SpecOps), "SpecOps",
                 "Hunt down the most wanted players on the server for rewards",
-                0, GroupIndex.LawEnforcement, null, null, null, 3, new ColorStruct(0.75f, 0.75f, 0.25f), 0.015f, 5,
+                0, GroupIndex.LawEnforcement, null, null, null, 3, new ColorStruct(0.75f, 0.75f, 0.25f), 0.015f, 8,
                 new Transports[] {
                     new Transports(new string[] {
                         "TroopCar1",
