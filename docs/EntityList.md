@@ -83,6 +83,8 @@ Cessna1
 Cessna2
 Cessna3
 Cessna4
+Fighter1
+Fighter2
 Hercules
 ParachuteBrown
 ParachuteGray
@@ -96,6 +98,7 @@ SmallHelo3
 Boat1
 Boat2
 Boat3
+PoliceBoat
 Dirtbike1
 Dirtbike2
 Dirtbike3
