@@ -1,3 +1,24 @@
+## 1.11
+?> The AI Overhaul Update. Adds API methods and Events around player display names. Minor naming changes and useful helper functions added as well.
+
+### API
+- Added GameSource Player Event: OnDisplayName -> Custom formatting for displayed names across playerlist, overhead, and chat on join
+- Added svPlayer.SvUpdateDisplayName() -> Change and sync display name updates at runtime to all clients - Color codes supported
+- Helper functions to iterate and test local entities (Used in GameSource Jobs as an example)
+    - svEntity.LoclaEntitiesAll(Test, Action) -> Perform Test and Action (if true) on all entities in rendering range
+    - svEntity.LocalEntitiesOne(Test, Action) -> Same as above but stops at the first entity that Test == true
+- entity.GetVelocity() -> entity.Velocity
+- player.fullname -> player.displayName
+
+### MODDING
+- Fixed longstanding issues with splines and heightmaps - loaded correctly now
+- Larger map/asset sizes are supported now
+
+### Misc
+- Color codes for OptionMenu and TextMenu are supported across all options and menu titles too
+- Don't use svPlayer.SetState(StateIndex.Attack) anymore
+    - Use svPlayer.SetAttackState() and svPlayer.SetFollowState() helper functions
+
 ## 1.1
 ?> The Hitman Update. Reworks basically all of the API around Jobs to support modding. Custom Jobs can now be defined in Plugins.
 
@@ -89,13 +110,3 @@
 - Added ShEntoty.collectedItems[] for a custom set of collected items when picked up
 - Added ShGun.fireEffect for preset particle effects to save filesize and memory (remove your custom effects)
 - Added Attachment, Muzzle, Sight, Underbarrel classes of entities
-
-## 1.05
-?> Most additions are related to the new injury system
-
-- Added GameSource Event: OnRestrain(ShPlayer player, ShRestrained restrained)
-- Added BPAPI.Instance.Plugins
-- Changed GameSource Event: OnDamage -> new `float hitY` parameter for locational damage
-- Recommend to use Channel.Reliable for all Game Messages 
-- Removed BrokeProtocol.Collections.LimitQueue.Add(T item);
-- Changed BrokeProtocol.Collections.LimitQueue.OverLimit(T item) -> Limit(T item, bool add = true)
