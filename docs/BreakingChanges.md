@@ -5,7 +5,7 @@
 - Added GameSource Player Event: OnDisplayName -> Custom formatting for displayed names across playerlist, overhead, and chat on join
 - Added svPlayer.SvUpdateDisplayName() -> Change and sync display name updates at runtime to all clients - Color codes supported
 - Helper functions to iterate and test local entities (Used in GameSource Jobs as an example)
-    - svEntity.LoclaEntitiesAll(Test, Action) -> Perform Test and Action (if true) on all entities in rendering range
+    - svEntity.LocalEntitiesAll(Test, Action) -> Perform Test and Action (if true) on all entities in rendering range
     - svEntity.LocalEntitiesOne(Test, Action) -> Same as above but stops at the first entity that Test == true
 - entity.GetVelocity() -> entity.Velocity
 - player.fullname -> player.displayName
