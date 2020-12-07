@@ -541,7 +541,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.tagname = string.Empty;
             }
 
-            player.displayName = player.username + player.svPlayer.tagname;
+            player.displayName = player.svPlayer.tagname + player.username;
         }
     }
 }
