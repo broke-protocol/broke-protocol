@@ -421,7 +421,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
-                return (territory.attackerIndex == Util.invalidByte) ? info.spawnRate : 4f;
+                // Boost gangster spawn rate if territory under attack
+                return (territory.attackerIndex == Util.invalidByte) ? info.spawnRate : 8f;
             }
             return 0f;
         }
