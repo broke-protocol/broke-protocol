@@ -541,7 +541,8 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.tagname = string.Empty;
             }
 
-            player.displayName = player.svPlayer.tagname + player.username;
+            // &f to reset back to white after any tag colors
+            player.displayName = $"{player.svPlayer.tagname}&f{player.username}";
         }
     }
 }
