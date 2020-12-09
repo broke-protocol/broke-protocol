@@ -35,10 +35,18 @@ namespace BrokeProtocol.CustomEvents
             caller.svPlayer.SendGameMessage((string)args["argument"]);
         }
 
+        bool voidRunning;
+
         [CustomTarget]
         public void ButtonPush(ShEntity target, ShPlayer caller)
         {
-            int cost = 500;
+            if(voidRunning)
+            {
+                caller.svPlayer.SendGameMessage("Do not challenge the void");
+                return;
+            }
+
+            const int cost = 500;
 
             if(caller.MyMoneyCount < cost)
             {
@@ -51,8 +59,12 @@ namespace BrokeProtocol.CustomEvents
             target.StartCoroutine(EnterTheVoid(target.svEntity.svManager));
         }
 
+        
+
         private IEnumerator EnterTheVoid(SvManager svManager)
         {
+            voidRunning = true;
+
             WaitForSecondsRealtime delay = new WaitForSecondsRealtime(0.1f);
 
             float duration = 4f;
@@ -112,6 +124,8 @@ namespace BrokeProtocol.CustomEvents
                 svManager.SvSetCloudColor(originalCloud);
                 svManager.SvSetWaterColor(originalWater);
             }
+
+            voidRunning = false;
         }
     }
 }
