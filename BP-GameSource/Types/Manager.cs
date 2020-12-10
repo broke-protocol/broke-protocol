@@ -1,12 +1,17 @@
-﻿using BrokeProtocol.LiteDB;
-using BrokeProtocol.Utility;
-using BrokeProtocol.Managers;
-using BrokeProtocol.Entities;
-using BrokeProtocol.Collections;
-using BrokeProtocol.API;
-using BrokeProtocol.GameSource.Jobs;
-using System;
+﻿using BrokeProtocol.API;
 using BrokeProtocol.API.Types;
+using BrokeProtocol.Collections;
+using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Jobs;
+using BrokeProtocol.LiteDB;
+using BrokeProtocol.Managers;
+using BrokeProtocol.Utility;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -104,6 +109,19 @@ namespace BrokeProtocol.GameSource.Types
                     Hitman.bounties.Add(bounty.Key, CustomData.ConvertData<DateTimeOffset>(bounty.Value));
                 }
             }
+        }
+
+        [Target(GameSourceEvent.ManagerReadGroups, ExecutionMode.Override)]
+        public void OnReadGroups()
+        {
+            var groups = JsonConvert.DeserializeObject<List<Group>>(File.ReadAllText(Paths.groupsFile));
+            if (groups == null)
+            {
+                Debug.Log("[SVR] Groups file has an error");
+                return;
+            }
+
+            GroupManager.Groups = groups.ToDictionary(x => x.Name, y => y);
         }
 
         private bool ValidateUser(SvManager svManager, ConnectionData connectionData)
