@@ -544,5 +544,53 @@ namespace BrokeProtocol.GameSource.Types
             // &f to reset back to white after any tag colors
             player.displayName = $"{player.svPlayer.tagname}&f{player.username}";
         }
+
+        [Target(GameSourceEvent.PlayerEnterDoor, ExecutionMode.Override)]
+        public void OnEnterDoor(ShPlayer player, int doorID, ShPlayer sender, bool forceEnter)
+        {
+            ShDoor door = EntityCollections.FindByID<ShDoor>(doorID);
+
+            if (door && door.svDoor.other)
+            {
+                if (!forceEnter)
+                {
+                    if (player.IsRestrained)
+                    {
+                        player.svPlayer.SendGameMessage("You are restrained");
+                        return;
+                    }
+
+                    if (door.svDoor.key && !player.HasItem(door.svDoor.key))
+                    {
+                        player.svPlayer.SendGameMessage("Need " + door.svDoor.key.itemName + " to enter");
+                        return;
+                    }
+                }
+
+                ShMountable baseEntity;
+
+                if (player.curMount is ShPlayer mountPlayer)
+                {
+                    baseEntity = mountPlayer;
+                }
+                else
+                {
+                    baseEntity = player;
+                    if (player.curMount) player.svPlayer.SvDismount();
+                }
+
+                if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out Place place))
+                {
+                    baseEntity.svMountable.SvSetParent(place.mTransform);
+                    baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint);
+                }
+                else
+                {
+                    ShDoor otherDoor = door.svDoor.other;
+                    baseEntity.svMountable.SvSetParent(otherDoor.GetPlace.mTransform);
+                    baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint);
+                }
+            }
+        }
     }
 }
