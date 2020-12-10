@@ -546,50 +546,72 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerEnterDoor, ExecutionMode.Override)]
-        public void OnEnterDoor(ShPlayer player, int doorID, ShPlayer sender, bool forceEnter)
+        public void OnEnterDoor(ShPlayer player, ShDoor door, ShPlayer sender, bool forceEnter)
         {
-            ShDoor door = EntityCollections.FindByID<ShDoor>(doorID);
-
-            if (door && door.svDoor.other)
+            if (!forceEnter)
             {
-                if (!forceEnter)
+                if (player.IsRestrained)
                 {
-                    if (player.IsRestrained)
-                    {
-                        player.svPlayer.SendGameMessage("You are restrained");
-                        return;
-                    }
-
-                    if (door.svDoor.key && !player.HasItem(door.svDoor.key))
-                    {
-                        player.svPlayer.SendGameMessage("Need " + door.svDoor.key.itemName + " to enter");
-                        return;
-                    }
+                    player.svPlayer.SendGameMessage("You are restrained");
+                    return;
                 }
 
-                ShMountable baseEntity;
-
-                if (player.curMount is ShPlayer mountPlayer)
+                if (door.svDoor.key && !player.HasItem(door.svDoor.key))
                 {
-                    baseEntity = mountPlayer;
+                    player.svPlayer.SendGameMessage("Need " + door.svDoor.key.itemName + " to enter");
+                    return;
+                }
+            }
+
+            ShMountable baseEntity;
+
+            if (player.curMount is ShPlayer mountPlayer)
+            {
+                baseEntity = mountPlayer;
+            }
+            else
+            {
+                baseEntity = player;
+                if (player.curMount) player.svPlayer.SvDismount();
+            }
+
+            if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out Place place))
+            {
+                baseEntity.svMountable.SvSetParent(place.mTransform);
+                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint);
+            }
+            else
+            {
+                ShDoor otherDoor = door.svDoor.other;
+                baseEntity.svMountable.SvSetParent(otherDoor.GetPlace.mTransform);
+                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint);
+            }
+        }
+
+
+        [Target(GameSourceEvent.PlayerFollower, ExecutionMode.Override)]
+        public void OnFollower(ShPlayer player, ShPlayer other)
+        {
+            if (player.svPlayer.follower)
+            {
+                if (player.svPlayer.follower != other)
+                {
+                    player.svPlayer.SendGameMessage("Already have a follower");
                 }
                 else
                 {
-                    baseEntity = player;
-                    if (player.curMount) player.svPlayer.SvDismount();
+                    other.svPlayer.SvDismount();
+                    other.svPlayer.ClearLeader();
+                    other.svPlayer.ResetAI();
                 }
-
-                if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out Place place))
-                {
-                    baseEntity.svMountable.SvSetParent(place.mTransform);
-                    baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint);
-                }
-                else
-                {
-                    ShDoor otherDoor = door.svDoor.other;
-                    baseEntity.svMountable.SvSetParent(otherDoor.GetPlace.mTransform);
-                    baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint);
-                }
+            }
+            else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.IsBusy)
+            {
+                other.svPlayer.SetFollowState(player);
+            }
+            else
+            {
+                player.svPlayer.SendGameMessage("NPC is occupied");
             }
         }
     }
