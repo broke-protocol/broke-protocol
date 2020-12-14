@@ -21,7 +21,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.MovableDeath, ExecutionMode.Override)]
-        public void OnDeath(ShMovable movable)
+        public void OnDeath(ShMovable movable, ShPlayer attacker)
         {
             if (movable.svMovable.respawnable)
             {
