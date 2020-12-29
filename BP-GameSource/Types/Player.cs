@@ -1,15 +1,16 @@
 ﻿using BrokeProtocol.API;
+using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Required;
 using BrokeProtocol.Managers;
+using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.Utility.Networking;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
-using BrokeProtocol.Collections;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -183,11 +184,20 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
+        private IEnumerator SpectateDelay(ShPlayer player, ShPlayer target)
+        {
+            yield return new WaitForSeconds(1f);
+            player.svPlayer.SvSpectate(target);
+
+        }
+
         [Target(GameSourceEvent.PlayerDeath, ExecutionMode.Override)]
         public void OnDeath(ShPlayer player, ShPlayer attacker)
         {
             if (attacker && attacker != player)
             {
+                if (player.isHuman) player.StartCoroutine(SpectateDelay(player, attacker));
+
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(
                     player.GetPosition + Vector3.up,
@@ -317,6 +327,9 @@ namespace BrokeProtocol.GameSource.Types
                 player.originalPosition = newSpawn.position;
                 player.originalRotation = newSpawn.rotation;
                 player.originalParent = newSpawn.parent;
+
+                // Back to spectate self on Respawn
+                player.svPlayer.SvSpectate(player);
             }
         }
 
@@ -392,11 +405,10 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.SvTrySetJob(BPAPI.Instance.PrisonerIndex, true, false);
             Transform jailSpawn = SceneManager.Instance.jail.mainT;
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
-
+            player.svPlayer.SvForceEquipable(player.manager.hands.index);
             player.svPlayer.SvClearCrimes();
             player.RemoveItemsJail();
-            player.StartCoroutine(player.svPlayer.JailTimer(time));
-            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, time);
+            player.svPlayer.StartJailTimer(time);
         }
 
         [Target(GameSourceEvent.PlayerCrime, ExecutionMode.Override)]
