@@ -402,6 +402,8 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerCrime, ExecutionMode.Override)]
         public void OnCrime(ShPlayer player, byte crimeIndex, ShPlayer victim)
         {
+            if(player.svPlayer.godMode) return;
+
             if (player.svPlayer.InvalidCrime(crimeIndex)) return;
 
             Crime crime = player.manager.GetCrime(crimeIndex);
