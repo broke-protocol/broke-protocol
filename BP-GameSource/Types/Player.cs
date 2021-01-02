@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -240,21 +241,20 @@ namespace BrokeProtocol.GameSource.Types
             player.SetStance(StanceIndex.Dead);
         }
 
-        [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
-        public void OnOptionAction(ShPlayer player, int targetID, string menuID, string optionID, string actionID)
+        private const string securityPanel = "securityPanel";
+        private const string enterPasscode = "enterPasscode";
+        private const string setPasscode = "setPasscode";
+        private const string clearPasscode = "clearPasscode";
+
+        [Target(GameSourceEvent.PlayerSecurityPanel, ExecutionMode.Override)]
+        public void OnSecurityPanel(ShPlayer player, ShApartment apartment)
         {
-            if (targetID >= 0)
-            {
-                player.svPlayer.job.OnOptionMenuAction(targetID, menuID, optionID, actionID);
-                return;
-            }
+            List<LabelID> options = new List<LabelID>();
 
-            ShPlayer target = EntityCollections.FindByID<ShPlayer>(-targetID);
-
-            if(target)
-            {
-                target.svPlayer.job.OnOptionMenuAction(player.ID, menuID, optionID, actionID);
-            }
+            options.Add(new LabelID("Enter Passcode", enterPasscode));
+            options.Add(new LabelID("Set Passcode", setPasscode));
+            options.Add(new LabelID("Clear Passcode", clearPasscode));
+            player.svPlayer.SendOptionMenu("&7Security Panel", apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
         }
 
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]
@@ -279,7 +279,7 @@ namespace BrokeProtocol.GameSource.Types
                 return;
             }
 
-            if (player.ownedApartments.TryGetValue(apartment, out Place place))
+            if (player.ownedApartments.TryGetValue(apartment, out var place))
             {
                 if (player.GetPlace == place)
                 {
@@ -585,7 +585,7 @@ namespace BrokeProtocol.GameSource.Types
                 if (player.curMount) player.svPlayer.SvDismount();
             }
 
-            if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out Place place))
+            if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out var place))
             {
                 baseEntity.svMountable.SvSetParent(place.mTransform);
                 baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint);
@@ -622,6 +622,75 @@ namespace BrokeProtocol.GameSource.Types
             else
             {
                 player.svPlayer.SendGameMessage("NPC is occupied");
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
+        public void OnOptionAction(ShPlayer player, int targetID, string menuID, string optionID, string actionID)
+        {
+            if(menuID == securityPanel)
+            {
+                switch (optionID)
+                {
+                    case enterPasscode:
+                        player.svPlayer.SendInputMenu("Enter Passcode", targetID, enterPasscode, InputField.ContentType.Password);
+                        break;
+                    case setPasscode:
+                        player.svPlayer.SendInputMenu("Set Passcode", targetID, setPasscode, InputField.ContentType.Password);
+                        break;
+                    case clearPasscode:
+                        var apartment = EntityCollections.FindByID<ShApartment>(targetID);
+                        if (apartment && player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
+                        {
+                            apartmentPlace.svPasscode = string.Empty;
+                            player.svPlayer.SendGameMessage("Apartment Passcode Cleared");
+                        }
+                        break;
+                }
+
+                return;
+            }
+
+            if (targetID >= 0)
+            {
+                player.svPlayer.job.OnOptionMenuAction(targetID, menuID, optionID, actionID);
+                return;
+            }
+
+            ShPlayer target = EntityCollections.FindByID<ShPlayer>(-targetID);
+
+            if (target)
+            {
+                target.svPlayer.job.OnOptionMenuAction(player.ID, menuID, optionID, actionID);
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerSendInput, ExecutionMode.Override)]
+        public void OnSendInput(ShPlayer player, int targetID, string menuID, string input)
+        {
+            switch (menuID)
+            {
+                case enterPasscode:
+                    var a1 = EntityCollections.FindByID<ShApartment>(targetID);
+
+                    foreach(var a in a1.svApartment.clones.Values)
+                    {
+                        if(a.svPasscode == input)
+                        {
+                            player.svPlayer.SvEnterDoor(targetID, a.svOwner, true);
+                            return;
+                        }
+                        player.svPlayer.SendGameMessage("Passcode: No Match");
+                    }
+                    break;
+                case setPasscode:
+                    var a2 = EntityCollections.FindByID<ShApartment>(targetID);
+                    if (a2 && player.ownedApartments.TryGetValue(a2, out var ap2))
+                    {
+                        ap2.svPasscode = input;
+                        player.svPlayer.SendGameMessage("Apartment Passcode Set");
+                    }
+                    break;
             }
         }
     }
