@@ -642,9 +642,11 @@ namespace BrokeProtocol.GameSource.Types
                         var apartment = EntityCollections.FindByID<ShApartment>(targetID);
                         if (apartment && player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
                         {
-                            apartmentPlace.svPasscode = string.Empty;
+                            apartmentPlace.svPasscode = null;
                             player.svPlayer.SendGameMessage("Apartment Passcode Cleared");
+                            return;
                         }
+                        player.svPlayer.SendGameMessage("No Apartment Owned");
                         break;
                 }
 
@@ -675,21 +677,24 @@ namespace BrokeProtocol.GameSource.Types
 
                     foreach(var a in a1.svApartment.clones.Values)
                     {
-                        if(a.svPasscode == input)
+                        if(a.svPasscode != null && a.svPasscode == input)
                         {
                             player.svPlayer.SvEnterDoor(targetID, a.svOwner, true);
                             return;
                         }
-                        player.svPlayer.SendGameMessage("Passcode: No Match");
                     }
+                    player.svPlayer.SendGameMessage("Passcode: No Match");
                     break;
+
                 case setPasscode:
                     var a2 = EntityCollections.FindByID<ShApartment>(targetID);
                     if (a2 && player.ownedApartments.TryGetValue(a2, out var ap2))
                     {
                         ap2.svPasscode = input;
                         player.svPlayer.SendGameMessage("Apartment Passcode Set");
+                        return;
                     }
+                    player.svPlayer.SendGameMessage("No Apartment Owned");
                     break;
             }
         }
