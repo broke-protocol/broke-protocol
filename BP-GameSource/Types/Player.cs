@@ -667,8 +667,8 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(GameSourceEvent.PlayerSendInput, ExecutionMode.Override)]
-        public void OnSendInput(ShPlayer player, int targetID, string menuID, string input)
+        [Target(GameSourceEvent.PlayerSubmitInput, ExecutionMode.Override)]
+        public void OnSubmitInput(ShPlayer player, int targetID, string menuID, string input)
         {
             switch (menuID)
             {
