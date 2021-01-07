@@ -187,7 +187,7 @@ namespace BrokeProtocol.GameSource.Types
 
         private IEnumerator SpectateDelay(ShPlayer player, ShPlayer target)
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(2f);
             player.svPlayer.SvSpectate(target);
 
         }
