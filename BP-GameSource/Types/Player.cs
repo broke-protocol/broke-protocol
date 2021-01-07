@@ -698,5 +698,11 @@ namespace BrokeProtocol.GameSource.Types
                     break;
             }
         }
+
+        [Target(GameSourceEvent.PlayerReady, ExecutionMode.Override)]
+        public void OnReady(ShPlayer player)
+        {
+            player.svPlayer.SendServerInfo();
+        }
     }
 }
