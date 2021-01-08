@@ -331,6 +331,8 @@ namespace BrokeProtocol.GameSource.Types
                 // Back to spectate self on Respawn
                 player.svPlayer.SvSpectate(player);
             }
+
+            player.svPlayer.SvForceEquipable(player.manager.hands.index);
         }
 
         [Target(GameSourceEvent.PlayerReward, ExecutionMode.Override)]
@@ -414,9 +416,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerCrime, ExecutionMode.Override)]
         public void OnCrime(ShPlayer player, byte crimeIndex, ShPlayer victim)
         {
-            if(player.svPlayer.godMode) return;
-
-            if (player.svPlayer.InvalidCrime(crimeIndex)) return;
+            if (player.svPlayer.godMode || player.svPlayer.InvalidCrime(crimeIndex)) return;
 
             Crime crime = player.manager.GetCrime(crimeIndex);
             ShPlayer witness = null;
