@@ -327,7 +327,12 @@ namespace BrokeProtocol.GameSource.Types
                 player.originalPosition = newSpawn.position;
                 player.originalRotation = newSpawn.rotation;
                 player.originalParent = newSpawn.parent;
+            }
 
+            base.OnRespawn(player);
+
+            if(player.isHuman)
+            {
                 // Back to spectate self on Respawn
                 player.svPlayer.SvSpectate(player);
             }

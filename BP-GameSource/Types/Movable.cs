@@ -3,6 +3,7 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility.Networking;
 using UnityEngine;
+using System.Collections;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -20,12 +21,30 @@ namespace BrokeProtocol.GameSource.Types
                 movable.health);
         }
 
+        private IEnumerator RespawnDelay(ShMovable movable)
+        {
+            float respawnTime = Time.time + movable.svMovable.RespawnTime;
+            WaitForSeconds delay = new WaitForSeconds(1f);
+
+            while (movable && movable.IsDead)
+            {
+                if (Time.time >= respawnTime)
+                {
+                    movable.svMovable.Disappear();
+                    movable.svMovable.Respawn();
+                    yield break;
+                }
+                yield return delay;
+            }
+        }
+
         [Target(GameSourceEvent.MovableDeath, ExecutionMode.Override)]
         public void OnDeath(ShMovable movable, ShPlayer attacker)
         {
             if (movable.svMovable.respawnable)
             {
-                movable.StartCoroutine(movable.svMovable.RespawnDelay());
+                // Must start coroutine on the manager because the movable will be disabled during killcam/spec mode
+                movable.manager.StartCoroutine(RespawnDelay(movable));
             }
             else
             {
@@ -39,7 +58,7 @@ namespace BrokeProtocol.GameSource.Types
             movable.svMovable.thrower = null; // So players aren't charged with Murder crimes after vehicles reset
             if (movable.svMovable.randomSpawn)
             {
-                movable.svMovable.Despawn();
+                movable.svMovable.Despawn(true);
             }
             else if (movable.IsDead)
             {

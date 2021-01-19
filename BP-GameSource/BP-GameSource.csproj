@@ -37,6 +37,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AstarPathfindingProject">
+      <HintPath>..\..\broke-protocol-game2\Library\ScriptAssemblies\AstarPathfindingProject.dll</HintPath>
+    </Reference>
     <Reference Include="ENet-CSharp">
       <HintPath>..\..\broke-protocol-game2\Assets\Plugins\Managed\ENet-CSharp.dll</HintPath>
     </Reference>
