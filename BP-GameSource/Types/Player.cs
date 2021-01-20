@@ -711,5 +711,18 @@ namespace BrokeProtocol.GameSource.Types
         {
             player.svPlayer.SendServerInfo();
         }
+
+        [Target(GameSourceEvent.PlayerPoint, ExecutionMode.Override)]
+        public void OnPoint(ShPlayer player, bool pointing)
+        {
+            player.pointing = pointing;
+            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Point, player.ID, pointing);
+        }
+
+        [Target(GameSourceEvent.PlayerAlert, ExecutionMode.Override)]
+        public void OnAlert(ShPlayer player)
+        {
+            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Alert, player.ID);
+        }
     }
 }
