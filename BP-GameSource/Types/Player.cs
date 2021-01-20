@@ -324,9 +324,9 @@ namespace BrokeProtocol.GameSource.Types
             if (player.isHuman)
             {
                 var newSpawn = player.svPlayer.svManager.spawnLocations.GetRandom().transform;
-                player.originalPosition = newSpawn.position;
-                player.originalRotation = newSpawn.rotation;
-                player.originalParent = newSpawn.parent;
+                player.svPlayer.originalPosition = newSpawn.position;
+                player.svPlayer.originalRotation = newSpawn.rotation;
+                player.svPlayer.originalParent = newSpawn.parent;
             }
 
             base.OnRespawn(player);
@@ -717,12 +717,23 @@ namespace BrokeProtocol.GameSource.Types
         {
             player.pointing = pointing;
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Point, player.ID, pointing);
+
+            if(pointing && player.svPlayer.follower && 
+                Physics.Raycast(player.GetOrigin, player.GetPositionT.forward, out var hit, Util.visibleRange, MaskIndex.hard) && 
+                player.svPlayer.follower.svPlayer.NodeNear(hit.point))
+            {
+                player.svPlayer.follower.svPlayer.SetGoToState(hit.point, player.GetRotation, player.GetParent);
+            }
         }
 
         [Target(GameSourceEvent.PlayerAlert, ExecutionMode.Override)]
         public void OnAlert(ShPlayer player)
         {
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Alert, player.ID);
+            if(player.svPlayer.follower && player.svPlayer.follower.svPlayer.currentState.index == StateIndex.Stop)
+            {
+                player.svPlayer.follower.svPlayer.SetFollowState(player);
+            }
         }
     }
 }
