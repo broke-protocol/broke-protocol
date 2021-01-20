@@ -64,10 +64,10 @@ namespace BrokeProtocol.GameSource.Types
             {
                 movable.svMovable.Send(SvSendType.Local, Channel.Reliable, ClPacket.Spawn,
                     movable.ID,
-                    movable.originalPosition,
-                    movable.originalRotation,
-                    movable.svMovable.GetOriginalParentIndex);
-                movable.Spawn(movable.originalPosition, movable.originalRotation, movable.originalParent);
+                    movable.svMovable.originalPosition,
+                    movable.svMovable.originalRotation,
+                    movable.svMovable.originalParent.GetSiblingIndex());
+                movable.Spawn(movable.svMovable.originalPosition, movable.svMovable.originalRotation, movable.svMovable.originalParent);
             }
             else
             {

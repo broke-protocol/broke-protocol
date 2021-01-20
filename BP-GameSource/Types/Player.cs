@@ -730,7 +730,7 @@ namespace BrokeProtocol.GameSource.Types
         public void OnAlert(ShPlayer player)
         {
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Alert, player.ID);
-            if(player.svPlayer.follower && player.svPlayer.follower.svPlayer.currentState.index == StateIndex.Stop)
+            if(player.svPlayer.follower)
             {
                 player.svPlayer.follower.svPlayer.SetFollowState(player);
             }
