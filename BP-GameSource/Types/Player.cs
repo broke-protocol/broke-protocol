@@ -594,14 +594,12 @@ namespace BrokeProtocol.GameSource.Types
 
             if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out var place))
             {
-                baseEntity.svMountable.SvSetParent(place.mTransform);
-                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint);
+                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint, place.mTransform);
             }
             else
             {
                 ShDoor otherDoor = door.svDoor.other;
-                baseEntity.svMountable.SvSetParent(otherDoor.GetPlace.mTransform);
-                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint);
+                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform);
             }
         }
 
