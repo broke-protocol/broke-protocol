@@ -16,5 +16,8 @@ namespace BrokeProtocol.GameSource.Types
 
         //[Target(GameSourceEvent.EntityRemoveItem, ExecutionMode.Override)]
         //public void OnRemoveItem(ShEntity entity, int itemIndex, int amount, bool dispatch) { }
+
+        //[Target(GameSourceEvent.EntityRespawn, ExecutionMode.Override)]
+        //public void OnRespawn(ShEntity entity) { }
     }
 }
