@@ -165,20 +165,19 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
 
-                ShPlayer playerFollower = player.svPlayer.follower;
-
                 if (!player.isHuman)
                 {
                     player.svPlayer.SetAttackState(attacker);
                 }
-                else if (playerFollower && playerFollower.svPlayer.currentState.index == StateIndex.Follow)
+                else
                 {
-                    playerFollower.svPlayer.SetAttackState(attacker);
+                    ShPlayer playerFollower = player.svPlayer.follower;
+                    if (playerFollower) playerFollower.svPlayer.SetAttackState(attacker);
                 }
 
                 ShPlayer attackerFollower = attacker.svPlayer.follower;
 
-                if (attackerFollower && attackerFollower.svPlayer.currentState.index == StateIndex.Follow)
+                if (attackerFollower)
                 {
                     attackerFollower.svPlayer.SetAttackState(player);
                 }
@@ -720,7 +719,7 @@ namespace BrokeProtocol.GameSource.Types
                 Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) && 
                 player.svPlayer.follower.svPlayer.NodeNear(hit.point))
             {
-                player.svPlayer.follower.svPlayer.SetGoToState(hit.point, player.GetRotation, player.GetParent);
+                player.svPlayer.follower.svPlayer.SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
             }
         }
 
