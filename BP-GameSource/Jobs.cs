@@ -73,8 +73,8 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 float rand = Random.value;
 
-                if(rand < 0.005f) TryFindVictim();
-                else if (rand < 0.02f) TryFindInnocent();
+                if (rand < 0.003f) TryFindVictim();
+                else if (rand < 0.015f) TryFindInnocent();
             }
         }
     }
