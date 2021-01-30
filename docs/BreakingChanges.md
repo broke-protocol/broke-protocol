@@ -1,3 +1,28 @@
+## 1.12
+?> The 2021 Update introduces a jumble of minor changes and additions. Adds API around user input: Apartment Security Panel code in GameSource serves as an example. New animation Packets/Functions to run custom character animations on clients. New GameSource events and functions around spectate functionality added.
+
+### API
+- Removed Channel.Fragmented: Channel.Reliable can now support large packets in the same way
+- Added svPlayer.SvSpectate(ShPlayer target)
+- Added svPlayer.SendInputMenu(...)
+- player.looking -> player.pointing
+- Added GameSource Player Events:
+    - OnSubmitInput: When a player submits input via the new text input API
+    - OnPoint: When a player starts/stops pointing (point location as argument)
+    - OnAlert: When a player hits the alert button (whistling/beeping)
+    - OnReady: When player is first spawned and ready (Sends ServerInfo window in GameSource)
+
+### MODDING
+- Custom Player animation parameters can now be set on clients to trigger custom animations
+    - SvPlayer.SvAnimateFloat(string parameterName, float value)
+    - SvPlayer.SvAnimateInt(string parameterName, int value)
+    - SvPlayer.SvAnimateBool(string parameterName, bool value)
+    - SvPlayer.SvAnimateTrigger(string parameterName)
+- Support for poisonous consumable mods (set negative health boost)
+
+### Misc
+- SvRestore has new optional interior/parent argument
+
 ## 1.11
 ?> The AI Overhaul Update. Adds API methods and Events around player display names. Minor naming changes and useful helper functions added as well.
 
@@ -94,19 +119,3 @@
 
 ### Misc
 - All ban functionality is now stored and tied to IP addresses, not accounts
-
-## 1.06
-?> Most additions are related to the new attachments and asset modding
-
-### API
-- Only 1 active jail per map now: ShManager.jails -> SceneManager.Instance.jail
-- Added ShPlayer.SetPositionSafe()
-- Added SvPlayer.SvBindAttachment()
-- Added SvPlayer.SvUnbindAttachment()
-- Added SvPlayer.SvSetAttachment()
-- Added GameSource Event: OnServerInfo(ShPlayer player)
-
-### MODDING
-- Added ShEntoty.collectedItems[] for a custom set of collected items when picked up
-- Added ShGun.fireEffect for preset particle effects to save filesize and memory (remove your custom effects)
-- Added Attachment, Muzzle, Sight, Underbarrel classes of entities
