@@ -12,6 +12,7 @@
 To make your own CEF UI for client modding, open up your favorite editor. I personally suggest VSC (Visual Studio Code) for web development.
 
 <!-- div:left-panel -->
+1. Edit `settings.json` and set `"cef"` to `true`.
 2. Go to your `/cef/` folder. This should be in `YourServerFolder/www/cef/`. Create a new file in there called `index.html`.
 3. Insert boilerplate HTML in there. See the note at the right if you have VSC installed. Otherwise you can copy and paste this:
 
