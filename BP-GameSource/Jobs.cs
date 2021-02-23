@@ -451,7 +451,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override float GetSpawnRate()
         {
-            ShTerritory territory = player.svPlayer.GetTerritory;
+            // Use the spawner territory to calculate spawn rate (better AI defence spawning during gangwars)
+            ShTerritory territory = player.svPlayer.spawner.svPlayer.GetTerritory;
 
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
