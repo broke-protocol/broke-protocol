@@ -48,7 +48,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else
             {
-                movable.StartCoroutine(movable.DestroyDelay(movable.svMovable.RespawnTime));
+                movable.svMovable.StartDestroyDelay(movable.svMovable.RespawnTime);
             }
         }
 
