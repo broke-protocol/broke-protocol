@@ -1,3 +1,13 @@
+## 1.12 Hotfix #3
+?> Coroutines (loops that perform continuous non-blocking work) on Entities were piling up on every respawn. The effect was server performance degration after significant uptime. Now all coroutines on Entities are cleared at the start of every Spawn() call. So if you had job coroutines or similar started on an Entities before, use Respawn events or the new Job.OnSpawn() callback to start them fresh each time.
+
+### API
+- Added Job.OnSpawn() virtual method
+- ShPlayer.RemoveItemsJail() -> SvPlayer.RemoveItemsJail()
+- ShPlayer.RemoveItemsDeath() -> SvPlayer.RemoveItemsDeath(bool dropItems)
+- Briefcase drop logic moved from PlayerDeath event to PlayerRemoveItemsDeath event
+- Job.OnDamageEntity and Job.OnDestroyEntity have their crime handling added to GameSource
+
 ## 1.12
 ?> The 2021 Update introduces a jumble of minor changes and additions. Adds API around user input: Apartment Security Panel code in GameSource serves as an example. New animation Packets/Functions to run custom character animations on clients. New GameSource events and functions around spectate functionality added.
 
