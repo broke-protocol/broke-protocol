@@ -46,6 +46,16 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void SetJob()
         {
             base.SetJob();
+            RestartCoroutines();
+        }
+
+        public override void OnSpawn()
+        {
+            RestartCoroutines();
+        }
+
+        private void RestartCoroutines()
+        {
             if (player.isActiveAndEnabled)
             {
                 if (player.jobCoroutine != null) player.StopCoroutine(player.jobCoroutine);

@@ -182,11 +182,38 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerDeath, ExecutionMode.Override)]
         public void OnDeath(ShPlayer player, ShPlayer attacker)
         {
+            List<InventoryItem> removedItems = new List<InventoryItem>();
+
+            // Allows players to keep items/rewards from job ranks
+            foreach (InventoryItem myItem in player.myItems.Values.ToArray())
+            {
+                int extra = myItem.count;
+
+                if (player.svPlayer.job.info.upgrades.Length > player.rank)
+                {
+                    for (int rankIndex = player.rank; rankIndex >= 0; rankIndex--)
+                    {
+                        foreach (InventoryStruct i in player.svPlayer.job.info.upgrades[rankIndex].items)
+                        {
+                            if (myItem.item.name == i.itemName)
+                            {
+                                extra = Mathf.Max(0, myItem.count - i.count);
+                            }
+                        }
+                    }
+                }
+
+                // Remove everything except legal items currently worn
+                if (extra > 0 && (myItem.item.illegal || !(myItem.item is ShWearable w) || player.curWearables[(int)w.type].index != w.index))
+                {
+                    removedItems.Add(new InventoryItem(myItem.item, extra));
+                    player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra, true);
+                }
+            }
+
             if (attacker && attacker != player)
             {
                 if (player.isHuman) player.StartCoroutine(SpectateDelay(player, attacker));
-
-                player.RemoveItemsDeath();
 
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(
@@ -205,14 +232,12 @@ namespace BrokeProtocol.GameSource.Types
 
                     if (briefcase)
                     {
-                        foreach (KeyValuePair<int, InventoryItem> pair in player.myItems)
+                        foreach (var invItem in removedItems)
                         {
                             if (Random.value < 0.8f)
                             {
-                                InventoryItem i = new InventoryItem(
-                                    pair.Value.item,
-                                    Mathf.CeilToInt(pair.Value.count * Random.Range(0.05f, 0.3f)));
-                                briefcase.myItems.Add(pair.Key, i);
+                                invItem.count = Mathf.CeilToInt(invItem.count * Random.Range(0.05f, 0.3f));
+                                briefcase.myItems.Add(invItem.item.index, invItem);
                             }
                         }
                     }
@@ -401,7 +426,15 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
             player.svPlayer.SvForceEquipable(player.manager.hands.index);
             player.svPlayer.SvClearCrimes();
-            player.RemoveItemsJail();
+
+            foreach (InventoryItem i in player.myItems.Values.ToArray())
+            {
+                if (i.item.illegal)
+                {
+                    player.TransferItem(DeltaInv.RemoveFromMe, i.item.index, i.count, true);
+                }
+            }
+
             player.svPlayer.StartJailTimer(time);
         }
 
@@ -446,48 +479,6 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.SvBanDatabase(target.username, reason);
             player.manager.svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
-        }
-
-        [Target(GameSourceEvent.PlayerRemoveItemsDeath, ExecutionMode.Override)]
-        public void OnRemoveItemsDeath(ShPlayer player)
-        {
-            // Allows players to keep items/rewards from job ranks
-            foreach (InventoryItem myItem in player.myItems.Values.ToArray())
-            {
-                int extra = myItem.count;
-
-                if (player.svPlayer.job.info.upgrades.Length > player.rank)
-                {
-                    for (int rankIndex = player.rank; rankIndex >= 0; rankIndex--)
-                    {
-                        foreach (InventoryStruct i in player.svPlayer.job.info.upgrades[rankIndex].items)
-                        {
-                            if (myItem.item.name == i.itemName)
-                            {
-                                extra = Mathf.Max(0, myItem.count - i.count);
-                            }
-                        }
-                    }
-                }
-
-                // Remove everything except legal items currently worn
-                if (extra > 0 && (myItem.item.illegal || !(myItem.item is ShWearable w) || player.curWearables[(int)w.type].index != w.index))
-                {
-                    player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra, true);
-                }
-            }
-        }
-
-        [Target(GameSourceEvent.PlayerRemoveItemsJail, ExecutionMode.Override)]
-        public void OnRemoveItemsJail(ShPlayer player)
-        {
-            foreach (InventoryItem i in player.myItems.Values.ToArray())
-            {
-                if (i.item.illegal)
-                {
-                    player.TransferItem(DeltaInv.RemoveFromMe, i.item.index, i.count, true);
-                }
-            }
         }
 
         [Target(GameSourceEvent.PlayerRestrain, ExecutionMode.Override)]
