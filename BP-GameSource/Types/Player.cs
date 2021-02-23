@@ -153,18 +153,6 @@ namespace BrokeProtocol.GameSource.Types
 
             if (attacker && attacker != player)
             {
-                if (player.wantedLevel == 0)
-                {
-                    if (attacker.curEquipable is ShGun)
-                    {
-                        attacker.svPlayer.SvAddCrime(CrimeIndex.ArmedAssault, player);
-                    }
-                    else
-                    {
-                        attacker.svPlayer.SvAddCrime(CrimeIndex.Assault, player);
-                    }
-                }
-
                 if (!player.isHuman)
                 {
                     player.svPlayer.SetAttackState(attacker);
@@ -198,6 +186,8 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (player.isHuman) player.StartCoroutine(SpectateDelay(player, attacker));
 
+                player.RemoveItemsDeath();
+
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(
                     player.GetPosition + Vector3.up,
@@ -228,8 +218,6 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
             }
-
-            player.RemoveItemsDeath();
 
             player.svPlayer.ClearWitnessed();
 

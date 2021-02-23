@@ -30,6 +30,10 @@ namespace BrokeProtocol.GameSource.Types
             {
                 destroyable.ShDie(attacker);
             }
+            else if (attacker && attacker != destroyable)
+            {
+                attacker.svPlayer.job.OnDamageEntity(destroyable);
+            }    
         }
     }
 }

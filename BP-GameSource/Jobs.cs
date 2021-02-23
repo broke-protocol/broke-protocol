@@ -19,6 +19,30 @@ namespace BrokeProtocol.GameSource.Jobs
 {
     public class LoopJob : Job
     {
+        public override void OnDamageEntity(ShEntity damaged)
+        {
+            if (damaged is ShPlayer victim && victim.wantedLevel == 0)
+            {
+                if (player.curEquipable is ShGun)
+                {
+                    player.svPlayer.SvAddCrime(CrimeIndex.ArmedAssault, victim);
+                }
+                else
+                {
+                    player.svPlayer.SvAddCrime(CrimeIndex.Assault, victim);
+                }
+            }
+        }
+
+        public override void OnDestroyEntity(ShEntity destroyed)
+        {
+            if (destroyed is ShPlayer victim && victim.wantedLevel == 0)
+            {
+                player.svPlayer.SvAddCrime(CrimeIndex.Murder, victim);
+                victim.svPlayer.SendMurderedMessage(player);
+            }
+        }
+
         public override void SetJob()
         {
             base.SetJob();
@@ -452,15 +476,21 @@ namespace BrokeProtocol.GameSource.Jobs
             base.RemoveJob();
         }
 
+        protected bool IsEnemyGangster(ShEntity target) => target is ShPlayer victim && victim.svPlayer.job is Gangster && this != victim.svPlayer.job;
+
+        public override void OnDamageEntity(ShEntity damaged)
+        {
+            if (!IsEnemyGangster(damaged))
+                base.OnDamageEntity(damaged);
+        }
+
         public override void OnDestroyEntity(ShEntity entity)
         {
-            base.OnDestroyEntity(entity);
-
-            if (entity is ShPlayer victim)
+            if (IsEnemyGangster(entity))
             {
                 if (!svManager.gangWar)
                 {
-                    if (player.isHuman && victim.svPlayer.job is Gangster && this != victim.svPlayer.job)
+                    if (player.isHuman)
                     {
                         ShTerritory t;
                         if (gangstersKilled >= 1 && (t = player.svPlayer.GetTerritory) && t.ownerIndex != info.shared.jobIndex)
@@ -476,10 +506,10 @@ namespace BrokeProtocol.GameSource.Jobs
                         player.svPlayer.Reward(2, 50);
                     }
                 }
-                else if (victim.svPlayer.job is Gangster)
+                else
                 {
                     ShTerritory t = player.svPlayer.GetTerritory;
-                    if (t && t.attackerIndex != Util.invalidByte)
+                    if (t && t.attackerIndex != Util.invalidByte && entity is ShPlayer victim)
                     {
                         if (victim.svPlayer.job.info.shared.jobIndex == t.ownerIndex)
                         {
@@ -495,6 +525,10 @@ namespace BrokeProtocol.GameSource.Jobs
                         }
                     }
                 }
+            }
+            else
+            {
+                base.OnDestroyEntity(entity);
             }
         }
 
