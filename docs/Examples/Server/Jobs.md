@@ -47,6 +47,7 @@ public virtual void OnOptionMenuAction(int targetID, string menuID, string optio
 public virtual void OnRevivePlayer(ShPlayer player);
 public virtual void OnSelfAction(string actionID);
 public virtual void OnSpecialAction(ShEntity target, string actionID);
+public virtual void OnSpawn();
 public virtual void RemoveJob();
 public virtual void ResetJobAI();
 public virtual void SetJob();
@@ -67,3 +68,71 @@ public abstract class Plugin
 ```
 
 So somewhere in your own Plugin class constructor, assign your custom Job definitions to the Jobs array to have it loaded in-game. Plugins are loaded in alphanumeric order so ``zGameSource`` definitions are usually going to be last. If another plugin has Jobs defined, then those will be loaded instead and the vanilla GameSource jobs ignored. Later on, it should be possible to mix job definitions from different Plugins, but for now, only the first non-null definition is loaded.
+
+## Adding a Job Example
+Here we will show how to add an additional Job to Broke Protocol. Everything from job parameters, logic, Boss modding, and more will be covered. The example will be a Mechanic job so players can get rewards for vehicle repairs, but nearly anything could be created. Note: There's a bug where OnHeal isn't called for vehicle repairs in 1.12 so the player won't be rewarded properly yet - this is fixed in 1.13 and after.
+
+The TargetEntity class does a lot of work with marking targets on the map and continually checking if they're valid so we'll use that as the parent class. Define the Mechanic Job in your plugin as its own class like below:
+
+```cs
+public class Mechanic : TargetEntityJob
+{
+    // How we find a random Transport/Vehicle in-game: Select random from Entities until a ShTransport type is found
+    protected override GetEntityCallback GetTargetHandler() => () => EntityCollections.Entities.ElementAt(Random.Range(0, EntityCollections.Entities.Count)) as ShTransport;
+
+    // Exit conditions and Retargeting checks in a loop
+    public override void Loop()
+    {
+        if (player.IsDead) return;
+
+        if (player.isHuman && !ValidTarget(target)) SetTarget();
+    }
+
+    // What happens when a valid target is found (a damaged vehicle)
+    protected override void FoundTarget()
+    {
+        base.FoundTarget();
+        player.svPlayer.SendGameMessage(target.name + " vehicle is damaged! Check map");
+    }
+
+    // Conditions for a valid target (is Transport and damaged-> health < maxStat)
+    protected override bool ValidTarget(ShEntity target) =>
+        base.ValidTarget(target) && target is ShTransport transport && transport.health < transport.maxStat;
+
+    // What do we do when player heals an entity (reward if entity is target)
+    public override void OnHealEntity(ShEntity entity)
+    {
+        if(entity == target) player.svPlayer.Reward(2, 150);
+    }
+}
+```
+
+Also in your Plugin class you want to define your new job within the JobInfo[] Jobs array as seen in https://github.com/broke-protocol/broke-protocol/blob/master/BP-GameSource/Core.cs
+
+```cs
+new JobInfo(
+        typeof(Mechanic), "Mechanic",
+        "Repair damaged vehicles for cash rewards",
+        0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.9f, 0.9f, 0.9f), 0f, 0,
+        new Transports[] {
+            new Transports(new string[0]),
+            new Transports(new string[0]),
+            new Transports(new string[0])
+        },
+        new Upgrades[] {
+            new Upgrades(
+                new InventoryStruct[] {
+                    new InventoryStruct("Toolkit", 5),
+                    new InventoryStruct("HatBoonieDark", 1)})
+        })
+```
+
+Adjust any job items or any other parameters to your liking (See the JobInfo class for more parameter descriptions or look at other jobs to see how they define parameters). Note that all jobs must be defined & assigned in the same plugin. There is no additive mixing of jobs from different plugins (yet).
+
+Next, we need a Boss to actually give the job in-game. There is no Boss for this job defined yet in the game so a new one must be modded in. Follow the guide for modding here: https://brokeprotocol.com/modding-guide/.
+
+You should duplicate another Boss in Unity, find a skin for it online (Synty character skins) or create your own and assign your created Material/Texture onto the model. Then set the Spawn Job Index field to the index of your new job (the index/order within the Jobs array in your Plugin).
+
+![Job Modding](https://brokeprotocol.com/wp-content/uploads/JobModding.png)
+
+After you export and add your BPA file to the games AssetBundles directory, you should then be able to place it in your map. And you're all set! That's all it takes to add a new Job to Broke Protocol.
