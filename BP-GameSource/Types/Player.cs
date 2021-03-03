@@ -304,7 +304,20 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerReward, ExecutionMode.Override)]
         public void OnReward(ShPlayer player, int experienceDelta, int moneyDelta)
         {
-            if (!player.isHuman || player.svPlayer.job.info.upgrades.Length <= 1) return;
+            if (!player.isHuman) return;
+
+            moneyDelta *= player.svPlayer.svManager.payScale[player.rank];
+
+            if (moneyDelta > 0)
+            {
+                player.TransferMoney(DeltaInv.AddToMe, moneyDelta);
+            }
+            else if (moneyDelta < 0)
+            {
+                player.TransferMoney(DeltaInv.RemoveFromMe, -moneyDelta);
+            }
+
+            if (player.svPlayer.job.info.upgrades.Length <= 1) return;
 
             var experience = player.experience + experienceDelta;
 
@@ -341,17 +354,6 @@ namespace BrokeProtocol.GameSource.Types
             else
             {
                 player.svPlayer.SetExperience(experience, true);
-            }
-
-            moneyDelta *= player.svPlayer.svManager.payScale[player.rank];
-
-            if (moneyDelta > 0)
-            {
-                player.TransferMoney(DeltaInv.AddToMe, moneyDelta);
-            }
-            else if (moneyDelta < 0)
-            {
-                player.TransferMoney(DeltaInv.RemoveFromMe, -moneyDelta);
             }
         }
 

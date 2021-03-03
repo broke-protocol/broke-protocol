@@ -371,7 +371,11 @@ namespace BrokeProtocol.GameSource.Jobs
         protected override bool ValidTarget(ShEntity target) => 
             base.ValidTarget(target) && (target as ShPlayer).IsKnockedOut;
 
-        public override void OnHealEntity(ShEntity entity) => player.svPlayer.Reward(2, 100);
+        public override void OnHealEntity(ShEntity entity)
+        {
+            // Make sure not a transport being fixed
+            if(entity is ShPlayer) player.svPlayer.Reward(2, 100);
+        }
 
         public override void OnRevivePlayer(ShPlayer entity) => player.svPlayer.Reward(3, 250);
     }
