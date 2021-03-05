@@ -456,7 +456,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            if (dropItems)
+            if (dropItems && removedItems.Count > 0)
             {
                 // Only drop items if attacker present, to prevent AI suicide item farming
                 if (Physics.Raycast(
@@ -470,7 +470,7 @@ namespace BrokeProtocol.GameSource.Types
                         player.manager.svManager.briefcasePrefabs.GetRandom(),
                         player.GetPlace,
                         hit.point,
-                        Quaternion.LookRotation(player.GetPositionT.forward),
+                        Quaternion.LookRotation(player.GetPositionT.forward, hit.normal),
                         false);
 
                     if (briefcase)
