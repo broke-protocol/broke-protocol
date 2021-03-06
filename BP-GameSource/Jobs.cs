@@ -32,6 +32,10 @@ namespace BrokeProtocol.GameSource.Jobs
                     player.svPlayer.SvAddCrime(CrimeIndex.Assault, victim);
                 }
             }
+            else
+            {
+                base.OnDamageEntity(damaged);
+            }
         }
 
         public override void OnDestroyEntity(ShEntity destroyed)
@@ -424,11 +428,15 @@ namespace BrokeProtocol.GameSource.Jobs
             player.svPlayer.SendGameMessage("Fire reported! Check Map");
         }
 
-        public override void OnDamageEntity(ShEntity hitTarget)
+        public override void OnDamageEntity(ShEntity damaged)
         {
-            if (hitTarget.svEntity.spawner != player)
+            if (damaged.svEntity.spawner != player && damaged.gameObject.layer == LayerIndex.fire)
             {
                 player.svPlayer.Reward(1, 25);
+            }
+            else
+            {
+                base.OnDamageEntity(damaged);
             }
         }
     }
