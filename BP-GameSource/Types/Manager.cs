@@ -62,6 +62,12 @@ namespace BrokeProtocol.GameSource.Types
                         svManager.RegisterFail(connectionData.connection, "Invalid credentials");
                         return;
                     }
+
+                    if (!Utility.tryRegister.Limit(connectionData.username))
+                    {
+                        svManager.RegisterFail(connectionData.connection, $"Character {connectionData.username} Exists - Sure you want to Register?");
+                        return;
+                    }
                 }
 
                 if (!connectionData.username.ValidCredential())
