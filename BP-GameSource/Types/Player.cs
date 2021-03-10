@@ -206,6 +206,7 @@ namespace BrokeProtocol.GameSource.Types
         private const string enterPasscode = "enterPasscode";
         private const string setPasscode = "setPasscode";
         private const string clearPasscode = "clearPasscode";
+        private const string hackPanel = "hackPanel";
 
         [Target(GameSourceEvent.PlayerSecurityPanel, ExecutionMode.Override)]
         public void OnSecurityPanel(ShPlayer player, ShApartment apartment)
@@ -215,6 +216,7 @@ namespace BrokeProtocol.GameSource.Types
             options.Add(new LabelID("Enter Passcode", enterPasscode));
             options.Add(new LabelID("Set Passcode", setPasscode));
             options.Add(new LabelID("Clear Passcode", clearPasscode));
+            options.Add(new LabelID("Hack Panel", hackPanel));
             player.svPlayer.SendOptionMenu("&7Security Panel", apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
         }
 
@@ -650,6 +652,9 @@ namespace BrokeProtocol.GameSource.Types
                             return;
                         }
                         player.svPlayer.SendGameMessage("No Apartment Owned");
+                        break;
+                    case hackPanel:
+                        // fun stuff
                         break;
                 }
 
