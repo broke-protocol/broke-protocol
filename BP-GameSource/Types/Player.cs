@@ -633,45 +633,52 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
         public void OnOptionAction(ShPlayer player, int targetID, string menuID, string optionID, string actionID)
         {
-            if(menuID == securityPanel)
+            switch(menuID)
             {
-                switch (optionID)
-                {
-                    case enterPasscode:
-                        player.svPlayer.SendInputMenu("Enter Passcode", targetID, enterPasscode, InputField.ContentType.Password);
-                        break;
-                    case setPasscode:
-                        player.svPlayer.SendInputMenu("Set Passcode", targetID, setPasscode, InputField.ContentType.Password);
-                        break;
-                    case clearPasscode:
-                        var apartment = EntityCollections.FindByID<ShApartment>(targetID);
-                        if (apartment && player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
-                        {
-                            apartmentPlace.svPasscode = null;
-                            player.svPlayer.SendGameMessage("Apartment Passcode Cleared");
-                            return;
-                        }
-                        player.svPlayer.SendGameMessage("No Apartment Owned");
-                        break;
-                    case hackPanel:
-                        // fun stuff
-                        break;
-                }
+                case securityPanel:
+                    var apartment = EntityCollections.FindByID<ShApartment>(targetID);
 
-                return;
-            }
+                    if (apartment == null) return;
 
-            if (targetID >= 0)
-            {
-                player.svPlayer.job.OnOptionMenuAction(targetID, menuID, optionID, actionID);
-                return;
-            }
-
-            ShPlayer target = EntityCollections.FindByID<ShPlayer>(-targetID);
-
-            if (target)
-            {
-                target.svPlayer.job.OnOptionMenuAction(player.ID, menuID, optionID, actionID);
+                    switch (optionID)
+                    {
+                        case enterPasscode:
+                            player.svPlayer.SendInputMenu("Enter Passcode", targetID, enterPasscode, InputField.ContentType.Password);
+                            break;
+                        case setPasscode:
+                            player.svPlayer.SendInputMenu("Set Passcode", targetID, setPasscode, InputField.ContentType.Password);
+                            break;
+                        case clearPasscode:
+                            if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
+                            {
+                                apartmentPlace.svPasscode = null;
+                                player.svPlayer.SendGameMessage("Apartment Passcode Cleared");
+                            }
+                            else player.svPlayer.SendGameMessage("No Apartment Owned");
+                            break;
+                        case hackPanel:
+                            List<LabelID> options = new List<LabelID>();
+                            foreach (var clone in apartment.svApartment.clones)
+                            {
+                                options.Add(new LabelID($"{clone.Value.svOwner.username}", clone.Value.svOwner.username));
+                            }
+                            player.svPlayer.SendOptionMenu("&7Places", targetID, menuID, options.ToArray(), new LabelID[] { new LabelID("Hack", string.Empty) });
+                            break;
+                    }
+                    break;
+                case hackPanel:
+                    break;
+                default:
+                    if (targetID >= 0)
+                    {
+                        player.svPlayer.job.OnOptionMenuAction(targetID, menuID, optionID, actionID);
+                    }
+                    else
+                    {
+                        ShPlayer target = EntityCollections.FindByID<ShPlayer>(-targetID);
+                        if (target) target.svPlayer.job.OnOptionMenuAction(player.ID, menuID, optionID, actionID);
+                    }
+                    break;
             }
         }
 
