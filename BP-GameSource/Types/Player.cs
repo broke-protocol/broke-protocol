@@ -638,7 +638,7 @@ namespace BrokeProtocol.GameSource.Types
                 case securityPanel:
                     var apartment = EntityCollections.FindByID<ShApartment>(targetID);
 
-                    if (apartment == null) return;
+                    if (!apartment) return;
 
                     switch (optionID)
                     {
@@ -662,16 +662,16 @@ namespace BrokeProtocol.GameSource.Types
                             {
                                 options.Add(new LabelID($"{clone.Value.svOwner.username}", clone.Value.svOwner.username));
                             }
-                            player.svPlayer.SendOptionMenu("&7Places", targetID, menuID, options.ToArray(), new LabelID[] { new LabelID("Hack", string.Empty) });
+                            player.svPlayer.SendOptionMenu("&7Places", targetID, hackPanel, options.ToArray(), new LabelID[] { new LabelID("Hack", string.Empty) });
                             break;
                     }
                     break;
                 case hackPanel:
                     var apt = EntityCollections.FindByID<ShApartment>(targetID);
 
-                    if (apt != null && EntityCollections.TryGetPlayerByNameOrID(actionID, out ShPlayer targetPlayer))
+                    if (apt && EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer targetPlayer))
                     {
-                        player.svPlayer.SendHackingMenu("Hack Security Panel", targetID, actionID, 0.5f);
+                        player.svPlayer.SendHackingMenu("Hack Security Panel", targetID, optionID, 0.5f);
                     }
                     break;
                 default:
