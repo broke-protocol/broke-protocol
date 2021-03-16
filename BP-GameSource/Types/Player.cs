@@ -671,7 +671,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     if (apt && EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer targetPlayer))
                     {
-                        player.svPlayer.SendHackingMenu("Hack Security Panel", targetID, optionID, 0.5f);
+                        player.svPlayer.SendHackingMenu("Hack Security Panel", targetID, menuID, optionID, 0.5f);
                     }
                     break;
                 default:
