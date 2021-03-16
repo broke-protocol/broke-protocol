@@ -667,12 +667,7 @@ namespace BrokeProtocol.GameSource.Types
                     }
                     break;
                 case hackPanel:
-                    var apt = EntityCollections.FindByID<ShApartment>(targetID);
-
-                    if (apt && EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer targetPlayer))
-                    {
-                        player.svPlayer.SendHackingMenu("Hack Security Panel", targetID, menuID, optionID, 0.5f);
-                    }
+                    player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, 0.5f);
                     break;
                 default:
                     if (targetID >= 0)
