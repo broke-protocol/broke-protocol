@@ -15,6 +15,24 @@ using UnityEngine.UI;
 
 namespace BrokeProtocol.GameSource.Types
 {
+    public class HackingContainer
+    {
+        public ShPlayer player;
+        public ShApartment targetApartment;
+        public ShPlayer targetPlayer;
+
+        public HackingContainer(ShPlayer player, int apartmentID, string username)
+        {
+            this.player = player;
+            targetApartment = EntityCollections.FindByID<ShApartment>(apartmentID);
+            EntityCollections.TryGetPlayerByNameOrID(username, out targetPlayer);
+        }
+
+        public bool IsValid => player && targetApartment && targetPlayer && targetPlayer.ownedApartments.ContainsKey(targetApartment);
+
+        public bool HackingActive => player.svPlayer.hackingGame != null;
+    }
+
     public class Player : Movable
     {
         //[Target(GameSourceEvent.PlayerInitialize, ExecutionMode.Override)]
@@ -630,6 +648,16 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
+        private IEnumerator CheckValidHackingGame(HackingContainer hackingContainer)
+        {
+            while(hackingContainer.HackingActive && hackingContainer.IsValid)
+            {
+                yield return null;
+            }
+
+            if(hackingContainer.HackingActive) hackingContainer.player.svPlayer.SvStopHacking(true);
+        }
+
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
         public void OnOptionAction(ShPlayer player, int targetID, string menuID, string optionID, string actionID)
         {
@@ -667,7 +695,15 @@ namespace BrokeProtocol.GameSource.Types
                     }
                     break;
                 case hackPanel:
-                    player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, 0.5f);
+
+                    HackingContainer hackingContainer = new HackingContainer(player, targetID, optionID);
+
+                    if (hackingContainer.IsValid)
+                    {
+                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, 0.5f);
+                        player.StartCoroutine(CheckValidHackingGame(hackingContainer));
+                    }
+
                     break;
                 default:
                     if (targetID >= 0)
