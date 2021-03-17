@@ -28,7 +28,7 @@ namespace BrokeProtocol.GameSource.Types
             EntityCollections.TryGetPlayerByNameOrID(username, out targetPlayer);
         }
 
-        public bool IsValid => player && targetApartment && targetPlayer && targetPlayer.ownedApartments.ContainsKey(targetApartment);
+        public bool IsValid => player && targetApartment && targetPlayer && player.IsMobile && player.InActionRange(targetApartment) && targetPlayer.ownedApartments.ContainsKey(targetApartment);
 
         public bool HackingActive => player.svPlayer.hackingGame != null;
     }
