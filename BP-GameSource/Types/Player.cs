@@ -655,7 +655,7 @@ namespace BrokeProtocol.GameSource.Types
                 yield return null;
             }
 
-            if(hackingContainer.HackingActive) hackingContainer.player.svPlayer.SvStopHacking(true);
+            if(hackingContainer.HackingActive) hackingContainer.player.svPlayer.SvHackingStop(true);
         }
 
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
@@ -778,6 +778,21 @@ namespace BrokeProtocol.GameSource.Types
             if(player.svPlayer.follower)
             {
                 player.svPlayer.follower.svPlayer.SetFollowState(player);
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerHackFinished, ExecutionMode.Override)]
+        public void OnHackFinished(ShPlayer player, bool sucessful, int targetID, string menuID, string optionID)
+        {
+            switch (menuID)
+            {
+                case hackPanel:
+                    if (sucessful)
+                    {
+                        EntityCollections.TryGetPlayerByNameOrID(optionID, out var targetPlayer);
+                        player.svPlayer.SvEnterDoor(targetID, targetPlayer, true);
+                    }
+                    break;
             }
         }
     }
