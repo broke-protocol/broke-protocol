@@ -789,11 +789,18 @@ namespace BrokeProtocol.GameSource.Types
                 case hackPanel:
                     if (sucessful)
                     {
-                        EntityCollections.TryGetPlayerByNameOrID(optionID, out var targetPlayer);
-                        player.svPlayer.SvEnterDoor(targetID, targetPlayer, true);
+                        player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f));
                     }
                     break;
             }
+        }
+
+        private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            if(EntityCollections.TryGetPlayerByNameOrID(senderName, out var sender))
+                player.svPlayer.SvEnterDoor(doorID, sender, true);
         }
     }
 }
