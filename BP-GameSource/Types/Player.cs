@@ -581,7 +581,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerEnterDoor, ExecutionMode.Override)]
-        public void OnEnterDoor(ShPlayer player, ShDoor door, ShPlayer sender, bool forceEnter)
+        public void OnEnterDoor(ShPlayer player, ShDoor door, ShPlayer sender, bool forceEnter, bool tresspassing)
         {
             if (!forceEnter)
             {
@@ -612,12 +612,12 @@ namespace BrokeProtocol.GameSource.Types
 
             if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out var place))
             {
-                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint, place.mTransform);
+                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint, place.mTransform, tresspassing);
             }
             else
             {
                 ShDoor otherDoor = door.svDoor.other;
-                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform);
+                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform, tresspassing);
             }
         }
 
@@ -789,18 +789,18 @@ namespace BrokeProtocol.GameSource.Types
                 case hackPanel:
                     if (sucessful)
                     {
-                        player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f));
+                        player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f, true));
                     }
                     break;
             }
         }
 
-        private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, float delay)
+        private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, float delay, bool trespassing = false)
         {
             yield return new WaitForSeconds(delay);
 
             if(EntityCollections.TryGetPlayerByNameOrID(senderName, out var sender))
-                player.svPlayer.SvEnterDoor(doorID, sender, true);
+                player.svPlayer.SvEnterDoor(doorID, sender, true, trespassing);
         }
     }
 }
