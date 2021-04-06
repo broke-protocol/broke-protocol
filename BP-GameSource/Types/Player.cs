@@ -28,7 +28,9 @@ namespace BrokeProtocol.GameSource.Types
             EntityCollections.TryGetPlayerByNameOrID(username, out targetPlayer);
         }
 
-        public bool IsValid => player && targetApartment && targetPlayer && player.IsMobile && player.InActionRange(targetApartment) && targetPlayer.ownedApartments.ContainsKey(targetApartment);
+        public ApartmentPlace ApartmentPlace => targetPlayer.ownedApartments.TryGetValue(targetApartment, out var apartmentPlace) ? apartmentPlace : null;
+
+        public bool IsValid => player && targetApartment && targetPlayer && player.IsMobile && player.InActionRange(targetApartment) && ApartmentPlace != null;
 
         public bool HackingActive => player.svPlayer.hackingGame != null;
     }
@@ -717,21 +719,20 @@ namespace BrokeProtocol.GameSource.Types
                             break;
                         case hackPanel:
                             List<LabelID> options = new List<LabelID>();
-                            foreach (var clone in apartment.svApartment.clones)
+                            foreach (var clone in apartment.svApartment.clones.Values)
                             {
-                                options.Add(new LabelID($"{clone.Value.svOwner.username}", clone.Value.svOwner.username));
+                                options.Add(new LabelID($"{clone.svOwner.username} - Difficulty: {clone.svSecurity.ToPercent()}", clone.svOwner.username));
                             }
                             player.svPlayer.SendOptionMenu("&7Places", targetID, hackPanel, options.ToArray(), new LabelID[] { new LabelID("Hack", string.Empty) });
                             break;
                     }
                     break;
                 case hackPanel:
-
                     HackingContainer hackingContainer = new HackingContainer(player, targetID, optionID);
 
                     if (hackingContainer.IsValid)
                     {
-                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, 0.5f);
+                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.ApartmentPlace.svSecurity);
                         player.StartCoroutine(CheckValidHackingGame(hackingContainer));
                     }
 
