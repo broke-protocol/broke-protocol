@@ -224,6 +224,7 @@ namespace BrokeProtocol.GameSource.Types
         private const string enterPasscode = "enterPasscode";
         private const string setPasscode = "setPasscode";
         private const string clearPasscode = "clearPasscode";
+        private const string upgradeSecurity = "upgradeSecurity";
         private const string hackPanel = "hackPanel";
 
         [Target(GameSourceEvent.PlayerSecurityPanel, ExecutionMode.Override)]
@@ -234,8 +235,17 @@ namespace BrokeProtocol.GameSource.Types
             options.Add(new LabelID("Enter Passcode", enterPasscode));
             options.Add(new LabelID("Set Passcode", setPasscode));
             options.Add(new LabelID("Clear Passcode", clearPasscode));
+            options.Add(new LabelID("Upgrade Security", upgradeSecurity));
             options.Add(new LabelID("Hack Panel", hackPanel));
-            player.svPlayer.SendOptionMenu("&7Security Panel", apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
+
+            string title = "&7Security Panel";
+
+            if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
+            {
+                title += ": Level" + apartmentPlace.svSecurity.ToPercent();
+            }
+
+            player.svPlayer.SendOptionMenu(title, apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
         }
 
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]
@@ -658,6 +668,8 @@ namespace BrokeProtocol.GameSource.Types
             if(hackingContainer.HackingActive) hackingContainer.player.svPlayer.SvHackingStop(true);
         }
 
+        private int SecurityUpgradeCost(float currentLevel) => (int)(8000f * currentLevel * currentLevel + 200f);
+
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
         public void OnOptionAction(ShPlayer player, int targetID, string menuID, string optionID, string actionID)
         {
@@ -683,6 +695,25 @@ namespace BrokeProtocol.GameSource.Types
                                 player.svPlayer.SendGameMessage("Apartment Passcode Cleared");
                             }
                             else player.svPlayer.SendGameMessage("No Apartment Owned");
+                            break;
+                        case upgradeSecurity:
+                            if (player.ownedApartments.TryGetValue(apartment, out var securityPlace) && securityPlace.svSecurity < 0.99f)
+                            {
+                                int upgradeCost = SecurityUpgradeCost(securityPlace.svSecurity);
+
+                                if(player.MyMoneyCount >= upgradeCost)
+                                {
+                                    player.TransferMoney(DeltaInv.RemoveFromMe, upgradeCost);
+                                    securityPlace.svSecurity += 0.1f;
+                                    player.svPlayer.SendGameMessage("Apartment Security Upgraded");
+                                    player.svPlayer.SvSecurityPanel(apartment.ID);
+                                }
+                                else
+                                {
+                                    player.svPlayer.SendGameMessage("Insufficient funds");
+                                }
+                            }
+                            else player.svPlayer.SendGameMessage("Unable");
                             break;
                         case hackPanel:
                             List<LabelID> options = new List<LabelID>();
