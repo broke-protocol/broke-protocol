@@ -1,7 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
@@ -592,7 +591,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerEnterDoor, ExecutionMode.Override)]
-        public void OnEnterDoor(ShPlayer player, ShDoor door, ShPlayer sender, bool forceEnter, bool tresspassing)
+        public void OnEnterDoor(ShPlayer player, ShDoor door, ShPlayer sender, bool forceEnter, bool trespassing)
         {
             if (!forceEnter)
             {
@@ -623,12 +622,12 @@ namespace BrokeProtocol.GameSource.Types
 
             if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out var place))
             {
-                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint, place.mTransform, tresspassing);
+                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint, place.mTransform, trespassing);
             }
             else
             {
                 ShDoor otherDoor = door.svDoor.other;
-                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform, tresspassing);
+                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform, trespassing);
             }
         }
 
@@ -821,6 +820,10 @@ namespace BrokeProtocol.GameSource.Types
                     if (sucessful)
                     {
                         player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f, true));
+                    }
+                    else if(EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer owner) && player.svPlayer.ApartmentTrespassing(owner))
+                    {
+                        player.AddCrime(CrimeIndex.Trespassing, owner);
                     }
                     break;
             }
