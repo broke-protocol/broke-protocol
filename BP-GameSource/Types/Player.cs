@@ -404,7 +404,7 @@ namespace BrokeProtocol.GameSource.Types
         public void OnGoToJail(ShPlayer player, float time, int fine)
         {
             player.svPlayer.SvTrySetJob(BPAPI.Instance.PrisonerIndex, true, false);
-            Transform jailSpawn = SceneManager.Instance.jail.mainT;
+            Transform jailSpawn = player.svPlayer.svManager.jails.GetRandom().mainT;
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
             player.svPlayer.SvForceEquipable(player.manager.hands.index);
             player.svPlayer.SvClearCrimes();
