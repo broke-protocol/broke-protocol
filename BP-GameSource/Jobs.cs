@@ -295,7 +295,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Prisoner : LoopJob
     {
-        public override void ResetJobAI() => player.svPlayer.SetState(StateIndex.Waypoint);
+        public override void ResetJobAI() => player.svPlayer.SetState(StateIndex.Wander);
     }
 
     public class Police : TargetPlayerJob
