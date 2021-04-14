@@ -19,5 +19,8 @@ namespace BrokeProtocol.GameSource.Types
 
         //[Target(GameSourceEvent.EntityRespawn, ExecutionMode.Override)]
         //public void OnRespawn(ShEntity entity) { }
+
+        //[Target(GameSourceEvent.EntityTransferItem, ExecutionMode.Override)]
+        //public void OnTransferItem(ShEntity entity, byte deltaType, int itemIndex, int amount, bool dispatch) { }
     }
 }

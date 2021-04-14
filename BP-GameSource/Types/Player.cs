@@ -54,6 +54,9 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.PlayerSave, ExecutionMode.Override)]
         //public void OnSave(ShPlayer player) { }
 
+        //[Target(GameSourceEvent.PlayerTransferItem, ExecutionMode.Override)]
+        //public void OnTransferItem(ShPlayer player, byte deltaType, int itemIndex, int amount, bool dispatch) { }
+
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]
         public void OnGlobalChatMessage(ShPlayer player, string message)
         {
