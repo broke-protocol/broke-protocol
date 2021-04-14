@@ -37,7 +37,7 @@ namespace BrokeProtocol.GameSource.Types
             }    
         }
 
-        [Target(GameSourceEvent.DestroableDestroySelf, ExecutionMode.Override)]
+        [Target(GameSourceEvent.DestroyableDestroySelf, ExecutionMode.Override)]
         public void OnDestroySelf(ShDestroyable destroyable)
         {
             if (!destroyable.IsDead)
