@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
 using BrokeProtocol.API;
+using BrokeProtocol.Utility.Networking;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -34,6 +35,16 @@ namespace BrokeProtocol.GameSource.Types
             {
                 attacker.svPlayer.job.OnDamageEntity(destroyable);
             }    
+        }
+
+        [Target(GameSourceEvent.DestroableDestroySelf, ExecutionMode.Override)]
+        public void OnDestroySelf(ShDestroyable destroyable)
+        {
+            if (!destroyable.IsDead)
+            {
+                destroyable.ShDie();
+                destroyable.svDestroyable.Send(SvSendType.Local, Channel.Reliable, ClPacket.UpdateHealth, destroyable.ID, destroyable.health);
+            }
         }
     }
 }

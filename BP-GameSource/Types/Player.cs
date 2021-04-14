@@ -830,6 +830,12 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
+        [Target(GameSourceEvent.PlayerDestroySelf, ExecutionMode.Override)]
+        public void OnDestroySelf(ShPlayer player)
+        {
+            if (!player.isHuman || !player.IsRestrained) base.OnDestroySelf(player);
+        }
+
         private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, float delay, bool trespassing = false)
         {
             yield return new WaitForSeconds(delay);
