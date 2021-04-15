@@ -598,7 +598,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerEnterDoor, ExecutionMode.Override)]
-        public void OnEnterDoor(ShPlayer player, ShDoor door, ShPlayer sender, bool forceEnter, bool trespassing)
+        public void OnEnterDoor(ShPlayer player, ShDoor door, ShPlayer sender, bool forceEnter)
         {
             if (!forceEnter)
             {
@@ -629,12 +629,12 @@ namespace BrokeProtocol.GameSource.Types
 
             if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out var place))
             {
-                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint, place.mTransform, trespassing);
+                baseEntity.svMountable.SvRelocate(place.mainDoor.spawnPoint, place.mTransform);
             }
             else
             {
                 ShDoor otherDoor = door.svDoor.other;
-                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform, trespassing);
+                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform);
             }
         }
 
@@ -829,7 +829,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         if (sucessful)
                         {
-                            player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f, player.svPlayer.ApartmentTrespassing(owner)));
+                            player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f));
                         }
                         else if (player.svPlayer.ApartmentTrespassing(owner))
                         {
@@ -846,12 +846,12 @@ namespace BrokeProtocol.GameSource.Types
             if (!player.isHuman || !player.IsRestrained) base.OnDestroySelf(player);
         }
 
-        private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, float delay, bool trespassing = false)
+        private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, float delay)
         {
             yield return new WaitForSeconds(delay);
 
             if(EntityCollections.TryGetPlayerByNameOrID(senderName, out var sender))
-                player.svPlayer.SvEnterDoor(doorID, sender, true, trespassing);
+                player.svPlayer.SvEnterDoor(doorID, sender, true);
         }
     }
 }
