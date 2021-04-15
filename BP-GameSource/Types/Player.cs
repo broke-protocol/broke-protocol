@@ -231,6 +231,8 @@ namespace BrokeProtocol.GameSource.Types
         private const string upgradeSecurity = "upgradeSecurity";
         private const string hackPanel = "hackPanel";
 
+        private const float securityCutoff = 0.99f;
+
         [Target(GameSourceEvent.PlayerSecurityPanel, ExecutionMode.Override)]
         public void OnSecurityPanel(ShPlayer player, ShApartment apartment)
         {
@@ -242,7 +244,7 @@ namespace BrokeProtocol.GameSource.Types
             options.Add(new LabelID("Hack Panel", hackPanel));
 
             string title = "&7Security Panel";
-            if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
+            if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace) && apartmentPlace.svSecurity < securityCutoff)
             {
                 title += ": Level " + apartmentPlace.svSecurity.ToPercent();
                 options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.svSecurity).ToString()})", upgradeSecurity));
@@ -672,7 +674,7 @@ namespace BrokeProtocol.GameSource.Types
             if(hackingContainer.HackingActive) hackingContainer.player.svPlayer.SvHackingStop(true);
         }
 
-        private int SecurityUpgradeCost(float currentLevel) => (int)(8000f * currentLevel * currentLevel + 200f);
+        private int SecurityUpgradeCost(float currentLevel) => (int)(15000f * currentLevel * currentLevel + 200f);
 
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
         public void OnOptionAction(ShPlayer player, int targetID, string menuID, string optionID, string actionID)
@@ -701,7 +703,7 @@ namespace BrokeProtocol.GameSource.Types
                             else player.svPlayer.SendGameMessage("No Apartment Owned");
                             break;
                         case upgradeSecurity:
-                            if (player.ownedApartments.TryGetValue(apartment, out var securityPlace) && securityPlace.svSecurity < 0.99f)
+                            if (player.ownedApartments.TryGetValue(apartment, out var securityPlace) && securityPlace.svSecurity < securityCutoff)
                             {
                                 int upgradeCost = SecurityUpgradeCost(securityPlace.svSecurity);
 
