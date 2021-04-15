@@ -244,10 +244,11 @@ namespace BrokeProtocol.GameSource.Types
             options.Add(new LabelID("Hack Panel", hackPanel));
 
             string title = "&7Security Panel";
-            if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace) && apartmentPlace.svSecurity < securityCutoff)
+            if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
             {
                 title += ": Level " + apartmentPlace.svSecurity.ToPercent();
-                options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.svSecurity).ToString()})", upgradeSecurity));
+                if(apartmentPlace.svSecurity < securityCutoff)
+                    options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.svSecurity).ToString()})", upgradeSecurity));
             }
 
             player.svPlayer.SendOptionMenu(title, apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
