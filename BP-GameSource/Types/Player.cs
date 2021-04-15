@@ -244,7 +244,7 @@ namespace BrokeProtocol.GameSource.Types
             string title = "&7Security Panel";
             if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
             {
-                title += ": Level" + apartmentPlace.svSecurity.ToPercent();
+                title += ": Level " + apartmentPlace.svSecurity.ToPercent();
                 options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.svSecurity).ToString()})", upgradeSecurity));
             }
 
@@ -821,13 +821,17 @@ namespace BrokeProtocol.GameSource.Types
             switch (menuID)
             {
                 case hackPanel:
-                    if (sucessful)
+
+                    if (EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer owner))
                     {
-                        player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f, true));
-                    }
-                    else if(EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer owner) && player.svPlayer.ApartmentTrespassing(owner))
-                    {
-                        player.AddCrime(CrimeIndex.Trespassing, owner);
+                        if (sucessful)
+                        {
+                            player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f, player.svPlayer.ApartmentTrespassing(owner)));
+                        }
+                        else if (player.svPlayer.ApartmentTrespassing(owner))
+                        {
+                            player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, owner);
+                        }
                     }
                     break;
             }
