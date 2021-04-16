@@ -7,6 +7,7 @@
 - Added svPlayer.SvOpenURL(string url, string title)
 - Added svPlayer.StartHackingMenu(string title, int targetID, string menuID, string optionID, float difficulty)
 - Renamed all SvAnimate*() functions to SvAnimator*() for consistency
+- Removed trySell and chatted LimitQueues for cooldown timers, define your own like in GameSource
 - SvAnimator*() functions moved to SvEntity base class so it can be called on any Entity with an Animator component
 - SvAnimatorEnabled(bool enabled) function added
 - Added GameSource Events:
