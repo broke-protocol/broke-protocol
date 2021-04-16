@@ -1,3 +1,28 @@
+## 1.12
+?> The Apartment Raiding Update changes some API related to Jails, Animation functions/packets, and AI states but most changes just add new functionality. New events related to Inventories and DestroySelf (suicide) could be useful. Servers can now request to open URLs on clients and a new class of ShSecurity items are added.
+
+### API
+- Multiple jails support: SceneManager.Instance.jail => svManager.jails
+    - Use svManager.jails.GetRandom() to pick randomly from all jails
+- Added svPlayer.SvOpenURL(string url, string title)
+- Added svPlayer.StartHackingMenu(string title, int targetID, string menuID, string optionID, float difficulty)
+- Renamed all SvAnimate*() functions to SvAnimator*() for consistency
+- SvAnimator*() functions moved to SvEntity base class so it can be called on any Entity with an Animator component
+- SvAnimatorEnabled(bool enabled) function added
+- Added GameSource Events:
+    - DestroyableDestroySelf
+    - PlayerDestroySelf (Suicide)
+    - EntityTransferItem
+    - PlayerTransferItem
+    - PlayerHackFinished
+
+### MODDING
+- ProcessOptions now also take an equipableName for auto-checking/equiping an item during a Processing (leave blank to use 'Hands', backwards compatible)
+- Added vehicle/mount stances for modding: StandStill, CrouchStill, StandFixed, CrouchFixed
+
+### Misc
+- BUG: Players invited to Apartments will trigger trespassing crimes if detected by Security items. Will fix soon.
+
 ## 1.12 Hotfix #3
 ?> Coroutines (loops that perform continuous non-blocking work) on Entities were piling up on every respawn. The effect was server performance degration after significant uptime. Now all coroutines on Entities are cleared at the start of every Spawn() call. So if you had job coroutines or similar started on an Entities before, use Respawn events or the new Job.OnSpawn() callback to start them fresh each time.
 
@@ -97,35 +122,3 @@
 
 ### Misc
 - Added /clearwanted and /deleteaccount commands (updated groups.json)
-
-## 1.07a
-?> Update to Unity 2020.1f1. Big engine update but minimal API changes. [Full 2020.1 Release Notes](https://unity3d.com/unity/whats-new/2020.1.0)
-
-### API
-- ShPlayer.currentTrigger => ShPlayer.currentTriggers (HashSet<ShTrigger> of all triggers in case of trigger nesting)
-- ClManager.handler and SvManager.handler packet handlers converted from Dictionary to Lists
-- BrokeProtocol.Server.LiteDB + Models namespaces => BrokeProtocol.LiteDB (used on client now for some things too)
-
-### MODDING
-- Processors must be updated to the new multi-process support (see ShProcessor.processOptions)
-- Added ShProcessor.processDuration for process duration modding
-
-### Misc
-- groups.json: JobIndex and JobGroupIndex Types now use the string job/class names instead of ints (documented in groups.json)
-- groups.json: ScriptableTrigger Type removed for now (due to more complex trigger handling)
-
-## 1.07
-?> Biggest breaker might be the update to LiteDB V5. Game will attempt to backup and upgrade your V4 database on server start. If you get errors with CustomData, you may try to repair things with these GUI editors and try to upgrade again: [V4 DB Editor](https://github.com/julianpaulozzi/LiteDbExplorer) or [V5 DB Editor](https://github.com/mbdavid/LiteDB.Studio)
-
-### API
-- Steam Authentication removed: AuthData and ConnectData merged into ConnectionData class
-- ShPlayer.accountID removed: Use ShPlayer.username for the database index now
-- SvPlayer.SvResetJob() always adds required job items now
-- Added SvContact.spawnFires if you want a thrown item to leave a fire on contact
-
-### MODDING
-- Added `skins.txt` for modding available skins during registration (custom skins allowed)
-- Game supports apartments within interiors again (as long as apartments aren't nested in apartments)
-
-### Misc
-- All ban functionality is now stored and tied to IP addresses, not accounts
