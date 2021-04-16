@@ -70,7 +70,7 @@ public abstract class Plugin
 So somewhere in your own Plugin class constructor, assign your custom Job definitions to the Jobs array to have it loaded in-game. Plugins are loaded in alphanumeric order so ``zGameSource`` definitions are usually going to be last. If another plugin has Jobs defined, then those will be loaded instead and the vanilla GameSource jobs ignored. Later on, it should be possible to mix job definitions from different Plugins, but for now, only the first non-null definition is loaded.
 
 ## Adding a Job Example
-Here we will show how to add an additional Job to Broke Protocol. Everything from job parameters, logic, Boss modding, and more will be covered. The example will be a Mechanic job so players can get rewards for vehicle repairs, but nearly anything could be created. Note: There's a bug where OnHeal isn't called for vehicle repairs in 1.12 so the player won't be rewarded properly yet - this is fixed in 1.13 and after.
+Here we will show how to add an additional Job to Broke Protocol. Everything from job parameters, logic, Boss modding, and more will be covered. The example will be a Mechanic job so players can get rewards for vehicle repairs, but nearly anything could be created.
 
 The TargetEntity class does a lot of work with marking targets on the map and continually checking if they're valid so we'll use that as the parent class. Define the Mechanic Job in your plugin as its own class like below:
 
