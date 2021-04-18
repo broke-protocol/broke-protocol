@@ -829,7 +829,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         if (sucessful)
                         {
-                            player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, 1f));
+                            player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, true, 1f));
                         }
                         else if (player.svPlayer.ApartmentTrespassing(owner))
                         {
@@ -846,12 +846,15 @@ namespace BrokeProtocol.GameSource.Types
             if (!player.isHuman || !player.IsRestrained) base.OnDestroySelf(player);
         }
 
-        private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, float delay)
+        private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, bool trespassing, float delay)
         {
             yield return new WaitForSeconds(delay);
 
-            if(EntityCollections.TryGetPlayerByNameOrID(senderName, out var sender))
+            if (EntityCollections.TryGetPlayerByNameOrID(senderName, out var sender))
+            {
+                player.svPlayer.trespassing = trespassing;
                 player.svPlayer.SvEnterDoor(doorID, sender, true);
+            }
         }
     }
 }
