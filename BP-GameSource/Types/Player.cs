@@ -831,7 +831,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, true, 1f));
                         }
-                        else if (player.svPlayer.ApartmentTrespassing(owner))
+                        else if (player.svPlayer.ApartmentUnlawful(owner))
                         {
                             player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, owner);
                         }
