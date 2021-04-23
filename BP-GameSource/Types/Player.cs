@@ -423,9 +423,10 @@ namespace BrokeProtocol.GameSource.Types
             if (player.svPlayer.godMode || player.svPlayer.InvalidCrime(crimeIndex)) return;
 
             Crime crime = player.manager.GetCrime(crimeIndex);
-            ShPlayer witness = null;
+            ShPlayer witness;
 
-            if (crime.witness && !player.svPlayer.GetWitness(victim, out witness)) return;
+            if (!crime.witness) witness = victim;
+            else if (!player.svPlayer.GetWitness(victim, out witness)) return;
 
             player.AddCrime(crime.index, witness);
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witness ? witness.ID : 0);
