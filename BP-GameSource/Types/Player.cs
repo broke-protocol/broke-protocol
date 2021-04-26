@@ -820,7 +820,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerHackFinished, ExecutionMode.Override)]
-        public void OnHackFinished(ShPlayer player, bool sucessful, int targetID, string menuID, string optionID)
+        public void OnHackFinished(ShPlayer player, bool successful, int targetID, string menuID, string optionID)
         {
             switch (menuID)
             {
@@ -828,7 +828,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     if (EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer owner))
                     {
-                        if (sucessful)
+                        if (successful)
                         {
                             player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, true, 1f));
                         }
