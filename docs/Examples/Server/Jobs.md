@@ -24,11 +24,10 @@ public Upgrades[] upgrades;
 
 Most are self-explanitory though you can check the GameSource to see how all of the default Jobs are defined.
 One point that does need a little explaination are the Lists of Actions. These are the custom Action Menu items that pop up on different entities.
-``selfActions`` -> List of self-action items when you have the job yourself
 
-``employeeActions`` -> List of action items on other players who hold this job
-
-``specialActions`` -> List of action items on other entities in general (note this has an optional Type parameter if you want to filter on only specific types of Entities, ex. "ShPlayer")
+- ``selfActions`` -> List of self-action items when you have the job yourself
+- ``employeeActions`` -> List of action items on other players who hold this job
+- ``specialActions`` -> List of action items on other entities in general (note this has an optional Type parameter if you want to filter on only specific types of Entities, ex. "ShPlayer")
 
 
 ## What is the ``Job`` class?
