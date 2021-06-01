@@ -112,6 +112,8 @@ namespace BrokeProtocol.GameSource.Types
 
                 BodyPart part;
 
+                float capsuleHeight = player.capsule.direction == 0 ? player.capsule.height : player.capsule.radius * 2f;
+
                 if(damageIndex == DamageIndex.Random)
                 {
                     part = (BodyPart)Random.Range(0, (int)BodyPart.Count);
@@ -126,11 +128,11 @@ namespace BrokeProtocol.GameSource.Types
                     part = BodyPart.Head;
                     amount *= 2f;
                 }
-                else if (hitY >= player.capsule.height * 0.75f)
+                else if (hitY >= capsuleHeight * 0.75f)
                 {
                     part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
                 }
-                else if (hitY >= player.capsule.height * 0.5f)
+                else if (hitY >= capsuleHeight * 0.5f)
                 {
                     part = BodyPart.Abdomen;
                     amount *= 0.8f;
