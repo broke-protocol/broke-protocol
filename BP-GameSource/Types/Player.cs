@@ -112,7 +112,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 BodyPart part;
 
-                float capsuleHeight = player.capsule.direction == 0 ? player.capsule.height : player.capsule.radius * 2f;
+                float capsuleHeight = player.capsule.direction == 1 ? player.capsule.height : player.capsule.radius * 2f;
 
                 if(damageIndex == DamageIndex.Random)
                 {
