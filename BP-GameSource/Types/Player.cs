@@ -805,7 +805,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if(pointing && player.svPlayer.follower && 
                 Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) && 
-                player.svPlayer.follower.svPlayer.NodeNear(hit.point))
+                player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
                 player.svPlayer.follower.svPlayer.SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
             }
