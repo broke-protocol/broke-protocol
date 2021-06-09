@@ -165,6 +165,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Taser", 1),
                             new InventoryStruct("AmmoTaser", 12),
                             new InventoryStruct("Handcuffs", 5),
+                            new InventoryStruct("Muzzle", 2),
                             new InventoryStruct("LicenseGun", 1),
                             new InventoryStruct("ShoesBrown", 1)}),
                     new Upgrades(

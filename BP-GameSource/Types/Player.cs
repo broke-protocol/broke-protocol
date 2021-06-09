@@ -154,7 +154,7 @@ namespace BrokeProtocol.GameSource.Types
                 amount /= player.svPlayer.svManager.settings.difficulty;
             }
 
-            amount -= amount * (player.armorLevel / player.maxStat * 0.5f);
+            amount -= amount * (player.armorLevel / 200f);
 
             base.OnDamage(player, damageIndex, amount, attacker, collider, hitY);
 
@@ -336,7 +336,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.SvSpectate(player);
             }
 
-            player.svPlayer.SvForceEquipable(player.manager.hands.index);
+            player.svPlayer.SvForceEquipable(player.Hands.index);
         }
 
         [Target(GameSourceEvent.PlayerReward, ExecutionMode.Override)]
@@ -413,7 +413,7 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.SvTrySetJob(BPAPI.Instance.PrisonerIndex, true, false);
             Transform jailSpawn = player.svPlayer.svManager.jails.GetRandom().mainT;
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
-            player.svPlayer.SvForceEquipable(player.manager.hands.index);
+            player.svPlayer.SvForceEquipable(player.Hands.index);
             player.svPlayer.SvClearCrimes();
             player.svPlayer.RemoveItemsJail();
             player.svPlayer.StartJailTimer(time);
@@ -563,7 +563,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerUnrestrain, ExecutionMode.Override)]
         public void OnUnrestrain(ShPlayer player)
         {
-            player.svPlayer.SvSetEquipable(player.manager.hands.index);
+            player.svPlayer.SvSetEquipable(player.Hands.index);
 
             if (!player.isHuman)
             {
