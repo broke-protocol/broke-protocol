@@ -23,7 +23,11 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (damaged is ShPlayer victim && victim.wantedLevel == 0)
             {
-                if (player.curEquipable is ShGun)
+                if(victim.characterType == CharacterType.Mob)
+                {
+                    player.svPlayer.SvAddCrime(CrimeIndex.AnimalCruelty, victim);
+                }
+                else if (player.curEquipable is ShGun)
                 {
                     player.svPlayer.SvAddCrime(CrimeIndex.ArmedAssault, victim);
                 }
@@ -42,7 +46,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (destroyed is ShPlayer victim && victim.wantedLevel == 0)
             {
-                player.svPlayer.SvAddCrime(CrimeIndex.Murder, victim);
+                player.svPlayer.SvAddCrime(victim.characterType == CharacterType.Human ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
                 victim.svPlayer.SendMurderedMessage(player);
             }
         }
