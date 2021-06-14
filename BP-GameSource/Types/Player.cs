@@ -849,6 +849,33 @@ namespace BrokeProtocol.GameSource.Types
             if (!player.isHuman || !player.IsRestrained || !player.IsUp) base.OnDestroySelf(player);
         }
 
+        [Target(GameSourceEvent.PlayerHandsUp, ExecutionMode.Override)]
+        public void OnHandsUp(ShPlayer player, ShPlayer victim)
+        {
+            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement)
+            {
+                player.svPlayer.SvAddCrime(CrimeIndex.Intimidation, victim);
+            }
+
+            if (!victim.isHuman)
+            {
+                if (victim.svPlayer.targetEntity) return;
+
+                if (victim.svPlayer.job.info.shared.groupIndex != GroupIndex.Citizen || Random.value < 0.2f)
+                {
+                    victim.svPlayer.SetAttackState(player);
+                }
+                else
+                {
+                    victim.svPlayer.SetState(StateIndex.Freeze);
+                }
+            }
+            else
+            {
+                victim.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.HandsUp);
+            }
+        }
+
         private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, bool trespassing, float delay)
         {
             yield return new WaitForSeconds(delay);
