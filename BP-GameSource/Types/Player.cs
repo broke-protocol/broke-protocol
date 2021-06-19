@@ -57,6 +57,9 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.PlayerTransferItem, ExecutionMode.Override)]
         //public void OnTransferItem(ShPlayer player, byte deltaType, int itemIndex, int amount, bool dispatch) { }
 
+        //[Target(GameSourceEvent.PlayerMenuClosed, ExecutionMode.Override)]
+        //public void OnMenuClosed(ShPlayer player, string menuID, bool manualClose) => player.svPlayer.SvGlobalChatMessage("[Menu Closed Event] " + menuID + " " + manualClose);
+
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]
         public void OnGlobalChatMessage(ShPlayer player, string message)
         {
