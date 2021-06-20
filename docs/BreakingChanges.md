@@ -1,3 +1,24 @@
+## 1.14
+?> The Animals Update adds a couple new useful GameSource events and a new character type called Mob (used only for basic animals currently). Most existing mods should be forward compatible with this version although Player character mods and custom Player animations will likely need to be redone and exported with the new BPResources.
+
+### API
+- Additional entity lookup method: 'bool EntityCollections.TryFindEntity(int id, out ShEntity e)'
+- Use new Player.Hands property instead of manager.hands since each characterType can have a different default 'Hands' item
+- svPlayer.NodeNear() returns the actual NavGraph Node instead of just a bool
+- New Animal related crimes:
+    - CrimeIndex.AnimalCruelty
+    - CrimeIndex.AnimalKilling
+- Added GameSource Events:
+    - PlayerHandsUp
+    - PlayerMenuClosed
+
+### MODDING
+- Re-organized Player Character controller (functionality is 99% the same, just a minor jump fix)
+- Player hip origin is different than before for most Sit animations (Player character mods will need to updated for Sit animations)
+    - Vehicles don't need to be updated (automatically handled)
+- Clothing/Wearables don't need colliders set anymore
+    - It's fine if old mods have them though they will be duplicated
+
 ## 1.12
 ?> The Apartment Raiding Update changes some API related to Jails, Animation functions/packets, and AI states but most changes just add new functionality. New events related to Inventories and DestroySelf (suicide) could be useful. Servers can now request to open URLs on clients and a new class of ShSecurity items are added.
 
