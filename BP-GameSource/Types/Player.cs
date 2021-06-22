@@ -57,6 +57,9 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.PlayerTransferItem, ExecutionMode.Override)]
         //public void OnTransferItem(ShPlayer player, byte deltaType, int itemIndex, int amount, bool dispatch) { }
 
+        //[Target(GameSourceEvent.PlayerMenuClosed, ExecutionMode.Override)]
+        //public void OnMenuClosed(ShPlayer player, string menuID, bool manualClose) => player.svPlayer.SvGlobalChatMessage("[Menu Closed Event] " + menuID + " " + manualClose);
+
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]
         public void OnGlobalChatMessage(ShPlayer player, string message)
         {
@@ -154,7 +157,7 @@ namespace BrokeProtocol.GameSource.Types
                 amount /= player.svPlayer.svManager.settings.difficulty;
             }
 
-            amount -= amount * (player.armorLevel / player.maxStat * 0.5f);
+            amount -= amount * (player.armorLevel / 200f);
 
             base.OnDamage(player, damageIndex, amount, attacker, collider, hitY);
 
@@ -336,7 +339,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.SvSpectate(player);
             }
 
-            player.svPlayer.SvForceEquipable(player.manager.hands.index);
+            player.svPlayer.SvForceEquipable(player.Hands.index);
         }
 
         [Target(GameSourceEvent.PlayerReward, ExecutionMode.Override)]
@@ -410,10 +413,10 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerGoToJail, ExecutionMode.Override)]
         public void OnGoToJail(ShPlayer player, float time, int fine)
         {
-            player.svPlayer.SvTrySetJob(BPAPI.Instance.PrisonerIndex, true, false);
+            player.svPlayer.SvSetJob(BPAPI.Instance.Jobs[BPAPI.Instance.PrisonerIndex], true, false);
             Transform jailSpawn = player.svPlayer.svManager.jails.GetRandom().mainT;
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
-            player.svPlayer.SvForceEquipable(player.manager.hands.index);
+            player.svPlayer.SvForceEquipable(player.Hands.index);
             player.svPlayer.SvClearCrimes();
             player.svPlayer.RemoveItemsJail();
             player.svPlayer.StartJailTimer(time);
@@ -563,7 +566,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerUnrestrain, ExecutionMode.Override)]
         public void OnUnrestrain(ShPlayer player)
         {
-            player.svPlayer.SvSetEquipable(player.manager.hands.index);
+            player.svPlayer.SvSetEquipable(player.Hands.index);
 
             if (!player.isHuman)
             {
@@ -805,7 +808,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if(pointing && player.svPlayer.follower && 
                 Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) && 
-                player.svPlayer.follower.svPlayer.NodeNear(hit.point))
+                player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
                 player.svPlayer.follower.svPlayer.SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
             }
@@ -847,6 +850,33 @@ namespace BrokeProtocol.GameSource.Types
         public void OnDestroySelf(ShPlayer player)
         {
             if (!player.isHuman || !player.IsRestrained || !player.IsUp) base.OnDestroySelf(player);
+        }
+
+        [Target(GameSourceEvent.PlayerHandsUp, ExecutionMode.Override)]
+        public void OnHandsUp(ShPlayer player, ShPlayer victim)
+        {
+            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement)
+            {
+                player.svPlayer.SvAddCrime(CrimeIndex.Intimidation, victim);
+            }
+
+            if (!victim.isHuman)
+            {
+                if (victim.svPlayer.targetEntity) return;
+
+                if (victim.svPlayer.job.info.shared.groupIndex != GroupIndex.Citizen || Random.value < 0.2f)
+                {
+                    victim.svPlayer.SetAttackState(player);
+                }
+                else
+                {
+                    victim.svPlayer.SetState(StateIndex.Freeze);
+                }
+            }
+            else
+            {
+                victim.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.HandsUp);
+            }
         }
 
         private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, bool trespassing, float delay)
