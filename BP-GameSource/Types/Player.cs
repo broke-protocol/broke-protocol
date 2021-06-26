@@ -545,7 +545,7 @@ namespace BrokeProtocol.GameSource.Types
 
 
         [Target(GameSourceEvent.PlayerRestrain, ExecutionMode.Override)]
-        public void OnRestrain(ShPlayer player, ShRestrained restrained)
+        public void OnRestrain(ShPlayer player, ShPlayer initiator, ShRestrained restrained)
         {
             if(player.svPlayer.godMode) return;
 
@@ -564,7 +564,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerUnrestrain, ExecutionMode.Override)]
-        public void OnUnrestrain(ShPlayer player)
+        public void OnUnrestrain(ShPlayer player, ShPlayer initiator)
         {
             player.svPlayer.SvSetEquipable(player.Hands.index);
 
