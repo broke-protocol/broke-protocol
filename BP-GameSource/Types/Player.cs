@@ -235,6 +235,10 @@ namespace BrokeProtocol.GameSource.Types
         private const string clearPasscode = "clearPasscode";
         private const string upgradeSecurity = "upgradeSecurity";
         private const string hackPanel = "hackPanel";
+        private const string videoPanel = "videoPanel";
+        private const string defaultVideo = "defaultVideo";
+        private const string customVideo = "customVideo";
+        private const string stopVideo = "stopVideo";
 
         private const float securityCutoff = 0.99f;
 
@@ -257,6 +261,23 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             player.svPlayer.SendOptionMenu(title, apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
+        }
+
+        [Target(GameSourceEvent.PlayerVideoPanel, ExecutionMode.Override)]
+        public void OnVideoPanel(ShPlayer player, ShEntity videoEntity)
+        {
+            List<LabelID> options = new List<LabelID>();
+            
+            foreach(var option in videoEntity.clEntity.videoOptions)
+            {
+                options.Add(new LabelID(option.name, defaultVideo + ':' + option.url));
+            }
+
+            options.Add(new LabelID("Custom Video URL", customVideo));
+            options.Add(new LabelID("Stop Video", stopVideo));
+
+            string title = "&7Video Panel";
+            player.svPlayer.SendOptionMenu(title, videoEntity.ID, videoPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
         }
 
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]
