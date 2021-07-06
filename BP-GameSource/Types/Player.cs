@@ -240,6 +240,8 @@ namespace BrokeProtocol.GameSource.Types
         private const string customVideo = "customVideo";
         private const string stopVideo = "stopVideo";
 
+        private const char videoSeparator = ':';
+
         private const float securityCutoff = 0.99f;
 
         [Target(GameSourceEvent.PlayerSecurityPanel, ExecutionMode.Override)]
@@ -267,10 +269,12 @@ namespace BrokeProtocol.GameSource.Types
         public void OnVideoPanel(ShPlayer player, ShEntity videoEntity)
         {
             List<LabelID> options = new List<LabelID>();
-            
-            foreach(var option in videoEntity.clEntity.videoOptions)
+
+            int index = 0;
+            foreach(var option in videoEntity.videoOptions)
             {
-                options.Add(new LabelID(option.name, defaultVideo + ':' + option.url));
+                options.Add(new LabelID(option.name, defaultVideo + videoSeparator + index));
+                index++;
             }
 
             options.Add(new LabelID("Custom Video URL", customVideo));
@@ -769,6 +773,28 @@ namespace BrokeProtocol.GameSource.Types
                     }
 
                     break;
+                case videoPanel:
+                    ShEntity videoEntity = EntityCollections.FindByID(targetID);
+
+                    if(optionID == customVideo)
+                    {
+                        player.svPlayer.SendInputMenu("Custom Video URL", targetID, videoPanel, InputField.ContentType.Alphanumeric, 128);
+                    }
+                    else if(optionID == stopVideo)
+                    {
+                        videoEntity.svEntity.SvStopVideo();
+                    }
+                    else
+                    {
+                        int splitIndex = optionID.IndexOf(videoSeparator);
+
+                        if(splitIndex >= 0 && int.TryParse(optionID.Substring(splitIndex), out var index))
+                        {
+                            videoEntity.svEntity.SvStartDefaultVideo(index);
+                        }
+                    }
+
+                    break;
                 default:
                     if (targetID >= 0)
                     {
@@ -811,6 +837,15 @@ namespace BrokeProtocol.GameSource.Types
                         return;
                     }
                     player.svPlayer.SendGameMessage("No Apartment Owned");
+                    break;
+
+                case customVideo:
+                    var videoEntity = EntityCollections.FindByID(targetID);
+
+                    if(videoEntity)
+                    {
+                        videoEntity.svEntity.SvStartCustomVideo(input);
+                    }
                     break;
             }
         }
