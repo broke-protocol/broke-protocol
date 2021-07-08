@@ -273,7 +273,7 @@ namespace BrokeProtocol.GameSource.Types
             if (player.svPlayer.HasPermissionBP(PermEnum.VideoDefault))
             {
                 int index = 0;
-                foreach (var option in videoEntity.videoOptions)
+                foreach (var option in videoEntity.svEntity.videoOptions)
                 {
                     options.Add(new LabelID(option.name, defaultVideo + videoSeparator + index));
                     index++;
