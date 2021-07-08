@@ -270,15 +270,25 @@ namespace BrokeProtocol.GameSource.Types
         {
             List<LabelID> options = new List<LabelID>();
 
-            int index = 0;
-            foreach(var option in videoEntity.videoOptions)
+            if (player.svPlayer.HasPermissionBP(PermEnum.VideoDefault))
             {
-                options.Add(new LabelID(option.name, defaultVideo + videoSeparator + index));
-                index++;
+                int index = 0;
+                foreach (var option in videoEntity.videoOptions)
+                {
+                    options.Add(new LabelID(option.name, defaultVideo + videoSeparator + index));
+                    index++;
+                }
             }
 
-            options.Add(new LabelID("Custom Video URL", customVideo));
-            options.Add(new LabelID("Stop Video", stopVideo));
+            if (player.svPlayer.HasPermissionBP(PermEnum.VideoCustom))
+            {
+                options.Add(new LabelID("Custom Video URL", customVideo));
+            }
+
+            if (player.svPlayer.HasPermissionBP(PermEnum.VideoStop))
+            {
+                options.Add(new LabelID("Stop Video", stopVideo));
+            }
 
             string title = "&7Video Panel";
             player.svPlayer.SendOptionMenu(title, videoEntity.ID, videoPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
@@ -776,15 +786,15 @@ namespace BrokeProtocol.GameSource.Types
                 case videoPanel:
                     ShEntity videoEntity = EntityCollections.FindByID(targetID);
 
-                    if(optionID == customVideo)
+                    if(optionID == customVideo && player.svPlayer.HasPermissionBP(PermEnum.VideoCustom))
                     {
                         player.svPlayer.SendInputMenu("Custom Video URL", targetID, videoPanel, InputField.ContentType.Alphanumeric, 128);
                     }
-                    else if(optionID == stopVideo)
+                    else if(optionID == stopVideo && player.svPlayer.HasPermissionBP(PermEnum.VideoStop))
                     {
                         videoEntity.svEntity.SvStopVideo();
                     }
-                    else
+                    else if (player.svPlayer.HasPermissionBP(PermEnum.VideoDefault))
                     {
                         int splitIndex = optionID.IndexOf(videoSeparator);
 
