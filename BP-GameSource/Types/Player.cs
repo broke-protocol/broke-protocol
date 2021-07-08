@@ -852,7 +852,7 @@ namespace BrokeProtocol.GameSource.Types
                 case customVideo:
                     var videoEntity = EntityCollections.FindByID(targetID);
 
-                    if(videoEntity)
+                    if(videoEntity && player.svPlayer.HasPermissionBP(PermEnum.VideoCustom))
                     {
                         videoEntity.svEntity.SvStartCustomVideo(input);
                     }
