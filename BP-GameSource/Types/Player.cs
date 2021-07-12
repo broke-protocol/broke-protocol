@@ -793,6 +793,7 @@ namespace BrokeProtocol.GameSource.Types
                     else if(optionID == stopVideo && player.svPlayer.HasPermissionBP(PermEnum.VideoStop))
                     {
                         videoEntity.svEntity.SvStopVideo();
+                        player.svPlayer.SvDestroyMenu(videoPanel);
                     }
                     else if (player.svPlayer.HasPermissionBP(PermEnum.VideoDefault))
                     {
@@ -802,6 +803,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             videoEntity.svEntity.SvStartDefaultVideo(index);
                         }
+                        player.svPlayer.SvDestroyMenu(videoPanel);
                     }
 
                     break;
