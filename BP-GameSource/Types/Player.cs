@@ -236,11 +236,8 @@ namespace BrokeProtocol.GameSource.Types
         private const string upgradeSecurity = "upgradeSecurity";
         private const string hackPanel = "hackPanel";
         private const string videoPanel = "videoPanel";
-        private const string defaultVideo = "defaultVideo";
         private const string customVideo = "customVideo";
         private const string stopVideo = "stopVideo";
-
-        private const char videoSeparator = ':';
 
         private const float securityCutoff = 0.99f;
 
@@ -275,7 +272,7 @@ namespace BrokeProtocol.GameSource.Types
                 int index = 0;
                 foreach (var option in videoEntity.svEntity.videoOptions)
                 {
-                    options.Add(new LabelID(option.name, defaultVideo + videoSeparator + index));
+                    options.Add(new LabelID(option.name, index.ToString()));
                     index++;
                 }
             }
@@ -578,7 +575,6 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-
         [Target(GameSourceEvent.PlayerRestrain, ExecutionMode.Override)]
         public void OnRestrain(ShPlayer player, ShPlayer initiator, ShRestrained restrained)
         {
@@ -773,16 +769,16 @@ namespace BrokeProtocol.GameSource.Types
                             break;
                     }
                     break;
+
                 case hackPanel:
                     HackingContainer hackingContainer = new HackingContainer(player, targetID, optionID);
-
                     if (hackingContainer.IsValid)
                     {
                         player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.ApartmentPlace.svSecurity);
                         player.StartCoroutine(CheckValidHackingGame(hackingContainer));
                     }
-
                     break;
+
                 case videoPanel:
                     ShEntity videoEntity = EntityCollections.FindByID(targetID);
 
@@ -795,18 +791,13 @@ namespace BrokeProtocol.GameSource.Types
                         videoEntity.svEntity.SvStopVideo();
                         player.svPlayer.SvDestroyMenu(videoPanel);
                     }
-                    else if (player.svPlayer.HasPermissionBP(PermEnum.VideoDefault))
+                    else if (player.svPlayer.HasPermissionBP(PermEnum.VideoDefault) && int.TryParse(optionID, out var index))
                     {
-                        int splitIndex = optionID.IndexOf(videoSeparator);
-
-                        if(splitIndex >= 0 && int.TryParse(optionID.Substring(splitIndex), out var index))
-                        {
-                            videoEntity.svEntity.SvStartDefaultVideo(index);
-                        }
+                        videoEntity.svEntity.SvStartDefaultVideo(index);
                         player.svPlayer.SvDestroyMenu(videoPanel);
                     }
-
                     break;
+
                 default:
                     if (targetID >= 0)
                     {
