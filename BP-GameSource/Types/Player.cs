@@ -813,7 +813,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         // Change Video permissions handling here: Default allows video controls in own apartment (else follow group permission settings)
-        private bool VideoPermission(ShPlayer player, ShEntity videoPlayer, PermEnum permission) => player.InActionRange(videoPlayer) && (player.InOwnApartment || player.svPlayer.HasPermissionBP(permission));
+        private bool VideoPermission(ShPlayer player, ShEntity videoPlayer, PermEnum permission) => videoPlayer && player.InActionRange(videoPlayer) && (player.InOwnApartment || player.svPlayer.HasPermissionBP(permission));
 
         [Target(GameSourceEvent.PlayerSubmitInput, ExecutionMode.Override)]
         public void OnSubmitInput(ShPlayer player, int targetID, string menuID, string input)
@@ -848,7 +848,7 @@ namespace BrokeProtocol.GameSource.Types
                 case customVideo:
                     var videoEntity = EntityCollections.FindByID(targetID);
 
-                    if(videoEntity && VideoPermission(player, videoEntity, PermEnum.VideoCustom))
+                    if(VideoPermission(player, videoEntity, PermEnum.VideoCustom))
                     {
                         videoEntity.svEntity.SvStartCustomVideo(input);
                     }
