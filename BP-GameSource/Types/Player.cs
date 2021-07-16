@@ -267,22 +267,22 @@ namespace BrokeProtocol.GameSource.Types
         {
             List<LabelID> options = new List<LabelID>();
 
-            if (player.svPlayer.HasPermissionBP(PermEnum.VideoDefault))
+            if (VideoPermission(player, videoEntity, PermEnum.VideoDefault))
             {
                 int index = 0;
                 foreach (var option in videoEntity.svEntity.videoOptions)
                 {
-                    options.Add(new LabelID(option.name, index.ToString()));
+                    options.Add(new LabelID(option.label, index.ToString()));
                     index++;
                 }
             }
 
-            if (player.svPlayer.HasPermissionBP(PermEnum.VideoCustom))
+            if (VideoPermission(player, videoEntity, PermEnum.VideoCustom))
             {
                 options.Add(new LabelID("Custom Video URL", customVideo));
             }
 
-            if (player.svPlayer.HasPermissionBP(PermEnum.VideoStop))
+            if (VideoPermission(player, videoEntity, PermEnum.VideoStop))
             {
                 options.Add(new LabelID("Stop Video", stopVideo));
             }
@@ -782,16 +782,16 @@ namespace BrokeProtocol.GameSource.Types
                 case videoPanel:
                     ShEntity videoEntity = EntityCollections.FindByID(targetID);
 
-                    if(optionID == customVideo && player.svPlayer.HasPermissionBP(PermEnum.VideoCustom))
+                    if(optionID == customVideo && VideoPermission(player, videoEntity, PermEnum.VideoCustom))
                     {
-                        player.svPlayer.SendInputMenu("Custom Video URL", targetID, videoPanel, InputField.ContentType.Alphanumeric, 128);
+                        player.svPlayer.SendInputMenu("Custom Video URL", targetID, videoPanel, InputField.ContentType.Standard, 128);
                     }
-                    else if(optionID == stopVideo && player.svPlayer.HasPermissionBP(PermEnum.VideoStop))
+                    else if(optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
                     {
                         videoEntity.svEntity.SvStopVideo();
                         player.svPlayer.SvDestroyMenu(videoPanel);
                     }
-                    else if (player.svPlayer.HasPermissionBP(PermEnum.VideoDefault) && int.TryParse(optionID, out var index))
+                    else if (VideoPermission(player, videoEntity, PermEnum.VideoDefault) && int.TryParse(optionID, out var index))
                     {
                         videoEntity.svEntity.SvStartDefaultVideo(index);
                         player.svPlayer.SvDestroyMenu(videoPanel);
@@ -811,6 +811,9 @@ namespace BrokeProtocol.GameSource.Types
                     break;
             }
         }
+
+        // Change Video permissions handling here: Default allows video controls in own apartment (else follow group permission settings)
+        private bool VideoPermission(ShPlayer player, ShEntity videoPlayer, PermEnum permission) => player.InActionRange(videoPlayer) && (player.InOwnApartment || player.svPlayer.HasPermissionBP(permission));
 
         [Target(GameSourceEvent.PlayerSubmitInput, ExecutionMode.Override)]
         public void OnSubmitInput(ShPlayer player, int targetID, string menuID, string input)
@@ -845,7 +848,7 @@ namespace BrokeProtocol.GameSource.Types
                 case customVideo:
                     var videoEntity = EntityCollections.FindByID(targetID);
 
-                    if(videoEntity && player.svPlayer.HasPermissionBP(PermEnum.VideoCustom))
+                    if(videoEntity && VideoPermission(player, videoEntity, PermEnum.VideoCustom))
                     {
                         videoEntity.svEntity.SvStartCustomVideo(input);
                     }
