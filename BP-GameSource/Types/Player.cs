@@ -848,7 +848,9 @@ namespace BrokeProtocol.GameSource.Types
                 case customVideo:
                     var videoEntity = EntityCollections.FindByID(targetID);
 
-                    if(VideoPermission(player, videoEntity, PermEnum.VideoCustom))
+                    // Do URL validation input here **MUST CHECK FOR HTTPS** Non-Secure Protocol isn't allowed on Android
+                    // Maybe only allow StartsWith("https://i.imgur.com") for safety
+                    if (VideoPermission(player, videoEntity, PermEnum.VideoCustom) && input.StartsWith("https://"))
                     {
                         videoEntity.svEntity.SvStartCustomVideo(input);
                     }
