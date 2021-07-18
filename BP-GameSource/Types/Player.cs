@@ -279,12 +279,12 @@ namespace BrokeProtocol.GameSource.Types
 
             if (VideoPermission(player, videoEntity, PermEnum.VideoCustom))
             {
-                options.Add(new LabelID("Custom Video URL", customVideo));
+                options.Add(new LabelID("&6Custom Video URL", customVideo));
             }
 
             if (VideoPermission(player, videoEntity, PermEnum.VideoStop))
             {
-                options.Add(new LabelID("Stop Video", stopVideo));
+                options.Add(new LabelID("&4Stop Video", stopVideo));
             }
 
             string title = "&7Video Panel";
@@ -784,7 +784,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     if(optionID == customVideo && VideoPermission(player, videoEntity, PermEnum.VideoCustom))
                     {
-                        player.svPlayer.SendInputMenu("Custom Video URL", targetID, videoPanel, InputField.ContentType.Standard, 128);
+                        player.svPlayer.SendInputMenu("Custom Video URL", targetID, customVideo, InputField.ContentType.Standard, 128);
                     }
                     else if(optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
                     {
@@ -853,6 +853,10 @@ namespace BrokeProtocol.GameSource.Types
                     if (VideoPermission(player, videoEntity, PermEnum.VideoCustom) && input.StartsWith("https://"))
                     {
                         videoEntity.svEntity.SvStartCustomVideo(input);
+                    }
+                    else
+                    {
+                        player.svPlayer.SendGameMessage("Must have permission and start with 'https://'");
                     }
                     break;
             }
