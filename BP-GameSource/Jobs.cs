@@ -2,7 +2,6 @@
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
-using BrokeProtocol.Prefabs;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
@@ -82,6 +81,12 @@ namespace BrokeProtocol.GameSource.Jobs
         }
 
         public virtual void Loop() { }
+
+        protected bool MountWithinReach(ShEntity e)
+        {
+            ShMountable m = player.GetMount;
+            return m.Velocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
+        }
     }
 
 
@@ -934,7 +939,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             base.FoundTarget();
             player.svPlayer.SendGameMessage("Delivery target: " + targetPlayer.username);
-            deliveryItem = SceneManager.Instance.consumablesCollection.GetRandom();
+            deliveryItem = SceneManager.Instance.consumablesCollection.GetRandom().Value;
             player.TransferItem(DeltaInv.AddToMe, deliveryItem);
             timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
@@ -991,20 +996,14 @@ namespace BrokeProtocol.GameSource.Jobs
         [NonSerialized]
         public float timeDeadline;
 
-        private bool ValidPlayer(ShPlayer player) => player.IsMobile && !(player.svPlayer.job is Prisoner) && player.IsOutside;
-
         override protected bool ValidTarget(ShEntity target)
         {
-            if (target is ShPlayer p)
+            if (base.ValidTarget(target) && target.IsOutside && target is ShPlayer p && p.IsMobile && !(p.svPlayer.job is Prisoner))
             {
                 if (destinationMarker)
-                {
-                    return base.ValidTarget(target) && ValidPlayer(p) && p.curMount && p.curMount == player.curMount;
-                }
+                    return p.curMount && p.curMount == player.curMount;
                 else
-                {
-                    return base.ValidTarget(target) && ValidPlayer(p) && !p.curMount;
-                }
+                    return !p.curMount;
             }
             return false;
         }
@@ -1029,12 +1028,6 @@ namespace BrokeProtocol.GameSource.Jobs
         }
 
         protected override GetEntityCallback GetTargetHandler() => () => EntityCollections.RandomNPC;
-
-        protected bool MountWithinReach(ShEntity e)
-        {
-            ShMountable m = player.GetMount;
-            return m.Velocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
-        }
 
         public override void Loop()
         {
@@ -1089,6 +1082,194 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             base.FoundTarget();
             player.svPlayer.SendGameMessage("Pickup target: " + targetPlayer.username);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public class Retriever : TargetPlayerJob
+        {
+            private enum Stage
+            {
+                NotSet,
+                Collecting,
+                Delivering
+            }
+
+            private Stage stage;
+
+            private ShEntity worldItem;
+            private InventoryStruct[] collectedItems;
+            private float timeDeadline;
+            
+            override protected bool ValidTarget(ShEntity target)
+            {
+                if (base.ValidTarget(target) && target is ShPlayer p && !(p.svPlayer.job is Prisoner))
+                {
+                    switch(stage)
+                    {
+                        case Stage.NotSet:
+                            if (p.isHuman)
+                            {
+                                var i = p.svPlayer.spawnedEntities.GetRandom();
+
+                                if(i && i.CollectedItems.Length > 0)
+                                {
+                                    worldItem = i;
+                                    player.svPlayer.StartGoalMarker(worldItem);
+                                    return true;
+                                }
+                                
+                            }
+                            else if(p.myItems.Count > 0)
+                            {
+                                var svManager = target.manager.svManager;
+
+                                var randomSpawn = svManager.worldWaypoints[0].spawns.Values.GetRandom()?.GetRandom();
+
+                                if (randomSpawn != null)
+                                {
+                                    worldItem = svManager.AddNewEntity(
+                                        p.myItems.GetRandom().Value.item,
+                                        SceneManager.Instance.ExteriorPlace,
+                                        randomSpawn.position,
+                                        randomSpawn.rotation,
+                                        null);
+                                    player.svPlayer.StartGoalMarker(worldItem);
+                                    return true;
+                                }
+                            }
+                            return false;
+
+                        case Stage.Collecting:
+                            return worldItem;
+
+                        case Stage.Delivering:
+
+                            if (collectedItems != null)
+                            {
+                                foreach (var i in collectedItems)
+                                {
+                                    if (player.MyItemCount(i.itemName.GetPrefabIndex()) < i.count)
+                                        return false;
+                                }
+                                return true;
+                            }
+                            return false;
+                    }
+                }
+                return false;
+            }
+
+            override public void ResetTarget()
+            {
+                player.svPlayer.DestroyGoalMarker();
+
+                if (worldItem)
+                {
+                    worldItem = null;
+                }
+                
+                if(collectedItems != null)
+                {
+                    foreach (var i in collectedItems)
+                    {
+                        player.TransferItem(DeltaInv.RemoveFromMe, i.itemName.GetPrefabIndex(), i.count);
+                    }
+
+                    collectedItems = null;
+                }
+                
+                player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.DestroyTimer);
+                stage = Stage.NotSet;
+                base.ResetTarget();
+            }
+
+            protected override void FoundTarget()
+            {
+                base.FoundTarget();
+                player.svPlayer.SendGameMessage($"Retrival target: {worldItem.name} for {targetPlayer.username}");
+                
+            }
+
+            public override void Loop()
+            {
+                if (player.isHuman && !player.IsDead)
+                {
+                    switch(stage)
+                    {
+                        case Stage.NotSet:
+                            SetTarget();
+                            break;
+
+                        case Stage.Collecting:
+                            if (!ValidTarget(targetPlayer))
+                            {
+                                SetTarget();
+                            }
+                            else if (MountWithinReach(worldItem))
+                            {
+                                collectedItems = worldItem.CollectedItems;
+
+                                foreach (var i in collectedItems)
+                                {
+                                    player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
+                                }
+
+                                worldItem.Destroy();
+
+                                timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
+                                player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
+                            }
+
+                            break;
+                        case Stage.Delivering:
+                            if (!ValidTarget(targetPlayer))
+                            {
+                                SetTarget();
+                            }
+                            else if (Time.time > timeDeadline)
+                            {
+                                player.svPlayer.SendGameMessage("Out of Time");
+                                SetTarget();
+                            }
+                            else if (MountWithinReach(targetPlayer))
+                            {
+                                foreach (var i in collectedItems)
+                                {
+                                    targetPlayer.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
+                                    player.TransferItem(DeltaInv.RemoveFromMe, i.itemName.GetPrefabIndex(), i.count);
+                                }
+
+                                player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
+                                SetTarget();
+                            }
+                            break;
+                    }
+
+                }
+            }
         }
     }
 }
