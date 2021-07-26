@@ -1209,6 +1209,7 @@ namespace BrokeProtocol.GameSource.Jobs
             protected override void FoundTarget()
             {
                 base.FoundTarget();
+                stage = Stage.Collecting;
                 player.svPlayer.SendGameMessage($"Retrival target: {worldItem.name} for {targetPlayer.username}");
                 
             }
@@ -1238,6 +1239,8 @@ namespace BrokeProtocol.GameSource.Jobs
                                 }
 
                                 worldItem.Destroy();
+
+                                stage = Stage.Delivering;
 
                                 timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
                                 player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
