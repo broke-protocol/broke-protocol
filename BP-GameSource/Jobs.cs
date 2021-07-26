@@ -1033,221 +1033,203 @@ namespace BrokeProtocol.GameSource.Jobs
             base.FoundTarget();
             player.svPlayer.SendGameMessage("Pickup target: " + targetPlayer.username);
         }
+    }
 
-        public class LawEnforcement : TargetPlayerJob
+
+
+    public class LawEnforcement : TargetPlayerJob
+    {
+        public override void Loop()
         {
-            public override void Loop()
-            {
-                if (player.IsDead) return;
+            if (player.IsDead) return;
 
-                if (!player.isHuman)
+            if (!player.isHuman)
+            {
+                if (!player.svPlayer.targetEntity && player.IsMobile && Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
                 {
-                    if (!player.svPlayer.targetEntity && player.IsMobile && Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
-                    {
-                        TryFindCriminal();
-                    }
-                }
-                else if (!ValidTarget(targetPlayer))
-                {
-                    SetTarget();
+                    TryFindCriminal();
                 }
             }
-
-            public override void ResetJobAI()
+            else if (!ValidTarget(targetPlayer))
             {
-                if (!SetSpawnTarget())
-                {
-                    base.ResetJobAI();
-                }
+                SetTarget();
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public class Retriever : TargetPlayerJob
+        public override void ResetJobAI()
         {
-            private enum Stage
+            if (!SetSpawnTarget())
             {
-                NotSet,
-                Collecting,
-                Delivering
+                base.ResetJobAI();
             }
+        }
+    }
 
-            private Stage stage;
 
-            private ShEntity worldItem;
-            private InventoryStruct[] collectedItems;
-            private float timeDeadline;
-            
-            override protected bool ValidTarget(ShEntity target)
+
+    public class Retriever : TargetPlayerJob
+    {
+        private enum Stage
+        {
+            NotSet,
+            Collecting,
+            Delivering
+        }
+
+        private Stage stage;
+
+        private ShEntity worldItem;
+        private InventoryStruct[] collectedItems;
+        private float timeDeadline;
+
+        override protected bool ValidTarget(ShEntity target)
+        {
+            if (base.ValidTarget(target) && target is ShPlayer p && !(p.svPlayer.job is Prisoner))
             {
-                if (base.ValidTarget(target) && target is ShPlayer p && !(p.svPlayer.job is Prisoner))
+                switch (stage)
                 {
-                    switch(stage)
-                    {
-                        case Stage.NotSet:
-                            if (p.isHuman)
+                    case Stage.NotSet:
+                        if (p.isHuman)
+                        {
+                            var i = p.svPlayer.spawnedEntities.GetRandom();
+
+                            if (i && i.CollectedItems.Length > 0)
                             {
-                                var i = p.svPlayer.spawnedEntities.GetRandom();
-
-                                if(i && i.CollectedItems.Length > 0)
-                                {
-                                    worldItem = i;
-                                    player.svPlayer.StartGoalMarker(worldItem);
-                                    return true;
-                                }
-                                
-                            }
-                            else if(p.myItems.Count > 0)
-                            {
-                                var svManager = target.manager.svManager;
-
-                                var randomSpawn = svManager.worldWaypoints[0].spawns.Values.GetRandom()?.GetRandom();
-
-                                if (randomSpawn != null)
-                                {
-                                    worldItem = svManager.AddNewEntity(
-                                        p.myItems.GetRandom().Value.item,
-                                        SceneManager.Instance.ExteriorPlace,
-                                        randomSpawn.position,
-                                        randomSpawn.rotation,
-                                        null);
-                                    player.svPlayer.StartGoalMarker(worldItem);
-                                    return true;
-                                }
-                            }
-                            return false;
-
-                        case Stage.Collecting:
-                            return worldItem;
-
-                        case Stage.Delivering:
-
-                            if (collectedItems != null)
-                            {
-                                foreach (var i in collectedItems)
-                                {
-                                    if (player.MyItemCount(i.itemName.GetPrefabIndex()) < i.count)
-                                        return false;
-                                }
+                                worldItem = i;
+                                player.svPlayer.StartGoalMarker(worldItem);
                                 return true;
                             }
-                            return false;
-                    }
+
+                        }
+                        else if (p.myItems.Count > 0)
+                        {
+                            var svManager = target.manager.svManager;
+
+                            var randomSpawn = svManager.worldWaypoints[0].spawns.Values.GetRandom()?.GetRandom();
+
+                            if (randomSpawn != null)
+                            {
+                                worldItem = svManager.AddNewEntity(
+                                    p.myItems.GetRandom().Value.item,
+                                    SceneManager.Instance.ExteriorPlace,
+                                    randomSpawn.position,
+                                    randomSpawn.rotation,
+                                    null);
+                                player.svPlayer.StartGoalMarker(worldItem);
+                                return true;
+                            }
+                        }
+                        return false;
+
+                    case Stage.Collecting:
+                        return worldItem;
+
+                    case Stage.Delivering:
+
+                        if (collectedItems != null)
+                        {
+                            foreach (var i in collectedItems)
+                            {
+                                if (player.MyItemCount(i.itemName.GetPrefabIndex()) < i.count)
+                                    return false;
+                            }
+                            return true;
+                        }
+                        return false;
                 }
-                return false;
+            }
+            return false;
+        }
+
+        override public void ResetTarget()
+        {
+            player.svPlayer.DestroyGoalMarker();
+
+            if (worldItem)
+            {
+                worldItem = null;
             }
 
-            override public void ResetTarget()
+            if (collectedItems != null)
             {
-                player.svPlayer.DestroyGoalMarker();
-
-                if (worldItem)
+                foreach (var i in collectedItems)
                 {
-                    worldItem = null;
+                    player.TransferItem(DeltaInv.RemoveFromMe, i.itemName.GetPrefabIndex(), i.count);
                 }
-                
-                if(collectedItems != null)
-                {
-                    foreach (var i in collectedItems)
-                    {
-                        player.TransferItem(DeltaInv.RemoveFromMe, i.itemName.GetPrefabIndex(), i.count);
-                    }
 
-                    collectedItems = null;
-                }
-                
-                player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.DestroyTimer);
-                stage = Stage.NotSet;
-                base.ResetTarget();
+                collectedItems = null;
             }
 
-            protected override void FoundTarget()
-            {
-                base.FoundTarget();
-                stage = Stage.Collecting;
-                player.svPlayer.SendGameMessage($"Retrival target: {worldItem.name} for {targetPlayer.username}");
-                
-            }
+            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.DestroyTimer);
+            stage = Stage.NotSet;
+            base.ResetTarget();
+        }
 
-            public override void Loop()
+        protected override void FoundTarget()
+        {
+            base.FoundTarget();
+            stage = Stage.Collecting;
+            player.svPlayer.SendGameMessage($"Retrival target: {worldItem.name} for {targetPlayer.username}");
+
+        }
+
+        public override void Loop()
+        {
+            if (player.isHuman && !player.IsDead)
             {
-                if (player.isHuman && !player.IsDead)
+                switch (stage)
                 {
-                    switch(stage)
-                    {
-                        case Stage.NotSet:
+                    case Stage.NotSet:
+                        SetTarget();
+                        break;
+
+                    case Stage.Collecting:
+                        if (!ValidTarget(targetPlayer))
+                        {
                             SetTarget();
-                            break;
+                        }
+                        else if (MountWithinReach(worldItem))
+                        {
+                            collectedItems = worldItem.CollectedItems;
 
-                        case Stage.Collecting:
-                            if (!ValidTarget(targetPlayer))
+                            foreach (var i in collectedItems)
                             {
-                                SetTarget();
-                            }
-                            else if (MountWithinReach(worldItem))
-                            {
-                                collectedItems = worldItem.CollectedItems;
-
-                                foreach (var i in collectedItems)
-                                {
-                                    player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
-                                }
-
-                                worldItem.Destroy();
-
-                                stage = Stage.Delivering;
-
-                                timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
-                                player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
+                                player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
                             }
 
-                            break;
-                        case Stage.Delivering:
-                            if (!ValidTarget(targetPlayer))
-                            {
-                                SetTarget();
-                            }
-                            else if (Time.time > timeDeadline)
-                            {
-                                player.svPlayer.SendGameMessage("Out of Time");
-                                SetTarget();
-                            }
-                            else if (MountWithinReach(targetPlayer))
-                            {
-                                foreach (var i in collectedItems)
-                                {
-                                    targetPlayer.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
-                                    player.TransferItem(DeltaInv.RemoveFromMe, i.itemName.GetPrefabIndex(), i.count);
-                                }
+                            worldItem.Destroy();
 
-                                player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
-                                SetTarget();
-                            }
-                            break;
-                    }
+                            stage = Stage.Delivering;
 
+                            timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
+                            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
+                        }
+
+                        break;
+                    case Stage.Delivering:
+                        if (!ValidTarget(targetPlayer))
+                        {
+                            SetTarget();
+                        }
+                        else if (Time.time > timeDeadline)
+                        {
+                            player.svPlayer.SendGameMessage("Out of Time");
+                            SetTarget();
+                        }
+                        else if (MountWithinReach(targetPlayer))
+                        {
+                            foreach (var i in collectedItems)
+                            {
+                                targetPlayer.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
+                                player.TransferItem(DeltaInv.RemoveFromMe, i.itemName.GetPrefabIndex(), i.count);
+                            }
+
+                            player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
+                            SetTarget();
+                        }
+                        break;
                 }
+
             }
         }
     }
