@@ -22,7 +22,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (damaged is ShPlayer victim && victim.wantedLevel == 0)
             {
-                if(victim.characterType == CharacterType.Mob)
+                if (victim.characterType == CharacterType.Mob)
                 {
                     player.svPlayer.SvAddCrime(CrimeIndex.AnimalCruelty, victim);
                 }
@@ -116,7 +116,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if(!player.isHuman && !player.svPlayer.targetEntity && !player.curMount && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if (!player.isHuman && !player.svPlayer.targetEntity && !player.curMount && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
                 float rand = Random.value;
 
@@ -192,7 +192,7 @@ namespace BrokeProtocol.GameSource.Jobs
                     TryFindBounty();
                 }
             }
-            else if(!aiTarget)
+            else if (!aiTarget)
             {
                 aiTarget = EntityCollections.RandomNPC;
 
@@ -213,7 +213,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 else
                 {
                     options.Add(new LabelID($"{p.username} &aAvailable", p.username));
-                }    
+                }
             }
 
             // Negative playerID means job action is called on the employer with that ID, not self
@@ -235,10 +235,10 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
         {
-            if(menuID == playersMenu)
+            if (menuID == playersMenu)
             {
-                if(actionID == place) PlaceBounty(targetID, optionID);
-                else if(actionID == cancel) CancelBounty(targetID, optionID);
+                if (actionID == place) PlaceBounty(targetID, optionID);
+                else if (actionID == cancel) CancelBounty(targetID, optionID);
             }
         }
 
@@ -307,7 +307,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void ResetJobAI() => player.svPlayer.SetState(StateIndex.Wander);
     }
 
-    public class Police : TargetPlayerJob
+    public class Police : LawEnforcement
     {
         protected override void FoundTarget()
         {
@@ -316,32 +316,7 @@ namespace BrokeProtocol.GameSource.Jobs
             targetPlayer.svPlayer.SendGameMessage("Police dispatched!");
         }
 
-        public override void Loop()
-        {
-            if (player.IsDead) return;
-
-            if (!player.isHuman)
-            {
-                if (!player.svPlayer.targetEntity && player.IsMobile && Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
-                {
-                    TryFindCriminal();
-                }
-            }
-            else if (!ValidTarget(targetPlayer))
-            {
-                SetTarget();
-            }
-        }
-
         public override void OnJailCriminal(ShPlayer criminal, int fine) => player.svPlayer.Reward(3, fine);
-
-        public override void ResetJobAI()
-        {
-            if (!SetSpawnTarget())
-            {
-                base.ResetJobAI();
-            }
-        }
     }
 
     public class Paramedic : TargetPlayerJob
@@ -865,7 +840,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class SpecOps : TargetPlayerJob
+    public class SpecOps : LawEnforcement
     {
         protected override void FoundTarget()
         {
@@ -874,37 +849,12 @@ namespace BrokeProtocol.GameSource.Jobs
             targetPlayer.svPlayer.SendGameMessage("SpecOps dispatched!");
         }
 
-        public override void Loop()
-        {
-            if (player.IsDead) return;
-
-            if (!player.isHuman)
-            {
-                if (!player.svPlayer.targetEntity && player.IsMobile && Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
-                {
-                    TryFindCriminal();
-                }
-            }
-            else if (!ValidTarget(targetPlayer))
-            {
-                SetTarget();
-            }
-        }
-
         public override void OnDestroyEntity(ShEntity entity)
         {
             base.OnDestroyEntity(entity);
             if (entity is ShPlayer victim && targetPlayer == victim && victim.wantedLevel > 0 && victim.wantedLevel >= info.attackLevel)
             {
                 player.svPlayer.Reward(3, 300);
-            }
-        }
-
-        public override void ResetJobAI()
-        {
-            if (!SetSpawnTarget())
-            {
-                base.ResetJobAI();
             }
         }
     }
@@ -1084,7 +1034,33 @@ namespace BrokeProtocol.GameSource.Jobs
             player.svPlayer.SendGameMessage("Pickup target: " + targetPlayer.username);
         }
 
+        public class LawEnforcement : TargetPlayerJob
+        {
+            public override void Loop()
+            {
+                if (player.IsDead) return;
 
+                if (!player.isHuman)
+                {
+                    if (!player.svPlayer.targetEntity && player.IsMobile && Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
+                    {
+                        TryFindCriminal();
+                    }
+                }
+                else if (!ValidTarget(targetPlayer))
+                {
+                    SetTarget();
+                }
+            }
+
+            public override void ResetJobAI()
+            {
+                if (!SetSpawnTarget())
+                {
+                    base.ResetJobAI();
+                }
+            }
+        }
 
 
 
