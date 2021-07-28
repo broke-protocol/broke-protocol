@@ -356,8 +356,7 @@ namespace BrokeProtocol.GameSource.Jobs
             targetPlayer.svPlayer.SendGameMessage("Paramedic alerted to your location");
         }
 
-        protected override bool ValidTarget(ShEntity target) => 
-            base.ValidTarget(target) && (target as ShPlayer).IsKnockedOut;
+        protected override bool ValidTarget(ShEntity target) => base.ValidTarget(target) && (target as ShPlayer).IsKnockedOut;
 
         public override void OnHealEntity(ShEntity entity)
         {
@@ -824,13 +823,9 @@ namespace BrokeProtocol.GameSource.Jobs
         protected override GetEntityCallback GetTargetHandler()
         {
             if (EntityCollections.Humans.Count >= 3)
-            {
                 return () => EntityCollections.RandomHuman;
-            }
-            else
-            {
-                return () => EntityCollections.RandomNPC;
-            }
+            
+            return () => EntityCollections.RandomNPC;
         }
 
         public override void ResetTarget()
@@ -1099,24 +1094,26 @@ namespace BrokeProtocol.GameSource.Jobs
                                 player.svPlayer.StartGoalMarker(worldItem);
                                 return true;
                             }
-
                         }
                         else if (p.myItems.Count > 0)
                         {
                             var svManager = target.manager.svManager;
 
-                            var randomSpawn = svManager.worldWaypoints[0].spawns.Values.GetRandom()?.GetRandom();
-
-                            if (randomSpawn != null)
+                            if(svManager.worldWaypoints[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
                             {
-                                worldItem = svManager.AddNewEntity(
-                                    p.myItems.GetRandom().Value.item,
-                                    SceneManager.Instance.ExteriorPlace,
-                                    randomSpawn.position,
-                                    randomSpawn.rotation,
-                                    null);
-                                player.svPlayer.StartGoalMarker(worldItem);
-                                return true;
+                                var randomSpawn = spawns.GetRandom();
+
+                                if (randomSpawn != null)
+                                {
+                                    worldItem = svManager.AddNewEntity(
+                                        p.myItems.GetRandom().Value.item,
+                                        SceneManager.Instance.ExteriorPlace,
+                                        randomSpawn.position,
+                                        randomSpawn.rotation,
+                                        null);
+                                    player.svPlayer.StartGoalMarker(worldItem);
+                                    return true;
+                                }
                             }
                         }
                         return false;
@@ -1125,7 +1122,6 @@ namespace BrokeProtocol.GameSource.Jobs
                         return worldItem;
 
                     case Stage.Delivering:
-
                         if (collectedItems != null)
                         {
                             foreach (var i in collectedItems)
@@ -1147,6 +1143,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (worldItem)
             {
+                if (targetPlayer && !targetPlayer.isHuman) worldItem.Destroy();
+
                 worldItem = null;
             }
 
@@ -1170,7 +1168,6 @@ namespace BrokeProtocol.GameSource.Jobs
             base.FoundTarget();
             stage = Stage.Collecting;
             player.svPlayer.SendGameMessage($"Retrival target: {worldItem.name} for {targetPlayer.username}");
-
         }
 
         public override void Loop()
@@ -1223,13 +1220,12 @@ namespace BrokeProtocol.GameSource.Jobs
                                 targetPlayer.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
                                 player.TransferItem(DeltaInv.RemoveFromMe, i.itemName.GetPrefabIndex(), i.count);
                             }
-
+                            collectedItems = null;
                             player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
                             SetTarget();
                         }
                         break;
                 }
-
             }
         }
     }
