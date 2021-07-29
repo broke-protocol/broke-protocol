@@ -56,7 +56,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Citizen), "Citizen",
                 "Get money by robbing, looting, and trading with NPCs and players or get a job by visiting map icons",
-                0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
+                CharacterType.Human, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
                 new Transports[] {
                     new Transports(new string[] {
                         "Car1",
@@ -108,7 +108,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Prisoner), "Prisoner",
                 "The prison door can be bombed and the guard might have a key",
-                0, GroupIndex.Prisoner, null, null, null, 0, new ColorStruct(1f, 0.5f, 0f), 0f, 0,
+                CharacterType.Human, 0, GroupIndex.Prisoner, null, null, null, 0, new ColorStruct(1f, 0.5f, 0f), 0f, 0,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -122,7 +122,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Hitman), "Hitman",
                 "Assasinate designated targets to earn bounty rewards",
-                0, GroupIndex.Criminal, null, new List<LabelID>{ new LabelID("Place Bounty", string.Empty) }, new List<LabelID>{ new LabelID("Bounties", string.Empty) }, 0, new ColorStruct(0f, 0f, 0f), 0.01f, 3,
+                CharacterType.Human, 0, GroupIndex.Criminal, null, new List<LabelID>{ new LabelID("Place Bounty", string.Empty) }, new List<LabelID>{ new LabelID("Bounties", string.Empty) }, 0, new ColorStruct(0f, 0f, 0f), 0.01f, 3,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -150,7 +150,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Police), "Police",
                 "Search others for illegal items, arrest criminals, put the them in your car, and bring to jail for cash rewards",
-                0, GroupIndex.LawEnforcement, null, null, null, 1, new ColorStruct(0f, 1f, 1f), 0.03f, 10,
+                CharacterType.Human, 0, GroupIndex.LawEnforcement, null, null, null, 1, new ColorStruct(0f, 1f, 1f), 0.03f, 10,
                 new Transports[] {
                     new Transports(new string[] { "CarPolice" }),
                     new Transports(new string[0]),
@@ -186,7 +186,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Paramedic), "Paramedic",
                 "Use map to find hurt and knocked out players to heal and revive",
-                0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(1f, 0.75f, 0.75f), 0.02f, 5,
+                CharacterType.Human, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(1f, 0.75f, 0.75f), 0.02f, 5,
                 new Transports[] {
                     new Transports(new string[] {"Ambulance"}),
                     new Transports(new string[0]),
@@ -214,7 +214,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Firefighter), "Firefighter",
                 "Use map to find fires to extinguish",
-                0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(1f, 1f, 0f), 0.01f, 3,
+                CharacterType.Human, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(1f, 1f, 0f), 0.01f, 3,
                 new Transports[] {
                     new Transports(new string[] {"FireTruck"}),
                     new Transports(new string[0]),
@@ -241,7 +241,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Gangster), "Rojo Loco",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                0, GroupIndex.Gang, null, null, null, 0, new ColorStruct(1f, 0f, 0f), 0.1f, 8,
+                CharacterType.Human, 0, GroupIndex.Gang, null, null, null, 0, new ColorStruct(1f, 0f, 0f), 0.1f, 8,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -266,7 +266,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Gangster), "Green St. Fam",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                0, GroupIndex.Gang, null, null, null, 0, new ColorStruct(0f, 1f, 0f), 0.1f, 8,
+                CharacterType.Human, 0, GroupIndex.Gang, null, null, null, 0, new ColorStruct(0f, 1f, 0f), 0.1f, 8,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -291,7 +291,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Gangster), "Borgata Blu",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                0, GroupIndex.Gang, null, null, null, 0, new ColorStruct(0f, 0f, 1f), 0.1f, 8,
+                CharacterType.Human, 0, GroupIndex.Gang, null, null, null, 0, new ColorStruct(0f, 0f, 1f), 0.1f, 8,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -318,7 +318,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Mayor), "Mayor",
                 "You're the Mayor: Accept or reject license requests",
-                1, GroupIndex.Citizen, null, new List<LabelID>{ new LabelID("Request Item", string.Empty) }, new List<LabelID>{ new LabelID("Requests", string.Empty) }, 0, new ColorStruct(1f, 0f, 1f), 0f, 0,
+                CharacterType.Human, 1, GroupIndex.Citizen, null, new List<LabelID>{ new LabelID("Request Item", string.Empty) }, new List<LabelID>{ new LabelID("Requests", string.Empty) }, 0, new ColorStruct(1f, 0f, 1f), 0f, 0,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -339,7 +339,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(DeliveryMan), "Delivery Man",
                 "Deliver food to hungry players and NPCs on your map (M) for rewards",
-                0, GroupIndex.Citizen, new List<TypeLabelID>{ new TypeLabelID("ShPlayer", "Deliver Item", "deliver") }, null, null, 0, new ColorStruct(0.5f, 0.25f, 0f), 0f, 0,
+                CharacterType.Human, 0, GroupIndex.Citizen, new List<TypeLabelID>{ new TypeLabelID("ShPlayer", "Deliver Item", "deliver") }, null, null, 0, new ColorStruct(0.5f, 0.25f, 0f), 0f, 0,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -363,7 +363,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(TaxiDriver), "Taxi Driver",
                 "Bring NPCs to destinations on your map (M) for rewards",
-                0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0f, 0f, 0.5f), 0f, 0,
+                CharacterType.Human, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0f, 0f, 0.5f), 0f, 0,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -388,7 +388,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(SpecOps), "SpecOps",
                 "Hunt down the most wanted players on the server for rewards",
-                0, GroupIndex.LawEnforcement, null, null, null, 3, new ColorStruct(0.75f, 0.75f, 0.25f), 0.015f, 8,
+                CharacterType.Human, 0, GroupIndex.LawEnforcement, null, null, null, 3, new ColorStruct(0.75f, 0.75f, 0.25f), 0.015f, 8,
                 new Transports[] {
                     new Transports(new string[] {
                         "TroopCar1",
@@ -427,7 +427,20 @@ namespace BrokeProtocol.GameSource
                         new InventoryStruct[] {
                             new InventoryStruct("M4", 1),
                             new InventoryStruct("AmmoRifle", 60)})
-                })
+                }),
+            new JobInfo(
+                typeof(Retriever), "Retriever",
+                "Return lost or dropped items to their rightful owner in time for rewards",
+                CharacterType.Human, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.25f, 0.75f, 0.25f), 0f, 0,
+                new Transports[] {
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0])
+                },
+                new Upgrades[] {
+                    new Upgrades(
+                        new InventoryStruct[] { })
+                }),
             };
     }
 }

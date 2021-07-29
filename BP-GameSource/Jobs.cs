@@ -1122,16 +1122,12 @@ namespace BrokeProtocol.GameSource.Jobs
                         return worldItem;
 
                     case Stage.Delivering:
-                        if (collectedItems != null)
+                        foreach (var i in collectedItems)
                         {
-                            foreach (var i in collectedItems)
-                            {
-                                if (player.MyItemCount(i.itemName.GetPrefabIndex()) < i.count)
-                                    return false;
-                            }
-                            return true;
+                            if (player.MyItemCount(i.itemName.GetPrefabIndex()) < i.count)
+                                return false;
                         }
-                        return false;
+                        return true;
                 }
             }
             return false;
@@ -1201,8 +1197,8 @@ namespace BrokeProtocol.GameSource.Jobs
                             timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
                             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
                         }
-
                         break;
+
                     case Stage.Delivering:
                         if (!ValidTarget(targetPlayer))
                         {
@@ -1217,10 +1213,11 @@ namespace BrokeProtocol.GameSource.Jobs
                         {
                             foreach (var i in collectedItems)
                             {
-                                targetPlayer.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
-                                player.TransferItem(DeltaInv.RemoveFromMe, i.itemName.GetPrefabIndex(), i.count);
+                                var prefabIndex = i.itemName.GetPrefabIndex();
+                                targetPlayer.TransferItem(DeltaInv.AddToMe, prefabIndex, i.count);
+                                player.TransferItem(DeltaInv.RemoveFromMe, prefabIndex, i.count);
                             }
-                            collectedItems = null;
+
                             player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
                             SetTarget();
                         }
