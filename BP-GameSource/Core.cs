@@ -431,7 +431,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Retriever), "Retriever",
                 "Return lost or dropped items to their rightful owner in time for rewards",
-                CharacterType.Human, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.25f, 0.75f, 0.25f), 0f, 0,
+                CharacterType.Mob, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.25f, 0.75f, 0.25f), 0f, 0,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),

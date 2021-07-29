@@ -309,9 +309,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Police : LawEnforcement
     {
-        protected override void FoundTarget()
+        protected override void FoundTarget(bool startGoalMarker)
         {
-            base.FoundTarget();
+            base.FoundTarget(startGoalMarker);
             player.svPlayer.SendGameMessage("Criminal target: " + targetPlayer.username);
             targetPlayer.svPlayer.SendGameMessage("Police dispatched!");
         }
@@ -349,9 +349,9 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
-        protected override void FoundTarget()
+        protected override void FoundTarget(bool startGoalMarker)
         {
-            base.FoundTarget();
+            base.FoundTarget(startGoalMarker);
             player.svPlayer.SendGameMessage(targetPlayer.username + " has been knocked out! Check map");
             targetPlayer.svPlayer.SendGameMessage("Paramedic alerted to your location");
         }
@@ -405,9 +405,9 @@ namespace BrokeProtocol.GameSource.Jobs
                 return null;
         };
 
-        protected override void FoundTarget()
+        protected override void FoundTarget(bool startGoalMarker)
         {
-            base.FoundTarget();
+            base.FoundTarget(startGoalMarker);
             player.svPlayer.SendGameMessage("Fire reported! Check Map");
         }
 
@@ -755,11 +755,14 @@ namespace BrokeProtocol.GameSource.Jobs
             target = null;
         }
 
-        protected virtual void FoundTarget() => player.svPlayer.StartGoalMarker(target);
+        protected virtual void FoundTarget(bool startGoalMarker)
+        {
+            if(startGoalMarker) player.svPlayer.StartGoalMarker(target);
+        }
 
         protected abstract GetEntityCallback GetTargetHandler();
 
-        protected bool SetTarget()
+        protected bool SetTarget(bool startGoalMarker = true)
         {
             ResetTarget();
 
@@ -772,7 +775,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 if (ValidTarget(e))
                 {
                     target = e;
-                    FoundTarget();
+                    FoundTarget(startGoalMarker);
                     return true;
                 }
             }
@@ -811,9 +814,9 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) => player.svPlayer.SetAttackState(e));
         }
 
-        protected override void FoundTarget()
+        protected override void FoundTarget(bool startGoalMarker)
         {
-            base.FoundTarget();
+            base.FoundTarget(startGoalMarker);
             targetPlayer = target as ShPlayer;
         }
 
@@ -837,9 +840,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class SpecOps : LawEnforcement
     {
-        protected override void FoundTarget()
+        protected override void FoundTarget(bool startGoalMarker)
         {
-            base.FoundTarget();
+            base.FoundTarget(startGoalMarker);
             player.svPlayer.SendGameMessage("High-value target: " + targetPlayer.username);
             targetPlayer.svPlayer.SendGameMessage("SpecOps dispatched!");
         }
@@ -880,9 +883,9 @@ namespace BrokeProtocol.GameSource.Jobs
             base.ResetTarget();
         }
 
-        protected override void FoundTarget()
+        protected override void FoundTarget(bool startGoalMarker)
         {
-            base.FoundTarget();
+            base.FoundTarget(startGoalMarker);
             player.svPlayer.SendGameMessage("Delivery target: " + targetPlayer.username);
             deliveryItem = SceneManager.Instance.consumablesCollection.GetRandom().Value;
             player.TransferItem(DeltaInv.AddToMe, deliveryItem);
@@ -1023,9 +1026,9 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
-        protected override void FoundTarget()
+        protected override void FoundTarget(bool startGoalMarker)
         {
-            base.FoundTarget();
+            base.FoundTarget(startGoalMarker);
             player.svPlayer.SendGameMessage("Pickup target: " + targetPlayer.username);
         }
     }
@@ -1072,7 +1075,6 @@ namespace BrokeProtocol.GameSource.Jobs
         }
 
         private Stage stage;
-
         private ShEntity worldItem;
         private InventoryStruct[] collectedItems;
         private float timeDeadline;
@@ -1105,14 +1107,17 @@ namespace BrokeProtocol.GameSource.Jobs
 
                                 if (randomSpawn != null)
                                 {
-                                    worldItem = svManager.AddNewEntity(
+                                    worldItem = svManager.DropEntity(
                                         p.myItems.GetRandom().Value.item,
                                         SceneManager.Instance.ExteriorPlace,
-                                        randomSpawn.position,
-                                        randomSpawn.rotation,
-                                        null);
-                                    player.svPlayer.StartGoalMarker(worldItem);
-                                    return true;
+                                        randomSpawn.position + Vector3.up,
+                                        Vector3.down);
+
+                                    if (worldItem)
+                                    {
+                                        player.svPlayer.StartGoalMarker(worldItem);
+                                        return true;
+                                    }
                                 }
                             }
                         }
@@ -1125,7 +1130,10 @@ namespace BrokeProtocol.GameSource.Jobs
                         foreach (var i in collectedItems)
                         {
                             if (player.MyItemCount(i.itemName.GetPrefabIndex()) < i.count)
+                            {
+                                player.svPlayer.SendGameMessage("Retrieval item lost..");
                                 return false;
+                            }
                         }
                         return true;
                 }
@@ -1159,11 +1167,11 @@ namespace BrokeProtocol.GameSource.Jobs
             base.ResetTarget();
         }
 
-        protected override void FoundTarget()
+        protected override void FoundTarget(bool startGoalMarker)
         {
-            base.FoundTarget();
+            base.FoundTarget(startGoalMarker);
             stage = Stage.Collecting;
-            player.svPlayer.SendGameMessage($"Retrival target: {worldItem.name} for {targetPlayer.username}");
+            player.svPlayer.SendGameMessage($"Retrieval target: {worldItem.name} for {targetPlayer.username}");
         }
 
         public override void Loop()
@@ -1173,13 +1181,13 @@ namespace BrokeProtocol.GameSource.Jobs
                 switch (stage)
                 {
                     case Stage.NotSet:
-                        SetTarget();
+                        SetTarget(false);
                         break;
 
                     case Stage.Collecting:
                         if (!ValidTarget(targetPlayer))
                         {
-                            SetTarget();
+                            SetTarget(false);
                         }
                         else if (MountWithinReach(worldItem))
                         {
@@ -1191,9 +1199,12 @@ namespace BrokeProtocol.GameSource.Jobs
                             }
 
                             worldItem.Destroy();
+                            worldItem = null;
 
                             stage = Stage.Delivering;
 
+                            player.svPlayer.StartGoalMarker(targetPlayer);
+                            player.svPlayer.SendGameMessage($"Reach {targetPlayer.username} in time");
                             timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
                             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
                         }
@@ -1202,12 +1213,12 @@ namespace BrokeProtocol.GameSource.Jobs
                     case Stage.Delivering:
                         if (!ValidTarget(targetPlayer))
                         {
-                            SetTarget();
+                            SetTarget(false);
                         }
                         else if (Time.time > timeDeadline)
                         {
                             player.svPlayer.SendGameMessage("Out of Time");
-                            SetTarget();
+                            SetTarget(false);
                         }
                         else if (MountWithinReach(targetPlayer))
                         {
@@ -1218,8 +1229,9 @@ namespace BrokeProtocol.GameSource.Jobs
                                 player.TransferItem(DeltaInv.RemoveFromMe, prefabIndex, i.count);
                             }
 
+                            player.svPlayer.SendGameMessage("Item returned to owner!");
                             player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
-                            SetTarget();
+                            SetTarget(false);
                         }
                         break;
                 }
