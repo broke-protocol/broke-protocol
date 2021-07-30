@@ -1,9 +1,11 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.Utility;
-using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Required;
+using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.Jobs;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BrokeProtocol.GameSource
 {
@@ -11,13 +13,24 @@ namespace BrokeProtocol.GameSource
     {
         public Core()
         {
-            Jobs = GetJobs;
-
             Info = new PluginInfo(
                 "GameSource",
                 "game",
                 "Default game source used by BP. May be modified.",
                 "https://github.com/broke-protocol/broke-protocol");
+
+            string jobsFilename = Info.Name + " Jobs.json";
+
+            if (!File.Exists(jobsFilename))
+            {
+                // Use JobsAdditive if you're adding to Default jobs and not replacing them
+                JobsOverride = GetJobs;
+                File.WriteAllText(jobsFilename, JsonConvert.SerializeObject(JobsOverride, Formatting.Indented));
+            }
+            else
+            {
+                JobsOverride = JsonConvert.DeserializeObject<List<JobInfo>>(File.ReadAllText(jobsFilename));
+            }
         }
 
         /*
@@ -52,7 +65,7 @@ namespace BrokeProtocol.GameSource
                 })
             */
 
-        private JobInfo[] GetJobs => new JobInfo[] {
+        private List<JobInfo> GetJobs => new List<JobInfo> {
             new JobInfo(
                 typeof(Citizen), "Citizen",
                 "Get money by robbing, looting, and trading with NPCs and players or get a job by visiting map icons",
