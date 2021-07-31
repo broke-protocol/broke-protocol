@@ -452,6 +452,11 @@ namespace BrokeProtocol.GameSource
                 },
                 new Upgrades[] {
                     new Upgrades(
+                        new InventoryStruct[] {
+                            new InventoryStruct("CapMob", 1)}),
+                    new Upgrades(
+                        new InventoryStruct[] { }),
+                    new Upgrades(
                         new InventoryStruct[] { })
                 }),
             };
