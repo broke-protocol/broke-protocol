@@ -23,14 +23,11 @@ namespace BrokeProtocol.GameSource
 
             if (!File.Exists(jobsFilename))
             {
-                // Use JobsAdditive if you're adding to Default jobs and not replacing them
-                JobsOverride = GetJobs;
-                File.WriteAllText(jobsFilename, JsonConvert.SerializeObject(JobsOverride, Formatting.Indented));
+                File.WriteAllText(jobsFilename, JsonConvert.SerializeObject(GetJobs, Formatting.Indented));
             }
-            else
-            {
-                JobsOverride = JsonConvert.DeserializeObject<List<JobInfo>>(File.ReadAllText(jobsFilename));
-            }
+
+            // Use JobsAdditive if you're adding to Default jobs and not replacing them
+            JobsOverride = JsonConvert.DeserializeObject<List<JobInfo>>(File.ReadAllText(jobsFilename));
         }
 
         /*
