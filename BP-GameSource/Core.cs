@@ -34,7 +34,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Citizen), "Job Name",
                 "Job Description",
-                0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
+                CharacterType.Human, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
                 new Transports[] {
                     new Transports(new string[] {
                         "Car1",
@@ -59,7 +59,7 @@ namespace BrokeProtocol.GameSource
                         new InventoryStruct[] {
                             new InventoryStruct("Item1", 1),
                             new InventoryStruct("Item2", 1)})
-                })
+                }),
             */
 
         private List<JobInfo> GetJobs => new List<JobInfo> {
