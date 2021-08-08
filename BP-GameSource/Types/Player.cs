@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using BrokeProtocol.CustomEvents;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -789,12 +790,12 @@ namespace BrokeProtocol.GameSource.Types
                     else if(optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
                     {
                         videoEntity.svEntity.SvStopVideo();
-                        player.svPlayer.SvDestroyMenu(videoPanel);
+                        player.svPlayer.DestroyMenu(videoPanel);
                     }
                     else if (VideoPermission(player, videoEntity, PermEnum.VideoDefault) && int.TryParse(optionID, out var index))
                     {
                         videoEntity.svEntity.SvStartDefaultVideo(index);
-                        player.svPlayer.SvDestroyMenu(videoPanel);
+                        player.svPlayer.DestroyMenu(videoPanel);
                     }
                     break;
 
@@ -860,6 +861,59 @@ namespace BrokeProtocol.GameSource.Types
                     }
                     break;
             }
+        }
+
+        [Target(GameSourceEvent.PlayerTextPanelButton, ExecutionMode.Override)]
+        public void OnTextPanelButton(ShPlayer player, string menuID, string optionID)
+        {
+            switch (menuID)
+            {
+                case ExampleCommand.coinFlip:
+                    switch(optionID)
+                    {
+                        case ExampleCommand.heads:
+                            player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.heads));
+                            break;
+                        case ExampleCommand.tails:
+                            player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.tails));
+                            break;
+                        case ExampleCommand.cancel:
+                            player.svPlayer.DestroyTextPanel(ExampleCommand.coinFlip);
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        private IEnumerator DelayCoinFlip(ShPlayer player, string prediction)
+        {
+            const int coinFlipCost = 100;
+
+            player.svPlayer.SendTextPanel("Flipping coin..", ExampleCommand.coinFlip);
+            yield return new WaitForSeconds(1f);
+
+            if (player.MyMoneyCount < coinFlipCost)
+            {
+                player.svPlayer.SendTextPanel($"Need ${coinFlipCost} to play", ExampleCommand.coinFlip);
+            }
+            else
+            {
+                var coin = Random.value >= 0.5f ? ExampleCommand.heads : ExampleCommand.tails;
+
+                if (coin == prediction)
+                {
+                    player.svPlayer.SendTextPanel($"Flipped {coin}!\n\n&aYou guessed right!", ExampleCommand.coinFlip);
+                    player.TransferMoney(DeltaInv.AddToMe, coinFlipCost);
+                }
+                else
+                {
+                    player.svPlayer.SendTextPanel($"Flipped {coin}!\n\n&4You guessed wrong :(", ExampleCommand.coinFlip);
+                    player.TransferMoney(DeltaInv.RemoveFromMe, coinFlipCost);
+                }
+            }
+
+            yield return new WaitForSeconds(1f);
+            player.svPlayer.DestroyTextPanel(ExampleCommand.coinFlip);
         }
 
         [Target(GameSourceEvent.PlayerReady, ExecutionMode.Override)]

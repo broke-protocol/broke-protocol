@@ -1,11 +1,18 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
+using BrokeProtocol.Required;
 using System;
 
 namespace BrokeProtocol.CustomEvents
 {
     public class ExampleCommand : IScript
     {
+        public const string coinFlip = "coinflip";
+        public const string heads = "heads";
+        public const string tails = "tails";
+        public const string cancel = "cancel";
+
+
         public ExampleCommand()
         {
             CommandHandler.RegisterCommand("Example", new Action<ShPlayer, ShPlayer, byte, int, float, string, string>(Command1), (player, command) =>
@@ -23,6 +30,7 @@ namespace BrokeProtocol.CustomEvents
             CommandHandler.RegisterCommand("ExampleString", new Action<ShPlayer, string>(Command3), null, "example.string");
             CommandHandler.RegisterCommand("ExamplePlayer", new Action<ShPlayer, ShPlayer>(Command4), null, "example.player");
             CommandHandler.RegisterCommand("ExampleDiscord", new Action<ShPlayer>(Command5), null, "example.discord");
+            CommandHandler.RegisterCommand("CoinFlip", new Action<ShPlayer>(Command6), null, "example.coinflip");
         }
 
 
@@ -50,6 +58,11 @@ namespace BrokeProtocol.CustomEvents
         public void Command5(ShPlayer player)
         {
             player.svPlayer.SvOpenURL("https://discord.gg/wEB2ZGU", "Open Official BP Discord");
+        }
+
+        public void Command6(ShPlayer player)
+        {
+            player.svPlayer.SendTextPanel("Pick Heads or Tails", coinFlip, new LabelID[] { new LabelID("Heads", heads), new LabelID("Tails", tails), new LabelID("Cancel", cancel)});
         }
     }
 }
