@@ -888,9 +888,10 @@ namespace BrokeProtocol.GameSource.Types
         private IEnumerator DelayCoinFlip(ShPlayer player, string prediction)
         {
             const int coinFlipCost = 100;
+            var delay = new WaitForSeconds(1f);
 
             player.svPlayer.SendTextPanel("Flipping coin..", ExampleCommand.coinFlip);
-            yield return new WaitForSeconds(1f);
+            yield return delay;
 
             if (player.MyMoneyCount < coinFlipCost)
             {
@@ -912,7 +913,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            yield return new WaitForSeconds(1f);
+            yield return delay;
             player.svPlayer.DestroyTextPanel(ExampleCommand.coinFlip);
         }
 
