@@ -1,5 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
@@ -58,8 +59,6 @@ namespace BrokeProtocol.CustomEvents
 
             target.StartCoroutine(EnterTheVoid(target.svEntity.svManager));
         }
-
-        
 
         private IEnumerator EnterTheVoid(SvManager svManager)
         {
@@ -127,5 +126,20 @@ namespace BrokeProtocol.CustomEvents
 
             voidRunning = false;
         }
+
+        [CustomTarget]
+        public void PlaceBounty(ShEntity target, ShPlayer player) => ((target as ShPlayer)?.svPlayer.job as Hitman)?.PlaceBountyAction(player);
+
+        [CustomTarget]
+        public void BountyList(ShPlayer player) => (player.svPlayer.job as Hitman)?.BountyListAction();
+
+        [CustomTarget]
+        public void RequestItem(ShEntity target, ShPlayer player) => ((target as ShPlayer)?.svPlayer.job as Mayor)?.RequestItemAction(player);
+
+        [CustomTarget]
+        public void RequestList(ShPlayer player) => (player.svPlayer.job as Mayor)?.RequestListAction();
+
+        [CustomTarget]
+        public void DeliverItem(ShEntity target, ShPlayer player) => (player.svPlayer.job as DeliveryMan)?.DeliverItemAction(target);
     }
 }

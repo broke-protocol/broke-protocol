@@ -132,8 +132,8 @@ namespace BrokeProtocol.GameSource.Jobs
         public static readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
         public static ShPlayer aiTarget;
 
-        private const string playersMenu = "players";
-        private const string bountiesMenu = "bounties";
+        public const string placeBountyMenu = "PlaceBounty";
+        public const string bountyListMenu = "BountyList";
 
         private const string place = "place";
         private const string cancel = "cancel";
@@ -142,6 +142,20 @@ namespace BrokeProtocol.GameSource.Jobs
         private const int cancelCost = 3000;
 
         private const float bountyLimitHours = 100f;
+
+        public override void SetJob()
+        {
+            player.svPlayer.SvAddDynamicAction(placeBountyMenu, "Place Bounty");
+            player.svPlayer.SvAddSelfAction(bountyListMenu, "Bounty List");
+            base.SetJob();
+        }
+
+        public override void RemoveJob()
+        {
+            player.svPlayer.SvRemoveDynamicAction(placeBountyMenu);
+            player.svPlayer.SvRemoveSelfAction(bountyListMenu);
+            base.RemoveJob();
+        }
 
         protected void TryFindBounty()
         {
@@ -200,7 +214,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
-        public override void OnEmployeeAction(ShPlayer target, string actionID)
+        public void PlaceBountyAction(ShPlayer requester)
         {
             List<LabelID> options = new List<LabelID>();
 
@@ -217,10 +231,10 @@ namespace BrokeProtocol.GameSource.Jobs
             }
 
             // Negative playerID means job action is called on the employer with that ID, not self
-            target.svPlayer.SendOptionMenu("&6Players", -player.ID, playersMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
+            requester.svPlayer.SendOptionMenu("&6Players", -player.ID, placeBountyMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
         }
 
-        public override void OnSelfAction(string actionID)
+        public void BountyListAction()
         {
             List<LabelID> options = new List<LabelID>();
 
@@ -230,12 +244,12 @@ namespace BrokeProtocol.GameSource.Jobs
                 options.Add(new LabelID($"{pair.Key}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours{online}", pair.Key));
             }
 
-            player.svPlayer.SendOptionMenu("&6Bounties", player.ID, bountiesMenu, options.ToArray(), new LabelID[0]);
+            player.svPlayer.SendOptionMenu("&6Bounties", player.ID, bountyListMenu, options.ToArray(), new LabelID[0]);
         }
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
         {
-            if (menuID == playersMenu)
+            if (menuID == placeBountyMenu)
             {
                 if (actionID == place) PlaceBounty(targetID, optionID);
                 else if (actionID == cancel) CancelBounty(targetID, optionID);
@@ -263,7 +277,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 AddBounty(bountyName);
                 requester.TransferMoney(DeltaInv.RemoveFromMe, placeCost);
-                OnEmployeeAction(requester, null);
+                PlaceBountyAction(requester);
             }
         }
 
@@ -295,7 +309,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 bounties.Remove(bountyName);
                 ChatHandler.SendToAll("Bounty Canceled on " + bountyName);
                 requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost);
-                OnEmployeeAction(requester, null);
+                PlaceBountyAction(requester);
 
                 if (aiTarget && bountyName == aiTarget.username) aiTarget = null;
             }
@@ -566,27 +580,33 @@ namespace BrokeProtocol.GameSource.Jobs
             "LicenseBoating"
         };
 
-        private const string requestMenu = "requests";
-        private const string itemMenu = "items";
+        private const string requestItemMenu = "RequestItem";
+        private const string requestListMenu = "RequestList";
 
         private const string accept = "accept";
         private const string deny = "deny";
 
         public override void SetJob()
         {
+            player.svPlayer.SvAddDynamicAction(requestItemMenu, "Request Item");
+            player.svPlayer.SvAddSelfAction(requestListMenu, "Request List");
+
             if (player.isHuman) ChatHandler.SendToAll("New Mayor: " + player.username);
             base.SetJob();
         }
 
         public override void RemoveJob()
         {
+            player.svPlayer.SvRemoveDynamicAction(requestItemMenu);
+            player.svPlayer.SvRemoveSelfAction(requestListMenu);
+
             if (player.isHuman) ChatHandler.SendToAll("Mayor Left: " + player.username);
             base.RemoveJob();
         }
 
         public override void Loop()
         {
-            List<string> removeKeys = new List<string>();
+            var removeKeys = new List<string>();
 
             foreach(string requesterName in requests.Keys.ToArray())
             {
@@ -601,16 +621,16 @@ namespace BrokeProtocol.GameSource.Jobs
                 }    
             }
 
-            foreach(string s in removeKeys) requests.Remove(s);
+            foreach(var s in removeKeys) requests.Remove(s);
         }
 
-        public override void OnEmployeeAction(ShPlayer target, string actionID)
+        public void RequestItemAction(ShPlayer target)
         {
-            List<LabelID> options = new List<LabelID>();
+            var options = new List<LabelID>();
 
-            foreach (string s in requestItems)
+            foreach (var s in requestItems)
             {
-                ShItem item = SceneManager.Instance.GetEntity<ShItem>(s.GetPrefabIndex());
+                var item = SceneManager.Instance.GetEntity<ShItem>(s.GetPrefabIndex());
 
                 if (item)
                 {
@@ -619,23 +639,23 @@ namespace BrokeProtocol.GameSource.Jobs
             }
 
             // Negative playerID means job action is called on the employer with that ID, not self
-            target.svPlayer.SendOptionMenu("&7Items", -player.ID, itemMenu, options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
+            target.svPlayer.SendOptionMenu("&7Items", -player.ID, requestItemMenu, options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
         }
 
-        public override void OnSelfAction(string actionID)
+        public void RequestListAction()
         {
-            List<LabelID> options = new List<LabelID>();
+            var options = new List<LabelID>();
 
             foreach (KeyValuePair<string, string> pair in requests)
             {
-                ShItem i = SceneManager.Instance.GetEntity<ShItem>(pair.Value);
+                var i = SceneManager.Instance.GetEntity<ShItem>(pair.Value);
                 if (i)
                 {
                     options.Add(new LabelID($"{pair.Key}: &6{i.itemName}", pair.Key));
                 }
             }
 
-            player.svPlayer.SendOptionMenu("&7Requests", player.ID, requestMenu, options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });
+            player.svPlayer.SendOptionMenu("&7Requests", player.ID, requestListMenu, options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });
         }
 
 
@@ -643,10 +663,10 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             switch(menuID)
             {
-                case itemMenu:
+                case requestItemMenu:
                     RequestAdd(targetID, optionID); // actionID doesn't matter here
                     break;
-                case requestMenu:
+                case requestListMenu:
                     ResultHandle(optionID, actionID); // targetID can only be self here
                     break;
                 default:
@@ -735,7 +755,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
 
             requests.Remove(requesterName);
-            OnSelfAction(null);
+            RequestListAction();
         }
     }
 
@@ -865,6 +885,22 @@ namespace BrokeProtocol.GameSource.Jobs
         [NonSerialized]
         public float timeDeadline;
 
+        private const string deliverItemAction = "DeliverItem";
+
+        public override void SetJob()
+        {
+            player.svPlayer.SvAddTypeAction(deliverItemAction, "ShPlayer", "Deliver Item");
+
+            base.SetJob();
+        }
+
+        public override void RemoveJob()
+        {
+            player.svPlayer.SvRemoveTypeAction(deliverItemAction);
+
+            base.RemoveJob();
+        }
+
         protected override bool ValidTarget(ShEntity target) => 
             base.ValidTarget(target) && (target is ShPlayer p) && !p.curMount && !(p.svPlayer.job is Prisoner);
 
@@ -914,7 +950,7 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
-        public override void OnSpecialAction(ShEntity target, string actionID)
+        public void DeliverItemAction(ShEntity target)
         {
             if (!target || target.IsDead || !player.InActionRange(target)) return;
 
