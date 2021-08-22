@@ -72,7 +72,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         private IEnumerator JobCoroutine()
         {
-            WaitForSeconds delay = new WaitForSeconds(1f);
+            var delay = new WaitForSeconds(1f);
             do
             {
                 yield return delay;
@@ -84,7 +84,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected bool MountWithinReach(ShEntity e)
         {
-            ShMountable m = player.GetMount;
+            var m = player.GetMount;
             return m.Velocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
         }
     }
@@ -118,7 +118,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (!player.isHuman && !player.svPlayer.targetEntity && !player.curMount && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
-                float rand = Random.value;
+                var rand = Random.value;
 
                 if (rand < 0.003f) TryFindVictim();
                 else if (rand < 0.015f) TryFindInnocent();
@@ -185,9 +185,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            List<string> removeKeys = new List<string>();
+            var removeKeys = new List<string>();
 
-            foreach (KeyValuePair<string, DateTimeOffset> pair in bounties)
+            foreach (var pair in bounties)
             {
                 if ((Util.CurrentTime - pair.Value).Hours >= bountyLimitHours)
                 {
@@ -195,7 +195,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
             }
 
-            foreach (string s in removeKeys) bounties.Remove(s);
+            foreach (var s in removeKeys) bounties.Remove(s);
 
             if (player.IsDead) return;
 
@@ -216,9 +216,9 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public void PlaceBountyAction(ShPlayer requester)
         {
-            List<LabelID> options = new List<LabelID>();
+            var options = new List<LabelID>();
 
-            foreach (ShPlayer p in EntityCollections.Humans)
+            foreach (var p in EntityCollections.Humans)
             {
                 if (bounties.TryGetValue(p.username, out var bountyTime))
                 {
@@ -236,11 +236,11 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public void BountyListAction()
         {
-            List<LabelID> options = new List<LabelID>();
+            var options = new List<LabelID>();
 
-            foreach (KeyValuePair<string, DateTimeOffset> pair in bounties)
+            foreach (var pair in bounties)
             {
-                string online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " &aOnline" : string.Empty;
+                var online = EntityCollections.Accounts.ContainsKey(pair.Key) ? " &aOnline" : string.Empty;
                 options.Add(new LabelID($"{pair.Key}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours{online}", pair.Key));
             }
 
@@ -258,7 +258,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public void PlaceBounty(int sourceID, string bountyName)
         {
-            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(sourceID);
+            var requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if (!requester)
             {
                 Debug.LogError("[SVR] Requester not found");
@@ -289,7 +289,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public void CancelBounty(int sourceID, string bountyName)
         {
-            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(sourceID);
+            var requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if (!requester)
             {
                 Debug.LogError("[SVR] Requester not found");
@@ -461,7 +461,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override float GetSpawnRate()
         {
             // Use the spawner territory to calculate spawn rate (better AI defence spawning during gangwars)
-            ShTerritory territory = player.svPlayer.spawner.svPlayer.GetTerritory;
+            var territory = player.svPlayer.spawner.svPlayer.GetTerritory;
 
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
@@ -476,7 +476,7 @@ namespace BrokeProtocol.GameSource.Jobs
             if (player.isHuman)
             {
                 gangstersKilled = 0;
-                foreach (ShTerritory territory in svManager.territories.Values)
+                foreach (var territory in svManager.territories.Values)
                 {
                     territory.svEntity.AddSubscribedPlayer(player);
                 }
@@ -488,7 +488,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (player.isHuman)
             {
-                foreach (ShTerritory territory in svManager.territories.Values)
+                foreach (var territory in svManager.territories.Values)
                 {
                     territory.svEntity.RemoveSubscribedPlayer(player, true);
                 }
@@ -528,7 +528,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
                 else
                 {
-                    ShTerritory t = player.svPlayer.GetTerritory;
+                    var t = player.svPlayer.GetTerritory;
                     if (t && t.attackerIndex != Util.invalidByte && entity is ShPlayer victim)
                     {
                         if (victim.svPlayer.job.info.shared.jobIndex == t.ownerIndex)
@@ -554,7 +554,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void ResetJobAI()
         {
-            ShPlayer target = player.svPlayer.spawner;
+            var target = player.svPlayer.spawner;
 
             if (target && target.IsOutside && target.svPlayer.job is Gangster &&
                 target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr)
@@ -608,7 +608,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             var removeKeys = new List<string>();
 
-            foreach(string requesterName in requests.Keys.ToArray())
+            foreach(var requesterName in requests.Keys.ToArray())
             {
                 if (!EntityCollections.Accounts.ContainsKey(requesterName))
                 {
@@ -646,7 +646,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             var options = new List<LabelID>();
 
-            foreach (KeyValuePair<string, string> pair in requests)
+            foreach (var pair in requests)
             {
                 var i = SceneManager.Instance.GetEntity<ShItem>(pair.Value);
                 if (i)
@@ -682,14 +682,14 @@ namespace BrokeProtocol.GameSource.Jobs
                 return;
             }
 
-            ShItem item = SceneManager.Instance.GetEntity<ShItem>(itemName);
+            var item = SceneManager.Instance.GetEntity<ShItem>(itemName);
             if (!item)
             {
                 Debug.LogError("[SVR] Item not found: " + itemName);
                 return;
             }
 
-            ShPlayer requester = EntityCollections.FindByID<ShPlayer>(sourceID);
+            var requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if(!requester)
             {
                 Debug.LogError("[SVR] Requester not found");
@@ -712,7 +712,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 requests[requester.username] = itemName;
                 requester.svPlayer.SendGameMessage("Request successfully sent");
-                ShPlayer mayor = info.members.FirstOrDefault();
+                var mayor = info.members.FirstOrDefault();
                 if (mayor)
                 {
                     mayor.svPlayer.SendGameMessage(requester.username + " requesting a " + item.itemName);
@@ -732,7 +732,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 if (result == accept)
                 {
-                    ShItem item = SceneManager.Instance.GetEntity<ShItem>(itemName);
+                    var item = SceneManager.Instance.GetEntity<ShItem>(itemName);
                     if (item)
                     {
                         if (requester.MyMoneyCount >= item.value)
@@ -786,11 +786,11 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             ResetTarget();
 
-            GetEntityCallback handler = GetTargetHandler();
+            var handler = GetTargetHandler();
 
             for (int i = 0; i < 20; i++)
             {
-                ShEntity e = handler();
+                var e = handler();
 
                 if (ValidTarget(e))
                 {
@@ -1044,7 +1044,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 {
                     player.svPlayer.DestroyGoalMarker();
 
-                    SpawnLocation destination = svManager.spawnLocations.GetRandom();
+                    var destination = svManager.spawnLocations.GetRandom();
 
                     destinationMarker = svManager.AddNewEntity(
                         svManager.markerGoalPrefab,
