@@ -1040,7 +1040,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
                 else if (
                     targetPlayer && MountWithinReach(targetPlayer) &&
-                    targetPlayer.svPlayer.SvMountBack(player.curMount.ID, false))
+                    targetPlayer.svPlayer.SvTryMount(player.curMount.ID, false))
                 {
                     player.svPlayer.DestroyGoalMarker();
 
