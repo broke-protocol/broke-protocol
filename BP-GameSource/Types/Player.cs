@@ -583,7 +583,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.curMount) player.svPlayer.SvDismount();
 
-            player.svPlayer.SvSetEquipable(restrained.index);
+            player.svPlayer.SvSetEquipable(restrained);
 
             if (!player.isHuman)
             {
@@ -598,7 +598,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerUnrestrain, ExecutionMode.Override)]
         public void OnUnrestrain(ShPlayer player, ShPlayer initiator)
         {
-            player.svPlayer.SvSetEquipable(player.Hands.index);
+            player.svPlayer.SvSetEquipable(player.Hands);
 
             if (!player.isHuman)
             {
@@ -999,6 +999,15 @@ namespace BrokeProtocol.GameSource.Types
             else
             {
                 victim.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.HandsUp);
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerSetEquipable, ExecutionMode.Override)]
+        public void OnSetEquipable(ShPlayer player, ShEquipable equipable)
+        {
+            if (!player.curEquipable || player.curEquipable.index != equipable.index)
+            {
+                player.svPlayer.SvForceEquipable(equipable.index);
             }
         }
 
