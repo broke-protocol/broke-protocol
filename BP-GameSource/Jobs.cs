@@ -425,16 +425,24 @@ namespace BrokeProtocol.GameSource.Jobs
             player.svPlayer.SendGameMessage("Fire reported! Check Map");
         }
 
-        public override void OnDamageEntity(ShEntity damaged)
+        public void CheckReward(ShEntity e)
         {
-            if (damaged.svEntity.spawner != player && damaged.gameObject.layer == LayerIndex.fire)
+            if (e.svEntity.spawner != player && e.gameObject.layer == LayerIndex.fire)
             {
                 player.svPlayer.Reward(1, 25);
             }
-            else
-            {
-                base.OnDamageEntity(damaged);
-            }
+        }
+
+        public override void OnDamageEntity(ShEntity damaged)
+        {
+            CheckReward(damaged);
+            base.OnDamageEntity(damaged);
+        }
+
+        public override void OnDestroyEntity(ShEntity destroyed)
+        {
+            CheckReward(destroyed);
+            base.OnDestroyEntity(destroyed);
         }
     }
 
