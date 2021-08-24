@@ -187,11 +187,11 @@ namespace BrokeProtocol.GameSource.Types
                 }
                 else
                 {
-                    ShPlayer playerFollower = player.svPlayer.follower;
+                    var playerFollower = player.svPlayer.follower;
                     if (playerFollower) playerFollower.svPlayer.SetAttackState(attacker);
                 }
 
-                ShPlayer attackerFollower = attacker.svPlayer.follower;
+                var attackerFollower = attacker.svPlayer.follower;
 
                 if (attackerFollower)
                 {
@@ -204,7 +204,6 @@ namespace BrokeProtocol.GameSource.Types
         {
             yield return new WaitForSeconds(2f);
             player.svPlayer.SvSpectate(target);
-
         }
 
         [Target(GameSourceEvent.PlayerDeath, ExecutionMode.Override)]
@@ -245,7 +244,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerSecurityPanel, ExecutionMode.Override)]
         public void OnSecurityPanel(ShPlayer player, ShApartment apartment)
         {
-            List<LabelID> options = new List<LabelID>();
+            var options = new List<LabelID>();
 
             options.Add(new LabelID("Enter Passcode", enterPasscode));
             options.Add(new LabelID("Set Passcode", setPasscode));
@@ -266,17 +265,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerVideoPanel, ExecutionMode.Override)]
         public void OnVideoPanel(ShPlayer player, ShEntity videoEntity)
         {
-            List<LabelID> options = new List<LabelID>();
-
-            if (VideoPermission(player, videoEntity, PermEnum.VideoDefault))
-            {
-                int index = 0;
-                foreach (var option in videoEntity.svEntity.videoOptions)
-                {
-                    options.Add(new LabelID(option.label, index.ToString()));
-                    index++;
-                }
-            }
+            var options = new List<LabelID>();
 
             if (VideoPermission(player, videoEntity, PermEnum.VideoCustom))
             {
@@ -286,6 +275,16 @@ namespace BrokeProtocol.GameSource.Types
             if (VideoPermission(player, videoEntity, PermEnum.VideoStop))
             {
                 options.Add(new LabelID("&4Stop Video", stopVideo));
+            }
+
+            if (VideoPermission(player, videoEntity, PermEnum.VideoDefault))
+            {
+                int index = 0;
+                foreach (var option in videoEntity.svEntity.videoOptions)
+                {
+                    options.Add(new LabelID(option.label, index.ToString()));
+                    index++;
+                }
             }
 
             string title = "&7Video Panel";
@@ -333,7 +332,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (other.isHuman && other.IsUp && player.IsMobile && !player.InOwnApartment)
             {
-                foreach (ShApartment apartment in player.ownedApartments.Keys)
+                foreach (var apartment in player.ownedApartments.Keys)
                 {
                     if (apartment.DistanceSqr(other) <= Util.inviteDistanceSqr)
                     {
@@ -447,7 +446,7 @@ namespace BrokeProtocol.GameSource.Types
         public void OnGoToJail(ShPlayer player, float time, int fine)
         {
             player.svPlayer.SvSetJob(BPAPI.Instance.Jobs[BPAPI.Instance.PrisonerIndex], true, false);
-            Transform jailSpawn = player.svPlayer.svManager.jails.GetRandom().mainT;
+            var jailSpawn = player.svPlayer.svManager.jails.GetRandom().mainT;
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
             player.svPlayer.SvForceEquipable(player.Hands.index);
             player.svPlayer.SvClearCrimes();
@@ -460,7 +459,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.svPlayer.godMode || player.svPlayer.InvalidCrime(crimeIndex)) return;
 
-            Crime crime = player.manager.GetCrime(crimeIndex);
+            var crime = player.manager.GetCrime(crimeIndex);
             ShPlayer witness;
 
             if (!crime.witness) witness = victim;
@@ -503,10 +502,10 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerRemoveItemsDeath, ExecutionMode.Override)]
         public void OnRemoveItemsDeath(ShPlayer player, bool dropItems)
         {
-            List<InventoryItem> removedItems = new List<InventoryItem>();
+            var removedItems = new List<InventoryItem>();
 
             // Allows players to keep items/rewards from job ranks
-            foreach (InventoryItem myItem in player.myItems.Values.ToArray())
+            foreach (var myItem in player.myItems.Values.ToArray())
             {
                 int extra = myItem.count;
 
@@ -514,7 +513,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     for (int rankIndex = player.rank; rankIndex >= 0; rankIndex--)
                     {
-                        foreach (InventoryStruct i in player.svPlayer.job.info.upgrades[rankIndex].items)
+                        foreach (var i in player.svPlayer.job.info.upgrades[rankIndex].items)
                         {
                             if (myItem.item.name == i.itemName)
                             {
@@ -538,11 +537,11 @@ namespace BrokeProtocol.GameSource.Types
                 if (Physics.Raycast(
                     player.GetPosition + Vector3.up,
                     Vector3.down,
-                    out RaycastHit hit,
+                    out var hit,
                     10f,
                     MaskIndex.world))
                 {
-                    ShEntity briefcase = player.manager.svManager.AddNewEntity(
+                    var briefcase = player.manager.svManager.AddNewEntity(
                         player.manager.svManager.briefcasePrefabs.GetRandom(),
                         player.GetPlace,
                         hit.point,
@@ -567,7 +566,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerRemoveItemsJail, ExecutionMode.Override)]
         public void OnRemoveItemsJail(ShPlayer player)
         {
-            foreach (InventoryItem i in player.myItems.Values.ToArray())
+            foreach (var i in player.myItems.Values.ToArray())
             {
                 if (i.item.illegal)
                 {
@@ -671,7 +670,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else
             {
-                ShDoor otherDoor = door.svDoor.other;
+                var otherDoor = door.svDoor.other;
                 baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform);
             }
         }
@@ -761,7 +760,7 @@ namespace BrokeProtocol.GameSource.Types
                             else player.svPlayer.SendGameMessage("Unable");
                             break;
                         case hackPanel:
-                            List<LabelID> options = new List<LabelID>();
+                            var options = new List<LabelID>();
                             foreach (var clone in apartment.svApartment.clones.Values)
                             {
                                 options.Add(new LabelID($"{clone.svOwner.username} - Difficulty: {clone.svSecurity.ToPercent()}", clone.svOwner.username));
@@ -772,7 +771,7 @@ namespace BrokeProtocol.GameSource.Types
                     break;
 
                 case hackPanel:
-                    HackingContainer hackingContainer = new HackingContainer(player, targetID, optionID);
+                    var hackingContainer = new HackingContainer(player, targetID, optionID);
                     if (hackingContainer.IsValid)
                     {
                         player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.ApartmentPlace.svSecurity);
@@ -781,11 +780,12 @@ namespace BrokeProtocol.GameSource.Types
                     break;
 
                 case videoPanel:
-                    ShEntity videoEntity = EntityCollections.FindByID(targetID);
+                    var videoEntity = EntityCollections.FindByID(targetID);
 
                     if(optionID == customVideo && VideoPermission(player, videoEntity, PermEnum.VideoCustom))
                     {
-                        player.svPlayer.SendInputMenu("Custom Video URL", targetID, customVideo, InputField.ContentType.Standard, 128);
+                        player.svPlayer.SendGameMessage("Only direct video links supported - Can upload to Imgur or Discord and link that");
+                        player.svPlayer.SendInputMenu("Direct MP4/WEBM URL", targetID, customVideo, InputField.ContentType.Standard, 128);
                     }
                     else if(optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
                     {
@@ -806,7 +806,7 @@ namespace BrokeProtocol.GameSource.Types
                     }
                     else
                     {
-                        ShPlayer target = EntityCollections.FindByID<ShPlayer>(-targetID);
+                        var target = EntityCollections.FindByID<ShPlayer>(-targetID);
                         if (target) target.svPlayer.job.OnOptionMenuAction(player.ID, menuID, optionID, actionID);
                     }
                     break;
