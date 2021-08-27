@@ -47,7 +47,7 @@
       <HintPath>..\..\broke-protocol-game2\Assets\Plugins\Managed\LiteDB.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\broke-protocol-game2\Assets\Plugins\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\broke-protocol-game2\BrokeProtocol\BrokeProtocol_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Scripts, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

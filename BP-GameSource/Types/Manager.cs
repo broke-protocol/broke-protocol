@@ -1,7 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.API.Types;
 using BrokeProtocol.Collections;
-using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.LiteDB;
 using BrokeProtocol.Managers;
@@ -83,7 +82,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
         public void OnSave(SvManager svManager)
         {
-            Data bountyData = new Data();
+            var bountyData = new Data();
             bountyData.ID = Hitman.bountiesKey;
             foreach(var bounty in Hitman.bounties)
             {
@@ -96,7 +95,7 @@ namespace BrokeProtocol.GameSource.Types
             svManager.database.Data.Upsert(bountyData);
 
             ChatHandler.SendToAll("Saving server status..");
-            foreach (ShPlayer player in EntityCollections.Humans)
+            foreach (var player in EntityCollections.Humans)
             {
                 player.svPlayer.Save();
             }
@@ -106,7 +105,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.ManagerLoad, ExecutionMode.Override)]
         public void OnLoad(SvManager svManager)
         {
-            Data bountyData = svManager.database.Data.FindById(Hitman.bountiesKey);
+            var bountyData = svManager.database.Data.FindById(Hitman.bountiesKey);
 
             if (bountyData != null)
             {
