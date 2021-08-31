@@ -280,7 +280,7 @@ namespace BrokeProtocol.GameSource.Types
             if (VideoPermission(player, videoEntity, PermEnum.VideoDefault))
             {
                 int index = 0;
-                foreach (var option in videoEntity.svEntity.videoOptions)
+                foreach (var option in player.manager.svManager.videoOptions)
                 {
                     options.Add(new LabelID(option.label, index.ToString()));
                     index++;
@@ -613,7 +613,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerServerInfo, ExecutionMode.Override)]
         public void OnServerInfo(ShPlayer player)
         {
-            player.svPlayer.SendTextMenu("&7Server Info", player.svPlayer.svManager.serverDescription);
+            player.svPlayer.SendTextMenu("&7Server Info", player.svPlayer.svManager.serverInfo);
         }
 
         [Target(GameSourceEvent.PlayerDisplayName, ExecutionMode.Override)]

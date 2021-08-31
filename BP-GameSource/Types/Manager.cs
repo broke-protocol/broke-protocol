@@ -119,14 +119,15 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.ManagerReadGroups, ExecutionMode.Override)]
         public void OnReadGroups()
         {
-            var groups = JsonConvert.DeserializeObject<List<Group>>(File.ReadAllText(Paths.groupsFile));
-            if (groups == null)
+            try
             {
-                Debug.Log("[SVR] Groups file has an error");
-                return;
+                var groups = JsonConvert.DeserializeObject<List<Group>>(File.ReadAllText(Paths.groupsFile));
+                GroupManager.Groups = groups.ToDictionary(x => x.Name, y => y);
             }
-
-            GroupManager.Groups = groups.ToDictionary(x => x.Name, y => y);
+            catch(Exception e)
+            {
+                Debug.Log("[SVR] Error reading groups file: " + e);
+            }
         }
 
         private bool ValidateUser(SvManager svManager, ConnectionData connectionData)
