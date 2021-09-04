@@ -792,7 +792,7 @@ namespace BrokeProtocol.GameSource.Types
                         videoEntity.svEntity.SvStopVideo();
                         player.svPlayer.DestroyMenu(videoPanel);
                     }
-                    else if (VideoPermission(player, videoEntity, PermEnum.VideoDefault) && int.TryParse(optionID, out var index))
+                    else if (VideoPermission(player, videoEntity, PermEnum.VideoDefault, true) && int.TryParse(optionID, out var index))
                     {
                         videoEntity.svEntity.SvStartDefaultVideo(index);
                         player.svPlayer.DestroyMenu(videoPanel);
@@ -814,7 +814,28 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         // Change Video permissions handling here: Default allows video controls in own apartment (else follow group permission settings)
-        private bool VideoPermission(ShPlayer player, ShEntity videoPlayer, PermEnum permission) => videoPlayer && player.InActionRange(videoPlayer) && (player.InOwnApartment || player.svPlayer.HasPermissionBP(permission));
+        private bool VideoPermission(ShPlayer player, ShEntity videoPlayer, PermEnum permission, bool checkLimit = false)
+        {
+            if (checkLimit)
+            {
+                const int videoLimit = 3;
+
+                int videoCount = 0;
+                foreach (var e in videoPlayer.svEntity.sector.controlled)
+                {
+                    if (e != videoPlayer && !string.IsNullOrWhiteSpace(e.svEntity.videoURL))
+                        videoCount++;
+                }
+
+                if (videoCount >= videoLimit)
+                {
+                    player.svPlayer.SendGameMessage($"Video limit of {videoLimit} reached");
+                    return false;
+                }
+            }
+
+            return videoPlayer && player.InActionRange(videoPlayer) && (player.InOwnApartment || player.svPlayer.HasPermissionBP(permission));
+        }
 
         [Target(GameSourceEvent.PlayerSubmitInput, ExecutionMode.Override)]
         public void OnSubmitInput(ShPlayer player, int targetID, string menuID, string input)
@@ -851,7 +872,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     // Do URL validation input here **MUST CHECK FOR HTTPS** Non-Secure Protocol isn't allowed on Android
                     // Maybe only allow StartsWith("https://i.imgur.com") for safety
-                    if (VideoPermission(player, videoEntity, PermEnum.VideoCustom) && input.StartsWith("https://"))
+                    if (VideoPermission(player, videoEntity, PermEnum.VideoCustom, true) && input.StartsWith("https://"))
                     {
                         videoEntity.svEntity.SvStartCustomVideo(input);
                     }
