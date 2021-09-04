@@ -66,7 +66,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Citizen), "Citizen",
                 "Get money by robbing, looting, and trading with NPCs and players or get a job by visiting map icons",
-                CharacterType.Human, 0, GroupIndex.Citizen, 0, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
+                CharacterType.All, 0, GroupIndex.Citizen, 0, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
                 new Transports[] {
                     new Transports(new string[] {
                         "Car1",
