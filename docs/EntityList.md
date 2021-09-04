@@ -1,6 +1,9 @@
 # Entity List
 
 Can use just ShItem types with /give and /take commands. Case-sensitive.
+
+[UserR00T's 3D Asset Browser](https://userr00t.com/bp/assetbrowser/)
+
 ```
 ATM
 ATMShop
@@ -79,6 +82,11 @@ Tourist1White
 WranglerBlack
 WranglerBrown
 WranglerWhite
+BossRetriever
+GermanShepherdDark
+GermanShepherdLight
+StripedCatDark
+StripedCatLight
 Cessna1
 Cessna2
 Cessna3
@@ -176,6 +184,7 @@ MineATThrown
 SatchelChargeThrown
 FlareThrown
 SmokeThrown
+FerrisWheel
 Compensator
 ExtendedBarrel
 FlashHider
@@ -198,6 +207,7 @@ Binoculars
 Flashlight
 RiotShield
 Surrender
+SurrenderMob
 Detonator
 Apple1
 Apple2
@@ -231,6 +241,8 @@ Cake3
 CakeSliceChocolate
 CakeSliceVanilla1
 CakeSliceVanilla2
+CannedFood1
+CannedFood2
 Carrot
 CarrotSliced
 CarrotSmall
@@ -384,6 +396,7 @@ FireExtinguisher
 FireHose
 Handcuffs
 HandcuffsFurry
+Muzzle
 Axe
 BatMetal
 Baton
@@ -414,6 +427,8 @@ SPAS12
 Taser
 Hammer
 Hands
+HandsCat
+HandsDog
 Kabar
 Knife
 Machete
@@ -527,6 +542,7 @@ Cabinet2
 Cabinet3
 Cabinet4
 Cabinet5
+CatTree
 Chair
 Chair1
 Chair2
@@ -594,6 +610,7 @@ Clock
 Corkboard
 Cushion1
 Cushion2
+DoggyBone
 Flag
 FloorMat1
 FloorMat2
@@ -620,10 +637,10 @@ Rug4
 Saxophone
 ToiletBrush
 ToyBear
-ToyCat
 ToyChick
 ToyDog
 ToyLamb
+ToyMouse
 ToyPig
 ToyRabbit
 ToyTurtle
@@ -641,7 +658,12 @@ WallDeco6
 WallDeco7
 WallDeco8
 RoomDivider
-SafeSmall
+ScratchPost
+DomeCamera
+MotionSensor
+SecurityCamera
+SurveillanceCamera
+Tripwire
 Shelf1Big
 Shelf1Medium
 Shelf1Small
@@ -664,6 +686,8 @@ Showcase
 CabinetFiling
 CabinetFlat
 Cabinets
+CarryCage1
+CarryCage2
 Case
 Chest
 ChestOld
@@ -674,7 +698,13 @@ Cupboards2
 Cupboards3
 Fridge
 GLFixed
+Litterbox
 MGFixed
+PetBowlDoubleEmpty
+PetBowlDoubleFull
+PetBowlEmpty
+PetBowlFood
+PetBowlWater
 PlanterPot
 PlanterPotLong
 RecordPlayer
@@ -682,6 +712,7 @@ RecordShelf1
 RecordShelf2
 RubbishBin1
 RubbishBin2
+SafeSmall
 SoundMonitor2
 Stereo
 TrashBinHome
@@ -847,6 +878,7 @@ MineAT
 Molotov
 SatchelCharge
 Smoke
+Muzzled
 Restrained
 RestrainedFurry
 BackpackBrown
@@ -992,14 +1024,6 @@ JacketVarsityBlue
 JacketVarsityGreen
 JacketVarsityRed
 KevlarVest
-NullArmor
-NullBack
-NullBody
-NullFace
-NullFeet
-NullHands
-NullHead
-NullLegs
 PantsBlue
 PantsBrown
 PantsBrownPatched
@@ -1111,6 +1135,16 @@ TopRiot
 TopSafetyVest
 TopSheriff
 TopStriped
+CapMob
+SunglassesMob
+NullArmor
+NullBack
+NullBody
+NullFace
+NullFeet
+NullHands
+NullHead
+NullLegs
 Safe
 DoorMetalApartment
 DoorWood1Apartment
@@ -1129,6 +1163,7 @@ GarageDoorMetalEntrance
 GarageDoorMetalExit
 TriggerBox
 TriggerSphere
+VideoPlayer
 SodaMachine1
 SodaMachine2
 SodaMachine3
