@@ -816,6 +816,8 @@ namespace BrokeProtocol.GameSource.Types
         // Change Video permissions handling here: Default allows video controls in own apartment (else follow group permission settings)
         private bool VideoPermission(ShPlayer player, ShEntity videoPlayer, PermEnum permission, bool checkLimit = false)
         {
+            if (!videoPlayer) return false;
+
             if (checkLimit)
             {
                 const int videoLimit = 3;
@@ -834,7 +836,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            return videoPlayer && player.InActionRange(videoPlayer) && (player.InOwnApartment || player.svPlayer.HasPermissionBP(permission));
+            return player.InActionRange(videoPlayer) && (player.InOwnApartment || player.svPlayer.HasPermissionBP(permission));
         }
 
         [Target(GameSourceEvent.PlayerSubmitInput, ExecutionMode.Override)]
