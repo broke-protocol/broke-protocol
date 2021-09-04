@@ -1,3 +1,41 @@
+## 1.2
+?> The Multimedia Update has sweeping changes across jobs, animations, vehicle mounting, UI API, and adds some useful new stuff too. Plugins and even some assets are likely to break, and I'll outline the main issues here.
+
+### API
+- SvPlayer.ShowTextPanel(text) -> SvPlayer.SendTextPanel(text, menuID, options)
+- SvPlayer.HideTextPanel() -> SvPlayer.DestroyTextPanel(menuID)
+- Removed SvPlayer.SvMountPrimary()
+- Removed SvPlayer.SvMountBack()
+- Added SvPlayer.SvTryMount() -> Used to find and mount to the closest seat
+    - Or use SvMount() to pick a specific seat
+- New Dynamic Action Menu Methods:
+    - ShEntity.SvAdd/RemoveDynamicAction(eventName, label)
+    - ShPlayer.SvAdd/RemoveSelfAction(eventName, label)
+    - ShPlayer.SvAdd/RemoveTypeAction(eventName, type, label)
+- New Video Methods:
+    - SvEntity.SvStartDefaultVideo(index)
+    - SvEntity.SvStartCustomVideo(url)
+    - SvEntity.SvStopVideo()
+- Added GameSource Event: PlayerSetEquipable
+- Jobs Modding Overhaul
+    - Can accept JSON metadata now
+    - Use new DynamicAction menu methods
+    - Can support multiple plugins with Plugin.JobsAdditive and Plugin.JobsOverride
+    - Too many changes, see Jobs.cs and Core.cs in GameSourse to see how everything works
+
+### MODDING
+- Animator property moved from (Cl)ient class to (Sh)ared class
+    - All player/character mods must have this assigned and re-exported with latest BPResources
+    - If you want to sync mod Animators automatically, check the 'Sync Animator' property in Unity
+- See existing VideoPlayer examples in BPResourses to see how they're set up and assigned
+
+### Misc
+- New Video Permissions
+    - "bp.videoDefault"
+    - "bp.videoCustom"
+    - "bp.videoStop"
+- Added ConnectionData.deviceID for checking hardware bans or alts during Login/Registration
+
 ## 1.14
 ?> The Animals Update adds a couple new useful GameSource events and a new character type called Mob (used only for basic animals currently). Most existing mods should be forward compatible with this version although Player character mods and custom Player animations will likely need to be redone and exported with the new BPResources.
 
@@ -128,19 +166,3 @@
 ### Misc
 - JobName and JobGroup type name changes in groups.json
 - Apartments can have custom furniture limited set now (in World Builder)
-
-## 1.08
-?> The Apps Update. Biggest changes based around new Apps for messaging, calls, and banking. Old ATM system replaced.
-
-### API
-- Added ExecutionMode.Test and ExecutionMode.PostEvent to EventHandler [Explained here](https://broke-protocol.github.io/broke-protocol/#/Examples/Server/Events?id=subscribing-to-a-game-event)
-- Added EntityCollections.Accounts (HashSet<string>) for fast login lookups
-- All Cl/SvPacket types changed to enums
-- Replace ServerInfo with generic TextPanel and helper function svPlayer.SendTextPanel(string title, string text)
-
-### MODDING
-- ATM class of items removed
-- ATMs, phones, and other electronic device mods must have AvailableApps property set
-
-### Misc
-- Added /clearwanted and /deleteaccount commands (updated groups.json)
