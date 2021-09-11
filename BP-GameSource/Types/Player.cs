@@ -222,8 +222,6 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.ClearWitnessed();
 
-            if (!player.isHuman) player.svPlayer.SetState(StateIndex.Null);
-
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, player.svPlayer.RespawnTime);
 
             player.SetStance(StanceIndex.Dead);
