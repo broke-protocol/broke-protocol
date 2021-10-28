@@ -523,32 +523,19 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
+            // Only drop items if attacker present, to prevent AI suicide item farming
             if (dropItems && removedItems.Count > 0)
             {
-                // Only drop items if attacker present, to prevent AI suicide item farming
-                if (Physics.Raycast(
-                    player.GetPosition + Vector3.up,
-                    Vector3.down,
-                    out var hit,
-                    10f,
-                    MaskIndex.world))
-                {
-                    var briefcase = player.manager.svManager.AddNewEntity(
-                        player.manager.svManager.briefcasePrefabs.GetRandom(),
-                        player.GetPlace,
-                        hit.point,
-                        Quaternion.LookRotation(player.GetPositionT.forward, hit.normal),
-                        false);
+                var briefcase = player.svPlayer.SpawnBriefcase();
 
-                    if (briefcase)
+                if (briefcase)
+                {
+                    foreach (var invItem in removedItems)
                     {
-                        foreach (var invItem in removedItems)
+                        if (Random.value < 0.8f)
                         {
-                            if (Random.value < 0.8f)
-                            {
-                                invItem.count = Mathf.CeilToInt(invItem.count * Random.Range(0.05f, 0.3f));
-                                briefcase.myItems.Add(invItem.item.index, invItem);
-                            }
+                            invItem.count = Mathf.CeilToInt(invItem.count * Random.Range(0.05f, 0.3f));
+                            briefcase.myItems.Add(invItem.item.index, invItem);
                         }
                     }
                 }
