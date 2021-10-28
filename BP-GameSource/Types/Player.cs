@@ -313,13 +313,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.ownedApartments.TryGetValue(apartment, out var place))
             {
-                if (player.GetPlace == place)
-                {
-                    player.svPlayer.SvEnterDoor(place.mainDoor.ID, player, true);
-                }
-
                 player.TransferMoney(DeltaInv.AddToMe, apartment.value / 2);
-
                 player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.SellApartment, apartment.ID);
                 player.svPlayer.CleanupApartment(place);
             }
@@ -646,6 +640,11 @@ namespace BrokeProtocol.GameSource.Types
                 if (door.svDoor.key && !player.HasItem(door.svDoor.key))
                 {
                     player.svPlayer.SendGameMessage("Need " + door.svDoor.key.itemName + " to enter");
+                    return;
+                }
+
+                if(!player.InActionRange(door))
+                {
                     return;
                 }
             }
