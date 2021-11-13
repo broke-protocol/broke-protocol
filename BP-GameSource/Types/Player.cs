@@ -1,5 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
+using BrokeProtocol.CustomEvents;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
@@ -11,7 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using BrokeProtocol.CustomEvents;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -253,6 +253,7 @@ namespace BrokeProtocol.GameSource.Types
         private const string clearPasscode = "clearPasscode";
         private const string upgradeSecurity = "upgradeSecurity";
         private const string hackPanel = "hackPanel";
+        private const string crackPanel = "crackPanel";
         private const string videoPanel = "videoPanel";
         private const string customVideo = "customVideo";
         private const string stopVideo = "stopVideo";
@@ -975,13 +976,12 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(GameSourceEvent.PlayerHackFinished, ExecutionMode.Override)]
+        [Target(GameSourceEvent.PlayerMinigameFinished, ExecutionMode.Override)]
         public void OnHackFinished(ShPlayer player, bool successful, int targetID, string menuID, string optionID)
         {
             switch (menuID)
             {
                 case hackPanel:
-
                     if (EntityCollections.TryGetPlayerByNameOrID(optionID, out var owner))
                     {
                         if (successful)
@@ -993,6 +993,9 @@ namespace BrokeProtocol.GameSource.Types
                             player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, owner);
                         }
                     }
+                    break;
+
+                case crackPanel:
                     break;
             }
         }
@@ -1037,6 +1040,11 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.svPlayer.SvForceEquipable(equipable.index);
             }
+        }
+
+        [Target(GameSourceEvent.PlayerCrackStart, ExecutionMode.Override)]
+        public void OnCrackStart(ShPlayer player, int entityID)
+        {
         }
 
         private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, bool trespassing, float delay)
