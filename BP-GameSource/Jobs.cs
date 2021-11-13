@@ -730,13 +730,13 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public void ResultHandle(string requesterName, string result)
         {
-            if (!requests.TryGetValue(requesterName, out string itemName))
+            if (!requests.TryGetValue(requesterName, out var itemName))
             {
                 Debug.LogError("[SVR] Requester invalid: " + requesterName);
                 return;
             }
 
-            if (EntityCollections.Accounts.TryGetValue(requesterName, out ShPlayer requester))
+            if (EntityCollections.Accounts.TryGetValue(requesterName, out var requester))
             {
                 if (result == accept)
                 {

@@ -15,24 +15,44 @@ using BrokeProtocol.CustomEvents;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class HackingContainer
+    public class MinigameContainer
     {
         public ShPlayer player;
+        public ShEntity targetEntity;
+
+        public MinigameContainer(ShPlayer player, int entityID)
+        {
+            this.player = player;
+            targetEntity = EntityCollections.FindByID(entityID);
+        }
+
+        public virtual bool Valid => player && targetEntity && player.IsMobile && player.InActionRange(targetEntity);
+
+        public virtual bool Active => player.svPlayer.minigame != null;
+    }
+
+
+    public class HackingContainer : MinigameContainer
+    {
         public ShApartment targetApartment;
         public ShPlayer targetPlayer;
 
-        public HackingContainer(ShPlayer player, int apartmentID, string username)
+        public HackingContainer(ShPlayer player, int apartmentID, string username) : base (player, apartmentID)
         {
-            this.player = player;
-            targetApartment = EntityCollections.FindByID<ShApartment>(apartmentID);
+            targetApartment = targetEntity as ShApartment;
             EntityCollections.TryGetPlayerByNameOrID(username, out targetPlayer);
         }
 
-        public ApartmentPlace ApartmentPlace => targetPlayer.ownedApartments.TryGetValue(targetApartment, out var apartmentPlace) ? apartmentPlace : null;
+        public override bool Valid => base.Valid && targetPlayer && GetPlace != null;
 
-        public bool IsValid => player && targetApartment && targetPlayer && player.IsMobile && player.InActionRange(targetApartment) && ApartmentPlace != null;
+        public ApartmentPlace GetPlace => targetPlayer.ownedApartments.TryGetValue(targetApartment, out var apartmentPlace) ? apartmentPlace : null;
+    }
 
-        public bool HackingActive => player.svPlayer.hackingGame != null;
+    public class CrackingContainer : MinigameContainer
+    {
+        public CrackingContainer(ShPlayer player, int entityID) : base(player, entityID)
+        {
+        }
     }
 
     public class Player : Movable
@@ -242,12 +262,13 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerSecurityPanel, ExecutionMode.Override)]
         public void OnSecurityPanel(ShPlayer player, ShApartment apartment)
         {
-            var options = new List<LabelID>();
-
-            options.Add(new LabelID("Enter Passcode", enterPasscode));
-            options.Add(new LabelID("Set Passcode", setPasscode));
-            options.Add(new LabelID("Clear Passcode", clearPasscode));
-            options.Add(new LabelID("Hack Panel", hackPanel));
+            var options = new List<LabelID>
+            {
+                new LabelID("Enter Passcode", enterPasscode),
+                new LabelID("Set Passcode", setPasscode),
+                new LabelID("Clear Passcode", clearPasscode),
+                new LabelID("Hack Panel", hackPanel)
+            };
 
             string title = "&7Security Panel";
             if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
@@ -686,14 +707,14 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        private IEnumerator CheckValidHackingGame(HackingContainer hackingContainer)
+        private IEnumerator CheckValidMinigame(MinigameContainer minigameContainer)
         {
-            while(hackingContainer.HackingActive && hackingContainer.IsValid)
+            while(minigameContainer.Active && minigameContainer.Valid)
             {
                 yield return null;
             }
 
-            if(hackingContainer.HackingActive) hackingContainer.player.svPlayer.SvHackingStop(true);
+            if(minigameContainer.Active) minigameContainer.player.svPlayer.SvMinigameStop(true);
         }
 
         private int SecurityUpgradeCost(float currentLevel) => (int)(15000f * currentLevel * currentLevel + 200f);
@@ -756,10 +777,10 @@ namespace BrokeProtocol.GameSource.Types
 
                 case hackPanel:
                     var hackingContainer = new HackingContainer(player, targetID, optionID);
-                    if (hackingContainer.IsValid)
+                    if (hackingContainer.Valid)
                     {
-                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.ApartmentPlace.svSecurity);
-                        player.StartCoroutine(CheckValidHackingGame(hackingContainer));
+                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.GetPlace.svSecurity);
+                        player.StartCoroutine(CheckValidMinigame(hackingContainer));
                     }
                     break;
 
@@ -961,7 +982,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 case hackPanel:
 
-                    if (EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer owner))
+                    if (EntityCollections.TryGetPlayerByNameOrID(optionID, out var owner))
                     {
                         if (successful)
                         {
