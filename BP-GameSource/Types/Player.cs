@@ -26,9 +26,9 @@ namespace BrokeProtocol.GameSource.Types
             targetEntity = EntityCollections.FindByID(entityID);
         }
 
-        public virtual bool Valid => player && targetEntity && player.IsMobile && player.InActionRange(targetEntity);
+        public virtual bool IsValid() => player && targetEntity && player.IsMobile && player.InActionRange(targetEntity);
 
-        public virtual bool Active => player.svPlayer.minigame != null;
+        public bool Active => player.svPlayer.minigame != null;
     }
 
 
@@ -43,7 +43,7 @@ namespace BrokeProtocol.GameSource.Types
             EntityCollections.TryGetPlayerByNameOrID(username, out targetPlayer);
         }
 
-        public override bool Valid => base.Valid && targetPlayer && GetPlace != null;
+        public override bool IsValid() => base.IsValid() && targetPlayer && GetPlace != null;
 
         public ApartmentPlace GetPlace => targetPlayer.ownedApartments.TryGetValue(targetApartment, out var apartmentPlace) ? apartmentPlace : null;
     }
@@ -52,6 +52,19 @@ namespace BrokeProtocol.GameSource.Types
     {
         public CrackingContainer(ShPlayer player, int entityID) : base(player, entityID)
         {
+        }
+
+        public override bool IsValid()
+        {
+            if (!base.IsValid()) return false;
+            
+            if(!player.HasItem(player.manager.lockpick))
+            {
+                player.svPlayer.SendGameMessage($"Missing {player.manager.lockpick.itemName} item");
+                return false;
+            }
+
+            return true;
         }
     }
 
@@ -254,6 +267,8 @@ namespace BrokeProtocol.GameSource.Types
         private const string upgradeSecurity = "upgradeSecurity";
         private const string hackPanel = "hackPanel";
         private const string crackPanel = "crackPanel";
+        private const string crackInventoryOption = "crackInventory";
+        private const string crackTransportOption = "crackTransport";
         private const string videoPanel = "videoPanel";
         private const string customVideo = "customVideo";
         private const string stopVideo = "stopVideo";
@@ -710,7 +725,7 @@ namespace BrokeProtocol.GameSource.Types
 
         private IEnumerator CheckValidMinigame(MinigameContainer minigameContainer)
         {
-            while(minigameContainer.Active && minigameContainer.Valid)
+            while(minigameContainer.Active && minigameContainer.IsValid())
             {
                 yield return null;
             }
@@ -778,7 +793,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 case hackPanel:
                     var hackingContainer = new HackingContainer(player, targetID, optionID);
-                    if (hackingContainer.Valid)
+                    if (hackingContainer.IsValid())
                     {
                         player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.GetPlace.svSecurity);
                         player.StartCoroutine(CheckValidMinigame(hackingContainer));
@@ -996,6 +1011,14 @@ namespace BrokeProtocol.GameSource.Types
                     break;
 
                 case crackPanel:
+
+                    if (successful)
+                    {
+                        player.StartCoroutine(OpenInventoryDelay(player, targetID, 1f));
+                    }
+                    
+                    player.TransferItem(DeltaInv.RemoveFromMe, player.manager.lockpick);
+                    player.svPlayer.SvAddCrime(CrimeIndex.Robbery, null);
                     break;
             }
         }
@@ -1045,6 +1068,13 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerCrackStart, ExecutionMode.Override)]
         public void OnCrackStart(ShPlayer player, int entityID)
         {
+            var crackingContainer = new CrackingContainer(player, entityID);
+            if (crackingContainer.IsValid())
+            {
+                player.svPlayer.StartCrackingMenu("Crack Inventory Lock", entityID, crackPanel, crackInventoryOption, 
+                    Mathf.Min(0f, crackingContainer.targetEntity.InventoryValue()/10000f));
+                player.StartCoroutine(CheckValidMinigame(crackingContainer));
+            }
         }
 
         private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, bool trespassing, float delay)
@@ -1056,6 +1086,12 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.trespassing = trespassing;
                 player.svPlayer.SvEnterDoor(doorID, sender, true);
             }
+        }
+
+        private IEnumerator OpenInventoryDelay(ShPlayer player, int entityID, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            player.svPlayer.SvView(entityID);
         }
     }
 }
