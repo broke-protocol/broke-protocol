@@ -1072,7 +1072,7 @@ namespace BrokeProtocol.GameSource.Types
             if (crackingContainer.IsValid())
             {
                 player.svPlayer.StartCrackingMenu("Crack Inventory Lock", entityID, crackPanel, crackInventoryOption, 
-                    Mathf.Min(0f, crackingContainer.targetEntity.InventoryValue()/10000f));
+                    Mathf.Clamp01(crackingContainer.targetEntity.InventoryValue()/10000f));
                 player.StartCoroutine(CheckValidMinigame(crackingContainer));
             }
         }
