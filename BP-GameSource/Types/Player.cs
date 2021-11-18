@@ -408,7 +408,8 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (!player.isHuman) return;
 
-            moneyDelta *= player.svPlayer.svManager.payScale[player.rank];
+            // Player rank affects money rewards (can adjust for modding)
+            moneyDelta *= player.rank;
 
             if (moneyDelta > 0)
             {
