@@ -1072,9 +1072,41 @@ namespace BrokeProtocol.GameSource.Types
             if (crackingContainer.IsValid())
             {
                 player.svPlayer.StartCrackingMenu("Crack Inventory Lock", entityID, crackPanel, crackInventoryOption, 
-                    Mathf.Clamp01(crackingContainer.targetEntity.InventoryValue()/10000f));
+                    Mathf.Clamp01(crackingContainer.targetEntity.InventoryValue()/30000f));
                 player.StartCoroutine(CheckValidMinigame(crackingContainer));
             }
+        }
+
+        [Target(GameSourceEvent.PlayerMount, ExecutionMode.Override)]
+        public void OnMount(ShPlayer player, ShMountable mount, byte seat)
+        {
+            player.svPlayer.SvDismount();
+            player.Mount(mount, seat);
+            player.SetStance(mount.seats[seat].stanceIndex);
+
+            if (!player.isHuman)
+            {
+                player.svPlayer.ResetAI();
+            }
+            else if (seat == 0 && mount.svMountable.mountLicense && !player.HasItem(mount.svMountable.mountLicense))
+            {
+                player.svPlayer.SvAddCrime(CrimeIndex.NoLicense, null);
+            }
+
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.currentClip);
+        }
+
+        [Target(GameSourceEvent.PlayerDismount, ExecutionMode.Override)]
+        public void OnDismount(ShPlayer player)
+        {
+            if (player.curMount is ShPhysical physicalMount)
+                physicalMount.svPhysical.SvRepositionSelf();
+
+            player.SetStance(StanceIndex.Stand);
+            // Save because nulled in following function
+            player.Dismount();
+
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
         }
 
         private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, bool trespassing, float delay)
