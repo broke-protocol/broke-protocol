@@ -24,7 +24,7 @@ namespace BrokeProtocol.GameSource.Types
         private IEnumerator RespawnDelay(ShMovable movable)
         {
             float respawnTime = Time.time + movable.svMovable.RespawnTime;
-            WaitForSeconds delay = new WaitForSeconds(1f);
+            var delay = new WaitForSeconds(1f);
 
             while (movable && movable.IsDead)
             {
