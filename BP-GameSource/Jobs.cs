@@ -134,6 +134,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public const string placeBountyMenu = "PlaceBounty";
         public const string bountyListMenu = "BountyList";
+        public const string bountyListSelfMenu = "BountyListSelf";
 
         private const string place = "place";
         private const string cancel = "cancel";
@@ -146,14 +147,16 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void SetJob()
         {
             player.svPlayer.SvAddDynamicAction(placeBountyMenu, "Place Bounty");
-            player.svPlayer.SvAddSelfAction(bountyListMenu, "Bounty List");
+            player.svPlayer.SvAddDynamicAction(bountyListMenu, "Bounty List");
+            player.svPlayer.SvAddSelfAction(bountyListSelfMenu, "Bounty List");
             base.SetJob();
         }
 
         public override void RemoveJob()
         {
             player.svPlayer.SvRemoveDynamicAction(placeBountyMenu);
-            player.svPlayer.SvRemoveSelfAction(bountyListMenu);
+            player.svPlayer.SvRemoveDynamicAction(bountyListMenu);
+            player.svPlayer.SvRemoveSelfAction(bountyListSelfMenu);
             base.RemoveJob();
         }
 
@@ -231,10 +234,10 @@ namespace BrokeProtocol.GameSource.Jobs
             }
 
             // Negative playerID means job action is called on the employer with that ID, not self
-            requester.svPlayer.SendOptionMenu("&6Players", -player.ID, placeBountyMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place), new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
+            requester.svPlayer.SendOptionMenu("&6Players", -player.ID, placeBountyMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place) });
         }
 
-        public void BountyListAction()
+        public void BountyListAction(ShPlayer requester)
         {
             var options = new List<LabelID>();
 
@@ -244,15 +247,20 @@ namespace BrokeProtocol.GameSource.Jobs
                 options.Add(new LabelID($"{pair.Key}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours{online}", pair.Key));
             }
 
-            player.svPlayer.SendOptionMenu("&6Bounties", player.ID, bountyListMenu, options.ToArray(), new LabelID[0]);
+            requester.svPlayer.SendOptionMenu("&6Bounties", player.ID, bountyListMenu, options.ToArray(), new LabelID[] { new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
         }
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
         {
-            if (menuID == placeBountyMenu)
+            switch(menuID)
             {
-                if (actionID == place) PlaceBounty(targetID, optionID);
-                else if (actionID == cancel) CancelBounty(targetID, optionID);
+                case placeBountyMenu:
+                    PlaceBounty(targetID, optionID);
+                    break;
+                case bountyListMenu:
+                case bountyListSelfMenu:
+                    CancelBounty(targetID, optionID);
+                    break;
             }
         }
 
@@ -309,7 +317,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 bounties.Remove(bountyName);
                 ChatHandler.SendToAll("Bounty Canceled on " + bountyName);
                 requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost);
-                PlaceBountyAction(requester);
+                BountyListAction(requester);
 
                 if (aiTarget && bountyName == aiTarget.username) aiTarget = null;
             }

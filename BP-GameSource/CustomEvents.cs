@@ -41,7 +41,7 @@ namespace BrokeProtocol.CustomEvents
         [CustomTarget]
         public void ButtonPush(ShEntity target, ShPlayer caller)
         {
-            if(voidRunning)
+            if (voidRunning)
             {
                 caller.svPlayer.SendGameMessage("Do not challenge the void");
                 return;
@@ -49,7 +49,7 @@ namespace BrokeProtocol.CustomEvents
 
             const int cost = 500;
 
-            if(caller.MyMoneyCount < cost)
+            if (caller.MyMoneyCount < cost)
             {
                 caller.svPlayer.SendGameMessage("Not enough cash");
                 return;
@@ -96,7 +96,7 @@ namespace BrokeProtocol.CustomEvents
                 {
                     lerp = normalizedTime / normalizedClip;
                 }
-                else if(normalizedTime >= 1f - normalizedClip)
+                else if (normalizedTime >= 1f - normalizedClip)
                 {
                     lerp = (1f - normalizedTime) / normalizedClip;
                 }
@@ -128,10 +128,27 @@ namespace BrokeProtocol.CustomEvents
         }
 
         [CustomTarget]
-        public void PlaceBounty(ShEntity target, ShPlayer player) => ((target as ShPlayer)?.svPlayer.job as Hitman)?.PlaceBountyAction(player);
+        public void PlaceBounty(ShEntity target, ShPlayer player)
+        {
+            if (target is ShPlayer targetPlayer)
+                if (targetPlayer.svPlayer.job is Hitman hitmanJob)
+                    hitmanJob.PlaceBountyAction(player);
+        }
 
         [CustomTarget]
-        public void BountyList(ShPlayer player) => (player.svPlayer.job as Hitman)?.BountyListAction();
+        public void BountyList(ShEntity target, ShPlayer player)
+        {
+            if(target is ShPlayer targetPlayer)
+                if(targetPlayer.svPlayer.job is Hitman hitmanJob)
+                    hitmanJob.BountyListAction(player);
+        }
+
+        [CustomTarget]
+        public void BountyListSelf(ShPlayer player)
+        {
+            if(player.svPlayer.job is Hitman hitmanJob)
+                hitmanJob.BountyListAction(player);
+        }
 
         [CustomTarget]
         public void RequestItem(ShEntity target, ShPlayer player) => ((target as ShPlayer)?.svPlayer.job as Mayor)?.RequestItemAction(player);
