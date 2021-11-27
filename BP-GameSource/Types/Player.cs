@@ -1012,10 +1012,9 @@ namespace BrokeProtocol.GameSource.Types
                     break;
 
                 case crackPanel:
-
                     if (successful)
                     {
-                        player.StartCoroutine(OpenInventoryDelay(player, targetID, 1f));
+                        player.StartCoroutine(OpenInventoryDelay(player, targetID, 1f, true));
                     }
                     
                     player.TransferItem(DeltaInv.RemoveFromMe, player.manager.lockpick);
@@ -1122,10 +1121,10 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        private IEnumerator OpenInventoryDelay(ShPlayer player, int entityID, float delay)
+        private IEnumerator OpenInventoryDelay(ShPlayer player, int entityID, float delay, bool force = false)
         {
             yield return new WaitForSeconds(delay);
-            player.svPlayer.SvView(entityID);
+            player.svPlayer.SvView(entityID, force);
         }
     }
 }
