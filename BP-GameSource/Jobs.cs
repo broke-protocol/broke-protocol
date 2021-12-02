@@ -233,7 +233,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
             }
 
-            // Negative playerID means job action is called on the employer with that ID, not self
+            // Negative playerID means job action is called on the employee with that ID, not self
             requester.svPlayer.SendOptionMenu("&6Players", -player.ID, placeBountyMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place) });
         }
 
@@ -247,7 +247,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 options.Add(new LabelID($"{pair.Key}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours{online}", pair.Key));
             }
 
-            requester.svPlayer.SendOptionMenu("&6Bounties", player.ID, bountyListMenu, options.ToArray(), new LabelID[] { new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
+            requester.svPlayer.SendOptionMenu("&6Bounties", -player.ID, bountyListMenu, options.ToArray(), new LabelID[] { new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
         }
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
@@ -257,6 +257,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 case placeBountyMenu:
                     PlaceBounty(targetID, optionID);
                     break;
+
                 case bountyListMenu:
                 case bountyListSelfMenu:
                     CancelBounty(targetID, optionID);
