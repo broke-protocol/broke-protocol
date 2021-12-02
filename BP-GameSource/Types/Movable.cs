@@ -19,7 +19,7 @@ namespace BrokeProtocol.GameSource.Types
                 ClPacket.UpdateHealth,
                 movable.ID,
                 movable.health,
-                (hitPoint == default) ? 0f : movable.GetFlatAngle(hitPoint));
+                (hitPoint == default) ? 0f : movable.OutsideController ? movable.controller.GetFlatAngle(hitPoint) : movable.GetFlatAngle(hitPoint));
         }
 
         private IEnumerator RespawnDelay(ShMovable movable)
