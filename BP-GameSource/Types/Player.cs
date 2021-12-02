@@ -129,7 +129,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerDamage, ExecutionMode.Override)]
-        public void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
+        public void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
             if (player.svPlayer.godMode || player.IsDead || player.IsShielded(damageIndex, collider)) return;
 
@@ -150,6 +150,8 @@ namespace BrokeProtocol.GameSource.Types
                 BodyPart part;
 
                 float capsuleHeight = player.capsule.direction == 1 ? player.capsule.height : player.capsule.radius * 2f;
+
+                float hitY = player.GetLocalY(hitPoint);
 
                 if(damageIndex == DamageIndex.Random)
                 {
@@ -193,7 +195,7 @@ namespace BrokeProtocol.GameSource.Types
 
             amount -= amount * (player.armorLevel / 200f);
 
-            base.OnDamage(player, damageIndex, amount, attacker, collider, hitY);
+            base.OnDamage(player, damageIndex, amount, attacker, collider, source, hitPoint);
 
             if (player.IsDead) return;
 
