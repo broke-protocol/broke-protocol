@@ -270,7 +270,7 @@ namespace BrokeProtocol.GameSource.Types
         private const string hackPanel = "hackPanel";
         private const string crackPanel = "crackPanel";
         private const string crackInventoryOption = "crackInventory";
-        private const string crackTransportOption = "crackTransport";
+        //private const string crackTransportOption = "crackTransport";
         private const string videoPanel = "videoPanel";
         private const string customVideo = "customVideo";
         private const string stopVideo = "stopVideo";
