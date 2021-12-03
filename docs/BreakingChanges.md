@@ -1,3 +1,37 @@
+## 1.22
+?> The Cracking Update has a few important breaking changes but mostly extends the API with additional functionality around the lockpicking minigame and almos mounting and dismounting vehicles
+
+### API
+- GameSource New Events
+    - PlayerCrackStart, PlayerMount, PlayerDismount
+- GameSource OnDamage Events now receive more useful parameters about the source
+    - New parameters Vector3 source, Vector3 hitPoint
+    - Replaces old hitY parameter
+    - Used for damage calculations and also for direction markers
+- New 'inventoryType' Enum
+    - Replaces hasInventory, shop, lockable fields
+    - Removed 'Safe' Class of items (use Entity with Locked inventoryType)
+- New entity methods
+    - HasInventory
+    - Shop
+    - InApartment
+    - CanView
+    - CanCrack
+- Removed svManager.fixedPlaces (due to cleaner InApartment implementation)
+- Removed svManager.payScale (handled fully in GameSource now)
+- Removed BrokeProtocol.Prefabs namespace (just use BrokeProtocol.Entities)
+- New LineGraphic, QuadGraphic, CircleGraphic UI Classes
+    - Available for ExecuteCS but will have proper API later
+
+### MODDING
+- All Transports have some air control now
+    - Adjust with new per-axis orientStrength Property
+- Thrown objects now support a customDestroyEffect
+    - Old mods need reconfiguration
+- Hitscan items now support a customFireEffect
+- Added vanilla game Destructibles to BPResources
+    - Working and properly modable now
+
 ## 1.2
 ?> The Multimedia Update has sweeping changes across jobs, animations, vehicle mounting, UI API, and adds some useful new stuff too. Plugins and even some assets are likely to break, and I'll outline the main issues here.
 
@@ -138,31 +172,3 @@
 - Color codes for OptionMenu and TextMenu are supported across all options and menu titles too
 - Don't use svPlayer.SetState(StateIndex.Attack) anymore
     - Use svPlayer.SetAttackState() and svPlayer.SetFollowState() helper functions
-
-## 1.1
-?> The Hitman Update. Reworks basically all of the API around Jobs to support modding. Custom Jobs can now be defined in Plugins.
-
-### API
-- Added BPAPI.Instance.Jobs -> Stores all Job metadata
-- Added JobInfoShared class -> Contains Job metadata that is sent to clients
-- ShPlayer.job -> Split into SvPlayer.job (Server Job info) and ClPlayer.job (Client Job info)
-- Added EntityCollections.RandomPlayer and RandomNPC
-- Added SendOptionMenu() UI helper function
-- FunctionMenu replaced with TextPanel (use OptionMenu for input handling)
-- Old TextPanel functions renamed to TextMenu across API
-- Updated SendTextMenu() with optional window size parameters
-- More GetEntity() overloads to use entity names directly
-- Added ManagerLoad, Unrestrain, JailCriminal, and GoToJail events to GameSource
-- Persistent server storage now available in svManager.database.Data collection
-- Session server storage now available at svManager.sessionData
-- Added CustomData.ConvertData<T> helper static function
-
-### MODDING
-- Asset Mods can have eventActions defined for custom Action Menu options
-- Added Button entity as an example (new custom ButtonPush event defined in GameSource)
-- Added 'entity.svEntity.data' string field for custom storage (set in World Builder or via code)
-- Removed 'identifier' field from Triggers, use data field instead
-
-### Misc
-- JobName and JobGroup type name changes in groups.json
-- Apartments can have custom furniture limited set now (in World Builder)
