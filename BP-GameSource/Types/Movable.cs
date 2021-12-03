@@ -10,21 +10,22 @@ namespace BrokeProtocol.GameSource.Types
     public class Movable : Destroyable
     {
         [Target(GameSourceEvent.MovableDamage, ExecutionMode.Override)]
-        public void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
+        public void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            base.OnDamage(movable, damageIndex, amount, attacker, collider, hitY);
+            base.OnDamage(movable, damageIndex, amount, attacker, collider, source, hitPoint);
 
             movable.svMovable.Send(SvSendType.Local,
                 Channel.Reliable,
                 ClPacket.UpdateHealth,
                 movable.ID,
-                movable.health);
+                movable.health,
+                (hitPoint == default) ? 0f : movable.OutsideController ? movable.controller.GetFlatAngle(hitPoint) : movable.GetFlatAngle(hitPoint));
         }
 
         private IEnumerator RespawnDelay(ShMovable movable)
         {
-            float respawnTime = Time.time + movable.svMovable.RespawnTime;
-            WaitForSeconds delay = new WaitForSeconds(1f);
+            var respawnTime = Time.time + movable.svMovable.RespawnTime;
+            var delay = new WaitForSeconds(1f);
 
             while (movable && movable.IsDead)
             {

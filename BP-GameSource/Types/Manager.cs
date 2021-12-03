@@ -33,7 +33,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (ValidateUser(svManager, connectionData))
             {
-                if (!svManager.TryGetUserData(connectionData.username, out User playerData))
+                if (!svManager.TryGetUserData(connectionData.username, out var playerData))
                 {
                     svManager.RegisterFail(connectionData.connection, "Account not found - Please Register");
                     return;
@@ -54,7 +54,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (ValidateUser(svManager, connectionData))
             {
-                if (svManager.TryGetUserData(connectionData.username, out User playerData))
+                if (svManager.TryGetUserData(connectionData.username, out var playerData))
                 {
                     if (playerData.PasswordHash != connectionData.passwordHash)
                     {
@@ -82,9 +82,11 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
         public void OnSave(SvManager svManager)
         {
-            var bountyData = new Data();
-            bountyData.ID = Hitman.bountiesKey;
-            foreach(var bounty in Hitman.bounties)
+            var bountyData = new Data
+            {
+                ID = Hitman.bountiesKey
+            };
+            foreach (var bounty in Hitman.bounties)
             {
                 // Only save bounties targeting Humans
                 if (!Hitman.aiTarget || Hitman.aiTarget.username != bounty.Key)

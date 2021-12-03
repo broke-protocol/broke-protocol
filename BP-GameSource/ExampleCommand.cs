@@ -17,7 +17,7 @@ namespace BrokeProtocol.CustomEvents
             CommandHandler.RegisterCommand("Example", new Action<ShPlayer, ShPlayer, byte, int, float, string, string>(Command1), (player, command) =>
             {
                 // Silly example
-                if (player.health < 50)
+                if (player.health < 50f)
                 {
                     player.svPlayer.SendGameMessage("Must be over 50 health to use this command");
                     return false;

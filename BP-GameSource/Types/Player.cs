@@ -1,5 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
+using BrokeProtocol.CustomEvents;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
@@ -11,28 +12,60 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using BrokeProtocol.CustomEvents;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class HackingContainer
+    public class MinigameContainer
     {
         public ShPlayer player;
+        public ShEntity targetEntity;
+
+        public MinigameContainer(ShPlayer player, int entityID)
+        {
+            this.player = player;
+            targetEntity = EntityCollections.FindByID(entityID);
+        }
+
+        public virtual bool IsValid() => player && targetEntity && player.IsMobile && player.InActionRange(targetEntity);
+
+        public bool Active => player.svPlayer.minigame != null;
+    }
+
+
+    public class HackingContainer : MinigameContainer
+    {
         public ShApartment targetApartment;
         public ShPlayer targetPlayer;
 
-        public HackingContainer(ShPlayer player, int apartmentID, string username)
+        public HackingContainer(ShPlayer player, int apartmentID, string username) : base (player, apartmentID)
         {
-            this.player = player;
-            targetApartment = EntityCollections.FindByID<ShApartment>(apartmentID);
+            targetApartment = targetEntity as ShApartment;
             EntityCollections.TryGetPlayerByNameOrID(username, out targetPlayer);
         }
 
-        public ApartmentPlace ApartmentPlace => targetPlayer.ownedApartments.TryGetValue(targetApartment, out var apartmentPlace) ? apartmentPlace : null;
+        public override bool IsValid() => base.IsValid() && targetPlayer && GetPlace != null;
 
-        public bool IsValid => player && targetApartment && targetPlayer && player.IsMobile && player.InActionRange(targetApartment) && ApartmentPlace != null;
+        public ApartmentPlace GetPlace => targetPlayer.ownedApartments.TryGetValue(targetApartment, out var apartmentPlace) ? apartmentPlace : null;
+    }
 
-        public bool HackingActive => player.svPlayer.hackingGame != null;
+    public class CrackingContainer : MinigameContainer
+    {
+        public CrackingContainer(ShPlayer player, int entityID) : base(player, entityID)
+        {
+        }
+
+        public override bool IsValid()
+        {
+            if (!base.IsValid()) return false;
+            
+            if(!player.HasItem(player.manager.lockpick))
+            {
+                player.svPlayer.SendGameMessage($"Missing {player.manager.lockpick.itemName} item");
+                return false;
+            }
+
+            return true;
+        }
     }
 
     public class Player : Movable
@@ -96,7 +129,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.PlayerDamage, ExecutionMode.Override)]
-        public void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, float hitY)
+        public void OnDamage(ShPlayer player, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
             if (player.svPlayer.godMode || player.IsDead || player.IsShielded(damageIndex, collider)) return;
 
@@ -117,6 +150,8 @@ namespace BrokeProtocol.GameSource.Types
                 BodyPart part;
 
                 float capsuleHeight = player.capsule.direction == 1 ? player.capsule.height : player.capsule.radius * 2f;
+
+                float hitY = player.GetLocalY(hitPoint);
 
                 if(damageIndex == DamageIndex.Random)
                 {
@@ -160,7 +195,7 @@ namespace BrokeProtocol.GameSource.Types
 
             amount -= amount * (player.armorLevel / 200f);
 
-            base.OnDamage(player, damageIndex, amount, attacker, collider, hitY);
+            base.OnDamage(player, damageIndex, amount, attacker, collider, source, hitPoint);
 
             if (player.IsDead) return;
 
@@ -233,6 +268,9 @@ namespace BrokeProtocol.GameSource.Types
         private const string clearPasscode = "clearPasscode";
         private const string upgradeSecurity = "upgradeSecurity";
         private const string hackPanel = "hackPanel";
+        private const string crackPanel = "crackPanel";
+        private const string crackInventoryOption = "crackInventory";
+        //private const string crackTransportOption = "crackTransport";
         private const string videoPanel = "videoPanel";
         private const string customVideo = "customVideo";
         private const string stopVideo = "stopVideo";
@@ -242,12 +280,13 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerSecurityPanel, ExecutionMode.Override)]
         public void OnSecurityPanel(ShPlayer player, ShApartment apartment)
         {
-            var options = new List<LabelID>();
-
-            options.Add(new LabelID("Enter Passcode", enterPasscode));
-            options.Add(new LabelID("Set Passcode", setPasscode));
-            options.Add(new LabelID("Clear Passcode", clearPasscode));
-            options.Add(new LabelID("Hack Panel", hackPanel));
+            var options = new List<LabelID>
+            {
+                new LabelID("Enter Passcode", enterPasscode),
+                new LabelID("Set Passcode", setPasscode),
+                new LabelID("Clear Passcode", clearPasscode),
+                new LabelID("Hack Panel", hackPanel)
+            };
 
             string title = "&7Security Panel";
             if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
@@ -371,7 +410,8 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (!player.isHuman) return;
 
-            moneyDelta *= player.svPlayer.svManager.payScale[player.rank];
+            // Player rank affects money rewards (can adjust for modding)
+            moneyDelta *= player.rank;
 
             if (moneyDelta > 0)
             {
@@ -523,32 +563,19 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
+            // Only drop items if attacker present, to prevent AI suicide item farming
             if (dropItems && removedItems.Count > 0)
             {
-                // Only drop items if attacker present, to prevent AI suicide item farming
-                if (Physics.Raycast(
-                    player.GetPosition + Vector3.up,
-                    Vector3.down,
-                    out var hit,
-                    10f,
-                    MaskIndex.world))
-                {
-                    var briefcase = player.manager.svManager.AddNewEntity(
-                        player.manager.svManager.briefcasePrefabs.GetRandom(),
-                        player.GetPlace,
-                        hit.point,
-                        Quaternion.LookRotation(player.GetPositionT.forward, hit.normal),
-                        false);
+                var briefcase = player.svPlayer.SpawnBriefcase();
 
-                    if (briefcase)
+                if (briefcase)
+                {
+                    foreach (var invItem in removedItems)
                     {
-                        foreach (var invItem in removedItems)
+                        if (Random.value < 0.8f)
                         {
-                            if (Random.value < 0.8f)
-                            {
-                                invItem.count = Mathf.CeilToInt(invItem.count * Random.Range(0.05f, 0.3f));
-                                briefcase.myItems.Add(invItem.item.index, invItem);
-                            }
+                            invItem.count = Mathf.CeilToInt(invItem.count * Random.Range(0.05f, 0.3f));
+                            briefcase.myItems.Add(invItem.item.index, invItem);
                         }
                     }
                 }
@@ -699,14 +726,14 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        private IEnumerator CheckValidHackingGame(HackingContainer hackingContainer)
+        private IEnumerator CheckValidMinigame(MinigameContainer minigameContainer)
         {
-            while(hackingContainer.HackingActive && hackingContainer.IsValid)
+            while(minigameContainer.Active && minigameContainer.IsValid())
             {
                 yield return null;
             }
 
-            if(hackingContainer.HackingActive) hackingContainer.player.svPlayer.SvHackingStop(true);
+            if(minigameContainer.Active) minigameContainer.player.svPlayer.SvMinigameStop(true);
         }
 
         private int SecurityUpgradeCost(float currentLevel) => (int)(15000f * currentLevel * currentLevel + 200f);
@@ -769,10 +796,10 @@ namespace BrokeProtocol.GameSource.Types
 
                 case hackPanel:
                     var hackingContainer = new HackingContainer(player, targetID, optionID);
-                    if (hackingContainer.IsValid)
+                    if (hackingContainer.IsValid())
                     {
-                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.ApartmentPlace.svSecurity);
-                        player.StartCoroutine(CheckValidHackingGame(hackingContainer));
+                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.GetPlace.svSecurity);
+                        player.StartCoroutine(CheckValidMinigame(hackingContainer));
                     }
                     break;
 
@@ -967,14 +994,13 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(GameSourceEvent.PlayerHackFinished, ExecutionMode.Override)]
+        [Target(GameSourceEvent.PlayerMinigameFinished, ExecutionMode.Override)]
         public void OnHackFinished(ShPlayer player, bool successful, int targetID, string menuID, string optionID)
         {
             switch (menuID)
             {
                 case hackPanel:
-
-                    if (EntityCollections.TryGetPlayerByNameOrID(optionID, out ShPlayer owner))
+                    if (EntityCollections.TryGetPlayerByNameOrID(optionID, out var owner))
                     {
                         if (successful)
                         {
@@ -985,6 +1011,19 @@ namespace BrokeProtocol.GameSource.Types
                             player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, owner);
                         }
                     }
+                    break;
+
+                case crackPanel:
+                    if (successful)
+                    {
+                        player.StartCoroutine(OpenInventoryDelay(player, targetID, 1f, true));
+                    }
+
+                    // To stop Active/Valid() checks for a lockpick
+                    player.svPlayer.minigame = null;
+
+                    player.TransferItem(DeltaInv.RemoveFromMe, player.manager.lockpick);
+                    player.svPlayer.SvAddCrime(CrimeIndex.Robbery, null);
                     break;
             }
         }
@@ -1031,6 +1070,51 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
+        [Target(GameSourceEvent.PlayerCrackStart, ExecutionMode.Override)]
+        public void OnCrackStart(ShPlayer player, int entityID)
+        {
+            var crackingContainer = new CrackingContainer(player, entityID);
+            if (crackingContainer.IsValid())
+            {
+                player.svPlayer.StartCrackingMenu("Crack Inventory Lock", entityID, crackPanel, crackInventoryOption, 
+                    Mathf.Clamp01(crackingContainer.targetEntity.InventoryValue()/30000f));
+                player.StartCoroutine(CheckValidMinigame(crackingContainer));
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerMount, ExecutionMode.Override)]
+        public void OnMount(ShPlayer player, ShMountable mount, byte seat)
+        {
+            player.svPlayer.SvDismount();
+            player.Mount(mount, seat);
+            player.SetStance(mount.seats[seat].stanceIndex);
+
+            if (!player.isHuman)
+            {
+                player.svPlayer.ResetAI();
+            }
+            else if (seat == 0 && mount.svMountable.mountLicense && !player.HasItem(mount.svMountable.mountLicense))
+            {
+                player.svPlayer.SvAddCrime(CrimeIndex.NoLicense, null);
+            }
+
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.currentClip);
+        }
+
+        [Target(GameSourceEvent.PlayerDismount, ExecutionMode.Override)]
+        public void OnDismount(ShPlayer player)
+        {
+            if (player.IsDriving)
+            {
+                // Send serverside transport position to override client-side predicted location while it was driven
+                player.curMount.svMountable.SvRepositionSelf();
+            }
+
+            player.SetStance(StanceIndex.Stand);
+            player.Dismount();
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
+        }
+
         private IEnumerator EnterDoorDelay(ShPlayer player, int doorID, string senderName, bool trespassing, float delay)
         {
             yield return new WaitForSeconds(delay);
@@ -1040,6 +1124,12 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.trespassing = trespassing;
                 player.svPlayer.SvEnterDoor(doorID, sender, true);
             }
+        }
+
+        private IEnumerator OpenInventoryDelay(ShPlayer player, int entityID, float delay, bool force = false)
+        {
+            yield return new WaitForSeconds(delay);
+            player.svPlayer.SvView(entityID, force);
         }
     }
 }
