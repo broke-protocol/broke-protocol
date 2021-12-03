@@ -64,31 +64,31 @@ namespace BrokeProtocol.CustomEvents
         {
             voidRunning = true;
 
-            WaitForSecondsRealtime delay = new WaitForSecondsRealtime(0.1f);
+            var delay = new WaitForSecondsRealtime(0.1f);
 
-            float duration = 4f;
-            float startTime = Time.time;
+            var duration = 4f;
+            var startTime = Time.time;
 
-            float originalTimeScale = Time.timeScale;
-            float targetTimeScale = 0.25f;
+            var originalTimeScale = Time.timeScale;
+            var targetTimeScale = 0.25f;
 
-            bool defaultEnvironment = SceneManager.Instance.defaultEnvironment;
+            var defaultEnvironment = SceneManager.Instance.defaultEnvironment;
 
-            Color originalSky = SceneManager.Instance.skyColor;
-            Color originalCloud = SceneManager.Instance.cloudColor;
-            Color originalWater = SceneManager.Instance.waterColor;
+            var originalSky = SceneManager.Instance.skyColor;
+            var originalCloud = SceneManager.Instance.cloudColor;
+            var originalWater = SceneManager.Instance.waterColor;
 
-            Color targetSky = Color.red;
-            Color targetCloud = Color.black;
-            Color targetWater = Color.cyan;
+            var targetSky = Color.red;
+            var targetCloud = Color.black;
+            var targetWater = Color.cyan;
 
-            float normalizedClip = 0.25f;
+            var normalizedClip = 0.25f;
 
             while (Time.time < startTime + duration)
             {
                 yield return delay;
 
-                float normalizedTime = (Time.time - startTime) / duration;
+                var normalizedTime = (Time.time - startTime) / duration;
 
                 float lerp;
 
