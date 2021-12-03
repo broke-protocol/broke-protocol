@@ -177,6 +177,7 @@ FlashbangThrown
 GrenadeCartridgeThrown
 MolotovThrown
 RocketThrown
+ShellFastThrown
 ShellThrown
 GrenadeThrown
 MineAPThrown
@@ -417,6 +418,7 @@ M4
 Mac
 MachineGun
 MP5SD
+P90
 PKM
 PPK
 Sig
@@ -712,6 +714,7 @@ RecordShelf1
 RecordShelf2
 RubbishBin1
 RubbishBin2
+Safe
 SafeSmall
 SoundMonitor2
 Stereo
@@ -1145,7 +1148,6 @@ NullFeet
 NullHands
 NullHead
 NullLegs
-Safe
 DoorMetalApartment
 DoorWood1Apartment
 DoubleDoorMetalApartment
