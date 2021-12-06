@@ -411,7 +411,7 @@ namespace BrokeProtocol.GameSource.Types
             if (!player.isHuman) return;
 
             // Player rank affects money rewards (can adjust for modding)
-            moneyDelta *= player.rank;
+            moneyDelta *= player.rank + 1;
 
             if (moneyDelta > 0)
             {
