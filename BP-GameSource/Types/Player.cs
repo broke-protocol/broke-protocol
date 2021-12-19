@@ -1018,11 +1018,14 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         player.StartCoroutine(OpenInventoryDelay(player, targetID, 1f, true));
                     }
+                    else
+                    {
+                        player.TransferItem(DeltaInv.RemoveFromMe, player.manager.lockpick);
+                    }
 
                     // To stop Active/Valid() checks for a lockpick
                     player.svPlayer.minigame = null;
-
-                    player.TransferItem(DeltaInv.RemoveFromMe, player.manager.lockpick);
+                    
                     player.svPlayer.SvAddCrime(CrimeIndex.Robbery, null);
                     break;
             }
