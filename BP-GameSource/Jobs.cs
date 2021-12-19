@@ -818,6 +818,21 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected delegate ShEntity GetEntityCallback();
 
+        public const string resetTarget = "ResetTarget";
+
+        public override void SetJob()
+        {
+            player.svPlayer.SvAddSelfAction(resetTarget, "Reset Target");
+            base.SetJob();
+        }
+
+        public override void RemoveJob()
+        {
+            player.svPlayer.SvRemoveSelfAction(resetTarget);
+            if (player.isHuman) ResetTarget();
+            base.RemoveJob();
+        }
+
         protected virtual bool ValidTarget(ShEntity target) => 
             target && target != player && target.isActiveAndEnabled && !target.IsDead;
 
@@ -853,12 +868,6 @@ namespace BrokeProtocol.GameSource.Jobs
             }
 
             return false;
-        }
-
-        public override void RemoveJob()
-        {
-            if(player.isHuman) ResetTarget();
-            base.RemoveJob();
         }
     }
 

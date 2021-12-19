@@ -151,6 +151,13 @@ namespace BrokeProtocol.CustomEvents
         }
 
         [CustomTarget]
+        public void ResetTarget(ShPlayer player)
+        {
+            if (player.svPlayer.job is TargetEntityJob targetEntityJob)
+                targetEntityJob.ResetTarget();
+        }
+
+        [CustomTarget]
         public void RequestItem(ShEntity target, ShPlayer player) => ((target as ShPlayer)?.svPlayer.job as Mayor)?.RequestItemAction(player);
 
         [CustomTarget]
