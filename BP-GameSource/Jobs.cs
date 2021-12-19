@@ -344,6 +344,41 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Paramedic : TargetPlayerJob
     {
+        public const string requestHeal = "RequestHeal";
+
+        public override void SetJob()
+        {
+            player.svPlayer.SvAddDynamicAction(requestHeal, "Request Heal");
+            base.SetJob();
+        }
+
+        public override void RemoveJob()
+        {
+            player.svPlayer.SvRemoveDynamicAction(requestHeal);
+            base.RemoveJob();
+        }
+
+        public void RequestHeal(ShPlayer requester)
+        {
+            if (requester.health >= requester.maxStat)
+            {
+                requester.svPlayer.SendGameMessage("Already at max HP");
+            }
+            else if (player.isHuman)
+            {
+                player.svPlayer.SendGameMessage($"{requester.username} is requesting healing");
+            }
+            else if(!player.isActiveAndEnabled || !player.IsUp || player.svPlayer.IsBusy)
+            {
+                requester.svPlayer.SendGameMessage("NPC is occupied");
+            }
+            else
+            {
+                player.svPlayer.targetEntity = requester;
+                player.svPlayer.SetState(StateIndex.Heal);
+            }
+        }
+
         protected void TryFindKnockedOut()
         {
             player.svPlayer.LocalEntitiesOne(

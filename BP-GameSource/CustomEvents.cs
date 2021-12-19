@@ -158,5 +158,8 @@ namespace BrokeProtocol.CustomEvents
 
         [CustomTarget]
         public void DeliverItem(ShEntity target, ShPlayer player) => (player.svPlayer.job as DeliveryMan)?.DeliverItemAction(target);
+
+        [CustomTarget]
+        public void RequestHeal(ShEntity target, ShPlayer player) => ((target as ShPlayer)?.svPlayer.job as Paramedic)?.RequestHeal(player);
     }
 }
