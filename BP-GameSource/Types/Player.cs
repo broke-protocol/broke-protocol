@@ -656,6 +656,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerEnterDoor, ExecutionMode.Override)]
         public void OnEnterDoor(ShPlayer player, ShDoor door, ShPlayer sender, bool forceEnter)
         {
+            if(!door.InActionRange(sender)) {
+                return;
+            }
             if (!forceEnter)
             {
                 if (player.IsRestrained)
