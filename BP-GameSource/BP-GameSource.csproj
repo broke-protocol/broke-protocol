@@ -7,7 +7,7 @@
     <ProjectGuid>{C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>BrokeProtocol.GameSource</RootNamespace>
-    <AssemblyName>zGameSource</AssemblyName>
+    <AssemblyName>_GameSource</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
