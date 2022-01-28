@@ -168,5 +168,12 @@ namespace BrokeProtocol.CustomEvents
 
         [CustomTarget]
         public void RequestHeal(ShEntity target, ShPlayer player) => ((target as ShPlayer)?.svPlayer.job as Paramedic)?.RequestHeal(player);
+
+        [CustomTarget]
+        public void StealItem(ShPlayer player, ShItem item)
+        {
+            //TransferItem already has sanity checks -> if(player.otherEntity && player.otherEntity.HasItem(item))
+            player.TransferItem(DeltaInv.StealFromOther, item.index);
+        }
     }
 }

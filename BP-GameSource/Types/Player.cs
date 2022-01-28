@@ -70,9 +70,6 @@ namespace BrokeProtocol.GameSource.Types
 
     public class Player : Movable
     {
-        //[Target(GameSourceEvent.PlayerInitialize, ExecutionMode.Override)]
-        //public void OnInitialize(ShPlayer player) { }
-
         //[Target(GameSourceEvent.PlayerDestroy, ExecutionMode.Override)]
         //public void OnDestroy(ShPlayer player) { }
 
@@ -93,6 +90,12 @@ namespace BrokeProtocol.GameSource.Types
 
         //[Target(GameSourceEvent.PlayerMenuClosed, ExecutionMode.Override)]
         //public void OnMenuClosed(ShPlayer player, string menuID, bool manualClose) => player.svPlayer.SvGlobalChatMessage("[Menu Closed Event] " + menuID + " " + manualClose);
+
+        [Target(GameSourceEvent.PlayerInitialize, ExecutionMode.Override)]
+        public void OnInitialize(ShPlayer player)
+        {
+            player.svPlayer.SvAddInventoryAction("StealItem", "ShItem", ButtonType.Buyable, "Steal");
+        }
 
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]
         public void OnGlobalChatMessage(ShPlayer player, string message)
