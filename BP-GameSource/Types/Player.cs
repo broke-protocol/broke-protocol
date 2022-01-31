@@ -495,13 +495,31 @@ namespace BrokeProtocol.GameSource.Types
             if (player.svPlayer.godMode || player.svPlayer.InvalidCrime(crimeIndex)) return;
 
             var crime = player.manager.GetCrime(crimeIndex);
-            ShPlayer witness;
 
-            if (!crime.witness) witness = victim;
-            else if (!player.svPlayer.GetWitness(victim, out witness)) return;
+            ShPlayer witness;
+            if (!crime.witness)
+            {
+                witness = victim; // May be null which is fine in this case
+            }
+            else
+            {
+                witness = player.svPlayer.GetWitness(victim);
+                if (!witness) return;
+            }
+
+            int witnessID;
+            if (witness)
+            {
+                witnessID = witness.ID;
+                witness.svPlayer.AddWitnessedCriminal(player);
+            }
+            else
+            {
+                witnessID = 0;
+            }
 
             player.AddCrime(crime.index, witness);
-            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witness ? witness.ID : 0);
+            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witnessID);
 
             // Don't hand out crime penalties for criminal jobs and default job
             if (!player.svPlayer.job.IsCriminal && player.svPlayer.job.info.shared.jobIndex > 0)
