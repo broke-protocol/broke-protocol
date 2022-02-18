@@ -1122,7 +1122,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.SvAddCrime(CrimeIndex.NoLicense, null);
             }
 
-            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.currentClip);
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.CurrentClip);
         }
 
         [Target(GameSourceEvent.PlayerDismount, ExecutionMode.Override)]
