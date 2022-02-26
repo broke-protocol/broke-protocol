@@ -33,8 +33,13 @@ namespace BrokeProtocol.GameSource.Types
             }
             else if (attacker && attacker != destroyable)
             {
+                var controller = destroyable.Controller;
+
+                if (controller && controller != destroyable && !controller.isHuman && !controller.svPlayer.IsBusy)
+                    controller.svPlayer.SetAttackState(attacker);
+                
                 attacker.svPlayer.job.OnDamageEntity(destroyable);
-            }    
+            }
         }
 
         [Target(GameSourceEvent.DestroyableDestroySelf, ExecutionMode.Override)]
