@@ -108,7 +108,9 @@ namespace BrokeProtocol.GameSource
                         "Cessna4",
                         "SmallHelo1",
                         "SmallHelo2",
-                        "SmallHelo3"}),
+                        "SmallHelo3",
+                        "Biplane1",
+                        "Biplane2"}),
                     new Transports(new string[] {
                         "Boat1",
                         "Boat2",
@@ -415,7 +417,9 @@ namespace BrokeProtocol.GameSource
                         "Apache2",
                         "Apache3",
                         "Fighter1",
-                        "Fighter2" }),
+                        "Fighter2",
+                        "FighterBig1",
+                        "FighterBig2"}),
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
