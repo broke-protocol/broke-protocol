@@ -1136,6 +1136,13 @@ namespace BrokeProtocol.GameSource.Types
 
             player.SetStance(StanceIndex.Stand);
             player.Dismount();
+
+            // Start locking behavior after exiting vehicle
+            if (player.curEquipable.ThrownHasGuidance)
+            {
+                player.svPlayer.StartLocking(player.curEquipable);
+            }
+
             player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
         }
 
