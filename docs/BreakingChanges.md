@@ -1,3 +1,30 @@
+## 1.25
+?> The Locked On Update overhauls how thrown items are handled for projectiles and vehicles. Now they offer multiple weapon sets that can be cycled through so old mods will have to be updated for their weapons to be usable again. Also some hideInterior references for hiding tank turrets, etc is now per-seat instead of per-vehicle. For code changes, GameSource.dll has been renamed to load first and ExecutionModes have been altered slightly though it shouldn't break things in the majority of cases.
+
+### API
+- New Plugin ExectionModes
+    - ExecutionMode.Override events will replace previous override events
+    - Added ExecutionMode.Final (Doesn't allow any more overrides, same as Override behavior prior to 1.25)
+- ShowAlert packet added to API
+    - Use helper functions for SvShowTime and SvShowAlert now instead of sending packets manually
+- New svManager.Add/RemoveInventoryAction() for custom inventory item actions/events
+- Added ShEntity.CenterBounds/Mass properties for aiming/looking/buoyancy
+- svEntity.thrower -> svEntity.instigator
+    - Since it's used for fires, exited vehicles, more than just thrown items
+
+### MODDING
+- Boats now have a stabilityFactor moddable property that was hard-coded before
+- Physics updates -> Mods likely need values updated:
+    - Aircraft mods should multiply old values by 25x : uprightStrength, stabilityStrength
+    - Boat mods should mutltiply old values by 25x : engineFactor, turnFactor
+- Steerable class removed
+    - Modders delete Steerable scripts in Unity project if updating
+- HideInterior is now a per-seat property
+    - Mods using this to hide player models need to update
+- ThrownEntities for Projectiles and Vehicles must be redone under new Weapon Sets property
+- New Target Type property on Thrown entities makes the projectile locking/tracking any entity of that type
+- New 'Flare' tag will make any Entity act as countermeasures for guided weapons
+
 ## 1.22
 ?> The Cracking Update has a few important breaking changes but mostly extends the API with additional functionality around the lockpicking minigame and almos mounting and dismounting vehicles
 
