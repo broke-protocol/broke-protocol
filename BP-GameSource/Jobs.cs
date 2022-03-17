@@ -1189,7 +1189,7 @@ namespace BrokeProtocol.GameSource.Jobs
                         {
                             var i = p.svPlayer.spawnedEntities.GetRandom();
 
-                            if (i && i.CollectedItems.Length > 0)
+                            if (i && i.CollectedItems?.Length > 0)
                             {
                                 worldItem = i;
                                 player.svPlayer.StartGoalMarker(worldItem);
