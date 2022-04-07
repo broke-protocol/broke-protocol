@@ -1,10 +1,13 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.API.Types;
 using BrokeProtocol.Collections;
+using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.LiteDB;
 using BrokeProtocol.Managers;
+using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.Networking;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,8 +19,60 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Manager
     {
-        //[Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
-        //public void OnStart(SvManager svManager) { }
+        public List<ShPlayer> skinPrefabs;
+
+        [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
+        public void OnStart(SvManager svManager) {
+            var skins = new HashSet<string>();
+            svManager.ParseFile(ref skins, Paths.skinsFile);
+            skinPrefabs = skins.ToEntityList<ShPlayer>();
+
+
+            var waypointTypes = Enum.GetValues(typeof(WaypointType)).Length;
+
+            for (byte jobIndex = 0; jobIndex < BPAPI.Instance.Jobs.Count; jobIndex++)
+            {
+                var job = BPAPI.Instance.Jobs[jobIndex];
+
+                job.randomEntities = new HashSet<ShEntity>[waypointTypes];
+
+                for (int i = 0; i < waypointTypes; i++)
+                {
+                    job.randomEntities[i] = new HashSet<ShEntity>();
+                }
+
+                int count = 0;
+                int limit = 0;
+                while (count < job.poolSize && limit < 100)
+                {
+                    var randomSkin = skinPrefabs.GetRandom();
+
+                    if (job.characterType == CharacterType.All || randomSkin.characterType == job.characterType)
+                    {
+                        svManager.AddRandomSpawn(randomSkin, jobIndex, (int)WaypointType.Player);
+                        count++;
+                    }
+                    else
+                    {
+                        limit++;
+                    }
+                }
+
+                int waypointIndex = 1; // PlayerWaypoints has no transports
+                foreach (var transportArray in job.transports)
+                {
+                    if (transportArray.transports.Length > 0)
+                    {
+                        for (int i = 0; i < job.poolSize; i++)
+                        {
+                            if (SceneManager.Instance.TryGetEntity<ShTransport>(transportArray.transports.GetRandom(), out var t))
+                                svManager.AddRandomSpawn(t, jobIndex, waypointIndex);
+                        }
+                    }
+                    waypointIndex++;
+                }
+            }
+        }
 
         //[Target(GameSourceEvent.ManagerUpdate, ExecutionMode.Override)]
         //public void OnUpdate(SvManager svManager) { }
@@ -29,53 +84,57 @@ namespace BrokeProtocol.GameSource.Types
         //public void OnConsoleInput(SvManager svManager, string cmd) { }
 
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
-        public void OnTryLogin(SvManager svManager, ConnectionData connectionData)
+        public void OnTryLogin(SvManager svManager, ConnectionData connectData)
         {
-            if (ValidateUser(svManager, connectionData))
+            if (ValidateUser(svManager, connectData))
             {
-                if (!svManager.TryGetUserData(connectionData.username, out var playerData))
+                if (!svManager.TryGetUserData(connectData.username, out var playerData))
                 {
-                    svManager.RegisterFail(connectionData.connection, "Account not found - Please Register");
+                    svManager.RegisterFail(connectData.connection, "Account not found - Please Register");
                     return;
                 }
 
-                if (playerData.PasswordHash != connectionData.passwordHash)
+                if (playerData.PasswordHash != connectData.passwordHash)
                 {
-                    svManager.RegisterFail(connectionData.connection, "Invalid credentials");
+                    svManager.RegisterFail(connectData.connection, "Invalid credentials");
                     return;
                 }
 
-                svManager.LoadSavedPlayer(playerData, connectionData);
+                svManager.LoadSavedPlayer(playerData, connectData);
             }
         }
 
+
         [Target(GameSourceEvent.ManagerTryRegister, ExecutionMode.Override)]
-        public void OnTryRegister(SvManager svManager, ConnectionData connectionData)
+        public void OnTryRegister(SvManager svManager, ConnectionData connectData)
         {
-            if (ValidateUser(svManager, connectionData))
+            if (ValidateUser(svManager, connectData))
             {
-                if (svManager.TryGetUserData(connectionData.username, out var playerData))
+                if (svManager.TryGetUserData(connectData.username, out var playerData))
                 {
-                    if (playerData.PasswordHash != connectionData.passwordHash)
+                    if (playerData.PasswordHash != connectData.passwordHash)
                     {
-                        svManager.RegisterFail(connectionData.connection, "Invalid credentials");
+                        svManager.RegisterFail(connectData.connection, "Invalid credentials");
                         return;
                     }
 
-                    if (!Utility.tryRegister.Limit(connectionData.username))
+                    if (!Utility.tryRegister.Limit(connectData.username))
                     {
-                        svManager.RegisterFail(connectionData.connection, $"Character {connectionData.username} Exists - Sure you want to Register?");
+                        svManager.RegisterFail(connectData.connection, $"Character {connectData.username} Exists - Sure you want to Register?");
                         return;
                     }
                 }
 
-                if (!connectionData.username.ValidCredential())
+                if (!connectData.username.ValidCredential())
                 {
-                    svManager.RegisterFail(connectionData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
+                    svManager.RegisterFail(connectData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
                     return;
                 }
 
-                svManager.AddNewPlayer(connectionData, playerData?.Persistent);
+                if(connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs.Count && connectData.wearableIndices?.Length == svManager.manager.nullWearable.Length)
+                    svManager.AddNewPlayer(skinPrefabs[connectData.skinIndex], connectData, playerData?.Persistent);
+                else
+                    svManager.RegisterFail(connectData.connection, "Invalid data");
             }
         }
 
@@ -132,18 +191,32 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        private bool ValidateUser(SvManager svManager, ConnectionData connectionData)
+        [Target(GameSourceEvent.ManagerPlayerLoaded, ExecutionMode.Override)]
+        public void OnPlayerLoaded(SvManager svManager, ConnectionData connectData)
         {
-            if (!svManager.HandleWhitelist(connectionData.username))
+            connectData.connectionStatus = ConnectionStatus.LoadedMap;
+            Buffers.writer.SeekZero();
+            Buffers.writer.WriteClPacket(ClPacket.RegisterMenu);
+            Buffers.writer.Write(skinPrefabs.Count);
+            foreach (var p in skinPrefabs)
             {
-                svManager.RegisterFail(connectionData.connection, "Account not whitelisted");
+                Buffers.writer.Write(p.name);
+            }
+            SvManager.SendToConnection(connectData.connection, Channel.Reliable);
+        }
+
+        private bool ValidateUser(SvManager svManager, ConnectionData connectData)
+        {
+            if (!svManager.HandleWhitelist(connectData.username))
+            {
+                svManager.RegisterFail(connectData.connection, "Account not whitelisted");
                 return false;
             }
 
             // Don't allow multi-boxing, WebAPI doesn't prevent this
-            if (EntityCollections.Accounts.ContainsKey(connectionData.username))
+            if (EntityCollections.Accounts.ContainsKey(connectData.username))
             {
-                svManager.RegisterFail(connectionData.connection, "Account still logged in");
+                svManager.RegisterFail(connectData.connection, "Account still logged in");
                 return false;
             }
 
