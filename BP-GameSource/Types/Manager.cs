@@ -23,8 +23,9 @@ namespace BrokeProtocol.GameSource.Types
 
         [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
         public void OnStart(SvManager svManager) {
+            
             var skins = new HashSet<string>();
-            svManager.ParseFile(ref skins, Paths.skinsFile);
+            svManager.ParseFile(ref skins, Paths.AbsolutePath("skins.txt"));
             skinPrefabs = skins.ToEntityList<ShPlayer>();
 
 
