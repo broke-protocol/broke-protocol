@@ -223,5 +223,12 @@ namespace BrokeProtocol.GameSource.Types
 
             return true;
         }
+
+        // Read packet data from Buffers.reader
+        [Target(GameSourceEvent.ManagerCustomPacket, ExecutionMode.Override)]
+        public void OnCustomPacket(SvManager svManager, ConnectionData connectData)
+        {
+            var packetID = Buffers.reader.ReadByte();
+        }
     }
 }
