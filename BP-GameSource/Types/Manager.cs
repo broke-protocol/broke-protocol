@@ -226,7 +226,7 @@ namespace BrokeProtocol.GameSource.Types
 
         // Read packet data from Buffers.reader
         [Target(GameSourceEvent.ManagerCustomPacket, ExecutionMode.Override)]
-        public void OnCustomPacket(SvManager svManager, ConnectionData connectData)
+        public void OnCustomPacket(SvManager svManager, ConnectionData connectData, SvPacket packet)
         {
             var packetID = Buffers.reader.ReadByte();
         }
