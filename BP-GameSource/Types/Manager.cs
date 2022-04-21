@@ -28,7 +28,6 @@ namespace BrokeProtocol.GameSource.Types
             svManager.ParseFile(ref skins, Paths.AbsolutePath("skins.txt"));
             skinPrefabs = skins.ToEntityList<ShPlayer>();
 
-
             var waypointTypes = Enum.GetValues(typeof(WaypointType)).Length;
 
             for (byte jobIndex = 0; jobIndex < BPAPI.Instance.Jobs.Count; jobIndex++)
@@ -196,14 +195,7 @@ namespace BrokeProtocol.GameSource.Types
         public void OnPlayerLoaded(SvManager svManager, ConnectionData connectData)
         {
             connectData.connectionStatus = ConnectionStatus.LoadedMap;
-            Buffers.writer.SeekZero();
-            Buffers.writer.WriteClPacket(ClPacket.RegisterMenu);
-            Buffers.writer.Write(skinPrefabs.Count);
-            foreach (var p in skinPrefabs)
-            {
-                Buffers.writer.Write(p.name);
-            }
-            SvManager.SendToConnection(connectData.connection, Channel.Reliable);
+            svManager.SendRegisterMenu(connectData.connection, true, skinPrefabs);
         }
 
         private bool ValidateUser(SvManager svManager, ConnectionData connectData)
