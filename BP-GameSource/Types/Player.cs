@@ -391,7 +391,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.isHuman)
             {
-                var newSpawn = player.svPlayer.svManager.spawnLocations.GetRandom().transform;
+                var newSpawn = Manager.spawnLocations.GetRandom().mainT;
                 player.svPlayer.originalPosition = newSpawn.position;
                 player.svPlayer.originalRotation = newSpawn.rotation;
                 player.svPlayer.originalParent = newSpawn.parent;
@@ -481,7 +481,7 @@ namespace BrokeProtocol.GameSource.Types
         public void OnGoToJail(ShPlayer player, float time, int fine)
         {
             player.svPlayer.SvSetJob(BPAPI.Instance.Jobs[BPAPI.Instance.PrisonerIndex], true, false);
-            var jailSpawn = player.svPlayer.svManager.jails.GetRandom().mainT;
+            var jailSpawn = Manager.jails.GetRandom().mainT;
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
             player.svPlayer.SvForceEquipable(player.Hands.index);
             player.svPlayer.SvClearCrimes();

@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
@@ -1107,7 +1108,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 {
                     player.svPlayer.DestroyGoalMarker();
 
-                    var destination = svManager.spawnLocations.GetRandom();
+                    var destination = Manager.spawnLocations.GetRandom();
 
                     destinationMarker = svManager.AddNewEntity(
                         svManager.markerGoalPrefab,

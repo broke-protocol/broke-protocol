@@ -21,12 +21,29 @@ namespace BrokeProtocol.GameSource.Types
     {
         public List<ShPlayer> skinPrefabs;
 
+        [NonSerialized]
+        public static List<SpawnLocation> spawnLocations = new List<SpawnLocation>();
+        [NonSerialized]
+        public static List<Jail> jails = new List<Jail>();
+
         [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
-        public void OnStart(SvManager svManager) {
-            
+        public void OnStart(SvManager svManager)
+        {
             var skins = new HashSet<string>();
             svManager.ParseFile(ref skins, Paths.AbsolutePath("skins.txt"));
             skinPrefabs = skins.ToEntityList<ShPlayer>();
+
+            foreach (Transform place in SceneManager.Instance.mTransform)
+            {
+                foreach (Transform child in place)
+                {
+                    if (child.TryGetComponent(out SpawnLocation s)) spawnLocations.Add(s);
+                    else if (child.TryGetComponent(out Jail j)) jails.Add(j);
+                }
+            }
+
+            if (spawnLocations.Count == 0) Debug.LogWarning("[SVR] No spawn locations found");
+            if (jails.Count == 0) Debug.LogWarning("[SVR] No jails found");
 
             var waypointTypes = Enum.GetValues(typeof(WaypointType)).Length;
 
@@ -131,10 +148,24 @@ namespace BrokeProtocol.GameSource.Types
                     return;
                 }
 
-                if(connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs.Count && connectData.wearableIndices?.Length == svManager.manager.nullWearable.Length)
-                    svManager.AddNewPlayer(skinPrefabs[connectData.skinIndex], connectData, playerData?.Persistent);
+                if (connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs.Count && connectData.wearableIndices?.Length == svManager.manager.nullWearable.Length)
+                {
+                    var spawn = spawnLocations.GetRandom();
+
+                    if (spawn)
+                    {
+                        var location = spawn.mainT;
+                        svManager.AddNewPlayer(skinPrefabs[connectData.skinIndex], connectData, playerData?.Persistent, location.position, location.rotation, location.parent);
+                    }
+                    else
+                    {
+                        svManager.RegisterFail(connectData.connection, "No spawn locations");
+                    }
+                }
                 else
+                {
                     svManager.RegisterFail(connectData.connection, "Invalid data");
+                }
             }
         }
 
