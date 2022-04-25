@@ -32,7 +32,7 @@ namespace BrokeProtocol.GameSource
 
         private List<JobInfo> GetJobs => new List<JobInfo> {
             new JobInfo(
-                typeof(Gangster), "SpecOps",
+                typeof(Army), "SpecOps",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Human, 0, GroupIndex.Gang, 0, new ColorStruct(1f, 0f, 0f), 0.1f, 8,
                 new Transports[] {
@@ -57,7 +57,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("AmmoSMG", 90)})
                 }),
             new JobInfo(
-                typeof(Gangster), "OpFor",
+                typeof(Army), "OpFor",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Human, 0, GroupIndex.Gang, 0, new ColorStruct(0f, 1f, 0f), 0.1f, 8,
                 new Transports[] {

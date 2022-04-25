@@ -13,10 +13,30 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Manager
     {
+        public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
+
         [NonSerialized]
         public static List<ShTerritory> territories = new List<ShTerritory>();
 
-        public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
+        public static ShTerritory GetTerritory(ShEntity entity)
+        {
+            foreach (var t in territories)
+            {
+                var p = entity.mainT.position;
+                var trs = t.mainT;
+
+                if (p.x < trs.position.x + trs.localScale.x &&
+                    p.x >= trs.position.x - trs.localScale.x &&
+                    p.z < trs.position.z + trs.localScale.z &&
+                    p.z >= trs.position.z - trs.localScale.z)
+                {
+                    return t;
+                }
+            }
+
+            return null;
+        }
+
 
         [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
         public void OnStart(SvManager svManager) {

@@ -10,6 +10,7 @@ using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,97 @@ namespace BrokeProtocol.GameSource.Types
         public static List<SpawnLocation> spawnLocations = new List<SpawnLocation>();
         [NonSerialized]
         public static List<Jail> jails = new List<Jail>();
+        [NonSerialized]
+        public static List<ShTerritory> territories = new List<ShTerritory>();
+
+        private static float endTime;
+        private static int attackerLimit;
+        public static int defenderLimit;
+        public static float attackTime;
+        public static int attackersKilled;
+        public static int defendersKilled;
+        public static ShTerritory warTerritory;
+
+        public static ShTerritory GetTerritory(ShEntity entity)
+        {
+            foreach (var t in territories)
+            {
+                var p = entity.mainT.position;
+                var trs = t.mainT;
+
+                if (p.x < trs.position.x + trs.localScale.x &&
+                    p.x >= trs.position.x - trs.localScale.x &&
+                    p.z < trs.position.z + trs.localScale.z &&
+                    p.z >= trs.position.z - trs.localScale.z)
+                {
+                    return t;
+                }
+            }
+
+            return null;
+        }
+
+        public static void StartGangWar(ShTerritory startT, byte attackerJob)
+        {
+            if (!warTerritory)
+            {
+                warTerritory = startT;
+
+                int total = 0;
+                int count = 0;
+                foreach (var t in territories)
+                {
+                    if (t.ownerIndex == attackerJob)
+                    {
+                        count++;
+                    }
+                    total++;
+                }
+
+                endTime = Time.time + attackTime;
+                attackersKilled = 0;
+                defendersKilled = 0;
+                defenderLimit = 2 + count;
+                attackerLimit = Mathf.CeilToInt((total - count) * 0.25f);
+
+                startT.svTerritory.SvSetTerritory(startT.ownerIndex, attackerJob);
+                startT.StartCoroutine(Defend());
+
+                SendTerritoryStats();
+            }
+        }
+
+        public static void SendTerritoryStats()
+        {
+            warTerritory.svEntity.Send(SvSendType.All, Channel.Reliable, ClPacket.GameMessage, 
+                $"Defender lives: {defenderLimit - defendersKilled} Attacker lives: {attackerLimit - attackersKilled} Timeleft: {(int)(endTime - Time.time)}");
+        }
+
+        public static void EndGangWar(byte owner)
+        {
+            warTerritory.svTerritory.SvSetTerritory(owner, Util.invalidByte);
+            warTerritory = null;
+        }
+
+        private static IEnumerator Defend()
+        {
+            var delay = new WaitForSeconds(0.5f);
+            while (Time.time < endTime)
+            {
+                if (attackersKilled >= attackerLimit)
+                {
+                    EndGangWar(warTerritory.ownerIndex);
+                    yield break;
+                }
+                else if (defendersKilled >= defenderLimit)
+                {
+                    EndGangWar(warTerritory.attackerIndex);
+                    yield break;
+                }
+                yield return delay;
+            }
+            EndGangWar(warTerritory.ownerIndex);
+        }
 
         [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
         public void OnStart(SvManager svManager)
@@ -39,6 +131,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     if (child.TryGetComponent(out SpawnLocation s)) spawnLocations.Add(s);
                     else if (child.TryGetComponent(out Jail j)) jails.Add(j);
+                    else if (child.TryGetComponent(out ShTerritory t)) territories.Add(t);
                 }
             }
 

@@ -17,7 +17,7 @@ using Random = UnityEngine.Random;
 
 namespace BrokeProtocol.GameSource.Jobs
 {
-    public class LoopJob : Job
+    public class JobRP : Job
     {
         public override void OnDamageEntity(ShEntity damaged)
         {
@@ -51,6 +51,16 @@ namespace BrokeProtocol.GameSource.Jobs
             }
         }
 
+        protected bool MountWithinReach(ShEntity e)
+        {
+            var m = player.GetMount;
+            return m.Velocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
+        }
+    }
+
+
+    public abstract class LoopJob : JobRP
+    {
         public override void SetJob()
         {
             base.SetJob();
@@ -81,13 +91,7 @@ namespace BrokeProtocol.GameSource.Jobs
             } while (true);
         }
 
-        public virtual void Loop() { }
-
-        protected bool MountWithinReach(ShEntity e)
-        {
-            var m = player.GetMount;
-            return m.Velocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
-        }
+        public abstract void Loop();
     }
 
 
@@ -328,7 +332,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class Prisoner : LoopJob
+    public class Prisoner : JobRP
     {
         public override void ResetJobAI() => player.svPlayer.SetState(StateIndex.Wander);
     }
@@ -516,7 +520,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override float GetSpawnRate()
         {
             // Use the spawner territory to calculate spawn rate (better AI defence spawning during gangwars)
-            var territory = player.svPlayer.spawner.svPlayer.GetTerritory;
+            var territory = Manager.GetTerritory(player.svPlayer.spawner);
 
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
@@ -531,7 +535,7 @@ namespace BrokeProtocol.GameSource.Jobs
             if (player.isHuman)
             {
                 gangstersKilled = 0;
-                foreach (var territory in svManager.territories.Values)
+                foreach (var territory in Manager.territories)
                 {
                     territory.svEntity.AddSubscribedPlayer(player);
                 }
@@ -543,7 +547,7 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (player.isHuman)
             {
-                foreach (var territory in svManager.territories.Values)
+                foreach (var territory in Manager.territories)
                 {
                     territory.svEntity.RemoveSubscribedPlayer(player, true);
                 }
@@ -563,14 +567,14 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (IsEnemyGangster(entity))
             {
-                if (!svManager.gangWar)
+                if (!Manager.warTerritory)
                 {
                     if (player.isHuman)
                     {
-                        ShTerritory t;
-                        if (gangstersKilled >= 1 && (t = player.svPlayer.GetTerritory) && t.ownerIndex != info.shared.jobIndex)
+                        ShTerritory t = Manager.GetTerritory(player);
+                        if (t && t.ownerIndex != info.shared.jobIndex && gangstersKilled >= 1)
                         {
-                            t.svTerritory.StartGangWar(info.shared.jobIndex);
+                            Manager.StartGangWar(t, info.shared.jobIndex);
                             gangstersKilled = 0;
                         }
                         else
@@ -583,19 +587,19 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
                 else
                 {
-                    var t = player.svPlayer.GetTerritory;
+                    var t = Manager.GetTerritory(player);
                     if (t && t.attackerIndex != Util.invalidByte && entity is ShPlayer victim)
                     {
                         if (victim.svPlayer.job.info.shared.jobIndex == t.ownerIndex)
                         {
-                            t.svTerritory.defendersKilled++;
-                            t.svTerritory.SendTerritoryStats();
+                            Manager.defendersKilled++;
+                            Manager.SendTerritoryStats();
                             player.svPlayer.Reward(3, 100);
                         }
                         else if (victim.svPlayer.job.info.shared.jobIndex == t.attackerIndex)
                         {
-                            t.svTerritory.attackersKilled++;
-                            t.svTerritory.SendTerritoryStats();
+                            Manager.attackersKilled++;
+                            Manager.SendTerritoryStats();
                             player.svPlayer.Reward(3, 100);
                         }
                     }
@@ -614,7 +618,7 @@ namespace BrokeProtocol.GameSource.Jobs
             if (target && target.IsOutside && target.svPlayer.job is Gangster &&
                 target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
-                ShTerritory territory = target.svPlayer.GetTerritory;
+                var territory = Manager.GetTerritory(target);
                 if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex != Util.invalidByte)
                 {
                     if (player.svPlayer.SetAttackState(target)) return;
