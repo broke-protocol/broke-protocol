@@ -1245,5 +1245,31 @@ namespace BrokeProtocol.GameSource.Types
             yield return new WaitForSeconds(delay);
             player.svPlayer.SvView(entityID, force);
         }
+
+        [Target(GameSourceEvent.PlayerPlaceItem, ExecutionMode.Override)]
+        public void OnPlaceItem(ShPlayer player, ShEntity placeableEntity, Vector3 position, Quaternion rotation, float spawnDelay)
+        {
+            if (spawnDelay > 0f)
+            {
+                player.svPlayer.svManager.AddNewEntityDelay(
+                    placeableEntity,
+                    player.GetPlace,
+                    position,
+                    rotation,
+                    false,
+                    spawnDelay);
+            }
+            else
+            {
+                player.svPlayer.svManager.AddNewEntity(
+                    placeableEntity,
+                    player.GetPlace,
+                    position,
+                    rotation,
+                    false);
+            }
+
+            player.svPlayer.placementValid = true;
+        }
     }
 }

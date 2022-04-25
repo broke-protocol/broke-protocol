@@ -1205,11 +1205,12 @@ namespace BrokeProtocol.GameSource.Jobs
 
                                 if (randomSpawn != null)
                                 {
-                                    worldItem = svManager.DropEntity(
+                                    worldItem = svManager.AddNewEntity(
                                         p.myItems.GetRandom().Value.item,
                                         SceneManager.Instance.ExteriorPlace,
-                                        randomSpawn.position + Vector3.up,
-                                        Vector3.down);
+                                        randomSpawn.position,
+                                        randomSpawn.rotation,
+                                        false);
 
                                     if (worldItem)
                                     {
