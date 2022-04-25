@@ -8,6 +8,9 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.EntityInitialize, ExecutionMode.Override)]
         //public void OnInitialize(ShEntity entity) { }
 
+        //[Target(GameSourceEvent.EntitySpawn, ExecutionMode.Override)]
+        //public void OnSpawn(ShEntity entity) { }
+
         //[Target(GameSourceEvent.EntityDestroy, ExecutionMode.Override)]
         //public void OnDestroy(ShEntity entity) { }
 

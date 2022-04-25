@@ -2,6 +2,7 @@
 using BrokeProtocol.Collections;
 using BrokeProtocol.CustomEvents;
 using BrokeProtocol.Entities;
+using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
@@ -95,6 +96,88 @@ namespace BrokeProtocol.GameSource.Types
         public void OnInitialize(ShPlayer player)
         {
             player.svPlayer.SvAddInventoryAction("StealItem", "ShItem", ButtonType.Buyable, "Steal");
+        }
+
+        [Target(GameSourceEvent.PlayerSpawn, ExecutionMode.Override)]
+        public void OnSpawn(ShPlayer player)
+        {
+            player.StartCoroutine(Maintenance(player));
+        }
+
+        public IEnumerator Maintenance(ShPlayer player)
+        {
+            yield return null;
+
+            var delay = new WaitForSeconds(5f);
+
+            while (!player.IsDead)
+            {
+                for (int i = player.offenses.Count - 1; i >= 0; i--)
+                {
+                    if (Time.time >= player.offenses[i].commitTime + player.offenses[i].AdjustedExpiration())
+                    {
+                        var witness = player.offenses[i].witness;
+
+                        if (witness && witness.svPlayer.witnessedPlayers.TryGetValue(player, out var value))
+                        {
+                            if (value <= 1) witness.svPlayer.witnessedPlayers.Remove(player);
+                            else witness.svPlayer.witnessedPlayers[player] = value - 1;
+                        }
+
+                        player.RemoveCrime(i);
+                        player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.RemoveCrime, i);
+                    }
+                }
+
+                if (player.GetStanceIndex == StanceIndex.Sleep)
+                {
+                    player.svPlayer.UpdateStatsDelta(0f, 0f, 0.02f);
+                }
+                else
+                {
+                    var injuryDelta = 0.05f / Util.hundredF;
+                    var stomachLoss = player.injuryAmount[(int)BodyPart.Abdomen] * injuryDelta;
+                    var energyLoss = player.injuryAmount[(int)BodyPart.Chest] * injuryDelta;
+                    const float statsDelta = -0.0018f;
+                    player.svPlayer.UpdateStatsDelta(statsDelta - stomachLoss, statsDelta - stomachLoss, statsDelta - energyLoss);
+                }
+
+                var totalDamage = 0f;
+                foreach (var f in player.stats)
+                {
+                    if (f >= 0.75f) totalDamage -= 2f;
+                    else if (f == 0f) totalDamage += 2f;
+                }
+
+                if (totalDamage > 0f) player.svPlayer.Damage(DamageIndex.Null, totalDamage);
+                else if (totalDamage < 0f && player.health < player.maxStat * 0.5f) player.svPlayer.SvHeal(-totalDamage);
+
+                if (player.isHuman)
+                {
+                    if (player.wantedLevel > 0 && !player.IsOutside && Random.value < player.wantedNormalized * 0.08f)
+                    {
+                        player.svPlayer.svManager.worldWaypoints[(int)WaypointType.Player].SpawnAttack(player);
+                    }
+
+                    if (player.otherEntity && (!player.otherEntity.isActiveAndEnabled || !player.InActionRange(player.otherEntity)))
+                    {
+                        player.svPlayer.SvStopInventory(true);
+                    }
+                }
+                else if (Random.value < 0.1f)
+                {
+                    if (player.injuries.Count > 0)
+                    {
+                        player.svPlayer.SvConsume(SceneManager.Instance.healerCollection.GetRandom().Value);
+                    }
+                    else
+                    {
+                        player.svPlayer.SvConsume(SceneManager.Instance.consumablesCollection.GetRandom().Value);
+                    }
+                }
+
+                yield return delay;
+            }
         }
 
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]

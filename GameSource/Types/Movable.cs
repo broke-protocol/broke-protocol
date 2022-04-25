@@ -7,7 +7,7 @@ using System.Collections;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Movable : Destroyable
+    public class Movable : Physical
     {
         [Target(GameSourceEvent.MovableDamage, ExecutionMode.Override)]
         public void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)

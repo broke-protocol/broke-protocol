@@ -6,8 +6,11 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Destroyable : Entity
+    public class Destroyable : Mountable
     {
+        //[Target(GameSourceEvent.DestroyableSpawn, ExecutionMode.Override)]
+        //public void OnSpawn(ShDestroyable destroyable) { }
+
         //[Target(GameSourceEvent.DestroyableDeath, ExecutionMode.Override)]
         //public void OnDeath(ShDestroyable destroyable) { }
 

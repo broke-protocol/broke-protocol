@@ -82,8 +82,10 @@
     <Compile Include="Types\Entity.cs" />
     <Compile Include="Types\Manager.cs" />
     <Compile Include="Types\Destroyable.cs" />
+    <Compile Include="Types\Mountable.cs" />
     <Compile Include="Types\Movable.cs" />
     <Compile Include="CustomEvents.cs" />
+    <Compile Include="Types\Physical.cs" />
     <Compile Include="Types\Player.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
