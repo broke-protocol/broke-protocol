@@ -50,12 +50,6 @@ namespace BrokeProtocol.GameSource.Jobs
                 victim.svPlayer.SendMurderedMessage(player);
             }
         }
-
-        protected bool MountWithinReach(ShEntity e)
-        {
-            var m = player.GetMount;
-            return m.Velocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
-        }
     }
 
 
@@ -1100,14 +1094,14 @@ namespace BrokeProtocol.GameSource.Jobs
                         player.svPlayer.SendGameMessage("Out of Time");
                         SetTarget();
                     }
-                    else if (MountWithinReach(destinationMarker))
+                    else if (destinationMarker.MountWithinReach(player))
                     {
                         player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
                         SetTarget();
                     }
                 }
                 else if (
-                    targetPlayer && MountWithinReach(targetPlayer) &&
+                    targetPlayer && targetPlayer.MountWithinReach(player) &&
                     targetPlayer.svPlayer.SvTryMount(player.curMount.ID, false))
                 {
                     player.svPlayer.DestroyGoalMarker();
@@ -1293,7 +1287,7 @@ namespace BrokeProtocol.GameSource.Jobs
                         {
                             SetTarget(false);
                         }
-                        else if (MountWithinReach(worldItem))
+                        else if (player.InActionRange(worldItem))
                         {
                             collectedItems = worldItem.CollectedItems;
 
@@ -1324,7 +1318,7 @@ namespace BrokeProtocol.GameSource.Jobs
                             player.svPlayer.SendGameMessage("Out of Time");
                             SetTarget(false);
                         }
-                        else if (MountWithinReach(targetPlayer))
+                        else if (targetPlayer.MountWithinReach(player))
                         {
                             foreach (var i in collectedItems)
                             {

@@ -7,7 +7,7 @@ using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace BrokeProtocol.GameSource.Jobs
+namespace BrokeProtocol.WarSource.Jobs
 {
     public class JobWar : Job
     {
@@ -17,12 +17,6 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 victim.svPlayer.SendMurderedMessage(player);
             }
-        }
-
-        protected bool MountWithinReach(ShEntity e)
-        {
-            var m = player.GetMount;
-            return m.Velocity.sqrMagnitude <= Util.slowSpeedSqr && e.InActionRange(m);
         }
     }
 

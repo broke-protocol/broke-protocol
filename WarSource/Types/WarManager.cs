@@ -1,44 +1,20 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace BrokeProtocol.GameSource.Types
+namespace BrokeProtocol.WarSource.Types
 {
-    public class Manager
+    public class WarManager
     {
         public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
 
-        [NonSerialized]
-        public static List<ShTerritory> territories = new List<ShTerritory>();
-
-        public static ShTerritory GetTerritory(ShEntity entity)
-        {
-            foreach (var t in territories)
-            {
-                var p = entity.mainT.position;
-                var trs = t.mainT;
-
-                if (p.x < trs.position.x + trs.localScale.x &&
-                    p.x >= trs.position.x - trs.localScale.x &&
-                    p.z < trs.position.z + trs.localScale.z &&
-                    p.z >= trs.position.z - trs.localScale.z)
-                {
-                    return t;
-                }
-            }
-
-            return null;
-        }
-
-
-        [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
+        [Target(GameSourceEvent.ManagerStart, ExecutionMode.Event)]
         public void OnStart(SvManager svManager) {
             
             var skins = new HashSet<string>();
@@ -48,17 +24,6 @@ namespace BrokeProtocol.GameSource.Types
                 svManager.ParseFile(ref skins, Paths.AbsolutePath($"skins{i}.txt"));
                 skinPrefabs[i] = skins.ToEntityList<ShPlayer>();
             }
-
-
-            foreach (Transform place in SceneManager.Instance.mTransform)
-            {
-                foreach (Transform child in place)
-                {
-                    if (child.TryGetComponent(out ShTerritory s)) territories.Add(s);
-                }
-            }
-
-            if (territories.Count == 0) Debug.LogWarning("[SVR] No territories found");
         }
 
         //[Target(GameSourceEvent.ManagerUpdate, ExecutionMode.Override)]
@@ -100,7 +65,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex) && connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs[teamIndex].Count && connectData.wearableIndices?.Length == svManager.manager.nullWearable.Length)
                 {
-                    var territory = territories.GetRandom();
+                    var territory = Manager.territories.GetRandom();
 
                     if (territory)
                     {

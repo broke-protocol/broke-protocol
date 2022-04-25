@@ -1,17 +1,17 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
+using BrokeProtocol.WarSource.Jobs;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 
-namespace BrokeProtocol.GameSource
+namespace BrokeProtocol.WarSource
 {
-    public class Core : Plugin
+    public class WarCore : Plugin
     {
-        public Core()
+        public WarCore()
         {
             Info = new PluginInfo(
                 "WarSource",

@@ -2,9 +2,9 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.Utility.Networking;
 
-namespace BrokeProtocol.GameSource.Types
+namespace BrokeProtocol.WarSource.Types
 {
-    public class Movable
+    public class WarMovable
     {
         [Target(GameSourceEvent.MovableRespawn, ExecutionMode.Override)]
         public void OnRespawn(ShMovable movable)

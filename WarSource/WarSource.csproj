@@ -74,13 +74,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\broke-protocol-game2\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
+    <Reference Include="_GameSource">
+      <HintPath>..\GameSource\bin\Release\_GameSource.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core.cs" />
+    <Compile Include="WarCore.cs" />
     <Compile Include="Jobs.cs" />
-    <Compile Include="Types\Manager.cs" />
-    <Compile Include="Types\Movable.cs" />
-    <Compile Include="Types\Player.cs" />
+    <Compile Include="Types\WarManager.cs" />
+    <Compile Include="Types\WarMovable.cs" />
+    <Compile Include="Types\WarPlayer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

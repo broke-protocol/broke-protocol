@@ -1,10 +1,11 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Utility;
+using BrokeProtocol.GameSource.Types;
 
-namespace BrokeProtocol.GameSource.Types
+namespace BrokeProtocol.WarSource.Types
 {
-    public class Player : Movable
+    public class WarPlayer : WarMovable
     {
         [Target(GameSourceEvent.PlayerRespawn, ExecutionMode.Override)]
         public void OnRespawn(ShPlayer player)
