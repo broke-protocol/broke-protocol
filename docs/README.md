@@ -52,6 +52,7 @@ Now every time you build your class library your target file will automatically 
 7. Once you're ready for the next step, go to the Examples page and start with the first one.
 
 ## Tips
+- Broke Protocol is compatible with Harmany assembly patching. Modify functionality on either the server or client to edit behaviors that aren't yet available in GameSource events. [Official Harmony Github](https://github.com/pardeike/Harmony)
 - Check the [Official Unity3D Manual](https://docs.unity3d.com/Manual/index.html) for Unity specific documentation.
 - Stay away from multi-threading (System.Threading & System.Timers) since much of BP and Unity code is not thread-safe. Use Unity Coroutines or InvokeRepeating instead to keep things on the main thread.
 - Don't forget to Upsert changes back into the database when finished editing. Typical usage:
