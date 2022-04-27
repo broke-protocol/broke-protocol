@@ -7,6 +7,7 @@ using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace BrokeProtocol.WarSource.Types
 {
@@ -69,12 +70,15 @@ namespace BrokeProtocol.WarSource.Types
 
                     if (territory)
                     {
-                        var location = territory.mainT;
-                        svManager.AddNewPlayer(skinPrefabs[teamIndex][connectData.skinIndex], connectData, playerData?.Persistent, location.position, location.rotation, location.parent);
+                        var t = territory.mainT;
+                        const float offset = 0.5f;
+                        var localPosition = new Vector3(Random.value - offset, 0f, Random.value - offset);
+                        var worldPosition = Util.SafePosition(t.TransformPoint(localPosition), 100f);
+                        svManager.AddNewPlayer(skinPrefabs[teamIndex][connectData.skinIndex], connectData, playerData?.Persistent, worldPosition, (-worldPosition).SafeLookRotation(Vector3.up), t.parent);
                     }
                     else
                     {
-                        svManager.RegisterFail(connectData.connection, "No spawn locations");
+                        svManager.RegisterFail(connectData.connection, "No spawn territories");
                     }
                 }
                 else
