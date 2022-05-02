@@ -38,15 +38,17 @@ namespace BrokeProtocol.GameSource.Types
 
         public static ShTerritory GetTerritory(ShEntity entity)
         {
+            var p = entity.mainT.position;
+
             foreach (var t in territories)
             {
-                var p = entity.mainT.position;
-                var trs = t.mainT;
+                var tPos = t.mainT.position;
+                var tScale = t.mainT.localScale * 0.5f;
 
-                if (p.x < trs.position.x + trs.localScale.x &&
-                    p.x >= trs.position.x - trs.localScale.x &&
-                    p.z < trs.position.z + trs.localScale.z &&
-                    p.z >= trs.position.z - trs.localScale.z)
+                if (p.x < tPos.x + tScale.x &&
+                    p.x > tPos.x - tScale.x &&
+                    p.z < tPos.z + tScale.z &&
+                    p.z > tPos.z - tScale.z)
                 {
                     return t;
                 }
