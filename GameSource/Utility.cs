@@ -4,7 +4,7 @@ using BrokeProtocol.Entities;
 
 namespace BrokeProtocol.GameSource
 {
-    static class Utility
+    public static class Utility
     {
         public static LimitQueue<ShPlayer> chatted = new LimitQueue<ShPlayer>(8, 20f);
 

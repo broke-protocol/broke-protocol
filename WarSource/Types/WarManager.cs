@@ -1,13 +1,11 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace BrokeProtocol.WarSource.Types
 {
@@ -16,14 +14,20 @@ namespace BrokeProtocol.WarSource.Types
         public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
 
         [Target(GameSourceEvent.ManagerStart, ExecutionMode.Event)]
-        public void OnStart(SvManager svManager) {
-            
+        public void OnStart(SvManager svManager)
+        {
             var skins = new HashSet<string>();
 
-            for(int i = 0; i<=1; i++)
+            for (int i = 0; i <= 1; i++)
             {
                 svManager.ParseFile(ref skins, Paths.AbsolutePath($"skins{i}.txt"));
                 skinPrefabs[i] = skins.ToEntityList<ShPlayer>();
+            }
+
+            for (int i = 0; i < 20; i++)
+            {
+                Utility.GetSpawn(out var position, out var rotation, out var place);
+                svManager.AddNewEntity(skinPrefabs[i % 2].GetRandom(), place, position, rotation, true);
             }
         }
 
@@ -66,15 +70,9 @@ namespace BrokeProtocol.WarSource.Types
 
                 if (connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex) && connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs[teamIndex].Count && connectData.wearableIndices?.Length == svManager.manager.nullWearable.Length)
                 {
-                    var territory = Manager.territories.GetRandom();
-
-                    if (territory)
+                    if (Utility.GetSpawn(out var position, out var rotation, out var place))
                     {
-                        var t = territory.mainT;
-                        const float offset = 0.5f;
-                        var localPosition = new Vector3(Random.value - offset, 0f, Random.value - offset);
-                        var worldPosition = Util.SafePosition(t.TransformPoint(localPosition), 100f);
-                        svManager.AddNewPlayer(skinPrefabs[teamIndex][connectData.skinIndex], connectData, playerData?.Persistent, worldPosition, (-worldPosition).SafeLookRotation(Vector3.up), t.parent);
+                        svManager.AddNewPlayer(skinPrefabs[teamIndex][connectData.skinIndex], connectData, playerData?.Persistent, position, rotation, place.mTransform);
                     }
                     else
                     {

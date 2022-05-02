@@ -1,7 +1,5 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Utility;
-using BrokeProtocol.GameSource.Types;
 
 namespace BrokeProtocol.WarSource.Types
 {
@@ -10,12 +8,11 @@ namespace BrokeProtocol.WarSource.Types
         [Target(GameSourceEvent.PlayerRespawn, ExecutionMode.Override)]
         public void OnRespawn(ShPlayer player)
         {
-            if (player.isHuman)
+            if (Utility.GetSpawn(out var position, out var rotation, out var place))
             {
-                var newSpawn = Manager.territories.GetRandom().transform;
-                player.svPlayer.originalPosition = newSpawn.position;
-                player.svPlayer.originalRotation = newSpawn.rotation;
-                player.svPlayer.originalParent = newSpawn.parent;
+                player.svPlayer.originalPosition = position;
+                player.svPlayer.originalRotation = rotation;
+                player.svPlayer.originalParent = place.mTransform;
             }
 
             base.OnRespawn(player);

@@ -79,6 +79,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Utility.cs" />
     <Compile Include="WarCore.cs" />
     <Compile Include="Jobs.cs" />
     <Compile Include="Types\WarManager.cs" />

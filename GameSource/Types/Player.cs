@@ -222,7 +222,7 @@ namespace BrokeProtocol.GameSource.Types
             if (damageIndex != DamageIndex.Null)
             {
                 BodyEffect effect;
-                float random = Random.value;
+                var random = Random.value;
 
                 if (random < 0.6f)
                     effect = BodyEffect.Null;
@@ -235,9 +235,9 @@ namespace BrokeProtocol.GameSource.Types
 
                 BodyPart part;
 
-                float capsuleHeight = player.capsule.direction == 1 ? player.capsule.height : player.capsule.radius * 2f;
+                var capsuleHeight = player.capsule.direction == 1 ? player.capsule.height : player.capsule.radius * 2f;
 
-                float hitY = player.GetLocalY(hitPoint);
+                var hitY = player.GetLocalY(hitPoint);
 
                 if(damageIndex == DamageIndex.Random)
                 {
@@ -374,7 +374,7 @@ namespace BrokeProtocol.GameSource.Types
                 new LabelID("Hack Panel", hackPanel)
             };
 
-            string title = "&7Security Panel";
+            var title = "&7Security Panel";
             if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
             {
                 title += ": Level " + apartmentPlace.svSecurity.ToPercent();
@@ -410,8 +410,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            string title = "&7Video Panel";
-            player.svPlayer.SendOptionMenu(title, videoEntity.ID, videoPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
+            player.svPlayer.SendOptionMenu("&7Video Panel", videoEntity.ID, videoPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
         }
 
         [Target(GameSourceEvent.PlayerBuyApartment, ExecutionMode.Override)]
