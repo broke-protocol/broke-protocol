@@ -32,7 +32,6 @@ namespace BrokeProtocol.GameSource.Types
         private static float endTime;
         private static int attackerLimit;
         public static int defenderLimit;
-        public static float attackTime;
         public static int attackersKilled;
         public static int defendersKilled;
         public static ShTerritory warTerritory;
@@ -73,7 +72,7 @@ namespace BrokeProtocol.GameSource.Types
                     total++;
                 }
 
-                endTime = Time.time + attackTime;
+                endTime = Time.time + 300f;
                 attackersKilled = 0;
                 defendersKilled = 0;
                 defenderLimit = 2 + count;
