@@ -253,7 +253,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Gangster), "Rojo Loco",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                CharacterType.Human, 0, GroupIndex.Gang, 0, new ColorStruct(1f, 0f, 0f), 0.1f, 8,
+                CharacterType.Human, 0, GroupIndex.Criminal, 0, new ColorStruct(1f, 0f, 0f), 0.1f, 8,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -278,7 +278,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Gangster), "Green St. Fam",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                CharacterType.Human, 0, GroupIndex.Gang, 0, new ColorStruct(0f, 1f, 0f), 0.1f, 8,
+                CharacterType.Human, 0, GroupIndex.Criminal, 0, new ColorStruct(0f, 1f, 0f), 0.1f, 8,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -303,7 +303,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Gangster), "Borgata Blu",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                CharacterType.Human, 0, GroupIndex.Gang, 0, new ColorStruct(0f, 0f, 1f), 0.1f, 8,
+                CharacterType.Human, 0, GroupIndex.Criminal, 0, new ColorStruct(0f, 0f, 1f), 0.1f, 8,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),

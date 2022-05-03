@@ -61,10 +61,10 @@ namespace BrokeProtocol.WarSource.Jobs
 
     public abstract class Army : LoopJob
     {
-        public void TryFindEnemyGang()
+        public void TryFindEnemy()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.groupIndex == GroupIndex.Gang &&
+                (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job is Army &&
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
                 (e) => player.svPlayer.SetAttackState(e));
         }
@@ -73,7 +73,7 @@ namespace BrokeProtocol.WarSource.Jobs
         {
             if (!player.isHuman && !player.svPlayer.targetEntity && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
             {
-                TryFindEnemyGang();
+                TryFindEnemy();
             }
         }
 

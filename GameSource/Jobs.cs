@@ -498,7 +498,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public void TryFindEnemyGang()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job.info.shared.groupIndex == GroupIndex.Gang &&
+                (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job is Gangster &&
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
                 (e) => player.svPlayer.SetAttackState(e));
         }

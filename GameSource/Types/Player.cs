@@ -604,7 +604,7 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witnessID);
 
             // Don't hand out crime penalties for criminal jobs and default job
-            if (!player.svPlayer.job.IsCriminal && player.svPlayer.job.info.shared.jobIndex > 0)
+            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Criminal && player.svPlayer.job.info.shared.jobIndex > 0)
             {
                 player.svPlayer.Reward(-crime.experiencePenalty, -crime.fine);
             }

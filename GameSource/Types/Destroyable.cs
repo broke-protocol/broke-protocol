@@ -1,6 +1,6 @@
-﻿using BrokeProtocol.Entities;
+﻿using BrokeProtocol.API;
+using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
-using BrokeProtocol.API;
 using BrokeProtocol.Utility.Networking;
 using UnityEngine;
 
@@ -10,9 +10,6 @@ namespace BrokeProtocol.GameSource.Types
     {
         //[Target(GameSourceEvent.DestroyableSpawn, ExecutionMode.Override)]
         //public void OnSpawn(ShDestroyable destroyable) { }
-
-        //[Target(GameSourceEvent.DestroyableDeath, ExecutionMode.Override)]
-        //public void OnDeath(ShDestroyable destroyable) { }
 
         [Target(GameSourceEvent.DestroyableDeath, ExecutionMode.Override)]
         public void OnDeath(ShDestroyable destroyable, ShPlayer attacker)
