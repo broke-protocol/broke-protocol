@@ -80,6 +80,9 @@ namespace BrokeProtocol.GameSource.Types
                 defenderLimit = 2 + count;
                 attackerLimit = Mathf.CeilToInt((total - count) * 0.25f);
 
+                var jobs = BPAPI.Instance.Jobs;
+                ChatHandler.SendToAll($"{jobs[attackerJob].shared.jobName} Attacking {jobs[startT.ownerIndex].shared.jobName}");
+
                 startT.svTerritory.SvSetTerritory(startT.ownerIndex, attackerJob);
                 startT.StartCoroutine(Defend());
 
@@ -95,7 +98,19 @@ namespace BrokeProtocol.GameSource.Types
 
         public static void EndGangWar(byte owner)
         {
-            warTerritory.svTerritory.SvSetTerritory(owner, Util.invalidByte);
+            var jobs = BPAPI.Instance.Jobs;
+            if (warTerritory.ownerIndex == owner)
+            {
+                ChatHandler.SendToAll(
+                    $"{jobs[owner].shared.jobName} Defended Against {jobs[warTerritory.attackerIndex].shared.jobName}");
+            }
+            else
+            {
+                ChatHandler.SendToAll(
+                    $"{jobs[owner].shared.jobName} Won Against {jobs[warTerritory.ownerIndex].shared.jobName}");
+            }
+
+            warTerritory.svTerritory.SvSetTerritory(owner);
             warTerritory = null;
         }
 
