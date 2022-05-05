@@ -1,16 +1,102 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace BrokeProtocol.WarSource.Types
 {
+    public class TerritoryState
+    {
+        private ShTerritory territory;
+        public float lastSpeed;
+        public float captureState;
+        public IDCollection<ShPlayer> players = new IDCollection<ShPlayer>();
+
+        public TerritoryState(ShTerritory territory)
+        {
+            this.territory = territory;
+        }
+
+        public float CaptureSpeed()
+        {
+            int count = 0;
+
+            foreach(var p in players)
+            {
+                if (p.svPlayer.job.info.shared.jobIndex == territory.ownerIndex)
+                    count++;
+                else
+                    count--;
+            }
+
+            return count * 0.1f;
+        }
+
+        public void Update()
+        {
+            foreach(var p in players.ToArray())
+            {
+                if (!p.isActiveAndEnabled || p.IsDead || Manager.GetTerritory(p) != territory)
+                {
+                    p.svPlayer.SvProgressStop();
+                    players.Remove(p);
+                }
+            }
+
+            var newSpeed = CaptureSpeed();
+
+            if (newSpeed > 0f && captureState >= 1f || newSpeed < 0f && captureState <= 0f)
+            {
+                return;
+            }
+
+            if (newSpeed != 0f)
+            {
+                captureState += newSpeed * Time.deltaTime;
+
+                if (captureState >= 1f)
+                {
+                    captureState = 0f;
+                    territory.svTerritory.SvSetTerritory(territory.attackerIndex);
+                    foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f);
+                }
+                else if (captureState <= 0f)
+                {
+                    captureState = 0f;
+                    territory.svTerritory.SvSetTerritory(territory.ownerIndex);
+                    foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f);
+                }
+                else if (territory.attackerIndex != Util.invalidByte)
+                {
+                    territory.svTerritory.SvSetTerritory(territory.ownerIndex, InvertOwnerIndex);
+                }
+            }
+
+            if (newSpeed != lastSpeed)
+            {
+                lastSpeed = newSpeed;
+
+                foreach (var p in players)
+                {
+                    p.svPlayer.SvProgressBar(captureState, newSpeed);
+                }
+            }
+        }
+
+        public byte InvertOwnerIndex => territory.ownerIndex == 0 ? (byte)1 : (byte)0;
+    }
+
     public class WarManager
     {
+        public Dictionary<ShTerritory, TerritoryState> territoryStates = new Dictionary<ShTerritory, TerritoryState>();
+
         public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
 
         [Target(GameSourceEvent.ManagerStart, ExecutionMode.Event)]
@@ -29,10 +115,34 @@ namespace BrokeProtocol.WarSource.Types
                 Utility.GetSpawn(out var position, out var rotation, out var place);
                 svManager.AddNewEntity(skinPrefabs[i % 2].GetRandom(), place, position, rotation, true);
             }
+
+            foreach(var t in Manager.territories)
+            {
+                territoryStates.Add(t, new TerritoryState(t));
+            }
         }
 
-        //[Target(GameSourceEvent.ManagerUpdate, ExecutionMode.Override)]
-        //public void OnUpdate(SvManager svManager) { }
+        [Target(GameSourceEvent.ManagerUpdate, ExecutionMode.Override)]
+        public void OnUpdate(SvManager svManager)
+        {
+            foreach(var t in territoryStates.Values)
+            {
+                t.Update();
+            }
+
+            foreach(var p in EntityCollections.Players)
+            {
+                if(p.isActiveAndEnabled && !p.IsDead)
+                {
+                    var territory = Manager.GetTerritory(p);
+
+                    if(territory && territoryStates.TryGetValue(territory, out var state) && state.players.TryAdd(p))
+                    {
+                        p.svPlayer.SvProgressBar(state.captureState, state.lastSpeed);
+                    }
+                }
+            }
+        }
 
         //[Target(GameSourceEvent.ManagerFixedUpdate, ExecutionMode.Override)]
         //public void OnFixedUpdate(SvManager svManager) { }
@@ -86,7 +196,7 @@ namespace BrokeProtocol.WarSource.Types
             }
         }
 
-        public readonly List<string> teams = new List<string> { "Red", "Blue" };
+        public readonly List<string> teams = new List<string> { "SpecOps", "OpFor" };
 
         public readonly List<string> classes = new List<string> { "Rifleman", "Officer", "Sniper", "Support", "Medic", "Anti-Tank" };
 

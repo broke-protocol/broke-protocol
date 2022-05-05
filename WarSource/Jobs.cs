@@ -59,7 +59,7 @@ namespace BrokeProtocol.WarSource.Jobs
 
     
 
-    public abstract class Army : LoopJob
+    public class Army : LoopJob
     {
         public void TryFindEnemy()
         {

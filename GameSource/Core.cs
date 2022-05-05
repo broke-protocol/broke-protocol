@@ -19,7 +19,7 @@ namespace BrokeProtocol.GameSource
                 "Default game source used by BP. May be modified.",
                 "https://github.com/broke-protocol/broke-protocol");
 
-            string jobsFilename = Info.Name + " Jobs.json";
+            var jobsFilename = Info.Name + " Jobs.json";
 
             if (!File.Exists(jobsFilename))
             {
