@@ -47,6 +47,8 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (localPos.x < extent &&
                     localPos.x > -extent &&
+                    localPos.y < extent &&
+                    localPos.y > -extent &&
                     localPos.z < extent &&
                     localPos.z > -extent)
                 {
@@ -57,7 +59,7 @@ namespace BrokeProtocol.GameSource.Types
             return null;
         }
 
-        public static void StartGangWar(ShTerritory startT, byte attackerJob)
+        public static void StartGangWar(ShTerritory startT, int attackerJob)
         {
             if (!warTerritory)
             {
@@ -96,7 +98,7 @@ namespace BrokeProtocol.GameSource.Types
                 $"Defender lives: {defenderLimit - defendersKilled} Attacker lives: {attackerLimit - attackersKilled} Timeleft: {(int)(endTime - Time.time)}");
         }
 
-        public static void EndGangWar(byte owner)
+        public static void EndGangWar(int owner)
         {
             var jobs = BPAPI.Instance.Jobs;
             if (warTerritory.ownerIndex == owner)

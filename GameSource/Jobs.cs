@@ -519,7 +519,7 @@ namespace BrokeProtocol.GameSource.Jobs
             if (territory && territory.ownerIndex == info.shared.jobIndex)
             {
                 // Boost gangster spawn rate if territory under attack
-                return (territory.attackerIndex == Util.invalidByte) ? info.spawnRate : 8f;
+                return (territory.attackerIndex < 0) ? info.spawnRate : 8f;
             }
             return 0f;
         }
@@ -582,7 +582,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 else
                 {
                     var t = Manager.GetTerritory(player);
-                    if (t && t.attackerIndex != Util.invalidByte && entity is ShPlayer victim)
+                    if (t && t.attackerIndex >= 0 && entity is ShPlayer victim)
                     {
                         if (victim.svPlayer.job.info.shared.jobIndex == t.ownerIndex)
                         {
@@ -613,7 +613,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 var territory = Manager.GetTerritory(target);
-                if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex != Util.invalidByte)
+                if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex >= 0)
                 {
                     if (player.svPlayer.SetAttackState(target)) return;
                 }

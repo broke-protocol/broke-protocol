@@ -129,7 +129,7 @@ namespace BrokeProtocol.WarSource.Jobs
                 target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 var territory = Manager.GetTerritory(target);
-                if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex != Util.invalidByte)
+                if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex >= 0)
                 {
                     if (player.svPlayer.SetAttackState(target)) return;
                 }

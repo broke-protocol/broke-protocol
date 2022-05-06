@@ -73,7 +73,7 @@ namespace BrokeProtocol.WarSource.Types
                     territory.svTerritory.SvSetTerritory(territory.ownerIndex);
                     foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f);
                 }
-                else if (territory.attackerIndex != Util.invalidByte)
+                else if (territory.attackerIndex >= 0)
                 {
                     territory.svTerritory.SvSetTerritory(territory.ownerIndex, InvertOwnerIndex);
                 }
