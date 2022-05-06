@@ -105,7 +105,11 @@ namespace BrokeProtocol.WarSource.Types
                 }
                 else if (territory.attackerIndex < 0)
                 {
-                    territory.svTerritory.SvSetTerritory(territory.ownerIndex, attackerIndex);
+                    // Set to Gray (unowned) area before transitioning to attackerIndex
+                    if (territory.ownerIndex >= 0 && territory.ownerIndex < BPAPI.Instance.Jobs.Count)
+                        territory.svTerritory.SvSetTerritory(territory.ownerIndex, BPAPI.Instance.Jobs.Count);
+                    else
+                        territory.svTerritory.SvSetTerritory(territory.ownerIndex, attackerIndex);
                 }
             }
 
