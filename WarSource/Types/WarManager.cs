@@ -146,7 +146,8 @@ namespace BrokeProtocol.WarSource.Types
 
             foreach(var t in Manager.territories)
             {
-                territoryStates.Add(t, new TerritoryState(t));
+                if(t.capturable)
+                    territoryStates.Add(t, new TerritoryState(t));
             }
         }
 
