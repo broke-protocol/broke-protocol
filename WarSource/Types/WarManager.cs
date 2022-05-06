@@ -80,8 +80,7 @@ namespace BrokeProtocol.WarSource.Types
 
             if (attackerIndex == territory.ownerIndex) newSpeed = -newSpeed;
 
-            if(territory.ID == 99)
-            Debug.Log(territory.ID + " " + territory.ownerIndex + " " + territory.attackerIndex + " " + newSpeed + " " + captureState + " " + players.Count);
+            //Debug.Log(territory.ID + " " + territory.ownerIndex + " " + territory.attackerIndex + " " + newSpeed + " " + captureState + " " + players.Count);
 
             if (newSpeed < 0f && captureState <= 0f)
             {
@@ -96,11 +95,13 @@ namespace BrokeProtocol.WarSource.Types
                 {
                     territory.svTerritory.SvSetTerritory(territory.attackerIndex);
                     ResetCaptureState();
+                    return;
                 }
                 else if (captureState <= 0f)
                 {
                     territory.svTerritory.SvSetTerritory(territory.ownerIndex);
                     ResetCaptureState();
+                    return;
                 }
                 else if (territory.attackerIndex < 0)
                 {
