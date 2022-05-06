@@ -14,6 +14,7 @@ namespace BrokeProtocol.WarSource.Types
 {
     public class TerritoryState
     {
+        public const string territoryProgressBarID = "territory";
         private ShTerritory territory;
         public float lastSpeed;
         public float captureState;
@@ -28,7 +29,7 @@ namespace BrokeProtocol.WarSource.Types
         public void ResetCaptureState()
         {
             captureState = lastSpeed = 0f;
-            foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f);
+            foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f, territoryProgressBarID);
         }
 
         public void Update()
@@ -37,7 +38,7 @@ namespace BrokeProtocol.WarSource.Types
             {
                 if (!p.isActiveAndEnabled || p.IsDead || Manager.GetTerritory(p) != territory)
                 {
-                    p.svPlayer.SvProgressStop();
+                    p.svPlayer.SvProgressStop(territoryProgressBarID);
                     players.Remove(p);
                 }
             }
@@ -119,7 +120,7 @@ namespace BrokeProtocol.WarSource.Types
 
                 foreach (var p in players)
                 {
-                    p.svPlayer.SvProgressBar(captureState, newSpeed);
+                    p.svPlayer.SvProgressBar(captureState, newSpeed, territoryProgressBarID);
                 }
             }
         }
@@ -171,7 +172,7 @@ namespace BrokeProtocol.WarSource.Types
 
                     if(territory && territoryStates.TryGetValue(territory, out var state) && state.players.TryAdd(p))
                     {
-                        p.svPlayer.SvProgressBar(state.captureState, state.lastSpeed);
+                        p.svPlayer.SvProgressBar(state.captureState, state.lastSpeed, TerritoryState.territoryProgressBarID);
                     }
                 }
             }
