@@ -25,6 +25,12 @@ namespace BrokeProtocol.WarSource.Types
             this.territory = territory;
         }
 
+        public void ResetCaptureState()
+        {
+            captureState = lastSpeed = 0f;
+            foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f);
+        }
+
         public void Update()
         {
             foreach(var p in players.ToArray())
@@ -36,36 +42,48 @@ namespace BrokeProtocol.WarSource.Types
                 }
             }
 
-            if (players.Count == 0) return;
+            var newSpeed = 1f;
+            var attackerIndex = territory.ownerIndex;
 
-            attackerCounts.Clear();
-            foreach (var p in players)
+            if (players.Count > 0)
             {
-                var j = p.svPlayer.job.info.shared.jobIndex;
-                if (attackerCounts.TryGetValue(j, out var count))
+                attackerCounts.Clear();
+                foreach (var p in players)
                 {
-                    attackerCounts[j] = count++;
+                    var j = p.svPlayer.job.info.shared.jobIndex;
+                    if (attackerCounts.TryGetValue(j, out var count))
+                    {
+                        attackerCounts[j] = count++;
+                    }
+                    else
+                    {
+                        attackerCounts[j] = 1;
+                    }
                 }
-                else
+
+                attackerIndex = -1;
+                var highestCount = -1;
+
+                foreach (var pair in attackerCounts)
                 {
-                    attackerCounts[j] = 0;
+                    if (pair.Value > highestCount)
+                    {
+                        highestCount = pair.Value;
+                        attackerIndex = pair.Key;
+                    }
                 }
+
+                newSpeed = highestCount - (players.Count - highestCount);
             }
 
-            int attackerIndex = -1;
-            int highestCount = -1;
-
-            foreach(var pair in attackerCounts)
-            {
-                if (pair.Value > highestCount)
-                    attackerIndex = pair.Key;
-            }
-
-            var newSpeed = (highestCount - (players.Count - highestCount)) * 0.1f;
+            newSpeed *= 0.05f;
 
             if (attackerIndex == territory.ownerIndex) newSpeed = -newSpeed;
 
-            if (newSpeed > 0f && captureState >= 1f || newSpeed < 0f && captureState <= 0f)
+            if(territory.ID == 99)
+            Debug.Log(territory.ID + " " + territory.ownerIndex + " " + territory.attackerIndex + " " + newSpeed + " " + captureState + " " + players.Count);
+
+            if (newSpeed < 0f && captureState <= 0f)
             {
                 return;
             }
@@ -76,17 +94,15 @@ namespace BrokeProtocol.WarSource.Types
 
                 if (captureState >= 1f)
                 {
-                    captureState = 0f;
                     territory.svTerritory.SvSetTerritory(territory.attackerIndex);
-                    foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f);
+                    ResetCaptureState();
                 }
                 else if (captureState <= 0f)
                 {
-                    captureState = 0f;
                     territory.svTerritory.SvSetTerritory(territory.ownerIndex);
-                    foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f);
+                    ResetCaptureState();
                 }
-                else if (territory.attackerIndex >= 0)
+                else if (territory.attackerIndex < 0)
                 {
                     territory.svTerritory.SvSetTerritory(territory.ownerIndex, attackerIndex);
                 }
