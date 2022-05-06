@@ -18,25 +18,11 @@ namespace BrokeProtocol.WarSource.Types
         public float lastSpeed;
         public float captureState;
         public IDCollection<ShPlayer> players = new IDCollection<ShPlayer>();
+        public Dictionary<int, int> attackerCounts = new Dictionary<int, int>();
 
         public TerritoryState(ShTerritory territory)
         {
             this.territory = territory;
-        }
-
-        public float CaptureSpeed()
-        {
-            int count = 0;
-
-            foreach(var p in players)
-            {
-                if (p.svPlayer.job.info.shared.jobIndex == territory.ownerIndex)
-                    count++;
-                else
-                    count--;
-            }
-
-            return count * 0.1f;
         }
 
         public void Update()
@@ -50,7 +36,34 @@ namespace BrokeProtocol.WarSource.Types
                 }
             }
 
-            var newSpeed = CaptureSpeed();
+            if (players.Count == 0) return;
+
+            attackerCounts.Clear();
+            foreach (var p in players)
+            {
+                var j = p.svPlayer.job.info.shared.jobIndex;
+                if (attackerCounts.TryGetValue(j, out var count))
+                {
+                    attackerCounts[j] = count++;
+                }
+                else
+                {
+                    attackerCounts[j] = 0;
+                }
+            }
+
+            int attackerIndex = -1;
+            int highestCount = -1;
+
+            foreach(var pair in attackerCounts)
+            {
+                if (pair.Value > highestCount)
+                    attackerIndex = pair.Key;
+            }
+
+            var newSpeed = (highestCount - (players.Count - highestCount)) * 0.1f;
+
+            if (attackerIndex == territory.ownerIndex) newSpeed = -newSpeed;
 
             if (newSpeed > 0f && captureState >= 1f || newSpeed < 0f && captureState <= 0f)
             {
@@ -75,7 +88,7 @@ namespace BrokeProtocol.WarSource.Types
                 }
                 else if (territory.attackerIndex >= 0)
                 {
-                    territory.svTerritory.SvSetTerritory(territory.ownerIndex, InvertOwnerIndex);
+                    territory.svTerritory.SvSetTerritory(territory.ownerIndex, attackerIndex);
                 }
             }
 
@@ -89,8 +102,6 @@ namespace BrokeProtocol.WarSource.Types
                 }
             }
         }
-
-        public byte InvertOwnerIndex => territory.ownerIndex == 0 ? (byte)1 : (byte)0;
     }
 
     public class WarManager
@@ -233,8 +244,8 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
-        private const string teamIndexKey = "teamIndex";
-        private const string classIndexKey = "classIndex";
+        public const string teamIndexKey = "teamIndex";
+        public const string classIndexKey = "classIndex";
 
         // Read packet data from Buffers.reader
         [Target(GameSourceEvent.ManagerCustomPacket, ExecutionMode.Override)]

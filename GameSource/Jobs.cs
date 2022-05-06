@@ -565,7 +565,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 {
                     if (player.isHuman)
                     {
-                        ShTerritory t = Manager.GetTerritory(player);
+                        var t = Manager.GetTerritory(player);
                         if (t && t.ownerIndex != info.shared.jobIndex && gangstersKilled >= 1)
                         {
                             Manager.StartGangWar(t, info.shared.jobIndex);
