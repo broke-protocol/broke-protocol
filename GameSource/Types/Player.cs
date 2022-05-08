@@ -1270,5 +1270,35 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.placementValid = true;
         }
+
+        [Target(GameSourceEvent.PlayerResetAI, ExecutionMode.Override)]
+        public void OnResetAI(ShPlayer player)
+        {
+            if (player.svPlayer.targetPlayer && !player.svPlayer.preFrame)
+            {
+                player.svPlayer.targetPlayer = null;
+                player.svPlayer.Respawn();
+                return;
+            }
+
+            if (player.IsKnockedOut && player.svPlayer.SetState(StateIndex.Null)) return;
+            if (player.IsRestrained && player.svPlayer.SetState(StateIndex.Restrained)) return;
+            player.svPlayer.SvTrySetEquipable(player.Hands.index);
+            if (player.svPlayer.leader && player.svPlayer.SetFollowState(player.svPlayer.leader)) return;
+            if (player.IsPassenger && player.svPlayer.SetState(StateIndex.Null)) return;
+
+            player.svPlayer.targetEntity = null;
+
+            if (player.IsDriving && player.svPlayer.SetState(StateIndex.Waypoint)) return;
+            if (player.svPlayer.currentState.index == StateIndex.Freeze && !player.svPlayer.stop && player.svPlayer.SetState(StateIndex.Flee)) return;
+            if (player.svPlayer.targetPlayer && player.svPlayer.SetAttackState(player.svPlayer.targetPlayer)) return;
+
+            if (player.GetParent != player.svPlayer.originalParent)
+            {
+                player.svPlayer.ResetOriginal();
+            }
+
+            player.svPlayer.job.ResetJobAI();
+        }
     }
 }

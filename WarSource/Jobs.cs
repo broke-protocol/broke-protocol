@@ -101,17 +101,17 @@ namespace BrokeProtocol.WarSource.Jobs
             base.RemoveJob();
         }
 
-        protected bool IsEnemyGangster(ShEntity target) => target is ShPlayer victim && this != victim.svPlayer.job;
+        protected bool IsEnemy(ShEntity target) => target is ShPlayer victim && this != victim.svPlayer.job;
 
         public override void OnDamageEntity(ShEntity damaged)
         {
-            if (!IsEnemyGangster(damaged))
+            if (!IsEnemy(damaged))
                 base.OnDamageEntity(damaged);
         }
 
         public override void OnDestroyEntity(ShEntity entity)
         {
-            if (IsEnemyGangster(entity))
+            if (IsEnemy(entity))
             {
                 //
             }
@@ -123,18 +123,15 @@ namespace BrokeProtocol.WarSource.Jobs
 
         public override void ResetJobAI()
         {
-            var target = player.svPlayer.spawner;
+            Debug.Log("territories: " + Manager.territories.Count);
+            var goal = Manager.territories.GetRandom();
 
-            if (target && target.IsOutside && target.svPlayer.job is Army &&
-                target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr)
+            if (!goal)
             {
-                var territory = Manager.GetTerritory(target);
-                if (territory && territory.ownerIndex == info.shared.jobIndex && territory.attackerIndex >= 0)
-                {
-                    if (player.svPlayer.SetAttackState(target)) return;
-                }
+                player.svPlayer.SetState(StateIndex.Null);
+                return;
             }
-            base.ResetJobAI();
+            player.svPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent);
         }
     }
 }

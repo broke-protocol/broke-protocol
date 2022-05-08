@@ -14,10 +14,21 @@ namespace BrokeProtocol.WarSource
             {
                 var t = territory.mainT;
                 const float offset = 0.5f;
-                var localPosition = new Vector3(Random.value - offset, 0f, Random.value - offset);
-                position = Util.SafePosition(t.TransformPoint(localPosition), 100f);
-                rotation = (-position).SafeLookRotation(Vector3.up);
                 place = territory.GetPlace;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    var localPosition = new Vector3(Random.value - offset, 0f, Random.value - offset);
+                    if(t.TransformPoint(localPosition).SafePosition(out var hit) && Mathf.Abs(hit.point.y - t.position.y) <= 10f)
+                    {
+                        position = hit.point;
+                        rotation = (-position).SafeLookRotation(Vector3.up);
+                        return true;
+                    }
+                }
+
+                position = t.position;
+                rotation = t.rotation;
                 return true;
             }
 
