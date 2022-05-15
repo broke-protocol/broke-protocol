@@ -29,7 +29,7 @@ namespace BrokeProtocol.CustomEvents
             }
         }
 
-        // Example call from CEF used in www/cef/index2.html -> "window.trigger("YourEventName", {argument : YourArgs});"
+        // Example call from CEF used in www/cef/index.html -> "window.trigger("YourEventName", {argument : YourArgs});"
         [CustomTarget]
         public void OnPressedKey(ShPlayer caller, JToken args)
         {
