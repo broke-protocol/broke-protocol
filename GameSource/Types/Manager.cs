@@ -82,7 +82,7 @@ namespace BrokeProtocol.GameSource.Types
                 defenderLimit = 2 + count;
                 attackerLimit = Mathf.CeilToInt((total - count) * 0.25f);
 
-                var jobs = BPAPI.Instance.Jobs;
+                var jobs = BPAPI.Jobs;
                 ChatHandler.SendToAll($"{jobs[attackerJob].shared.jobName} Attacking {jobs[startT.ownerIndex].shared.jobName}");
 
                 startT.svTerritory.SvSetTerritory(startT.ownerIndex, attackerJob);
@@ -100,7 +100,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public static void EndGangWar(int owner)
         {
-            var jobs = BPAPI.Instance.Jobs;
+            var jobs = BPAPI.Jobs;
             if (warTerritory.ownerIndex == owner)
             {
                 ChatHandler.SendToAll(
@@ -158,9 +158,9 @@ namespace BrokeProtocol.GameSource.Types
 
             var waypointTypes = Enum.GetValues(typeof(WaypointType)).Length;
 
-            for (byte jobIndex = 0; jobIndex < BPAPI.Instance.Jobs.Count; jobIndex++)
+            for (byte jobIndex = 0; jobIndex < BPAPI.Jobs.Count; jobIndex++)
             {
-                var job = BPAPI.Instance.Jobs[jobIndex];
+                var job = BPAPI.Jobs[jobIndex];
 
                 job.randomEntities = new HashSet<ShEntity>[waypointTypes];
 

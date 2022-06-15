@@ -592,7 +592,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerGoToJail, ExecutionMode.Override)]
         public void OnGoToJail(ShPlayer player, float time, int fine)
         {
-            player.svPlayer.SvSetJob(BPAPI.Instance.Jobs[Core.prisonerIndex], true, false);
+            player.svPlayer.SvSetJob(BPAPI.Jobs[Core.prisonerIndex], true, false);
             var jailSpawn = Manager.jails.GetRandom().mainT;
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
             player.svPlayer.SvForceEquipable(player.Hands.index);

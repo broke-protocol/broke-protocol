@@ -12,7 +12,7 @@ namespace BrokeProtocol.WarSource.Types
                 connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) &&
                 connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
             {
-                player.svPlayer.SvSetJob(BPAPI.Instance.Jobs[teamIndex], true, false);
+                player.svPlayer.SvSetJob(BPAPI.Jobs[teamIndex], true, false);
             }
 
             player.svPlayer.SvForceEquipable(player.svPlayer.GetBestWeapon().index);
