@@ -123,7 +123,7 @@ namespace BrokeProtocol.WarSource.Jobs
 
         public override void ResetJobAI()
         {
-            Debug.Log("territories: " + Manager.territories.Count);
+            //Debug.Log("territories: " + Manager.territories.Count);
             var goal = Manager.territories.GetRandom();
 
             if (!goal)

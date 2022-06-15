@@ -137,10 +137,10 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
-        public void OnStart(SvManager svManager)
+        public void OnStart()
         {
             var skins = new HashSet<string>();
-            svManager.ParseFile(ref skins, Paths.AbsolutePath("skins.txt"));
+            SvManager.Instance.ParseFile(ref skins, Paths.AbsolutePath("skins.txt"));
             skinPrefabs = skins.ToEntityList<ShPlayer>();
 
             foreach (Transform place in SceneManager.Instance.mTransform)
@@ -177,7 +177,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     if (job.characterType == CharacterType.All || randomSkin.characterType == job.characterType)
                     {
-                        svManager.AddRandomSpawn(randomSkin, jobIndex, (int)WaypointType.Player);
+                        SvManager.Instance.AddRandomSpawn(randomSkin, jobIndex, (int)WaypointType.Player);
                         count++;
                     }
                     else
@@ -194,7 +194,7 @@ namespace BrokeProtocol.GameSource.Types
                         for (int i = 0; i < job.poolSize; i++)
                         {
                             if (SceneManager.Instance.TryGetEntity<ShTransport>(transportArray.transports.GetRandom(), out var t))
-                                svManager.AddRandomSpawn(t, jobIndex, waypointIndex);
+                                SvManager.Instance.AddRandomSpawn(t, jobIndex, waypointIndex);
                         }
                     }
                     waypointIndex++;
@@ -203,85 +203,85 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         //[Target(GameSourceEvent.ManagerUpdate, ExecutionMode.Override)]
-        //public void OnUpdate(SvManager svManager) { }
+        //public void OnUpdate() { }
 
         //[Target(GameSourceEvent.ManagerFixedUpdate, ExecutionMode.Override)]
-        //public void OnFixedUpdate(SvManager svManager) { }
+        //public void OnFixedUpdate() { }
 
         //[Target(GameSourceEvent.ManagerConsoleInput, ExecutionMode.Override)]
-        //public void OnConsoleInput(SvManager svManager, string cmd) { }
+        //public void OnConsoleInput(string cmd) { }
 
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
-        public void OnTryLogin(SvManager svManager, ConnectionData connectData)
+        public void OnTryLogin(ConnectionData connectData)
         {
-            if (ValidateUser(svManager, connectData))
+            if (ValidateUser(connectData))
             {
-                if (!svManager.TryGetUserData(connectData.username, out var playerData))
+                if (!SvManager.Instance.TryGetUserData(connectData.username, out var playerData))
                 {
-                    svManager.RegisterFail(connectData.connection, "Account not found - Please Register");
+                    SvManager.Instance.RegisterFail(connectData.connection, "Account not found - Please Register");
                     return;
                 }
 
                 if (playerData.PasswordHash != connectData.passwordHash)
                 {
-                    svManager.RegisterFail(connectData.connection, "Invalid credentials");
+                    SvManager.Instance.RegisterFail(connectData.connection, "Invalid credentials");
                     return;
                 }
 
-                svManager.LoadSavedPlayer(playerData, connectData);
+                SvManager.Instance.LoadSavedPlayer(playerData, connectData);
             }
         }
 
 
         [Target(GameSourceEvent.ManagerTryRegister, ExecutionMode.Override)]
-        public void OnTryRegister(SvManager svManager, ConnectionData connectData)
+        public void OnTryRegister(ConnectionData connectData)
         {
-            if (ValidateUser(svManager, connectData))
+            if (ValidateUser(connectData))
             {
-                if (svManager.TryGetUserData(connectData.username, out var playerData))
+                if (SvManager.Instance.TryGetUserData(connectData.username, out var playerData))
                 {
                     if (playerData.PasswordHash != connectData.passwordHash)
                     {
-                        svManager.RegisterFail(connectData.connection, "Invalid credentials");
+                        SvManager.Instance.RegisterFail(connectData.connection, "Invalid credentials");
                         return;
                     }
 
                     if (!Utility.tryRegister.Limit(connectData.username))
                     {
-                        svManager.RegisterFail(connectData.connection, $"Character {connectData.username} Exists - Sure you want to Register?");
+                        SvManager.Instance.RegisterFail(connectData.connection, $"Character {connectData.username} Exists - Sure you want to Register?");
                         return;
                     }
                 }
 
                 if (!connectData.username.ValidCredential())
                 {
-                    svManager.RegisterFail(connectData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
                     return;
                 }
 
-                if (connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs.Count && connectData.wearableIndices?.Length == svManager.manager.nullWearable.Length)
+                if (connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs.Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
                 {
                     var spawn = spawnLocations.GetRandom();
 
                     if (spawn)
                     {
                         var location = spawn.mainT;
-                        svManager.AddNewPlayer(skinPrefabs[connectData.skinIndex], connectData, playerData?.Persistent, location.position, location.rotation, location.parent);
+                        SvManager.Instance.AddNewPlayer(skinPrefabs[connectData.skinIndex], connectData, playerData?.Persistent, location.position, location.rotation, location.parent);
                     }
                     else
                     {
-                        svManager.RegisterFail(connectData.connection, "No spawn locations");
+                        SvManager.Instance.RegisterFail(connectData.connection, "No spawn locations");
                     }
                 }
                 else
                 {
-                    svManager.RegisterFail(connectData.connection, "Invalid data");
+                    SvManager.Instance.RegisterFail(connectData.connection, "Invalid data");
                 }
             }
         }
 
         [Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
-        public void OnSave(SvManager svManager)
+        public void OnSave()
         {
             var bountyData = new Data
             {
@@ -295,20 +295,20 @@ namespace BrokeProtocol.GameSource.Types
                     bountyData.CustomData[bounty.Key] = bounty.Value;
                 }
             }
-            svManager.database.Data.Upsert(bountyData);
+            SvManager.Instance.database.Data.Upsert(bountyData);
 
             ChatHandler.SendToAll("Saving server status..");
             foreach (var player in EntityCollections.Humans)
             {
                 player.svPlayer.Save();
             }
-            svManager.database.WriteOut();
+            SvManager.Instance.database.WriteOut();
         }
 
         [Target(GameSourceEvent.ManagerLoad, ExecutionMode.Override)]
-        public void OnLoad(SvManager svManager)
+        public void OnLoad()
         {
-            var bountyData = svManager.database.Data.FindById(Hitman.bountiesKey);
+            var bountyData = SvManager.Instance.database.Data.FindById(Hitman.bountiesKey);
 
             if (bountyData != null)
             {
@@ -334,24 +334,24 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.ManagerPlayerLoaded, ExecutionMode.Override)]
-        public void OnPlayerLoaded(SvManager svManager, ConnectionData connectData)
+        public void OnPlayerLoaded(ConnectionData connectData)
         {
             connectData.connectionStatus = ConnectionStatus.LoadedMap;
-            svManager.SendRegisterMenu(connectData.connection, true, skinPrefabs);
+            SvManager.Instance.SendRegisterMenu(connectData.connection, true, skinPrefabs);
         }
 
-        private bool ValidateUser(SvManager svManager, ConnectionData connectData)
+        private bool ValidateUser(ConnectionData connectData)
         {
-            if (!svManager.HandleWhitelist(connectData.username))
+            if (!SvManager.Instance.HandleWhitelist(connectData.username))
             {
-                svManager.RegisterFail(connectData.connection, "Account not whitelisted");
+                SvManager.Instance.RegisterFail(connectData.connection, "Account not whitelisted");
                 return false;
             }
 
             // Don't allow multi-boxing, WebAPI doesn't prevent this
             if (EntityCollections.Accounts.ContainsKey(connectData.username))
             {
-                svManager.RegisterFail(connectData.connection, "Account still logged in");
+                SvManager.Instance.RegisterFail(connectData.connection, "Account still logged in");
                 return false;
             }
 
@@ -360,7 +360,7 @@ namespace BrokeProtocol.GameSource.Types
 
         // Read packet data from Buffers.reader
         [Target(GameSourceEvent.ManagerCustomPacket, ExecutionMode.Override)]
-        public void OnCustomPacket(SvManager svManager, ConnectionData connectData, SvPacket packet)
+        public void OnCustomPacket(ConnectionData connectData, SvPacket packet)
         {
             var packetID = Buffers.reader.ReadByte();
         }

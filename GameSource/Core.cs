@@ -11,6 +11,9 @@ namespace BrokeProtocol.GameSource
 {
     public class Core : Plugin
     {
+        public static int prisonerIndex = -1;
+        public static int policeIndex = -1;
+
         public Core()
         {
             Info = new PluginInfo(
@@ -28,6 +31,23 @@ namespace BrokeProtocol.GameSource
 
             // Use JobsAdditive if you're adding to Default jobs and not replacing them
             JobsOverride = JsonConvert.DeserializeObject<List<JobInfo>>(File.ReadAllText(jobsFilename));
+
+            var index = 0;
+            foreach (var info in JobsOverride)
+            {
+                if (info.jobType != null)
+                {
+                    if (prisonerIndex < 0 && info.shared.groupIndex == GroupIndex.Prisoner)
+                    {
+                        prisonerIndex = index;
+                    }
+                    else if (policeIndex < 0 && info.shared.groupIndex == GroupIndex.LawEnforcement)
+                    {
+                        policeIndex = index;
+                    }
+                }
+                index++;
+            }
         }
 
         /*

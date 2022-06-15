@@ -57,10 +57,10 @@ namespace BrokeProtocol.CustomEvents
 
             caller.TransferMoney(DeltaInv.RemoveFromMe, cost);
 
-            target.StartCoroutine(EnterTheVoid(target.svEntity.svManager));
+            target.StartCoroutine(EnterTheVoid());
         }
 
-        private IEnumerator EnterTheVoid(SvManager svManager)
+        private IEnumerator EnterTheVoid()
         {
             voidRunning = true;
 
@@ -105,23 +105,23 @@ namespace BrokeProtocol.CustomEvents
                     lerp = 1f;
                 }
 
-                svManager.SvSetTimeScale(Mathf.Lerp(originalTimeScale, targetTimeScale, lerp));
-                svManager.SvSetSkyColor(Color.LerpUnclamped(originalSky, targetSky, lerp));
-                svManager.SvSetCloudColor(Color.LerpUnclamped(originalCloud, targetCloud, lerp));
-                svManager.SvSetWaterColor(Color.LerpUnclamped(originalWater, targetWater, lerp));
+                SvManager.Instance.SvSetTimeScale(Mathf.Lerp(originalTimeScale, targetTimeScale, lerp));
+                SvManager.Instance.SvSetSkyColor(Color.LerpUnclamped(originalSky, targetSky, lerp));
+                SvManager.Instance.SvSetCloudColor(Color.LerpUnclamped(originalCloud, targetCloud, lerp));
+                SvManager.Instance.SvSetWaterColor(Color.LerpUnclamped(originalWater, targetWater, lerp));
             }
 
-            svManager.SvSetTimeScale(originalTimeScale);
+            SvManager.Instance.SvSetTimeScale(originalTimeScale);
 
             if (defaultEnvironment)
             {
-                svManager.SvSetDefaultEnvironment();
+                SvManager.Instance.SvSetDefaultEnvironment();
             }
             else
             {
-                svManager.SvSetSkyColor(originalSky);
-                svManager.SvSetCloudColor(originalCloud);
-                svManager.SvSetWaterColor(originalWater);
+                SvManager.Instance.SvSetSkyColor(originalSky);
+                SvManager.Instance.SvSetCloudColor(originalCloud);
+                SvManager.Instance.SvSetWaterColor(originalWater);
             }
 
             voidRunning = false;

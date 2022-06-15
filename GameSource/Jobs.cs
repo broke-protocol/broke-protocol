@@ -458,8 +458,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         protected override GetEntityCallback GetTargetHandler() => () =>
         {
-            if (svManager.fires.Count > 0)
-                return svManager.fires.ToArray().GetRandom();
+            if (SvManager.Instance.fires.Count > 0)
+                return SvManager.Instance.fires.ToArray().GetRandom();
             else
                 return null;
         };
@@ -1108,8 +1108,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
                     var destination = Manager.spawnLocations.GetRandom();
 
-                    destinationMarker = svManager.AddNewEntity(
-                        svManager.markerGoalPrefab,
+                    destinationMarker = SvManager.Instance.AddNewEntity(
+                        SvManager.Instance.markerGoalPrefab,
                         SceneManager.Instance.ExteriorPlace,
                         destination.transform.position,
                         Quaternion.identity,
@@ -1197,7 +1197,7 @@ namespace BrokeProtocol.GameSource.Jobs
                         }
                         else if (p.myItems.Count > 0)
                         {
-                            var svManager = target.manager.svManager;
+                            var svManager = SvManager.Instance;
 
                             if(svManager.worldWaypoints[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
                             {

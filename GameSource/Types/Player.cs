@@ -156,7 +156,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     if (player.wantedLevel > 0 && !player.IsOutside && Random.value < player.wantedNormalized * 0.08f)
                     {
-                        player.svPlayer.svManager.worldWaypoints[(int)WaypointType.Player].SpawnAttack(player);
+                        SpawnAttack(player);
                     }
 
                     if (player.otherEntity && (!player.otherEntity.isActiveAndEnabled || !player.InActionRange(player.otherEntity)))
@@ -178,6 +178,36 @@ namespace BrokeProtocol.GameSource.Types
 
                 yield return delay;
             }
+        }
+
+        public ShPlayer SpawnAttack(ShPlayer target)
+        {
+            var spawnEntity = target.svEntity.svManager.GetAvailable(Core.policeIndex);
+
+            if (spawnEntity)
+            {
+                var spawnBot = spawnEntity.Player;
+                if (spawnBot)
+                {
+                    var spawnT = target.svEntity.GetDoor.spawnPoint;
+
+                    if (spawnT)
+                    {
+                        spawnBot.svPlayer.SpawnBot(
+                            spawnT.position,
+                            spawnT.rotation,
+                            target.GetPlace,
+                            null,
+                            target,
+                            null,
+                            target);
+
+                        return spawnBot;
+                    }
+                }
+            }
+
+            return null;
         }
 
         [Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Override)]
@@ -562,7 +592,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerGoToJail, ExecutionMode.Override)]
         public void OnGoToJail(ShPlayer player, float time, int fine)
         {
-            player.svPlayer.SvSetJob(BPAPI.Instance.Jobs[BPAPI.Instance.PrisonerIndex], true, false);
+            player.svPlayer.SvSetJob(BPAPI.Instance.Jobs[Core.prisonerIndex], true, false);
             var jailSpawn = Manager.jails.GetRandom().mainT;
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
             player.svPlayer.SvForceEquipable(player.Hands.index);
