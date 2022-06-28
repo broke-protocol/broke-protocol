@@ -1,5 +1,4 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.API.Types;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Jobs;
@@ -208,9 +207,6 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.ManagerFixedUpdate, ExecutionMode.Override)]
         //public void OnFixedUpdate() { }
 
-        //[Target(GameSourceEvent.ManagerConsoleInput, ExecutionMode.Override)]
-        //public void OnConsoleInput(string cmd) { }
-
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
         public void OnTryLogin(ConnectionData connectData)
         {
@@ -325,7 +321,7 @@ namespace BrokeProtocol.GameSource.Types
             try
             {
                 var groups = JsonConvert.DeserializeObject<List<Group>>(File.ReadAllText(Paths.groupsFile));
-                GroupManager.Groups = groups.ToDictionary(x => x.Name, y => y);
+                GroupHandler.Groups = groups.ToDictionary(x => x.Name, y => y);
             }
             catch(Exception e)
             {
