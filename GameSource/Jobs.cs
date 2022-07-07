@@ -19,21 +19,54 @@ namespace BrokeProtocol.GameSource.Jobs
 {
     public class JobRP : Job
     {
+        public override bool IsValidTarget(ShPlayer chaser)
+        {
+            var pluginPlayer = Manager.pluginPlayers[player];
+
+            if ((!chaser.svPlayer.IsFollower(player) && chaser.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement && (player.IsRestrained || pluginPlayer.wantedLevel == 0)))
+            {
+                return false;
+            }
+
+            if (player.GetPlaceIndex != chaser.GetPlaceIndex)
+            {
+                if (chaser.svPlayer.IsFollower(player))
+                {
+                    chaser.svPlayer.SvRelocate(player.GetPositionT, player.GetParent);
+                }
+                else return false;
+            }
+
+            return true;
+        }
+
+        public override ShUsable GetBestJobWeapon()
+        {
+            if (info.shared.groupIndex == GroupIndex.LawEnforcement && player.svPlayer.targetEntity is ShPlayer targetPlayer &&
+                Manager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget) && pluginTarget.wantedLevel <= 1 && player.HasItem(targetPlayer.Handcuffs))
+            {
+                return targetPlayer.Handcuffs;
+            }
+
+            return null;
+        }
+
         public override void OnDamageEntity(ShEntity damaged)
         {
-            if (damaged is ShPlayer victim && victim.wantedLevel == 0)
+            if (damaged is ShPlayer victim && Manager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
+                pluginVictim.wantedLevel == 0 && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 if (victim.characterType == CharacterType.Mob)
                 {
-                    player.svPlayer.SvAddCrime(CrimeIndex.AnimalCruelty, victim);
+                    pluginPlayer.AddCrime(CrimeIndex.AnimalCruelty, victim);
                 }
                 else if (player.curEquipable is ShGun)
                 {
-                    player.svPlayer.SvAddCrime(CrimeIndex.ArmedAssault, victim);
+                    pluginPlayer.AddCrime(CrimeIndex.ArmedAssault, victim);
                 }
                 else
                 {
-                    player.svPlayer.SvAddCrime(CrimeIndex.Assault, victim);
+                    pluginPlayer.AddCrime(CrimeIndex.Assault, victim);
                 }
             }
             else
@@ -44,9 +77,10 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void OnDestroyEntity(ShEntity destroyed)
         {
-            if (destroyed is ShPlayer victim && victim.wantedLevel == 0)
+            if (destroyed is ShPlayer victim && Manager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
+                pluginVictim.wantedLevel == 0 && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                player.svPlayer.SvAddCrime(victim.characterType == CharacterType.Human ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
+                pluginPlayer.AddCrime(victim.characterType == CharacterType.Human ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
                 victim.svPlayer.SendMurderedMessage(player);
             }
         }
@@ -94,7 +128,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected void TryFindInnocent()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.curMount && !p.IsDead && p.IsRestrained && p.wantedLevel == 0 && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginPlayer) && !p.curMount && !p.IsDead && p.IsRestrained && pluginPlayer.wantedLevel == 0 && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
@@ -165,10 +199,11 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e),
                 (e) =>
                 {
+                    var pluginPlayer = Manager.pluginPlayers[player];
                     // Add random crimes to ensure high wanted level (targetable by SpecOps)
-                    while (player.wantedLevel < 3)
+                    while (pluginPlayer.wantedLevel < 3)
                     {
-                        player.AddCrime((byte)Random.Range(1, CrimeIndex.Count), e as ShPlayer);
+                        pluginPlayer.AddCrime((byte)Random.Range(1, CrimeIndex.Count), e as ShPlayer);
                     }
                     player.svPlayer.SetAttackState(e);
                 });
@@ -333,14 +368,26 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Police : LawEnforcement
     {
+        public const string drugTest = "DrugTest";
+
+        public override void SetJob()
+        {
+            player.svPlayer.SvAddDynamicAction(drugTest, "Drug Test");
+            base.SetJob();
+        }
+
+        public override void RemoveJob()
+        {
+            player.svPlayer.SvRemoveDynamicAction(drugTest);
+            base.RemoveJob();
+        }
+
         protected override void FoundTarget(bool startGoalMarker)
         {
             base.FoundTarget(startGoalMarker);
             player.svPlayer.SendGameMessage("Criminal target: " + targetPlayer.username);
             targetPlayer.svPlayer.SendGameMessage("Police dispatched!");
         }
-
-        public override void OnJailCriminal(ShPlayer criminal, int fine) => player.svPlayer.Reward(3, fine);
     }
 
     public class Paramedic : TargetPlayerJob
@@ -881,8 +928,8 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             ShPlayer target = player.svPlayer.spawner;
 
-            if (target && target.IsOutside && target.wantedLevel >= info.attackLevel &&
-                Random.value < target.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
+            if (target && Manager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= info.attackLevel &&
+                Random.value < pluginTarget.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 return player.svPlayer.SetAttackState(target);
             }
@@ -892,7 +939,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected void TryFindCriminal()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && p.wantedLevel >= info.attackLevel && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= info.attackLevel && player.CanSeeEntity(e),
                 (e) => player.svPlayer.SetAttackState(e));
         }
 
@@ -903,7 +950,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
 
         protected override bool ValidTarget(ShEntity target) => 
-            base.ValidTarget(target) && (target as ShPlayer).wantedLevel >= info.attackLevel;
+            base.ValidTarget(target) && target is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= info.attackLevel;
 
         protected override GetEntityCallback GetTargetHandler()
         {
@@ -932,7 +979,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void OnDestroyEntity(ShEntity entity)
         {
             base.OnDestroyEntity(entity);
-            if (entity is ShPlayer victim && targetPlayer == victim && victim.wantedLevel > 0 && victim.wantedLevel >= info.attackLevel)
+            if (entity is ShPlayer victim && Manager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && targetPlayer == victim && pluginVictim.wantedLevel > 0 && pluginVictim.wantedLevel >= info.attackLevel)
             {
                 player.svPlayer.Reward(3, 300);
             }
@@ -1135,6 +1182,23 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class LawEnforcement : TargetPlayerJob
     {
+        public const string sendToJail = "SendToJail";
+        public const string showCrimes = "ShowCrimes";
+
+        public override void SetJob()
+        {
+            player.svPlayer.SvAddDynamicAction(showCrimes, "Show Crimes");
+            player.svPlayer.SvAddDynamicAction(sendToJail, "Send to Jail");
+            base.SetJob();
+        }
+
+        public override void RemoveJob()
+        {
+            player.svPlayer.SvRemoveDynamicAction(showCrimes);
+            player.svPlayer.SvRemoveDynamicAction(sendToJail);
+            base.RemoveJob();
+        }
+
         public override void Loop()
         {
             if (player.IsDead) return;

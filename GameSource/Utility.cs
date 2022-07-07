@@ -11,5 +11,8 @@ namespace BrokeProtocol.GameSource
         public static LimitQueue<ShPlayer> trySell = new LimitQueue<ShPlayer>(0, 5f);
 
         public static LimitQueue<string> tryRegister = new LimitQueue<string>(0, 5f);
+
+        public const int maxWantedLevel = 5;
+        public const string starName = "Star";
     }
 }

@@ -16,6 +16,179 @@ using UnityEngine.UI;
 
 namespace BrokeProtocol.GameSource.Types
 {
+    public class PluginPlayer
+    {
+        ShPlayer player;
+
+        public int wantedLevel;
+        public float wantedNormalized;
+
+        public PluginPlayer(ShPlayer player)
+        {
+            this.player = player;
+        }
+
+        public void ClearCrimes()
+        {
+            if (SceneManager.Instance.isServer)
+            {
+                foreach (var o in player.offenses)
+                {
+                    if (o.witness) o.witness.svPlayer.witnessedPlayers.Remove(player);
+                }
+            }
+            else if (player.clPlayer.isMain)
+            {
+                ClManager.Instance.ShowGameMessage("Crimes Cleared");
+            }
+
+            player.offenses.Clear();
+            UpdateWantedLevel(false);
+        }
+
+        public void ClearWitnessed()
+        {
+            foreach (var criminal in player.svPlayer.witnessedPlayers.Keys)
+            {
+                if(Manager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal))
+                {
+                    pluginCriminal.RemoveWitness(player);
+                    //criminal.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.RemoveWitness, player.ID);
+                }
+            }
+
+            player.svPlayer.witnessedPlayers.Clear();
+        }
+
+        public void RemoveWitness(ShPlayer witness)
+        {
+            foreach (var offense in player.offenses)
+            {
+                if (offense.witness == witness) offense.witness = null;
+            }
+
+            UpdateWantedLevel(false);
+        }
+
+        public void UpdateWantedLevel(bool updateDisguised)
+        {
+            var totalExpiration = 0f;
+
+            foreach (var o in player.offenses)
+            {
+                if (updateDisguised)
+                {
+                    o.disguised = false;
+                    int j = 0;
+                    int count = 0;
+                    foreach (var w in player.curWearables)
+                    {
+                        if (w.index != ShManager.Instance.nullWearable[j].index && w.index != o.wearables[j])
+                        {
+                            if (count > 1)
+                            {
+                                o.disguised = true;
+                                break;
+                            }
+                            else
+                            {
+                                count++;
+                            }
+                        }
+                        j++;
+                    }
+                }
+
+                totalExpiration += o.AdjustedExpiration();
+            }
+
+            wantedLevel = Mathf.CeilToInt(Mathf.Min(totalExpiration / 360f, Utility.maxWantedLevel));
+        }
+
+        public void AddCrime(byte crimeIndex, ShPlayer victim)
+        {
+            if (player.svPlayer.godMode || !Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) || player.svPlayer.InvalidCrime(crimeIndex)) return;
+
+            var crime = player.manager.GetCrime(crimeIndex);
+
+            ShPlayer witness;
+            if (!crime.witness)
+            {
+                witness = victim; // May be null which is fine in this case
+            }
+            else
+            {
+                witness = player.svPlayer.GetWitness(victim);
+                if (!witness) return;
+            }
+
+            if (witness)
+            {
+                witness.svPlayer.AddWitnessedCriminal(player);
+            }
+
+            player.offenses.Add(new Offense(crime, player.curWearables, witness));
+            pluginPlayer.UpdateWantedLevel(false);
+
+            if (SceneManager.Instance.isClient)
+            {
+                ClManager.Instance.ShowGameMessage("Committed Crime: " + crime.crimeName);
+            }
+
+            var wantedLevel = pluginPlayer.wantedLevel;
+
+            for (int i = 1; i <= Utility.maxWantedLevel; i++)
+            {
+                player.svPlayer.VisualElementVisibility(Utility.starName, i <= wantedLevel);
+            }
+
+            // Don't hand out crime penalties for criminal jobs and default job
+            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Criminal && player.svPlayer.job.info.shared.jobIndex > 0)
+            {
+                player.svPlayer.Reward(-crime.experiencePenalty, -crime.fine);
+            }
+        }
+
+        public void RemoveCrime(int index)
+        {
+            player.offenses.RemoveAt(index);
+            UpdateWantedLevel(false);
+        }
+
+        public bool ApartmentUnlawful(ShPlayer apartmentOwner) => apartmentOwner != player && (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement || Manager.pluginPlayers[apartmentOwner].wantedLevel == 0);
+
+        public bool ApartmentTrespassing(ShPlayer apartmentOwner) => player.svPlayer.trespassing && ApartmentUnlawful(apartmentOwner);
+
+        public int GoToJail()
+        {
+            if (player.IsDead || !player.IsRestrained || player.svPlayer.job.info.shared.groupIndex == GroupIndex.Prisoner)
+            {
+                return 0;
+            }
+
+            var time = 0f;
+            var fine = 0;
+            foreach (var o in player.offenses)
+            {
+                time += o.crime.jailtime;
+                fine += o.crime.fine;
+            }
+
+            if (fine <= 0) return 0;
+
+            player.svPlayer.SvSetJob(BPAPI.Jobs[Core.prisonerIndex], true, false);
+            var jailSpawn = Manager.jails.GetRandom().mainT;
+            player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
+            player.svPlayer.SvForceEquipable(player.Hands.index);
+            ClearCrimes();
+            player.svPlayer.RemoveItemsJail();
+            player.svPlayer.StartJailTimer(time);
+
+            return fine;
+        }
+    }
+
+
     public class MinigameContainer
     {
         public ShPlayer player;
@@ -38,7 +211,7 @@ namespace BrokeProtocol.GameSource.Types
         public ShApartment targetApartment;
         public ShPlayer targetPlayer;
 
-        public HackingContainer(ShPlayer player, int apartmentID, string username) : base (player, apartmentID)
+        public HackingContainer(ShPlayer player, int apartmentID, string username) : base(player, apartmentID)
         {
             targetApartment = targetEntity as ShApartment;
             EntityCollections.TryGetPlayerByNameOrID(username, out targetPlayer);
@@ -58,8 +231,8 @@ namespace BrokeProtocol.GameSource.Types
         public override bool IsValid()
         {
             if (!base.IsValid()) return false;
-            
-            if(!player.HasItem(player.manager.lockpick))
+
+            if (!player.HasItem(player.manager.lockpick))
             {
                 player.svPlayer.SendGameMessage($"Missing {player.manager.lockpick.itemName} item");
                 return false;
@@ -71,8 +244,65 @@ namespace BrokeProtocol.GameSource.Types
 
     public class Player : Movable
     {
-        //[Target(GameSourceEvent.PlayerDestroy, ExecutionMode.Override)]
-        //public void OnDestroy(ShPlayer player) { }
+        [Target(GameSourceEvent.PlayerDestroy, ExecutionMode.Override)]
+        public void OnDestroy(ShPlayer player)
+        {
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                pluginPlayer.ClearWitnessed();
+                pluginPlayer.ClearCrimes();
+            }
+
+            Manager.pluginPlayers.Remove(player);
+        }
+
+        [Target(GameSourceEvent.PlayerLoad, ExecutionMode.Override)]
+        public void OnLoad(ShPlayer player)
+        {
+            if (player.svPlayer.PlayerData.Character.Crimes.Count > 0)
+            {
+                var wearables = new ShWearable[player.curWearables.Length];
+                foreach (var crimeSave in player.svPlayer.PlayerData.Character.Crimes)
+                {
+                    for (int i = 0; i < wearables.Length; i++)
+                    {
+                        // Future/mod-proofing
+                        if (i < crimeSave.Wearables.Length &&
+                            SceneManager.Instance.TryGetEntity<ShWearable>(crimeSave.Wearables[i], out var w))
+                        {
+                            wearables[i] = w;
+                        }
+
+                        if (!wearables[i]) wearables[i] = ShManager.Instance.nullWearable[i];
+                    }
+
+                    ShPlayer witness = null;
+
+                    if (crimeSave.WitnessBotID != 0)
+                    {
+                        witness = EntityCollections.FindByID<ShPlayer>(crimeSave.WitnessBotID);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(crimeSave.WitnessPlayerAccount))
+                    {
+                        foreach (var p in EntityCollections.Humans)
+                        {
+                            if (p.username == crimeSave.WitnessPlayerAccount)
+                            {
+                                witness = p;
+                                break;
+                            }
+                        }
+                    }
+
+                    player.offenses.Add(new Offense(ShManager.Instance.GetCrime(crimeSave.Index), wearables, witness, crimeSave.TimeSinceLast));
+                }
+
+                if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                {
+                    pluginPlayer.UpdateWantedLevel(true);
+                }
+            }
+        }
 
         //[Target(GameSourceEvent.PlayerAddItem, ExecutionMode.Override)]
         //public void OnAddItem(ShPlayer player, int itemIndex, int amount, bool dispatch) { }
@@ -86,8 +316,41 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.PlayerSave, ExecutionMode.Override)]
         //public void OnSave(ShPlayer player) { }
 
-        //[Target(GameSourceEvent.PlayerTransferItem, ExecutionMode.Override)]
-        //public void OnTransferItem(ShPlayer player, byte deltaType, int itemIndex, int amount, bool dispatch) { }
+        [Target(GameSourceEvent.PlayerTransferItem, ExecutionMode.Override)]
+        public void OnTransferItem(ShPlayer player, byte deltaType, int itemIndex, int amount, bool dispatch)
+        {
+            switch(deltaType)
+            {
+                case DeltaInv.OtherToMe:
+                    var otherPlayer = player.otherEntity as ShPlayer;
+
+                    if (player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+                    {
+                        if (SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item) && item.illegal)
+                        {
+                            if (otherPlayer && otherPlayer.Shop && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                            {
+                                pluginPlayer.AddCrime(CrimeIndex.Theft, otherPlayer);
+                            }
+                        }
+                        else if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                        {
+                            pluginPlayer.AddCrime(CrimeIndex.Theft, otherPlayer);
+                        }
+                    }
+                    else if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                    {
+                        pluginPlayer.AddCrime(CrimeIndex.Theft, otherPlayer);
+                    }
+
+                    if (otherPlayer && !otherPlayer.isHuman && Random.value < 0.25f && otherPlayer.svPlayer.SetAttackState(player))
+                    {
+                        player.svPlayer.SvStopInventory(true);
+                    }
+                    break;
+            }
+            
+        }
 
         //[Target(GameSourceEvent.PlayerMenuClosed, ExecutionMode.Override)]
         //public void OnMenuClosed(ShPlayer player, string menuID, bool manualClose) => player.svPlayer.SvGlobalChatMessage("[Menu Closed Event] " + menuID + " " + manualClose);
@@ -95,12 +358,18 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerInitialize, ExecutionMode.Override)]
         public void OnInitialize(ShPlayer player)
         {
-            player.svPlayer.SvAddInventoryAction("StealItem", "ShItem", ButtonType.Buyable, "Steal");
+            Manager.pluginPlayers.Add(player, new PluginPlayer(player));
+            player.svPlayer.SvAddSelfAction("MyCrimes", "My Crimes");
+            //player.svPlayer.SvAddInventoryAction("StealItem", "ShItem", ButtonType.Buyable, "Steal");
         }
 
         [Target(GameSourceEvent.PlayerSpawn, ExecutionMode.Override)]
         public void OnSpawn(ShPlayer player)
         {
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                pluginPlayer.ClearCrimes();
+            }
             player.StartCoroutine(Maintenance(player));
         }
 
@@ -109,6 +378,8 @@ namespace BrokeProtocol.GameSource.Types
             yield return null;
 
             var delay = new WaitForSeconds(5f);
+
+            Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer);
 
             while (!player.IsDead)
             {
@@ -123,9 +394,9 @@ namespace BrokeProtocol.GameSource.Types
                             if (value <= 1) witness.svPlayer.witnessedPlayers.Remove(player);
                             else witness.svPlayer.witnessedPlayers[player] = value - 1;
                         }
-
-                        player.RemoveCrime(i);
-                        player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.RemoveCrime, i);
+                        
+                        pluginPlayer.RemoveCrime(i);
+                        //player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.RemoveCrime, i);
                     }
                 }
 
@@ -154,7 +425,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (player.isHuman)
                 {
-                    if (player.wantedLevel > 0 && !player.IsOutside && Random.value < player.wantedNormalized * 0.08f)
+                    if (!player.IsOutside && Random.value < pluginPlayer.wantedNormalized * 0.08f)
                     {
                         SpawnAttack(player);
                     }
@@ -217,7 +488,7 @@ namespace BrokeProtocol.GameSource.Types
 
             message = message.CleanMessage();
 
-            if(string.IsNullOrWhiteSpace(message)) return;
+            if (string.IsNullOrWhiteSpace(message)) return;
 
             Debug.Log($"[CHAT] {player.username}:{message}");
 
@@ -269,7 +540,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 var hitY = player.GetLocalY(hitPoint);
 
-                if(damageIndex == DamageIndex.Random)
+                if (damageIndex == DamageIndex.Random)
                 {
                     part = (BodyPart)Random.Range(0, (int)BodyPart.Count);
                 }
@@ -315,7 +586,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.IsDead) return;
 
-            // Still alive, do knockdown and Assault crimes
+            // Still alive, do knockdown and AI retaliation
 
             if (player.stance.setable)
             {
@@ -371,7 +642,10 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.RemoveItemsDeath(false);
             }
 
-            player.svPlayer.ClearWitnessed();
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                pluginPlayer.ClearWitnessed();
+            }
 
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, player.svPlayer.RespawnTime);
 
@@ -408,7 +682,7 @@ namespace BrokeProtocol.GameSource.Types
             if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
             {
                 title += ": Level " + apartmentPlace.svSecurity.ToPercent();
-                if(apartmentPlace.svSecurity < securityCutoff)
+                if (apartmentPlace.svSecurity < securityCutoff)
                     options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.svSecurity).ToString()})", upgradeSecurity));
             }
 
@@ -511,7 +785,7 @@ namespace BrokeProtocol.GameSource.Types
 
             base.OnRespawn(player);
 
-            if(player.isHuman)
+            if (player.isHuman)
             {
                 // Back to spectate self on Respawn
                 player.svPlayer.SvSpectate(player);
@@ -577,66 +851,108 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(GameSourceEvent.PlayerJailCriminal, ExecutionMode.Override)]
-        public void OnJailCriminal(ShPlayer player, ShPlayer criminal)
+        [Target(GameSourceEvent.PlayerCollect, ExecutionMode.Override)]
+        public void OnCollect(ShPlayer player, ShEntity e, bool consume)
         {
-            if (player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+            if (consume && e is ShConsumable consumable)
             {
-                int fine = criminal.svPlayer.SvGoToJail();
-
-                if (fine > 0) player.svPlayer.job.OnJailCriminal(criminal, fine);
-                else player.svPlayer.SendGameMessage("Confirm criminal is cuffed and has crimes");
-            }
-        }
-
-        [Target(GameSourceEvent.PlayerGoToJail, ExecutionMode.Override)]
-        public void OnGoToJail(ShPlayer player, float time, int fine)
-        {
-            player.svPlayer.SvSetJob(BPAPI.Jobs[Core.prisonerIndex], true, false);
-            var jailSpawn = Manager.jails.GetRandom().mainT;
-            player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
-            player.svPlayer.SvForceEquipable(player.Hands.index);
-            player.svPlayer.SvClearCrimes();
-            player.svPlayer.RemoveItemsJail();
-            player.svPlayer.StartJailTimer(time);
-        }
-
-        [Target(GameSourceEvent.PlayerCrime, ExecutionMode.Override)]
-        public void OnCrime(ShPlayer player, byte crimeIndex, ShPlayer victim)
-        {
-            if (player.svPlayer.godMode || player.svPlayer.InvalidCrime(crimeIndex)) return;
-
-            var crime = player.manager.GetCrime(crimeIndex);
-
-            ShPlayer witness;
-            if (!crime.witness)
-            {
-                witness = victim; // May be null which is fine in this case
+                if (!player.svPlayer.SvConsume(consumable)) return;
             }
             else
             {
-                witness = player.svPlayer.GetWitness(victim);
-                if (!witness) return;
+                var collectedItems = e.CollectedItems;
+
+                for (int i = 0; i < collectedItems.Length; i++)
+                {
+                    var inv = collectedItems[i];
+
+                    var itemIndex = inv.itemName.GetPrefabIndex();
+                    if (SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item))
+                    {
+                        player.svPlayer.CollectItem(item, inv.count);
+                        if (i == 0) player.svPlayer.SvTrySetEquipable(itemIndex);
+                    }
+                }
             }
 
-            int witnessID;
-            if (witness)
+            if (!e.IsOutside && e.svEntity.respawnable && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                witnessID = witness.ID;
-                witness.svPlayer.AddWitnessedCriminal(player);
-            }
-            else
-            {
-                witnessID = 0;
+                pluginPlayer.AddCrime(CrimeIndex.Theft, null);
             }
 
-            player.AddCrime(crime.index, witness);
-            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddCrime, crime.index, witnessID);
+            e.Destroy();
+        }
 
-            // Don't hand out crime penalties for criminal jobs and default job
-            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Criminal && player.svPlayer.job.info.shared.jobIndex > 0)
+        [Target(GameSourceEvent.PlayerStopInventory, ExecutionMode.Override)]
+        public void OnStopInventory(ShPlayer player, bool sendToSelf)
+        {
+            if (!player.otherEntity && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer)) // Only null if being searched
             {
-                player.svPlayer.Reward(-crime.experiencePenalty, -crime.fine);
+                foreach (var p in player.viewers)
+                {
+                    if (p.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+                    {
+                        pluginPlayer.AddCrime(CrimeIndex.Obstruction, null);
+                        return;
+                    }
+                }
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerBomb, ExecutionMode.Override)]
+        public void OnBomb(ShPlayer player, ShVault vault)
+        {
+            player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.bomb.index);
+
+            player.svPlayer.SvShowTimer(vault.svVault.bombTimer);
+
+            if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                pluginPlayer.AddCrime(CrimeIndex.Bombing, null);
+
+            vault.svVault.SvSetVault(VaultState.Bombing);
+            vault.svVault.instigator = player;
+        }
+
+        [Target(GameSourceEvent.PlayerRepair, ExecutionMode.Override)]
+        public void OnRepair(ShPlayer player, ShTransport transport)
+        {
+            if (transport.svTransport.SvHeal(transport.maxStat, player))
+                player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.toolkit);
+        }
+
+        [Target(GameSourceEvent.PlayerLockpick, ExecutionMode.Override)]
+        public void OnLockpick(ShPlayer player, ShTransport transport)
+        {
+            if (player.CanMount(transport, false, true, out _) && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.lockpick);
+                transport.state = EntityState.Unlocked;
+                transport.svTransport.SendTransportState();
+
+                player.svPlayer.SvTryMount(transport.ID, true);
+
+                pluginPlayer.AddCrime(CrimeIndex.AutoTheft, null);
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerViewInventory, ExecutionMode.Override)]
+        public void OnViewInventory(ShPlayer player, ShEntity searchee, bool force)
+        {
+            if (searchee is ShPlayer playerSearchee && player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement &&
+                playerSearchee.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement && !searchee.Shop &&
+                Manager.pluginPlayers.TryGetValue(playerSearchee, out var pluginSearchee))
+            {
+                foreach (var i in searchee.myItems.Values)
+                {
+                    var item = i.item;
+
+                    if (item.illegal && (!item.license || !searchee.HasItem(item.license)))
+                    {
+                        pluginSearchee.AddCrime(CrimeIndex.Contraband, null);
+                        player.svPlayer.SendGameMessage("Contraband Found - Take unlicensed items");
+                        break;
+                    }
+                }
             }
         }
 
@@ -730,7 +1046,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerRestrain, ExecutionMode.Override)]
         public void OnRestrain(ShPlayer player, ShPlayer initiator, ShRestrained restrained)
         {
-            if(player.svPlayer.godMode) return;
+            if (player.svPlayer.godMode) return;
 
             if (player.curMount) player.svPlayer.SvDismount();
 
@@ -803,7 +1119,7 @@ namespace BrokeProtocol.GameSource.Types
                     return;
                 }
 
-                if(!player.InActionRange(door))
+                if (!player.InActionRange(door))
                 {
                     return;
                 }
@@ -861,12 +1177,12 @@ namespace BrokeProtocol.GameSource.Types
 
         private IEnumerator CheckValidMinigame(MinigameContainer minigameContainer)
         {
-            while(minigameContainer.Active && minigameContainer.IsValid())
+            while (minigameContainer.Active && minigameContainer.IsValid())
             {
                 yield return null;
             }
 
-            if(minigameContainer.Active) minigameContainer.player.svPlayer.SvMinigameStop(true);
+            if (minigameContainer.Active) minigameContainer.player.svPlayer.SvMinigameStop(true);
         }
 
         private int SecurityUpgradeCost(float currentLevel) => (int)(15000f * currentLevel * currentLevel + 200f);
@@ -874,7 +1190,7 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerOptionAction, ExecutionMode.Override)]
         public void OnOptionAction(ShPlayer player, int targetID, string menuID, string optionID, string actionID)
         {
-            switch(menuID)
+            switch (menuID)
             {
                 case securityPanel:
                     var apartment = EntityCollections.FindByID<ShApartment>(targetID);
@@ -900,9 +1216,9 @@ namespace BrokeProtocol.GameSource.Types
                         case upgradeSecurity:
                             if (player.ownedApartments.TryGetValue(apartment, out var securityPlace) && securityPlace.svSecurity < securityCutoff)
                             {
-                                int upgradeCost = SecurityUpgradeCost(securityPlace.svSecurity);
+                                var upgradeCost = SecurityUpgradeCost(securityPlace.svSecurity);
 
-                                if(player.MyMoneyCount >= upgradeCost)
+                                if (player.MyMoneyCount >= upgradeCost)
                                 {
                                     player.TransferMoney(DeltaInv.RemoveFromMe, upgradeCost);
                                     securityPlace.svSecurity += 0.1f;
@@ -939,12 +1255,12 @@ namespace BrokeProtocol.GameSource.Types
                 case videoPanel:
                     var videoEntity = EntityCollections.FindByID(targetID);
 
-                    if(optionID == customVideo && VideoPermission(player, videoEntity, PermEnum.VideoCustom))
+                    if (optionID == customVideo && VideoPermission(player, videoEntity, PermEnum.VideoCustom))
                     {
                         player.svPlayer.SendGameMessage("Only direct video links supported - Can upload to Imgur or Discord and link that");
                         player.svPlayer.SendInputMenu("Direct MP4/WEBM URL", targetID, customVideo, InputField.ContentType.Standard, 128);
                     }
-                    else if(optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
+                    else if (optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
                     {
                         videoEntity.svEntity.SvStopVideo();
                         player.svPlayer.DestroyMenu(videoPanel);
@@ -1004,9 +1320,9 @@ namespace BrokeProtocol.GameSource.Types
                 case enterPasscode:
                     var a1 = EntityCollections.FindByID<ShApartment>(targetID);
 
-                    foreach(var a in a1.svApartment.clones.Values)
+                    foreach (var a in a1.svApartment.clones.Values)
                     {
-                        if(a.svPasscode != null && a.svPasscode == input)
+                        if (a.svPasscode != null && a.svPasscode == input)
                         {
                             player.svPlayer.SvEnterDoor(targetID, a.svOwner, true);
                             return;
@@ -1049,7 +1365,7 @@ namespace BrokeProtocol.GameSource.Types
             switch (menuID)
             {
                 case ExampleCommand.coinFlip:
-                    switch(optionID)
+                    switch (optionID)
                     {
                         case ExampleCommand.heads:
                             player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.heads));
@@ -1109,8 +1425,8 @@ namespace BrokeProtocol.GameSource.Types
             player.pointing = pointing;
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Point, player.ID, pointing);
 
-            if(pointing && player.svPlayer.follower && 
-                Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) && 
+            if (pointing && player.svPlayer.follower &&
+                Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) &&
                 player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
                 player.svPlayer.follower.svPlayer.SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
@@ -1121,7 +1437,7 @@ namespace BrokeProtocol.GameSource.Types
         public void OnAlert(ShPlayer player)
         {
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Alert, player.ID);
-            if(player.svPlayer.follower)
+            if (player.svPlayer.follower)
             {
                 player.svPlayer.follower.svPlayer.SetFollowState(player);
             }
@@ -1130,6 +1446,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerMinigameFinished, ExecutionMode.Override)]
         public void OnHackFinished(ShPlayer player, bool successful, int targetID, string menuID, string optionID)
         {
+            if (!Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                return;
+
             switch (menuID)
             {
                 case hackPanel:
@@ -1139,9 +1458,9 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             player.StartCoroutine(EnterDoorDelay(player, targetID, optionID, true, 1f));
                         }
-                        else if (player.svPlayer.ApartmentUnlawful(owner))
+                        else if (pluginPlayer.ApartmentUnlawful(owner))
                         {
-                            player.svPlayer.SvAddCrime(CrimeIndex.Trespassing, owner);
+                            pluginPlayer.AddCrime(CrimeIndex.Trespassing, owner);
                         }
                     }
                     break;
@@ -1158,8 +1477,8 @@ namespace BrokeProtocol.GameSource.Types
 
                     // To stop Active/Valid() checks for a lockpick
                     player.svPlayer.minigame = null;
-                    
-                    player.svPlayer.SvAddCrime(CrimeIndex.Robbery, null);
+
+                    pluginPlayer.AddCrime(CrimeIndex.Robbery, null);
                     break;
             }
         }
@@ -1173,9 +1492,9 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerHandsUp, ExecutionMode.Override)]
         public void OnHandsUp(ShPlayer player, ShPlayer victim)
         {
-            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement)
+            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                player.svPlayer.SvAddCrime(CrimeIndex.Intimidation, victim);
+                pluginPlayer.AddCrime(CrimeIndex.Intimidation, victim);
             }
 
             if (!victim.isHuman)
@@ -1212,8 +1531,8 @@ namespace BrokeProtocol.GameSource.Types
             var crackingContainer = new CrackingContainer(player, entityID);
             if (crackingContainer.IsValid())
             {
-                player.svPlayer.StartCrackingMenu("Crack Inventory Lock", entityID, crackPanel, crackInventoryOption, 
-                    Mathf.Clamp01(crackingContainer.targetEntity.InventoryValue()/30000f));
+                player.svPlayer.StartCrackingMenu("Crack Inventory Lock", entityID, crackPanel, crackInventoryOption,
+                    Mathf.Clamp01(crackingContainer.targetEntity.InventoryValue() / 30000f));
                 player.StartCoroutine(CheckValidMinigame(crackingContainer));
             }
         }
@@ -1229,9 +1548,10 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.svPlayer.ResetAI();
             }
-            else if (seat == 0 && mount.svMountable.mountLicense && !player.HasItem(mount.svMountable.mountLicense))
+            else if (seat == 0 && mount.svMountable.mountLicense && !player.HasItem(mount.svMountable.mountLicense) && 
+                Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                player.svPlayer.SvAddCrime(CrimeIndex.NoLicense, null);
+                pluginPlayer.AddCrime(CrimeIndex.NoLicense, null);
             }
 
             player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.CurrentClip);
@@ -1329,6 +1649,80 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             player.svPlayer.job.ResetJobAI();
+        }
+
+        [Target(GameSourceEvent.PlayerSetWearable, ExecutionMode.Override)]
+        public void OnSetWearable(ShPlayer player, ShWearable wearable)
+        {
+            if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                pluginPlayer.UpdateWantedLevel(true);
+        }
+
+        [Target(GameSourceEvent.PlayerRestrainOther, ExecutionMode.Override)]
+        public void OnRestrainOther(ShPlayer player, ShPlayer hitPlayer, ShRestraint restraint)
+        {
+            restraint.RemoveAmmo();
+
+            if (Manager.pluginPlayers.TryGetValue(hitPlayer, out var hitPluginPlayer))
+            {
+                hitPlayer.svPlayer.Restrain(player, restraint.restrained);
+                if (hitPluginPlayer.wantedLevel == 0 && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+                    (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement || hitPlayer.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement))
+                {
+                    pluginPlayer.AddCrime(CrimeIndex.FalseArrest, hitPlayer);
+                }
+                else if (!player.isHuman && player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+                {
+                    hitPluginPlayer.GoToJail();
+                }
+            }
+        }
+
+        [Target(GameSourceEvent.PlayerDeposit, ExecutionMode.Override)]
+        public void OnDeposit(ShPlayer player, int entityID, int amount)
+        {
+            if (!player.svPlayer.CanUseApp(entityID, AppIndex.Withdraw) || !Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) || pluginPlayer.wantedLevel > 0 || amount <= 0 || player.svPlayer.bankBalance < amount)
+            {
+                player.svPlayer.SendGameMessage("Fraudulent activity detected");
+                return;
+            }
+
+            player.TransferMoney(DeltaInv.AddToMe, amount, true);
+            player.svPlayer.bankBalance -= amount;
+            player.svPlayer.AppendTransaction(-amount);
+            player.svPlayer.SvAppWithdraw(entityID);
+        }
+
+        [Target(GameSourceEvent.PlayerWithdraw, ExecutionMode.Override)]
+        public void OnWithdraw(ShPlayer player, int entityID, int amount)
+        {
+            if (!player.svPlayer.CanUseApp(entityID, AppIndex.Withdraw) || !Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) || pluginPlayer.wantedLevel > 0 || amount <= 0 || player.svPlayer.bankBalance < amount)
+            {
+                player.svPlayer.SendGameMessage("Fraudulent activity detected");
+                return;
+            }
+
+            player.TransferMoney(DeltaInv.AddToMe, amount, true);
+            player.svPlayer.bankBalance -= amount;
+            player.svPlayer.AppendTransaction(-amount);
+            player.svPlayer.SvAppWithdraw(entityID);
+        }
+
+        [Target(GameSourceEvent.PlayerTryGetJob, ExecutionMode.Override)]
+        public void OnTryGetJob(ShPlayer player, ShPlayer employer)
+        {
+            if (employer.svPlayer.job.info.characterType != CharacterType.All && player.characterType != employer.svPlayer.job.info.characterType)
+            {
+                player.svPlayer.SendGameMessage("You're not the correct mob type for this job");
+            }
+            else if (employer.svPlayer.job.info.shared.groupIndex == GroupIndex.Criminal && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && pluginPlayer.wantedLevel > 0)
+            {
+                player.svPlayer.SendGameMessage("We don't accept wanted criminals");
+            }
+            else
+            {
+                player.svPlayer.SvTrySetJob(employer.svPlayer.spawnJobIndex, true, true);
+            }
         }
     }
 }

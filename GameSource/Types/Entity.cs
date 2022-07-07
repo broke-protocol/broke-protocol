@@ -1,5 +1,7 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.API;
+using BrokeProtocol.Utility;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -25,5 +27,17 @@ namespace BrokeProtocol.GameSource.Types
 
         //[Target(GameSourceEvent.EntityTransferItem, ExecutionMode.Override)]
         //public void OnTransferItem(ShEntity entity, byte deltaType, int itemIndex, int amount, bool dispatch) { }
+
+        [Target(GameSourceEvent.EntitySecurityTrigger, ExecutionMode.Override)]
+        public void OnSecurityTrigger(ShEntity entity, Collider otherCollider)
+        {
+            if (entity.GetPlace is ApartmentPlace apartmentPlace && otherCollider.TryGetComponent(out ShPlayer player) && player != apartmentPlace.svOwner && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                apartmentPlace.svOwner.svPlayer.SendGameMessage($"{entity.name} detected {player.username} in apartment");
+
+                if (pluginPlayer.ApartmentTrespassing(apartmentPlace.svOwner))
+                    pluginPlayer.AddCrime(CrimeIndex.Trespassing, apartmentPlace.svOwner);
+            }
+        }
     }
 }

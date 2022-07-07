@@ -19,12 +19,14 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Manager
     {
+        public static Dictionary<ShPlayer, PluginPlayer> pluginPlayers = new Dictionary<ShPlayer, PluginPlayer>();
+
         public List<ShPlayer> skinPrefabs;
 
         [NonSerialized]
         public static List<SpawnLocation> spawnLocations = new List<SpawnLocation>();
         [NonSerialized]
-        public static List<Jail> jails = new List<Jail>();
+        public static List<ServerTrigger> jails = new List<ServerTrigger>();
         [NonSerialized]
         public static List<ShTerritory> territories = new List<ShTerritory>();
 
@@ -64,8 +66,8 @@ namespace BrokeProtocol.GameSource.Types
             {
                 warTerritory = startT;
 
-                int total = 0;
-                int count = 0;
+                var total = 0;
+                var count = 0;
                 foreach (var t in territories)
                 {
                     if (t.ownerIndex == attackerJob)
@@ -147,7 +149,7 @@ namespace BrokeProtocol.GameSource.Types
                 foreach (Transform child in place)
                 {
                     if (child.TryGetComponent(out SpawnLocation s)) spawnLocations.Add(s);
-                    else if (child.TryGetComponent(out Jail j)) jails.Add(j);
+                    else if (child.name.Equals("Jailyard") && child.TryGetComponent(out ServerTrigger j)) jails.Add(j);
                     else if (child.TryGetComponent(out ShTerritory t)) territories.Add(t);
                 }
             }

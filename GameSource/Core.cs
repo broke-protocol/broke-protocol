@@ -35,16 +35,13 @@ namespace BrokeProtocol.GameSource
             var index = 0;
             foreach (var info in JobsOverride)
             {
-                if (info.jobType != null)
+                if (prisonerIndex < 0 && info.shared.groupIndex == GroupIndex.Prisoner)
                 {
-                    if (prisonerIndex < 0 && info.shared.groupIndex == GroupIndex.Prisoner)
-                    {
-                        prisonerIndex = index;
-                    }
-                    else if (policeIndex < 0 && info.shared.groupIndex == GroupIndex.LawEnforcement)
-                    {
-                        policeIndex = index;
-                    }
+                    prisonerIndex = index;
+                }
+                else if (policeIndex < 0 && info.shared.groupIndex == GroupIndex.LawEnforcement)
+                {
+                    policeIndex = index;
                 }
                 index++;
             }

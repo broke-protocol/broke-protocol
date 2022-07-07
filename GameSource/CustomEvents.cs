@@ -1,10 +1,12 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
+using BrokeProtocol.Required;
 using BrokeProtocol.GameSource.Jobs;
+using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
-using Newtonsoft.Json.Linq;
+using BrokeProtocol.Utility.Networking;
 using System.Collections;
 using UnityEngine;
 
@@ -12,32 +14,159 @@ namespace BrokeProtocol.CustomEvents
 {
     public class CustomEvents : IScript
     {
-        // Can be called either via an in-game Trigger map object or CEF/JavaScript events
         [CustomTarget]
-        public void AreaWarning(ShEntity trigger, ShPhysical physical)
+        public void MyCrimes(ShPlayer player)
         {
-            if (physical is ShPlayer player && player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement)
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                player.svPlayer.SendGameMessage($"Warning! You are about to enter {trigger.svEntity.data}!");
-
-                /* Execute client C# example */
-                //player.svPlayer.ExecuteCS("clManager.SendToServer(Channel.Unsequenced, SvPacket.GlobalMessage, \"ExecuteCS Test\");");
-
-                /* Execute client C# via JavaScript example */
-                /* Note inner quote is escaped twice due to being unwrapped across 2 languages */
-                //player.svPlayer.ExecuteJS("exec(\"clManager.SendToServer(Channel.Unsequenced, SvPacket.GlobalMessage, \\\"ExecuteJS Test\\\");\");");
+                //
             }
         }
 
-        // Example call from CEF used in www/cef/index.html -> "window.trigger("YourEventName", {argument : YourArgs});"
         [CustomTarget]
-        public void OnPressedKey(ShPlayer caller, JToken args)
+        public void ShowCrimes(ShEntity target, ShPlayer player)
         {
-            caller.svPlayer.SendGameMessage((string)args["argument"]);
+            if (target is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                //
+            }
         }
 
-        bool voidRunning;
+        [CustomTarget]
+        public void SendToJail(ShEntity target, ShPlayer player)
+        {
+            if (player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement && target is ShPlayer criminal &&
+                Manager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal))
+            {
+                var fine = pluginCriminal.GoToJail();
+                if (fine > 0 && player.svPlayer.job is Police) player.svPlayer.Reward(3, fine);
+                else player.svPlayer.SendGameMessage("Confirm criminal is cuffed and has crimes");
+            }
+        }
 
+        [CustomTarget]
+        public void DrugTest(ShEntity target, ShPlayer player)
+        {
+            if (!(player.svPlayer.job is Police) || !(target is ShPlayer testee) || 
+                testee.IsDead || !Manager.pluginPlayers.TryGetValue(testee, out var pluginTestee))
+                return;
+
+            foreach (var i in testee.injuries)
+            {
+                if (i.effect == BodyEffect.Drugged)
+                {
+                    pluginTestee.AddCrime(CrimeIndex.Intoxication, null);
+                    var m = "Test Positive";
+                    testee.svPlayer.SendGameMessage(m);
+                    player.svPlayer.SendGameMessage(m);
+                    return;
+                }
+            }
+
+            var message = "Test Negative";
+            testee.svPlayer.SendGameMessage(message);
+            player.svPlayer.SendGameMessage(message);
+        }
+
+        [CustomTarget]
+        public void AreaWarning(Serialized trigger, ShPhysical physical)
+        {
+            if (physical is ShPlayer player && player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement)
+            {
+                player.svPlayer.SendGameMessage($"Warning! You are about to enter {trigger.data}!");
+            }
+        }
+
+        [CustomTarget]
+        public void RestrictedArea(Serialized trigger, ShPhysical physical)
+        {
+            if (physical is ShMovable movable)
+            {
+                var player = movable.controller;
+                if (player && player.isHuman && !player.IsDead && player.ValidCollider && 
+                    player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement && 
+                    Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                {
+                    pluginPlayer.AddCrime(CrimeIndex.Trespassing, null);
+                }
+            }
+        }
+
+        [CustomTarget]
+        public void ThrowableTarget(Serialized trigger, ShPhysical physical)
+        {
+            if (physical is ShThrown thrown)
+            {
+                var thrower = thrown.svEntity.instigator;
+                if (thrower)
+                {
+                    thrower.TransferMoney(
+                        DeltaInv.AddToMe,
+                        Mathf.Clamp(Mathf.CeilToInt(0.5f * thrower.DistanceSqr(trigger.mainT.position)), 10, 1000),
+                        true);
+                }
+                thrown.Destroy();
+            }
+        }
+
+        [CustomTarget]
+        public void JailExit(Serialized trigger, ShPhysical physical)
+        {
+            if (physical is ShMovable movable)
+            {
+                var player = movable.controller;
+                if (player && player.isHuman && !player.IsDead && player.ValidCollider && 
+                    player.svPlayer.job.info.shared.groupIndex == GroupIndex.Prisoner && 
+                    Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                {
+                    pluginPlayer.AddCrime(CrimeIndex.PrisonBreak, null);
+                    player.svPlayer.SvResetJob();
+                    player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.DestroyTimer);
+                }
+            }
+        }
+
+
+        [CustomTarget]
+        public void Rearm(Serialized trigger, ShPhysical physical)
+        {
+            if (physical is ShTransport transport)
+            {
+                transport.StartCoroutine(RearmCoroutine(trigger, transport));
+            }
+        }
+
+        private IEnumerator RearmCoroutine(Serialized trigger, ShTransport transport)
+        {
+            var delay = new WaitForSeconds(2f);
+            while(transport.svMovable.currentTriggers.Contains(trigger))
+            {
+                transport.Rearm(0.1f); // Rearm 10% of ammo capacity
+                yield return delay;
+            }
+        }
+
+        [CustomTarget]
+        public void Repair(Serialized trigger, ShPhysical physical)
+        {
+            if (physical is ShTransport transport)
+            {
+                transport.StartCoroutine(RepairCoroutine(trigger, transport));
+            }
+        }
+
+        private IEnumerator RepairCoroutine(Serialized trigger, ShTransport transport)
+        {
+            var delay = new WaitForSeconds(2f);
+            while (transport.svMovable.currentTriggers.Contains(trigger))
+            {
+                transport.svTransport.SvHeal(transport.maxStat * 0.1f); // Heal 10% of maxStat
+                yield return delay;
+            }
+        }
+
+
+        bool voidRunning;
         [CustomTarget]
         public void ButtonPush(ShEntity target, ShPlayer caller)
         {
@@ -168,12 +297,5 @@ namespace BrokeProtocol.CustomEvents
 
         [CustomTarget]
         public void RequestHeal(ShEntity target, ShPlayer player) => ((target as ShPlayer)?.svPlayer.job as Paramedic)?.RequestHeal(player);
-
-        [CustomTarget]
-        public void StealItem(ShPlayer player, ShItem item)
-        {
-            //TransferItem already has sanity checks -> if(player.otherEntity && player.otherEntity.HasItem(item))
-            player.TransferItem(DeltaInv.StealFromOther, item.index);
-        }
     }
 }
