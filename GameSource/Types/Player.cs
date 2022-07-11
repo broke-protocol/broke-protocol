@@ -20,6 +20,8 @@ namespace BrokeProtocol.GameSource.Types
     {
         ShPlayer player;
 
+        public List<Offense> offenses = new List<Offense>();
+
         public int wantedLevel;
         public float wantedNormalized;
 
@@ -28,11 +30,31 @@ namespace BrokeProtocol.GameSource.Types
             this.player = player;
         }
 
+        public int GetFineAmount()
+        {
+            var fine = 0;
+            foreach (var o in offenses) fine += o.crime.fine;
+            return fine;
+        }
+
+        public bool InvalidCrime(byte crimeIndex)
+        {
+            foreach (var o in offenses)
+            {
+                if (o.crime.index == crimeIndex && (Time.time - o.commitTime) < o.crime.repeatDelay)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void ClearCrimes()
         {
             if (SceneManager.Instance.isServer)
             {
-                foreach (var o in player.offenses)
+                foreach (var o in offenses)
                 {
                     if (o.witness) o.witness.svPlayer.witnessedPlayers.Remove(player);
                 }
@@ -42,7 +64,7 @@ namespace BrokeProtocol.GameSource.Types
                 ClManager.Instance.ShowGameMessage("Crimes Cleared");
             }
 
-            player.offenses.Clear();
+            offenses.Clear();
             UpdateWantedLevel(false);
         }
 
@@ -62,7 +84,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public void RemoveWitness(ShPlayer witness)
         {
-            foreach (var offense in player.offenses)
+            foreach (var offense in offenses)
             {
                 if (offense.witness == witness) offense.witness = null;
             }
@@ -74,7 +96,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             var totalExpiration = 0f;
 
-            foreach (var o in player.offenses)
+            foreach (var o in offenses)
             {
                 if (updateDisguised)
                 {
@@ -107,7 +129,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public void AddCrime(byte crimeIndex, ShPlayer victim)
         {
-            if (player.svPlayer.godMode || !Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) || player.svPlayer.InvalidCrime(crimeIndex)) return;
+            if (player.svPlayer.godMode || InvalidCrime(crimeIndex)) return;
 
             var crime = player.manager.GetCrime(crimeIndex);
 
@@ -127,15 +149,13 @@ namespace BrokeProtocol.GameSource.Types
                 witness.svPlayer.AddWitnessedCriminal(player);
             }
 
-            player.offenses.Add(new Offense(crime, player.curWearables, witness));
-            pluginPlayer.UpdateWantedLevel(false);
+            offenses.Add(new Offense(crime, player.curWearables, witness));
+            UpdateWantedLevel(false);
 
             if (SceneManager.Instance.isClient)
             {
                 ClManager.Instance.ShowGameMessage("Committed Crime: " + crime.crimeName);
             }
-
-            var wantedLevel = pluginPlayer.wantedLevel;
 
             for (int i = 1; i <= Utility.maxWantedLevel; i++)
             {
@@ -151,7 +171,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public void RemoveCrime(int index)
         {
-            player.offenses.RemoveAt(index);
+            offenses.RemoveAt(index);
             UpdateWantedLevel(false);
         }
 
@@ -168,7 +188,7 @@ namespace BrokeProtocol.GameSource.Types
 
             var time = 0f;
             var fine = 0;
-            foreach (var o in player.offenses)
+            foreach (var o in offenses)
             {
                 time += o.crime.jailtime;
                 fine += o.crime.fine;
@@ -188,6 +208,34 @@ namespace BrokeProtocol.GameSource.Types
         }
     }
 
+    public class CrimeSave
+    {
+        public CrimeSave() { }
+        public CrimeSave(byte index, int[] wearables, float timeSinceLast, ShPlayer witness)
+        {
+            Index = index;
+            Wearables = wearables;
+            TimeSinceLast = timeSinceLast;
+
+            if (witness)
+            {
+                if (witness.isHuman)
+                {
+                    WitnessPlayerAccount = witness.username;
+                }
+                else
+                {
+                    WitnessBotID = witness.ID;
+                }
+            }
+        }
+
+        public byte Index { get; set; }
+        public int[] Wearables { get; set; }
+        public float TimeSinceLast { get; set; }
+        public string WitnessPlayerAccount { get; set; } = string.Empty;
+        public int WitnessBotID { get; set; }
+    }
 
     public class MinigameContainer
     {
@@ -259,10 +307,11 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerLoad, ExecutionMode.Override)]
         public void OnLoad(ShPlayer player)
         {
-            if (player.svPlayer.PlayerData.Character.Crimes.Count > 0)
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+                player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(offensesKey, out List<CrimeSave> offensesList))
             {
                 var wearables = new ShWearable[player.curWearables.Length];
-                foreach (var crimeSave in player.svPlayer.PlayerData.Character.Crimes)
+                foreach (var crimeSave in offensesList)
                 {
                     for (int i = 0; i < wearables.Length; i++)
                     {
@@ -294,13 +343,10 @@ namespace BrokeProtocol.GameSource.Types
                         }
                     }
 
-                    player.offenses.Add(new Offense(ShManager.Instance.GetCrime(crimeSave.Index), wearables, witness, crimeSave.TimeSinceLast));
+                    pluginPlayer.offenses.Add(new Offense(ShManager.Instance.GetCrime(crimeSave.Index), wearables, witness, crimeSave.TimeSinceLast));
                 }
-
-                if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                {
-                    pluginPlayer.UpdateWantedLevel(true);
-                }
+                
+                pluginPlayer.UpdateWantedLevel(true);
             }
         }
 
@@ -313,8 +359,22 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.PlayerCommand, ExecutionMode.Override)]
         //public void OnCommand(ShPlayer player, string message) { }
 
-        //[Target(GameSourceEvent.PlayerSave, ExecutionMode.Override)]
-        //public void OnSave(ShPlayer player) { }
+        private const string offensesKey = "offsenses";
+
+        [Target(GameSourceEvent.PlayerSave, ExecutionMode.Override)]
+        public void OnSave(ShPlayer player) {
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                var offensesList = new List<CrimeSave>();
+
+                foreach (var offense in pluginPlayer.offenses)
+                {
+                    offensesList.Add(new CrimeSave(offense.crime.index, offense.wearables, Time.time - offense.commitTime, offense.witness));
+                }
+
+                player.svPlayer.PlayerData.Character.CustomData.AddOrUpdate(offensesKey, offensesList);
+            }
+        }
 
         [Target(GameSourceEvent.PlayerTransferItem, ExecutionMode.Override)]
         public void OnTransferItem(ShPlayer player, byte deltaType, int itemIndex, int amount, bool dispatch)
@@ -383,11 +443,11 @@ namespace BrokeProtocol.GameSource.Types
 
             while (!player.IsDead)
             {
-                for (int i = player.offenses.Count - 1; i >= 0; i--)
+                for (int i = pluginPlayer.offenses.Count - 1; i >= 0; i--)
                 {
-                    if (Time.time >= player.offenses[i].commitTime + player.offenses[i].AdjustedExpiration())
+                    if (Time.time >= pluginPlayer.offenses[i].commitTime + pluginPlayer.offenses[i].AdjustedExpiration())
                     {
-                        var witness = player.offenses[i].witness;
+                        var witness = pluginPlayer.offenses[i].witness;
 
                         if (witness && witness.svPlayer.witnessedPlayers.TryGetValue(player, out var value))
                         {
