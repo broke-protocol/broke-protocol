@@ -131,7 +131,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.svPlayer.godMode || InvalidCrime(crimeIndex)) return;
 
-            var crime = player.manager.GetCrime(crimeIndex);
+            var crime = Utility.crimeTypes[crimeIndex];
 
             ShPlayer witness;
             if (!crime.witness)
@@ -208,34 +208,7 @@ namespace BrokeProtocol.GameSource.Types
         }
     }
 
-    public class CrimeSave
-    {
-        public CrimeSave() { }
-        public CrimeSave(byte index, int[] wearables, float timeSinceLast, ShPlayer witness)
-        {
-            Index = index;
-            Wearables = wearables;
-            TimeSinceLast = timeSinceLast;
-
-            if (witness)
-            {
-                if (witness.isHuman)
-                {
-                    WitnessPlayerAccount = witness.username;
-                }
-                else
-                {
-                    WitnessBotID = witness.ID;
-                }
-            }
-        }
-
-        public byte Index { get; set; }
-        public int[] Wearables { get; set; }
-        public float TimeSinceLast { get; set; }
-        public string WitnessPlayerAccount { get; set; } = string.Empty;
-        public int WitnessBotID { get; set; }
-    }
+    
 
     public class MinigameContainer
     {
@@ -343,7 +316,7 @@ namespace BrokeProtocol.GameSource.Types
                         }
                     }
 
-                    pluginPlayer.offenses.Add(new Offense(ShManager.Instance.GetCrime(crimeSave.Index), wearables, witness, crimeSave.TimeSinceLast));
+                    pluginPlayer.offenses.Add(new Offense(Utility.crimeTypes[crimeSave.Index], wearables, witness, crimeSave.TimeSinceLast));
                 }
                 
                 pluginPlayer.UpdateWantedLevel(true);

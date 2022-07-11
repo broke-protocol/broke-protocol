@@ -1,9 +1,10 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Required;
+using BrokeProtocol.GameSource;
 using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
+using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.Utility.Networking;
