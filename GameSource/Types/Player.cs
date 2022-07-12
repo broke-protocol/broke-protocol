@@ -20,6 +20,8 @@ namespace BrokeProtocol.GameSource.Types
     {
         ShPlayer player;
 
+        public float jailExitTime;
+
         public List<Offense> offenses = new List<Offense>();
 
         public int wantedLevel;
@@ -29,6 +31,41 @@ namespace BrokeProtocol.GameSource.Types
         {
             this.player = player;
         }
+
+        public void StartJailTimer(float jailtime)
+        {
+            player.svPlayer.SvShowTimer(jailtime);
+            player.StartCoroutine(JailTimer(jailtime));
+        }
+
+        private IEnumerator JailTimer(float jailtime)
+        {
+            var delay = new WaitForSeconds(1f);
+            jailExitTime = jailtime + Time.time;
+
+            while (Time.time < jailExitTime)
+            {
+                yield return delay;
+
+                if (player.IsDead)
+                {
+                    player.svPlayer.SvResetJob();
+                    JailDone();
+                    yield break;
+                }
+
+                if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Prisoner)
+                {
+                    JailDone();
+                    yield break;
+                }
+            }
+            player.svPlayer.SvResetJob();
+            player.svPlayer.Respawn();
+            JailDone();
+        }
+
+        private void JailDone() => jailExitTime = 0f;
 
         public int GetFineAmount()
         {
@@ -201,8 +238,20 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.SvRestore(jailSpawn.position, jailSpawn.rotation, jailSpawn.parent.GetSiblingIndex());
             player.svPlayer.SvForceEquipable(player.Hands.index);
             ClearCrimes();
-            player.svPlayer.RemoveItemsJail();
-            player.svPlayer.StartJailTimer(time);
+
+            // Remove jail items
+            foreach (var i in player.myItems.Values.ToArray())
+            {
+                if (i.item.illegal)
+                {
+                    player.TransferItem(DeltaInv.RemoveFromMe, i.item.index, i.count, true);
+                }
+            }
+
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                pluginPlayer.StartJailTimer(time);
+            }
 
             return fine;
         }
@@ -280,46 +329,53 @@ namespace BrokeProtocol.GameSource.Types
         [Target(GameSourceEvent.PlayerLoad, ExecutionMode.Override)]
         public void OnLoad(ShPlayer player)
         {
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
-                player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(offensesKey, out List<CrimeSave> offensesList))
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                var wearables = new ShWearable[player.curWearables.Length];
-                foreach (var crimeSave in offensesList)
+                if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(offensesKey, out List<CrimeSave> offensesList))
                 {
-                    for (int i = 0; i < wearables.Length; i++)
+                    var wearables = new ShWearable[player.curWearables.Length];
+                    foreach (var crimeSave in offensesList)
                     {
-                        // Future/mod-proofing
-                        if (i < crimeSave.Wearables.Length &&
-                            SceneManager.Instance.TryGetEntity<ShWearable>(crimeSave.Wearables[i], out var w))
+                        for (int i = 0; i < wearables.Length; i++)
                         {
-                            wearables[i] = w;
+                            // Future/mod-proofing
+                            if (i < crimeSave.Wearables.Length &&
+                                SceneManager.Instance.TryGetEntity<ShWearable>(crimeSave.Wearables[i], out var w))
+                            {
+                                wearables[i] = w;
+                            }
+
+                            if (!wearables[i]) wearables[i] = ShManager.Instance.nullWearable[i];
                         }
 
-                        if (!wearables[i]) wearables[i] = ShManager.Instance.nullWearable[i];
-                    }
+                        ShPlayer witness = null;
 
-                    ShPlayer witness = null;
-
-                    if (crimeSave.WitnessBotID != 0)
-                    {
-                        witness = EntityCollections.FindByID<ShPlayer>(crimeSave.WitnessBotID);
-                    }
-                    else if (!string.IsNullOrWhiteSpace(crimeSave.WitnessPlayerAccount))
-                    {
-                        foreach (var p in EntityCollections.Humans)
+                        if (crimeSave.WitnessBotID != 0)
                         {
-                            if (p.username == crimeSave.WitnessPlayerAccount)
+                            witness = EntityCollections.FindByID<ShPlayer>(crimeSave.WitnessBotID);
+                        }
+                        else if (!string.IsNullOrWhiteSpace(crimeSave.WitnessPlayerAccount))
+                        {
+                            foreach (var p in EntityCollections.Humans)
                             {
-                                witness = p;
-                                break;
+                                if (p.username == crimeSave.WitnessPlayerAccount)
+                                {
+                                    witness = p;
+                                    break;
+                                }
                             }
                         }
+
+                        pluginPlayer.offenses.Add(new Offense(Utility.crimeTypes[crimeSave.Index], wearables, witness, crimeSave.TimeSinceLast));
                     }
 
-                    pluginPlayer.offenses.Add(new Offense(Utility.crimeTypes[crimeSave.Index], wearables, witness, crimeSave.TimeSinceLast));
+                    pluginPlayer.UpdateWantedLevel(true);
                 }
-                
-                pluginPlayer.UpdateWantedLevel(true);
+
+                if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(offensesKey, out float jailtime) && jailtime > 0f)
+                {
+                    pluginPlayer.StartJailTimer(jailtime);
+                }
             }
         }
 
@@ -332,7 +388,8 @@ namespace BrokeProtocol.GameSource.Types
         //[Target(GameSourceEvent.PlayerCommand, ExecutionMode.Override)]
         //public void OnCommand(ShPlayer player, string message) { }
 
-        private const string offensesKey = "offsenses";
+        private const string offensesKey = "Offenses";
+        private const string jailtimeKey = "Jailtime";
 
         [Target(GameSourceEvent.PlayerSave, ExecutionMode.Override)]
         public void OnSave(ShPlayer player) {
@@ -346,6 +403,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
 
                 player.svPlayer.PlayerData.Character.CustomData.AddOrUpdate(offensesKey, offensesList);
+                player.svPlayer.PlayerData.Character.CustomData.AddOrUpdate(jailtimeKey, Mathf.Max(0f, pluginPlayer.jailExitTime - Time.time));
             }
         }
 
@@ -1060,18 +1118,6 @@ namespace BrokeProtocol.GameSource.Types
                             briefcase.myItems.Add(invItem.item.index, invItem);
                         }
                     }
-                }
-            }
-        }
-
-        [Target(GameSourceEvent.PlayerRemoveItemsJail, ExecutionMode.Override)]
-        public void OnRemoveItemsJail(ShPlayer player)
-        {
-            foreach (var i in player.myItems.Values.ToArray())
-            {
-                if (i.item.illegal)
-                {
-                    player.TransferItem(DeltaInv.RemoveFromMe, i.item.index, i.count, true);
                 }
             }
         }

@@ -924,11 +924,13 @@ namespace BrokeProtocol.GameSource.Jobs
         [NonSerialized]
         public ShPlayer targetPlayer;
 
+        public virtual int AttackLevel => 0;
+
         protected bool SetSpawnTarget()
         {
             ShPlayer target = player.svPlayer.spawner;
 
-            if (target && Manager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= info.attackLevel &&
+            if (target && Manager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
                 Random.value < pluginTarget.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 return player.svPlayer.SetAttackState(target);
@@ -939,7 +941,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected void TryFindCriminal()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= info.attackLevel && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e),
                 (e) => player.svPlayer.SetAttackState(e));
         }
 
@@ -950,7 +952,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
 
         protected override bool ValidTarget(ShEntity target) => 
-            base.ValidTarget(target) && target is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= info.attackLevel;
+            base.ValidTarget(target) && target is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel;
 
         protected override GetEntityCallback GetTargetHandler()
         {
@@ -969,6 +971,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class SpecOps : LawEnforcement
     {
+        public override int AttackLevel => 3;
+
         protected override void FoundTarget(bool startGoalMarker)
         {
             base.FoundTarget(startGoalMarker);
@@ -979,7 +983,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void OnDestroyEntity(ShEntity entity)
         {
             base.OnDestroyEntity(entity);
-            if (entity is ShPlayer victim && Manager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && targetPlayer == victim && pluginVictim.wantedLevel > 0 && pluginVictim.wantedLevel >= info.attackLevel)
+            if (entity is ShPlayer victim && Manager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && targetPlayer == victim && pluginVictim.wantedLevel > 0 && pluginVictim.wantedLevel >= AttackLevel)
             {
                 player.svPlayer.Reward(3, 300);
             }
@@ -1184,6 +1188,8 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         public const string sendToJail = "SendToJail";
         public const string showCrimes = "ShowCrimes";
+
+        public override int AttackLevel => 1;
 
         public override void SetJob()
         {
