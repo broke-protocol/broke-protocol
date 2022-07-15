@@ -9,27 +9,45 @@ using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.Utility.Networking;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BrokeProtocol.CustomEvents
 {
     public class CustomEvents : IScript
     {
+        public const string crimesMenu = "CrimesMenu";
+
+        private void SendCrimes(ShPlayer player, ShPlayer criminal)
+        {
+            if (Manager.pluginPlayers.TryGetValue(criminal, out var pluginPlayer))
+            {
+                var options = new List<LabelID>();
+
+                foreach (var pair in pluginPlayer.offenses)
+                {
+                    var o = pair.Value;
+                    options.Add(
+                        new LabelID($"{o.crime.crimeName} | {o.AdjustedExpiration.TimeStringFromSeconds()} | {(o.witness ? "&c" + o.witness.username : "&aNo Witness")} | {(o.disguised ? "&aDisguised" : "&cNo Disguise")}",
+                        pair.Key.ToString())); // Send offense HashCode for lookup later
+                }
+
+                player.svPlayer.SendOptionMenu($"{player.username}'s Criminal Record: ${pluginPlayer.GetFineAmount()}", criminal.ID, crimesMenu, options.ToArray(), new LabelID[] { new LabelID("Get Details", string.Empty) });
+            }
+        }
+
         [CustomTarget]
         public void MyCrimes(ShPlayer player)
         {
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                //
-            }
+            SendCrimes(player, player);
         }
 
         [CustomTarget]
         public void ShowCrimes(ShEntity target, ShPlayer player)
         {
-            if (target is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (target is ShPlayer criminal)
             {
-                //
+                SendCrimes(player, criminal);
             }
         }
 

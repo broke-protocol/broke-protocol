@@ -111,16 +111,21 @@ namespace BrokeProtocol.GameSource
             disguised = false;
         }
 
-        public float AdjustedExpiration()
+        public float AdjustedExpiration
         {
-            var expiration = crime.expiration;
+            get
+            {
+                var expiration = crime.expiration;
 
-            if (disguised) expiration *= 0.5f;
+                if (disguised) expiration *= 0.5f;
 
-            if (crime.witness && !witness) expiration *= 0.5f;
+                if (crime.witness && !witness) expiration *= 0.5f;
 
-            return expiration;
+                return expiration;
+            }
         }
+
+        public float ElapsedTime => Time.time - commitTime;
     }
 
     public static class Utility

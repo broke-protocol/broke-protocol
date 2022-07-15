@@ -11,6 +11,7 @@ using BrokeProtocol.Utility.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,7 +23,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public float jailExitTime;
 
-        public List<Offense> offenses = new List<Offense>();
+        public Dictionary<int, Offense> offenses = new Dictionary<int, Offense>();
 
         public int wantedLevel;
         public float wantedNormalized;
@@ -70,15 +71,15 @@ namespace BrokeProtocol.GameSource.Types
         public int GetFineAmount()
         {
             var fine = 0;
-            foreach (var o in offenses) fine += o.crime.fine;
+            foreach (var o in offenses.Values) fine += o.crime.fine;
             return fine;
         }
 
         public bool InvalidCrime(byte crimeIndex)
         {
-            foreach (var o in offenses)
+            foreach (var o in offenses.Values)
             {
-                if (o.crime.index == crimeIndex && (Time.time - o.commitTime) < o.crime.repeatDelay)
+                if (o.crime.index == crimeIndex && o.ElapsedTime < o.crime.repeatDelay)
                 {
                     return true;
                 }
@@ -89,20 +90,14 @@ namespace BrokeProtocol.GameSource.Types
 
         public void ClearCrimes()
         {
-            if (SceneManager.Instance.isServer)
+            foreach (var o in offenses.Values)
             {
-                foreach (var o in offenses)
-                {
-                    if (o.witness) o.witness.svPlayer.witnessedPlayers.Remove(player);
-                }
+                if (o.witness) o.witness.svPlayer.witnessedPlayers.Remove(player);
             }
-            else if (player.clPlayer.isMain)
-            {
-                ClManager.Instance.ShowGameMessage("Crimes Cleared");
-            }
-
+            
             offenses.Clear();
             UpdateWantedLevel(false);
+            player.svPlayer.SendGameMessage("Crimes Cleared");
         }
 
         public void ClearWitnessed()
@@ -112,7 +107,6 @@ namespace BrokeProtocol.GameSource.Types
                 if(Manager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal))
                 {
                     pluginCriminal.RemoveWitness(player);
-                    //criminal.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.RemoveWitness, player.ID);
                 }
             }
 
@@ -121,11 +115,11 @@ namespace BrokeProtocol.GameSource.Types
 
         public void RemoveWitness(ShPlayer witness)
         {
-            foreach (var offense in offenses)
+            foreach (var offense in offenses.Values)
             {
                 if (offense.witness == witness) offense.witness = null;
             }
-
+            player.svPlayer.SendGameMessage($"Witness Eliminated : {witness.username}");
             UpdateWantedLevel(false);
         }
 
@@ -133,7 +127,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             var totalExpiration = 0f;
 
-            foreach (var o in offenses)
+            foreach (var o in offenses.Values)
             {
                 if (updateDisguised)
                 {
@@ -158,10 +152,15 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
 
-                totalExpiration += o.AdjustedExpiration();
+                totalExpiration += o.AdjustedExpiration;
             }
 
             wantedLevel = Mathf.CeilToInt(Mathf.Min(totalExpiration / 360f, Utility.maxWantedLevel));
+
+            for (var i = 1; i <= Utility.maxWantedLevel; i++)
+            {
+                player.svPlayer.VisualElementVisibility(Utility.starName + i.ToString(), i <= wantedLevel);
+            }
         }
 
         public void AddCrime(byte crimeIndex, ShPlayer victim)
@@ -186,30 +185,16 @@ namespace BrokeProtocol.GameSource.Types
                 witness.svPlayer.AddWitnessedCriminal(player);
             }
 
-            offenses.Add(new Offense(crime, player.curWearables, witness));
+            var offense = new Offense(crime, player.curWearables, witness);
+            offenses.Add(offense.GetHashCode(), offense);
+            player.svPlayer.SendGameMessage("Committed Crime: " + crime.crimeName);
             UpdateWantedLevel(false);
-
-            if (SceneManager.Instance.isClient)
-            {
-                ClManager.Instance.ShowGameMessage("Committed Crime: " + crime.crimeName);
-            }
-
-            for (int i = 1; i <= Utility.maxWantedLevel; i++)
-            {
-                player.svPlayer.VisualElementVisibility(Utility.starName, i <= wantedLevel);
-            }
 
             // Don't hand out crime penalties for criminal jobs and default job
             if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Criminal && player.svPlayer.job.info.shared.jobIndex > 0)
             {
                 player.svPlayer.Reward(-crime.experiencePenalty, -crime.fine);
             }
-        }
-
-        public void RemoveCrime(int index)
-        {
-            offenses.RemoveAt(index);
-            UpdateWantedLevel(false);
         }
 
         public bool ApartmentUnlawful(ShPlayer apartmentOwner) => apartmentOwner != player && (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement || Manager.pluginPlayers[apartmentOwner].wantedLevel == 0);
@@ -225,7 +210,7 @@ namespace BrokeProtocol.GameSource.Types
 
             var time = 0f;
             var fine = 0;
-            foreach (var o in offenses)
+            foreach (var o in offenses.Values)
             {
                 time += o.crime.jailtime;
                 fine += o.crime.fine;
@@ -366,7 +351,8 @@ namespace BrokeProtocol.GameSource.Types
                             }
                         }
 
-                        pluginPlayer.offenses.Add(new Offense(Utility.crimeTypes[crimeSave.Index], wearables, witness, crimeSave.TimeSinceLast));
+                        var offense = new Offense(Utility.crimeTypes[crimeSave.Index], wearables, witness, crimeSave.TimeSinceLast);
+                        pluginPlayer.offenses.Add(offense.GetHashCode(), offense);
                     }
 
                     pluginPlayer.UpdateWantedLevel(true);
@@ -397,7 +383,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 var offensesList = new List<CrimeSave>();
 
-                foreach (var offense in pluginPlayer.offenses)
+                foreach (var offense in pluginPlayer.offenses.Values)
                 {
                     offensesList.Add(new CrimeSave(offense.crime.index, offense.wearables, Time.time - offense.commitTime, offense.witness));
                 }
@@ -472,23 +458,34 @@ namespace BrokeProtocol.GameSource.Types
 
             Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer);
 
+            var removeOffenseList = new List<Offense>();
+
             while (!player.IsDead)
             {
-                for (int i = pluginPlayer.offenses.Count - 1; i >= 0; i--)
+                foreach(var offense in pluginPlayer.offenses.Values)
                 {
-                    if (Time.time >= pluginPlayer.offenses[i].commitTime + pluginPlayer.offenses[i].AdjustedExpiration())
+                    if (Time.time >= offense.commitTime + offense.AdjustedExpiration)
                     {
-                        var witness = pluginPlayer.offenses[i].witness;
+                        var witness = offense.witness;
 
                         if (witness && witness.svPlayer.witnessedPlayers.TryGetValue(player, out var value))
                         {
                             if (value <= 1) witness.svPlayer.witnessedPlayers.Remove(player);
                             else witness.svPlayer.witnessedPlayers[player] = value - 1;
                         }
-                        
-                        pluginPlayer.RemoveCrime(i);
-                        //player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.RemoveCrime, i);
+
+                        removeOffenseList.Add(offense);
                     }
+                }
+
+                if (removeOffenseList.Count > 0)
+                {
+                    foreach (var offense in removeOffenseList)
+                    {
+                        pluginPlayer.offenses.Remove(offense.GetHashCode());
+                    }
+                    removeOffenseList.Clear();
+                    pluginPlayer.UpdateWantedLevel(false);
                 }
 
                 if (player.GetStanceIndex == StanceIndex.Sleep)
@@ -917,7 +914,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
                 else
                 {
-                    int newRank = player.rank + 1;
+                    var newRank = player.rank + 1;
                     player.svPlayer.AddJobItems(player.svPlayer.job.info, player.rank, newRank, false);
                     player.svPlayer.SetRank(newRank);
                     player.svPlayer.SetExperience(experience - Util.maxExperience, false);
@@ -953,7 +950,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 var collectedItems = e.CollectedItems;
 
-                for (int i = 0; i < collectedItems.Length; i++)
+                for (var i = 0; i < collectedItems.Length; i++)
                 {
                     var inv = collectedItems[i];
 
@@ -1349,6 +1346,31 @@ namespace BrokeProtocol.GameSource.Types
                         videoEntity.svEntity.SvStartDefaultVideo(index);
                         player.svPlayer.DestroyMenu(videoPanel);
                     }
+                    break;
+
+                case CustomEvents.CustomEvents.crimesMenu:
+                    var criminal = EntityCollections.FindByID<ShPlayer>(targetID);
+
+                    if(criminal && Manager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal) && int.TryParse(optionID, out var offenseHash) && 
+                        pluginCriminal.offenses.TryGetValue(offenseHash, out var o))
+                    {
+                        var sb = new StringBuilder();
+                        sb.AppendLine(o.crime.crimeName);
+                        sb.AppendLine("Time since Offense: " + o.ElapsedTime);
+                        sb.AppendLine("Expires in: " + o.AdjustedExpiration);
+                        sb.AppendLine("Witness: " + (o.witness ? "&c" + o.witness.username : "&aNo Witness"));
+                        sb.AppendLine(o.disguised ? "&aDisguised" : "&cNo Disguise");
+                        sb.AppendLine("&fClothing during crime:");
+                        foreach(var wearableIndex in o.wearables)
+                        {
+                            if(SceneManager.Instance.TryGetEntity<ShWearable>(wearableIndex, out var wearable))
+                            {
+                                sb.AppendLine(" - " + wearable.itemName);
+                            }
+                        }
+                        player.svPlayer.SendTextMenu(o.crime.crimeName, sb.ToString());
+                    }
+                    
                     break;
 
                 default:
