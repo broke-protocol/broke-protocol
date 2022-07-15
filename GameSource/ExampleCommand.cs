@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
+using BrokeProtocol.GameSource.Types;
 using System;
 
 namespace BrokeProtocol.CustomEvents
@@ -14,6 +15,8 @@ namespace BrokeProtocol.CustomEvents
 
         public ExampleCommand()
         {
+            CommandHandler.RegisterCommand("ClearCrimes", new Action<ShPlayer, ShPlayer>(ClearCrimes), null, "example.clearcrimes");
+
             CommandHandler.RegisterCommand("Example", new Action<ShPlayer, ShPlayer, byte, int, float, string, string>(Command1), (player, command) =>
             {
                 // Silly example
@@ -32,6 +35,15 @@ namespace BrokeProtocol.CustomEvents
             CommandHandler.RegisterCommand("CoinFlip", new Action<ShPlayer>(CoinFlip), null, "example.coinflip");
         }
 
+        public void ClearCrimes(ShPlayer player, ShPlayer target = null)
+        {
+            if (!target) target = player;
+
+            if (Manager.pluginPlayers.TryGetValue(target, out var pluginPlayer))
+            {
+                pluginPlayer.ClearCrimes();
+            }
+        }
 
         // Any optional parameters here will be optional with in-game commands too
         public void Command1(ShPlayer player, ShPlayer target, byte byte1 = 1, int int1 = 2, float float1 = 3f, string string1 = "default1", string string2 = "default2")
