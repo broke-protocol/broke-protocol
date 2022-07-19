@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Entity : SourceEntityEvents
+    public class Entity : EntityEvents
     {
         [Execution(ExecutionMode.Override)]
         public override bool SecurityTrigger(ShEntity entity, Collider otherCollider)

@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Manager : SourceManagerEvents
+    public class Manager : ManagerEvents
     {
         public static Dictionary<ShPlayer, PluginPlayer> pluginPlayers = new Dictionary<ShPlayer, PluginPlayer>();
 

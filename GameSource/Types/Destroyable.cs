@@ -6,24 +6,23 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Destroyable : Mountable
+    public class Destroyable : DestroyableEvents
     {
-        //[Target(GameSourceEvent.DestroyableSpawn, ExecutionMode.Override)]
-        //public void OnSpawn(ShDestroyable destroyable) { }
-
-        [Target(GameSourceEvent.DestroyableDeath, ExecutionMode.Override)]
-        public void OnDeath(ShDestroyable destroyable, ShPlayer attacker)
+        [Execution(ExecutionMode.Override)]
+        public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
             if (attacker && attacker != destroyable)
             {
                 attacker.svPlayer.job.OnDestroyEntity(destroyable);
             }
+
+            return true;
         }
 
-        [Target(GameSourceEvent.DestroyableDamage, ExecutionMode.Override)]
-        public void OnDamage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
+        [Execution(ExecutionMode.Override)]
+        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            if (destroyable.IsDead) return;
+            if (destroyable.IsDead) return true;
 
             destroyable.health -= amount;
 
@@ -40,16 +39,20 @@ namespace BrokeProtocol.GameSource.Types
                 
                 attacker.svPlayer.job.OnDamageEntity(destroyable);
             }
+
+            return true;
         }
 
-        [Target(GameSourceEvent.DestroyableDestroySelf, ExecutionMode.Override)]
-        public void OnDestroySelf(ShDestroyable destroyable)
+        [Execution(ExecutionMode.Override)]
+        public override bool DestroySelf(ShDestroyable destroyable)
         {
             if (!destroyable.IsDead)
             {
                 destroyable.ShDie();
                 destroyable.svDestroyable.Send(SvSendType.Local, Channel.Reliable, ClPacket.UpdateHealth, destroyable.ID, destroyable.health);
             }
+
+            return true;
         }
     }
 }
