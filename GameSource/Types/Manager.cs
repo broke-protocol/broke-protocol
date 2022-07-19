@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Manager : SourceEvents
+    public class Manager : SourceManagerEvents
     {
         public static Dictionary<ShPlayer, PluginPlayer> pluginPlayers = new Dictionary<ShPlayer, PluginPlayer>();
 
@@ -138,7 +138,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public override bool ManagerStart()
+        public override bool Start()
         {
             var skins = new HashSet<string>();
             SvManager.Instance.ParseFile(ref skins, Paths.AbsolutePath("skins.txt"));
@@ -206,7 +206,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public override bool ManagerTryLogin(ConnectionData connectData)
+        public override bool TryLogin(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
             {
@@ -228,7 +228,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public override bool ManagerTryRegister(ConnectionData connectData)
+        public override bool TryRegister(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
             {
@@ -275,7 +275,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public override bool ManagerSave()
+        public override bool Save()
         {
             var bountyData = new Data{ ID = Hitman.bountiesKey };
 
@@ -300,7 +300,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public override bool ManagerLoad()
+        public override bool Load()
         {
             var bountyData = SvManager.Instance.database.Data.FindById(Hitman.bountiesKey);
 
@@ -316,7 +316,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public override bool ManagerReadGroups()
+        public override bool ReadGroups()
         {
             try
             {
@@ -332,7 +332,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public override bool ManagerPlayerLoaded(ConnectionData connectData)
+        public override bool PlayerLoaded(ConnectionData connectData)
         {
             connectData.connectionStatus = ConnectionStatus.LoadedMap;
             SvManager.Instance.SendRegisterMenu(connectData.connection, true, skinPrefabs);
@@ -360,7 +360,7 @@ namespace BrokeProtocol.GameSource.Types
 
         // Read packet data from Buffers.reader
         [Execution(ExecutionMode.Override)]
-        public override bool ManagerCustomPacket(ConnectionData connectData, SvPacket packet)
+        public override bool CustomPacket(ConnectionData connectData, SvPacket packet)
         {
             var packetID = Buffers.reader.ReadByte();
 
