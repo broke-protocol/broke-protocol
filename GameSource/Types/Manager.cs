@@ -137,7 +137,7 @@ namespace BrokeProtocol.GameSource.Types
             EndGangWar(warTerritory.ownerIndex);
         }
 
-        [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public override bool ManagerStart()
         {
             var skins = new HashSet<string>();
@@ -205,7 +205,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public override bool ManagerTryLogin(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
@@ -227,8 +227,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-
-        [Target(GameSourceEvent.ManagerTryRegister, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public override bool ManagerTryRegister(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
@@ -275,7 +274,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public override bool ManagerSave()
         {
             var bountyData = new Data{ ID = Hitman.bountiesKey };
@@ -300,7 +299,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Target(GameSourceEvent.ManagerLoad, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public override bool ManagerLoad()
         {
             var bountyData = SvManager.Instance.database.Data.FindById(Hitman.bountiesKey);
@@ -316,7 +315,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Target(GameSourceEvent.ManagerReadGroups, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public override bool ManagerReadGroups()
         {
             try
@@ -332,7 +331,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Target(GameSourceEvent.ManagerPlayerLoaded, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public override bool ManagerPlayerLoaded(ConnectionData connectData)
         {
             connectData.connectionStatus = ConnectionStatus.LoadedMap;
@@ -360,7 +359,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         // Read packet data from Buffers.reader
-        [Target(GameSourceEvent.ManagerCustomPacket, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public override bool ManagerCustomPacket(ConnectionData connectData, SvPacket packet)
         {
             var packetID = Buffers.reader.ReadByte();
