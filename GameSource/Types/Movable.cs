@@ -7,19 +7,21 @@ using System.Collections;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Movable : Physical
+    public class Movable : MovableEvents
     {
-        [Target(GameSourceEvent.MovableDamage, ExecutionMode.Override)]
-        public void OnDamage(ShMovable movable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
+        [Execution(ExecutionMode.Override)]
+        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            base.OnDamage(movable, damageIndex, amount, attacker, collider, source, hitPoint);
+            base.Damage(destroyable, damageIndex, amount, attacker, collider, source, hitPoint);
 
-            movable.svMovable.Send(SvSendType.Local,
+            destroyable.svDestroyable.Send(SvSendType.Local,
                 Channel.Reliable,
                 ClPacket.UpdateHealth,
-                movable.ID,
-                movable.health,
-                (hitPoint == default) ? 0f : movable.OutsideController ? movable.controller.GetFlatAngle(source) : movable.GetFlatAngle(source));
+                destroyable.ID,
+                destroyable.health,
+                (hitPoint == default) ? 0f : destroyable.OutsideController ? destroyable.controller.GetFlatAngle(source) : destroyable.GetFlatAngle(source));
+
+            return true;
         }
 
         private IEnumerator RespawnDelay(ShMovable movable)
@@ -39,7 +41,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(GameSourceEvent.MovableDeath, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public void OnDeath(ShMovable movable, ShPlayer attacker)
         {
             if (movable.svMovable.respawnable)
@@ -53,7 +55,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Target(GameSourceEvent.MovableRespawn, ExecutionMode.Override)]
+        [Execution(ExecutionMode.Override)]
         public void OnRespawn(ShMovable movable)
         {
             movable.svMovable.instigator = null; // So players aren't charged with Murder crimes after vehicles reset

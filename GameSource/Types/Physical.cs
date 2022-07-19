@@ -3,9 +3,7 @@ using BrokeProtocol.Entities;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Physical : Destroyable
+    public class Physical : PhysicalEvents
     {
-        //[Target(GameSourceEvent.PhysicalSpawn, ExecutionMode.Override)]
-        //public void OnSpawn(ShPhysical physical) { }
     }
 }
