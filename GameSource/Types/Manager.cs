@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Manager
+    public class Manager : SourceEvents
     {
         public static Dictionary<ShPlayer, PluginPlayer> pluginPlayers = new Dictionary<ShPlayer, PluginPlayer>();
 
@@ -138,7 +138,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Target(GameSourceEvent.ManagerStart, ExecutionMode.Override)]
-        public void OnStart()
+        public override bool ManagerStart()
         {
             var skins = new HashSet<string>();
             SvManager.Instance.ParseFile(ref skins, Paths.AbsolutePath("skins.txt"));
@@ -201,38 +201,35 @@ namespace BrokeProtocol.GameSource.Types
                     waypointIndex++;
                 }
             }
+
+            return true;
         }
 
-        //[Target(GameSourceEvent.ManagerUpdate, ExecutionMode.Override)]
-        //public void OnUpdate() { }
-
-        //[Target(GameSourceEvent.ManagerFixedUpdate, ExecutionMode.Override)]
-        //public void OnFixedUpdate() { }
-
         [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
-        public void OnTryLogin(ConnectionData connectData)
+        public override bool ManagerTryLogin(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
             {
                 if (!SvManager.Instance.TryGetUserData(connectData.username, out var playerData))
                 {
                     SvManager.Instance.RegisterFail(connectData.connection, "Account not found - Please Register");
-                    return;
                 }
-
-                if (playerData.PasswordHash != connectData.passwordHash)
+                else if (playerData.PasswordHash != connectData.passwordHash)
                 {
                     SvManager.Instance.RegisterFail(connectData.connection, "Invalid credentials");
-                    return;
                 }
-
-                SvManager.Instance.LoadSavedPlayer(playerData, connectData);
+                else
+                {
+                    SvManager.Instance.LoadSavedPlayer(playerData, connectData);
+                }
             }
+
+            return true;
         }
 
 
         [Target(GameSourceEvent.ManagerTryRegister, ExecutionMode.Override)]
-        public void OnTryRegister(ConnectionData connectData)
+        public override bool ManagerTryRegister(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
             {
@@ -241,23 +238,21 @@ namespace BrokeProtocol.GameSource.Types
                     if (playerData.PasswordHash != connectData.passwordHash)
                     {
                         SvManager.Instance.RegisterFail(connectData.connection, "Invalid credentials");
-                        return;
+                        return true;
                     }
 
                     if (!Utility.tryRegister.Limit(connectData.username))
                     {
                         SvManager.Instance.RegisterFail(connectData.connection, $"Character {connectData.username} Exists - Sure you want to Register?");
-                        return;
+                        return true;
                     }
                 }
 
                 if (!connectData.username.ValidCredential())
                 {
                     SvManager.Instance.RegisterFail(connectData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
-                    return;
                 }
-
-                if (connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs.Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
+                else if (connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs.Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
                 {
                     var spawn = spawnLocations.GetRandom();
 
@@ -276,15 +271,15 @@ namespace BrokeProtocol.GameSource.Types
                     SvManager.Instance.RegisterFail(connectData.connection, "Invalid data");
                 }
             }
+
+            return true;
         }
 
         [Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
-        public void OnSave()
+        public override bool ManagerSave()
         {
-            var bountyData = new Data
-            {
-                ID = Hitman.bountiesKey
-            };
+            var bountyData = new Data{ ID = Hitman.bountiesKey };
+
             foreach (var bounty in Hitman.bounties)
             {
                 // Only save bounties targeting Humans
@@ -301,10 +296,12 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.Save();
             }
             SvManager.Instance.database.WriteOut();
+
+            return true;
         }
 
         [Target(GameSourceEvent.ManagerLoad, ExecutionMode.Override)]
-        public void OnLoad()
+        public override bool ManagerLoad()
         {
             var bountyData = SvManager.Instance.database.Data.FindById(Hitman.bountiesKey);
 
@@ -315,10 +312,12 @@ namespace BrokeProtocol.GameSource.Types
                     Hitman.bounties.Add(bounty.Key, CustomData.ConvertData<DateTimeOffset>(bounty.Value));
                 }
             }
+
+            return true;
         }
 
         [Target(GameSourceEvent.ManagerReadGroups, ExecutionMode.Override)]
-        public void OnReadGroups()
+        public override bool ManagerReadGroups()
         {
             try
             {
@@ -329,13 +328,17 @@ namespace BrokeProtocol.GameSource.Types
             {
                 Debug.Log("[SVR] Error reading groups file: " + e);
             }
+
+            return true;
         }
 
         [Target(GameSourceEvent.ManagerPlayerLoaded, ExecutionMode.Override)]
-        public void OnPlayerLoaded(ConnectionData connectData)
+        public override bool ManagerPlayerLoaded(ConnectionData connectData)
         {
             connectData.connectionStatus = ConnectionStatus.LoadedMap;
             SvManager.Instance.SendRegisterMenu(connectData.connection, true, skinPrefabs);
+
+            return true;
         }
 
         private bool ValidateUser(ConnectionData connectData)
@@ -358,9 +361,11 @@ namespace BrokeProtocol.GameSource.Types
 
         // Read packet data from Buffers.reader
         [Target(GameSourceEvent.ManagerCustomPacket, ExecutionMode.Override)]
-        public void OnCustomPacket(ConnectionData connectData, SvPacket packet)
+        public override bool ManagerCustomPacket(ConnectionData connectData, SvPacket packet)
         {
             var packetID = Buffers.reader.ReadByte();
+
+            return true;
         }
     }
 }
