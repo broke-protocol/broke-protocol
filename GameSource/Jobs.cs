@@ -21,7 +21,8 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         public override bool IsValidTarget(ShPlayer chaser)
         {
-            var pluginPlayer = Manager.pluginPlayers[player];
+            if (!Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                return false;
 
             if ((!chaser.svPlayer.IsFollower(player) && chaser.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement && (player.IsRestrained || pluginPlayer.wantedLevel == 0)))
             {
@@ -199,13 +200,15 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e),
                 (e) =>
                 {
-                    var pluginPlayer = Manager.pluginPlayers[player];
-                    // Add random crimes to ensure high wanted level (targetable by SpecOps)
-                    while (pluginPlayer.wantedLevel < 3)
+                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
                     {
-                        pluginPlayer.AddCrime((byte)Random.Range(1, CrimeIndex.Count), e as ShPlayer);
+                        // Add random crimes to ensure high wanted level (targetable by SpecOps)
+                        while (pluginPlayer.wantedLevel < 3)
+                        {
+                            pluginPlayer.AddCrime((byte)Random.Range(1, CrimeIndex.Count), e as ShPlayer);
+                        }
+                        player.svPlayer.SetAttackState(e);
                     }
-                    player.svPlayer.SetAttackState(e);
                 });
         }
 

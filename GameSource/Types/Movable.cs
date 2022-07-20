@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
+using BrokeProtocol.Managers;
 using BrokeProtocol.Utility.Networking;
 using UnityEngine;
 using System.Collections;
@@ -24,17 +25,17 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        private IEnumerator RespawnDelay(ShMovable movable)
+        private IEnumerator RespawnDelay(ShDestroyable destroyable)
         {
-            var respawnTime = Time.time + movable.svMovable.RespawnTime;
+            var respawnTime = Time.time + destroyable.svDestroyable.RespawnTime;
             var delay = new WaitForSeconds(1f);
 
-            while (movable && movable.IsDead)
+            while (destroyable && destroyable.IsDead)
             {
                 if (Time.time >= respawnTime)
                 {
-                    movable.svMovable.Disappear();
-                    movable.svMovable.Respawn();
+                    destroyable.svDestroyable.Disappear();
+                    destroyable.svDestroyable.Respawn();
                     yield break;
                 }
                 yield return delay;
@@ -42,40 +43,46 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public void OnDeath(ShMovable movable, ShPlayer attacker)
+        public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
-            if (movable.svMovable.respawnable)
+            base.Death(destroyable, attacker);
+
+            if (destroyable.svDestroyable.respawnable)
             {
                 // Must start coroutine on the manager because the movable will be disabled during killcam/spec mode
-                movable.manager.StartCoroutine(RespawnDelay(movable));
+                ShManager.Instance.StartCoroutine(RespawnDelay(destroyable));
             }
             else
             {
-                movable.svMovable.StartDestroyDelay(movable.svMovable.RespawnTime);
+                destroyable.svDestroyable.StartDestroyDelay(destroyable.svDestroyable.RespawnTime);
             }
+            return true;
         }
 
         [Execution(ExecutionMode.Override)]
-        public void OnRespawn(ShMovable movable)
+        public override bool Respawn(ShEntity entity)
         {
-            movable.svMovable.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
-            if (movable.svMovable.randomSpawn)
+            base.Respawn(entity);
+            entity.svEntity.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
+            if (entity.svEntity.randomSpawn)
             {
-                movable.svMovable.Despawn(true);
+                entity.svEntity.Despawn(true);
             }
-            else if (movable.IsDead)
+            else if (entity.IsDead)
             {
-                movable.svMovable.Send(SvSendType.Local, Channel.Reliable, ClPacket.Spawn,
-                    movable.ID,
-                    movable.svMovable.originalPosition,
-                    movable.svMovable.originalRotation,
-                    movable.svMovable.originalParent.GetSiblingIndex());
-                movable.Spawn(movable.svMovable.originalPosition, movable.svMovable.originalRotation, movable.svMovable.originalParent);
+                entity.svEntity.Send(SvSendType.Local, Channel.Reliable, ClPacket.Spawn,
+                    entity.ID,
+                    entity.svEntity.originalPosition,
+                    entity.svEntity.originalRotation,
+                    entity.svEntity.originalParent.GetSiblingIndex());
+                entity.Spawn(entity.svEntity.originalPosition, entity.svEntity.originalRotation, entity.svEntity.originalParent);
             }
             else
             {
-                movable.svMovable.ResetOriginal();
+                entity.svEntity.ResetOriginal();
             }
+
+            return true;
         }
     }
 }
