@@ -13,7 +13,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            base.Damage(destroyable, damageIndex, amount, attacker, collider, source, hitPoint);
+            Parent.Damage(destroyable, damageIndex, amount, attacker, collider, source, hitPoint);
 
             destroyable.svDestroyable.Send(SvSendType.Local,
                 Channel.Reliable,
@@ -45,7 +45,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
-            base.Death(destroyable, attacker);
+            Parent.Death(destroyable, attacker);
 
             if (destroyable.svDestroyable.respawnable)
             {
@@ -62,7 +62,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Respawn(ShEntity entity)
         {
-            base.Respawn(entity);
+            Parent.Respawn(entity);
             entity.svEntity.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
             if (entity.svEntity.randomSpawn)
             {

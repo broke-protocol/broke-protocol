@@ -303,7 +303,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Destroy(ShEntity entity)
         {
-            base.Destroy(entity);
+            Parent.Destroy(entity);
             if (entity is ShPlayer player && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 pluginPlayer.ClearWitnessed();
@@ -394,7 +394,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool TransferItem(ShEntity entity, byte deltaType, int itemIndex, int amount, bool dispatch)
         {
-            base.TransferItem(entity, deltaType, itemIndex, amount, dispatch);
+            Parent.TransferItem(entity, deltaType, itemIndex, amount, dispatch);
 
             if (!(entity is ShPlayer player)) return true;
 
@@ -434,7 +434,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Initialize(ShEntity entity)
         {
-            base.Initialize(entity);
+            Parent.Initialize(entity);
             if (entity is ShPlayer player)
             {
                 Manager.pluginPlayers.Add(player, new PluginPlayer(player));
@@ -448,7 +448,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Spawn(ShEntity entity)
         {
-            base.Spawn(entity);
+            Parent.Spawn(entity);
             if (entity is ShPlayer player && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 pluginPlayer.ClearCrimes();
@@ -681,7 +681,7 @@ namespace BrokeProtocol.GameSource.Types
 
             amount -= amount * (player.armorLevel / 200f);
 
-            base.Damage(player, damageIndex, amount, attacker, collider, source, hitPoint);
+            Parent.Damage(player, damageIndex, amount, attacker, collider, source, hitPoint);
 
             if (player.IsDead) return true;
 
@@ -754,7 +754,7 @@ namespace BrokeProtocol.GameSource.Types
 
             player.SetStance(StanceIndex.Dead);
 
-            base.Death(destroyable, attacker);
+            Parent.Death(destroyable, attacker);
 
             return true;
         }
@@ -902,7 +902,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.originalParent = newSpawn.parent;
             }
 
-            base.Respawn(player);
+            Parent.Respawn(player);
 
             if (player.isHuman)
             {
@@ -1667,8 +1667,8 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool DestroySelf(ShDestroyable destroyable)
         {
-            if (destroyable is ShPlayer player && !(player.isHuman && player.IsRestrained && player.IsUp)) 
-                base.DestroySelf(player);
+            if (destroyable is ShPlayer player && !(player.isHuman && player.IsRestrained && player.IsUp))
+                Parent.DestroySelf(player);
 
             return true;
         }
