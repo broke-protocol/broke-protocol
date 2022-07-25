@@ -75,7 +75,7 @@ namespace BrokeProtocol.GameSource.Types
             return fine;
         }
 
-        public bool InvalidCrime(byte crimeIndex)
+        public bool InvalidCrime(CrimeIndex crimeIndex)
         {
             foreach (var o in offenses.Values)
             {
@@ -163,11 +163,11 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        public void AddCrime(byte crimeIndex, ShPlayer victim)
+        public void AddCrime(CrimeIndex crimeIndex, ShPlayer victim)
         {
             if (player.svPlayer.godMode || InvalidCrime(crimeIndex)) return;
 
-            var crime = Utility.crimeTypes[crimeIndex];
+            var crime = Utility.crimeTypes[(int)crimeIndex];
 
             ShPlayer witness;
             if (!crime.witness)
@@ -327,8 +327,8 @@ namespace BrokeProtocol.GameSource.Types
                         for (int i = 0; i < wearables.Length; i++)
                         {
                             // Future/mod-proofing
-                            if (i < crimeSave.Wearables.Length &&
-                                SceneManager.Instance.TryGetEntity<ShWearable>(crimeSave.Wearables[i], out var w))
+                            if (i < crimeSave.wearables.Length &&
+                                SceneManager.Instance.TryGetEntity<ShWearable>(crimeSave.wearables[i], out var w))
                             {
                                 wearables[i] = w;
                             }
@@ -338,15 +338,15 @@ namespace BrokeProtocol.GameSource.Types
 
                         ShPlayer witness = null;
 
-                        if (crimeSave.WitnessBotID != 0)
+                        if (crimeSave.witnessBotID != 0)
                         {
-                            witness = EntityCollections.FindByID<ShPlayer>(crimeSave.WitnessBotID);
+                            witness = EntityCollections.FindByID<ShPlayer>(crimeSave.witnessBotID);
                         }
-                        else if (!string.IsNullOrWhiteSpace(crimeSave.WitnessPlayerAccount))
+                        else if (!string.IsNullOrWhiteSpace(crimeSave.witnessPlayerAccount))
                         {
                             foreach (var p in EntityCollections.Humans)
                             {
-                                if (p.username == crimeSave.WitnessPlayerAccount)
+                                if (p.username == crimeSave.witnessPlayerAccount)
                                 {
                                     witness = p;
                                     break;
@@ -354,14 +354,14 @@ namespace BrokeProtocol.GameSource.Types
                             }
                         }
 
-                        var offense = new Offense(Utility.crimeTypes[crimeSave.Index], wearables, witness, crimeSave.TimeSinceLast);
+                        var offense = new Offense(Utility.crimeTypes[(int)crimeSave.crimeIndex], wearables, witness, crimeSave.timeSinceLast);
                         pluginPlayer.offenses.Add(offense.GetHashCode(), offense);
                     }
 
                     pluginPlayer.UpdateWantedLevel(true);
                 }
-
-                if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(offensesKey, out float jailtime) && jailtime > 0f)
+                
+                if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(jailtimeKey, out float jailtime) && jailtime > 0f)
                 {
                     pluginPlayer.StartJailTimer(jailtime);
                 }

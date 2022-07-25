@@ -1,64 +1,71 @@
 ﻿using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
-using UnityEngine;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
+using UnityEngine;
 
 
 namespace BrokeProtocol.GameSource
 {
-    public class CrimeSave
+    [Serializable]
+    public struct CrimeSave
     {
-        public CrimeSave() { }
-        public CrimeSave(byte index, int[] wearables, float timeSinceLast, ShPlayer witness)
+        public CrimeSave(CrimeIndex crimeIndex, int[] wearables, float timeSinceLast, ShPlayer witness)
         {
-            Index = index;
-            Wearables = wearables;
-            TimeSinceLast = timeSinceLast;
+            this.crimeIndex = crimeIndex;
+            this.wearables = wearables;
+            this.timeSinceLast = timeSinceLast;
 
             if (witness)
             {
                 if (witness.isHuman)
                 {
-                    WitnessPlayerAccount = witness.username;
+                    witnessPlayerAccount = witness.username;
+                    witnessBotID = 0;
                 }
                 else
                 {
-                    WitnessBotID = witness.ID;
+                    witnessPlayerAccount = null;
+                    witnessBotID = witness.ID;
                 }
+            }
+            else
+            {
+                witnessPlayerAccount = null;
+                witnessBotID = 0;
             }
         }
 
-        public byte Index { get; set; }
-        public int[] Wearables { get; set; }
-        public float TimeSinceLast { get; set; }
-        public string WitnessPlayerAccount { get; set; } = string.Empty;
-        public int WitnessBotID { get; set; }
+        public CrimeIndex crimeIndex;
+        public int[] wearables;
+        public float timeSinceLast;
+        public string witnessPlayerAccount;
+        public int witnessBotID;
     }
 
-    public static class CrimeIndex
+    // Store as a string for future change compatibility
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CrimeIndex
     {
-        public const byte Null = 0;
-        public const byte Obstruction = 1;
-        public const byte Intoxication = 2;
-        public const byte Intimidation = 3;
-        public const byte FalseArrest = 4;
-        public const byte Contraband = 5;
-        public const byte AutoTheft = 6;
-        public const byte Theft = 7;
-        public const byte Assault = 8;
-        public const byte PrisonBreak = 9;
-        public const byte ArmedAssault = 10;
-        public const byte Bombing = 11;
-        public const byte Robbery = 12;
-        public const byte Murder = 13;
-        public const byte NoLicense = 14;
-        public const byte Trespassing = 15;
-        public const byte AnimalCruelty = 16;
-        public const byte AnimalKilling = 17;
-        public const byte Count = 18;
+        Obstruction,
+        Intoxication,
+        Intimidation,
+        FalseArrest,
+        Contraband,
+        AutoTheft,
+        Theft,
+        Assault,
+        PrisonBreak,
+        ArmedAssault,
+        Bombing,
+        Robbery,
+        Murder,
+        NoLicense,
+        Trespassing,
+        AnimalCruelty,
+        AnimalKilling,
     }
-
-
 
     [Serializable]
     public struct Crime
@@ -70,9 +77,9 @@ namespace BrokeProtocol.GameSource
         public int experiencePenalty;
         public float expiration;
         public float jailtime;
-        public byte index;
+        public CrimeIndex index;
 
-        public Crime(byte index, string crimeName, bool witness, float repeatDelay, float jailtime)
+        public Crime(CrimeIndex index, string crimeName, bool witness, float repeatDelay, float jailtime)
         {
             this.index = index;
             this.crimeName = crimeName;
@@ -141,7 +148,6 @@ namespace BrokeProtocol.GameSource
 
         public static readonly Crime[] crimeTypes = new Crime[]
         {
-            new Crime(CrimeIndex.Null,          "Null",             false, 0f, 0f),
             new Crime(CrimeIndex.Obstruction,   "Obstruction",      false, 0f, 20f),
             new Crime(CrimeIndex.Intoxication,  "Intoxication",     false, 60f, 30f),
             new Crime(CrimeIndex.Intimidation,  "Intimidation",     true, 10f, 35f),

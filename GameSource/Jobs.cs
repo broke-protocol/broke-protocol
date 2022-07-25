@@ -205,7 +205,7 @@ namespace BrokeProtocol.GameSource.Jobs
                         // Add random crimes to ensure high wanted level (targetable by SpecOps)
                         while (pluginPlayer.wantedLevel < 3)
                         {
-                            pluginPlayer.AddCrime((byte)Random.Range(1, CrimeIndex.Count), e as ShPlayer);
+                            pluginPlayer.AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
                         }
                         player.svPlayer.SetAttackState(e);
                     }
