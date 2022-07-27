@@ -4,29 +4,33 @@ using BrokeProtocol.Utility.Networking;
 
 namespace BrokeProtocol.WarSource.Types
 {
-    public class WarMovable
+    public class WarMovable : MovableEvents
     {
-        [Target(GameSourceEvent.MovableRespawn, ExecutionMode.Override)]
-        public void OnRespawn(ShMovable movable)
+        [Execution(ExecutionMode.Override)]
+        public override bool Respawn(ShEntity entity)
         {
-            movable.svMovable.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
-            if (movable.svMovable.randomSpawn)
+            Parent.Respawn(entity);
+
+            entity.svEntity.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
+            if (entity.svEntity.randomSpawn)
             {
-                movable.svMovable.Despawn(true);
+                entity.svEntity.Despawn(true);
             }
-            else if (movable.IsDead)
+            else if (entity.IsDead)
             {
-                movable.svMovable.Send(SvSendType.Local, Channel.Reliable, ClPacket.Spawn,
-                    movable.ID,
-                    movable.svMovable.originalPosition,
-                    movable.svMovable.originalRotation,
-                    movable.svMovable.originalParent.GetSiblingIndex());
-                movable.Spawn(movable.svMovable.originalPosition, movable.svMovable.originalRotation, movable.svMovable.originalParent);
+                entity.svEntity.Send(SvSendType.Local, Channel.Reliable, ClPacket.Spawn,
+                    entity.ID,
+                    entity.svEntity.originalPosition,
+                    entity.svEntity.originalRotation,
+                    entity.svEntity.originalParent.GetSiblingIndex());
+                entity.Spawn(entity.svEntity.originalPosition, entity.svEntity.originalRotation, entity.svEntity.originalParent);
             }
             else
             {
-                movable.svMovable.ResetOriginal();
+                entity.svEntity.ResetOriginal();
             }
+
+            return true;
         }
     }
 }

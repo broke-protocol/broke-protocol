@@ -1,14 +1,18 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
+using BrokeProtocol.Managers;
 
 namespace BrokeProtocol.WarSource.Types
 {
     public class WarPlayer : WarMovable
     {
-        [Target(GameSourceEvent.PlayerSpawn, ExecutionMode.Event)]
-        public void OnSpawn(ShPlayer player)
+        [Execution(ExecutionMode.Override)]
+        public override bool Spawn(ShEntity entity)
         {
-            if (player.svPlayer.svManager.connections.TryGetValue(player.svPlayer.connection, out var connectData) &&
+            Parent.Spawn(entity);
+            var player = entity as ShPlayer;
+
+            if (SvManager.Instance.connections.TryGetValue(player.svPlayer.connection, out var connectData) &&
                 connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) &&
                 connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
             {
@@ -16,25 +20,29 @@ namespace BrokeProtocol.WarSource.Types
             }
 
             player.svPlayer.SvForceEquipable(player.svPlayer.GetBestWeapon().index);
+
+            return true;
         }
 
-        [Target(GameSourceEvent.PlayerRespawn, ExecutionMode.Override)]
-        public void OnRespawn(ShPlayer player)
+        [Execution(ExecutionMode.Override)]
+        public override bool Respawn(ShEntity entity)
         {
             if (Utility.GetSpawn(out var position, out var rotation, out var place))
             {
-                player.svPlayer.originalPosition = position;
-                player.svPlayer.originalRotation = rotation;
-                player.svPlayer.originalParent = place.mTransform;
+                entity.svEntity.originalPosition = position;
+                entity.svEntity.originalRotation = rotation;
+                entity.svEntity.originalParent = place.mTransform;
             }
 
-            base.OnRespawn(player);
+            Parent.Respawn(entity);
 
-            if(player.isHuman)
+            if(entity.isHuman && entity is ShPlayer player)
             {
                 // Back to spectate self on Respawn
                 player.svPlayer.SvSpectate(player);
             }
+
+            return true;
         }
     }
 }

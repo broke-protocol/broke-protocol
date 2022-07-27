@@ -34,7 +34,7 @@ namespace BrokeProtocol.WarSource
             new JobInfo(
                 typeof(Army), "SpecOps",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                CharacterType.Human, 0, GroupIndex.Criminal, 0, new ColorStruct(1f, 0f, 0f), 0.1f, 8,
+                CharacterType.Human, 0, GroupIndex.Criminal, new ColorStruct(1f, 0f, 0f), 0.1f, 8,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -59,7 +59,7 @@ namespace BrokeProtocol.WarSource
             new JobInfo(
                 typeof(Army), "OpFor",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                CharacterType.Human, 0, GroupIndex.Criminal, 0, new ColorStruct(0f, 1f, 0f), 0.1f, 8,
+                CharacterType.Human, 0, GroupIndex.Criminal, new ColorStruct(0f, 1f, 0f), 0.1f, 8,
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),

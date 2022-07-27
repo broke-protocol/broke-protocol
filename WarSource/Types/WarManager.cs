@@ -126,14 +126,14 @@ namespace BrokeProtocol.WarSource.Types
         }
     }
 
-    public class WarManager
+    public class WarManager : ManagerEvents
     {
         public Dictionary<ShTerritory, TerritoryState> territoryStates = new Dictionary<ShTerritory, TerritoryState>();
 
         public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
 
-        [Target(GameSourceEvent.ManagerStart, ExecutionMode.Event)]
-        public void OnStart()
+        [Execution(ExecutionMode.Override)]
+        public override bool Start()
         {
             var skins = new HashSet<string>();
 
@@ -154,10 +154,12 @@ namespace BrokeProtocol.WarSource.Types
                 if(t.capturable)
                     territoryStates.Add(t, new TerritoryState(t));
             }
+
+            return true;
         }
 
-        [Target(GameSourceEvent.ManagerUpdate, ExecutionMode.Override)]
-        public void OnUpdate()
+        [Execution(ExecutionMode.Override)]
+        public override bool Update()
         {
             foreach(var t in territoryStates.Values)
             {
@@ -176,24 +178,21 @@ namespace BrokeProtocol.WarSource.Types
                     }
                 }
             }
+
+            return true;
         }
 
-        //[Target(GameSourceEvent.ManagerFixedUpdate, ExecutionMode.Override)]
-        //public void OnFixedUpdate() { }
-
-        //[Target(GameSourceEvent.ManagerConsoleInput, ExecutionMode.Override)]
-        //public void OnConsoleInput(string cmd) { }
-
-        [Target(GameSourceEvent.ManagerTryLogin, ExecutionMode.Override)]
-        public void OnTryLogin(ConnectionData connectData)
+        [Execution(ExecutionMode.Override)]
+        public override bool TryLogin(ConnectionData connectData)
         {
             // Logins disabled here
             SvManager.Instance.Disconnect(connectData.connection, DisconnectTypes.ClientIssue);
+            return true;
         }
 
 
-        [Target(GameSourceEvent.ManagerTryRegister, ExecutionMode.Override)]
-        public void OnTryRegister(ConnectionData connectData)
+        [Execution(ExecutionMode.Override)]
+        public override bool TryRegister(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
             {
@@ -202,14 +201,14 @@ namespace BrokeProtocol.WarSource.Types
                     if (playerData.PasswordHash != connectData.passwordHash)
                     {
                         SvManager.Instance.RegisterFail(connectData.connection, "Invalid credentials");
-                        return;
+                        return true;
                     }
                 }
 
                 if (!connectData.username.ValidCredential())
                 {
                     SvManager.Instance.RegisterFail(connectData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
-                    return;
+                    return true;
                 }
 
                 if (connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex) && connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs[teamIndex].Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
@@ -228,6 +227,7 @@ namespace BrokeProtocol.WarSource.Types
                     SvManager.Instance.RegisterFail(connectData.connection, "Invalid data");
                 }
             }
+            return true;
         }
 
         public readonly List<string> teams = new List<string> { "SpecOps", "OpFor" };
@@ -237,8 +237,8 @@ namespace BrokeProtocol.WarSource.Types
         public const string selectTeam = "Select Team";
         public const string selectClass = "Select Class";
 
-        [Target(GameSourceEvent.ManagerPlayerLoaded, ExecutionMode.Override)]
-        public void OnPlayerLoaded(ConnectionData connectData)
+        [Execution(ExecutionMode.Override)]
+        public override bool PlayerLoaded(ConnectionData connectData)
         {
             connectData.connectionStatus = ConnectionStatus.LoadedMap;
 
@@ -247,6 +247,7 @@ namespace BrokeProtocol.WarSource.Types
             var actions = new LabelID[] { new LabelID(selectTeam, selectTeam)};
 
             SvManager.Instance.SendOptionMenu(connectData.connection, selectTeam, 0, selectTeam, options.ToArray(), actions);
+            return true;
         }
 
         private bool ValidateUser(ConnectionData connectData)
@@ -271,8 +272,8 @@ namespace BrokeProtocol.WarSource.Types
         public const string classIndexKey = "classIndex";
 
         // Read packet data from Buffers.reader
-        [Target(GameSourceEvent.ManagerCustomPacket, ExecutionMode.Override)]
-        public void OnCustomPacket(ConnectionData connectData, SvPacket packet)
+        [Execution(ExecutionMode.Override)]
+        public override bool CustomPacket(ConnectionData connectData, SvPacket packet)
         {
             switch(packet)
             {
@@ -315,6 +316,7 @@ namespace BrokeProtocol.WarSource.Types
                     if(manualClose) SvManager.Instance.Disconnect(connectData.connection, DisconnectTypes.Normal);
                     break;
             }
+            return true;
         }
     }
 }
