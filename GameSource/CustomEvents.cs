@@ -102,7 +102,7 @@ namespace BrokeProtocol.CustomEvents
             if (physical is ShMovable movable)
             {
                 var player = movable.controller;
-                if (player && player.isHuman && !player.IsDead && player.ValidCollider && 
+                if (player && player.isHuman && !player.IsDead && 
                     player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement && 
                     Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
                 {
@@ -134,7 +134,7 @@ namespace BrokeProtocol.CustomEvents
             if (physical is ShMovable movable)
             {
                 var player = movable.controller;
-                if (player && player.isHuman && !player.IsDead && player.ValidCollider && 
+                if (player && player.isHuman && !player.IsDead && 
                     player.svPlayer.job.info.shared.groupIndex == GroupIndex.Prisoner && 
                     Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
                 {
