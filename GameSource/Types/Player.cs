@@ -1245,22 +1245,8 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (!forceEnter)
             {
-                if (player.IsRestrained)
-                {
-                    player.svPlayer.SendGameMessage("You are restrained");
+                if (!IsDoorAccessible(player, door) || player.IsRestrained || !player.InActionRange(door))
                     return true;
-                }
-
-                if (door.svDoor.key && !player.HasItem(door.svDoor.key))
-                {
-                    player.svPlayer.SendGameMessage("Need " + door.svDoor.key.itemName + " to enter");
-                    return true;
-                }
-
-                if (!player.InActionRange(door))
-                {
-                    return true;
-                }
             }
 
             ShMountable baseEntity;
@@ -1932,6 +1918,66 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.SvTrySetJob(employer.svPlayer.spawnJobIndex, true, true);
             }
 
+            return true;
+        }
+
+        [Execution(ExecutionMode.Override)]
+        public override bool Park(ShPlayer player, ShTransport transport)
+        {
+            if (transport && !transport.IsDead)
+            {
+                if (transport.controller && transport.controller != player)
+                {
+                    player.svPlayer.SendGameMessage("Transport is occupied");
+                    return true;
+                }
+
+                var distance = Mathf.Infinity;
+                ShDoor garage = null;
+                foreach (var d in transport.svTransport.GetLocalInRange<ShDoor>(Util.inviteDistance))
+                {
+                    var tempDistance = transport.DistanceSqr(d);
+                    if (d.isGarage && tempDistance < distance)
+                    {
+                        distance = tempDistance;
+                        garage = d;
+                    }
+                }
+
+                if (garage)
+                {
+                    if (!IsDoorAccessible(player, garage))
+                        return true;
+
+                    if (garage is ShApartment apartment && player.ownedApartments.TryGetValue(apartment, out var place))
+                    {
+                        if (ShManager.Instance.PlaceItemCount(place) >= apartment.limit ||
+                            !transport.svTransport.TryParking(place.mainDoor))
+                        {
+                            player.svPlayer.SendGameMessage("Cannot park in private garage");
+                        }
+                    }
+                    else if (!transport.svTransport.TryParking(garage.svDoor.other))
+                    {
+                        player.svPlayer.SendGameMessage("Cannot park in garage");
+                    }
+                }
+                else
+                {
+                    player.svPlayer.SendGameMessage("No garage door nearby");
+                }
+            }
+
+            return true;
+        }
+
+        private bool IsDoorAccessible(ShPlayer player, ShDoor door)
+        {
+            if (door.svDoor.key && !player.HasItem(door.svDoor.key))
+            {
+                player.svPlayer.SendGameMessage("Need " + door.svDoor.key.itemName + " to enter");
+                return false;
+            }
             return true;
         }
     }
