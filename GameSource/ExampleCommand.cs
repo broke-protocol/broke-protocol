@@ -1,7 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Required;
 using BrokeProtocol.GameSource.Types;
+using BrokeProtocol.Required;
 using System;
 
 namespace BrokeProtocol.CustomEvents
@@ -73,7 +73,10 @@ namespace BrokeProtocol.CustomEvents
 
         public void CoinFlip(ShPlayer player)
         {
-            player.svPlayer.SendTextPanel("Pick Heads or Tails", coinFlip, new LabelID[] { new LabelID("Heads", heads), new LabelID("Tails", tails), new LabelID("Cancel", cancel)});
+            player.svPlayer.SendTextPanel(
+                "Pick Heads or Tails", 
+                coinFlip.ToString() + new Random().Next(), // Send a random trailing number to differentiate menus
+                new LabelID[] { new LabelID("Heads", heads), new LabelID("Tails", tails), new LabelID("Cancel", cancel)});
         }
     }
 }

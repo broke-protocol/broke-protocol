@@ -1519,38 +1519,36 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool TextPanelButton(ShPlayer player, string menuID, string optionID)
         {
-            switch (menuID)
+            if(menuID.StartsWith(ExampleCommand.coinFlip))
             {
-                case ExampleCommand.coinFlip:
-                    switch (optionID)
-                    {
-                        case ExampleCommand.heads:
-                            player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.heads));
-                            break;
-                        case ExampleCommand.tails:
-                            player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.tails));
-                            break;
-                        case ExampleCommand.cancel:
-                            player.svPlayer.DestroyTextPanel(ExampleCommand.coinFlip);
-                            break;
-                    }
-                    break;
+                switch (optionID)
+                {
+                    case ExampleCommand.heads:
+                        player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.heads, menuID));
+                        break;
+                    case ExampleCommand.tails:
+                        player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.tails, menuID));
+                        break;
+                    case ExampleCommand.cancel:
+                        player.svPlayer.DestroyTextPanel(menuID);
+                        break;
+                }
             }
 
             return true;
         }
 
-        private IEnumerator DelayCoinFlip(ShPlayer player, string prediction)
+        private IEnumerator DelayCoinFlip(ShPlayer player, string prediction, string menuID)
         {
             const int coinFlipCost = 100;
             var delay = new WaitForSeconds(1f);
 
-            player.svPlayer.SendTextPanel("Flipping coin..", ExampleCommand.coinFlip);
+            player.svPlayer.SendTextPanel("Flipping coin..", menuID);
             yield return delay;
 
             if (player.MyMoneyCount < coinFlipCost)
             {
-                player.svPlayer.SendTextPanel($"Need ${coinFlipCost} to play", ExampleCommand.coinFlip);
+                player.svPlayer.SendTextPanel($"Need ${coinFlipCost} to play", menuID);
             }
             else
             {
@@ -1558,18 +1556,18 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (coin == prediction)
                 {
-                    player.svPlayer.SendTextPanel($"Flipped {coin}!\n\n&aYou guessed right!", ExampleCommand.coinFlip);
+                    player.svPlayer.SendTextPanel($"Flipped {coin}!\n\n&aYou guessed right!", menuID);
                     player.TransferMoney(DeltaInv.AddToMe, coinFlipCost);
                 }
                 else
                 {
-                    player.svPlayer.SendTextPanel($"Flipped {coin}!\n\n&4You guessed wrong :(", ExampleCommand.coinFlip);
+                    player.svPlayer.SendTextPanel($"Flipped {coin}!\n\n&4You guessed wrong :(", menuID);
                     player.TransferMoney(DeltaInv.RemoveFromMe, coinFlipCost);
                 }
             }
 
             yield return delay;
-            player.svPlayer.DestroyTextPanel(ExampleCommand.coinFlip);
+            player.svPlayer.DestroyTextPanel(menuID);
         }
 
         [Execution(ExecutionMode.Override)]
