@@ -1978,5 +1978,87 @@ namespace BrokeProtocol.GameSource.Types
             }
             return true;
         }
+
+        [Execution(ExecutionMode.Override)]
+        public override bool TransferShop(ShPlayer player, byte deltaType, int itemIndex, int amount)
+        {
+            int multiplier;
+            bool markup;
+            ShEntity source;
+            ShEntity target;
+
+            var shop = player.otherEntity;
+
+            if (!shop || !shop.Shop || !SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item) || !shop.ShopCanBuy(itemIndex))
+            {
+                player.svPlayer.SendGameMessage("Not suitable");
+                return true;
+            }
+
+            if (deltaType == DeltaInv.MeToOther)
+            {
+                multiplier = 1;
+                markup = false;
+                source = player;
+                target = shop;
+            }
+            else
+            {
+                multiplier = -1;
+                markup = true;
+                source = shop;
+                target = player;
+            }
+
+            var totalTransferValue = 0;
+            var initialItemCount = shop.MyItemCount(itemIndex);
+
+            for (var count = 0; count < amount; count++)
+            {
+                totalTransferValue += item.GetValue(initialItemCount + multiplier * count, markup);
+            }
+
+            if (source.MyItemCount(itemIndex) >= amount && target.MyMoneyCount >= totalTransferValue)
+            {
+                player.TransferItem(deltaType, itemIndex, amount);
+                player.TransferMoney(DeltaInv.InverseDelta[deltaType], totalTransferValue, true);
+            }
+            else
+            {
+                player.svPlayer.SendGameMessage("Unable");
+            }
+
+            return true;
+        }
+
+        [Execution(ExecutionMode.Override)]
+        public override bool TransferTrade(ShPlayer player, byte deltaType, int itemIndex, int amount)
+        {
+            if (!(player.otherEntity is ShPlayer otherPlayer)) return true;
+
+            player.TransferItem(deltaType, itemIndex, amount);
+
+            if (!otherPlayer.isHuman)
+            {
+                var itemValue = 0;
+
+                foreach (var pair in player.tradeItems)
+                {
+                    if (otherPlayer.svPlayer.buyerType.type.IsInstanceOfType(pair.Value.item))
+                    {
+                        var value = pair.Value.item.GetValue(otherPlayer.MyItemCount(itemIndex) + player.TradeItemCount(itemIndex), false);
+
+                        itemValue += pair.Value.count * value;
+                    }
+                }
+
+                var difference = Mathf.Min(itemValue - otherPlayer.TradeMoneyCount, otherPlayer.MyMoneyCount);
+
+                if (difference > 0) otherPlayer.TransferMoney(DeltaInv.MeToTrade, difference, true);
+                else if (difference < 0) otherPlayer.TransferMoney(DeltaInv.TradeToMe, -difference, true);
+            }
+
+            return true;
+        }
     }
 }
