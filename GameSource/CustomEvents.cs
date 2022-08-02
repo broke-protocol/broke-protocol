@@ -16,6 +16,17 @@ namespace BrokeProtocol.CustomEvents
 {
     public class CustomEvents : IScript
     {
+        [CustomTarget]
+        public void GetItemValue(ShPlayer player, ShItem item)
+        {
+            var other = player.otherEntity;
+
+            if (other && !other.IsDead && other.Shop)
+            {
+                player.svPlayer.SendGameMessage('$' + other.GetMyItemValue(item, false).ToString());
+            }
+        }
+
         public const string crimesMenu = "CrimesMenu";
 
         private void SendCrimes(ShPlayer player, ShPlayer criminal)

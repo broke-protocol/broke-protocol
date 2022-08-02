@@ -439,7 +439,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 Manager.pluginPlayers.Add(player, new PluginPlayer(player));
                 player.svPlayer.SvAddSelfAction("MyCrimes", "My Crimes");
-                //player.svPlayer.SvAddInventoryAction("StealItem", "ShItem", ButtonType.Buyable, "Steal");
+                player.svPlayer.SvAddInventoryAction("GetItemValue", "ShItem", ButtonType.Sellable, "Get Sell Value");
             }
 
             return true;
