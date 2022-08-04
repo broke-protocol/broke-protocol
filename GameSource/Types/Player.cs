@@ -1328,9 +1328,11 @@ namespace BrokeProtocol.GameSource.Types
                     switch (optionID)
                     {
                         case enterPasscode:
+                            player.svPlayer.DestroyMenu(securityPanel);
                             player.svPlayer.SendInputMenu("Enter Passcode", targetID, enterPasscode, InputField.ContentType.Password);
                             break;
                         case setPasscode:
+                            player.svPlayer.DestroyMenu(securityPanel);
                             player.svPlayer.SendInputMenu("Set Passcode", targetID, setPasscode, InputField.ContentType.Password);
                             break;
                         case clearPasscode:
@@ -1366,6 +1368,7 @@ namespace BrokeProtocol.GameSource.Types
                             {
                                 options.Add(new LabelID($"{clone.svOwner.username} - Difficulty: {clone.svSecurity.ToPercent()}", clone.svOwner.username));
                             }
+                            player.svPlayer.DestroyMenu(hackPanel);
                             player.svPlayer.SendOptionMenu("&7Places", targetID, hackPanel, options.ToArray(), new LabelID[] { new LabelID("Hack", string.Empty) });
                             break;
                     }
@@ -1386,6 +1389,7 @@ namespace BrokeProtocol.GameSource.Types
                     if (optionID == customVideo && VideoPermission(player, videoEntity, PermEnum.VideoCustom))
                     {
                         player.svPlayer.SendGameMessage("Only direct video links supported - Can upload to Imgur or Discord and link that");
+                        player.svPlayer.DestroyMenu(videoPanel);
                         player.svPlayer.SendInputMenu("Direct MP4/WEBM URL", targetID, customVideo, InputField.ContentType.Standard, 128);
                     }
                     else if (optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
@@ -1420,6 +1424,7 @@ namespace BrokeProtocol.GameSource.Types
                                 sb.AppendLine(" - " + wearable.itemName);
                             }
                         }
+                        player.svPlayer.DestroyMenu(CustomEvents.CustomEvents.crimesMenu);
                         player.svPlayer.SendTextMenu(o.crime.crimeName, sb.ToString());
                     }
                     
@@ -1989,7 +1994,7 @@ namespace BrokeProtocol.GameSource.Types
 
             var shop = player.otherEntity;
 
-            if (!shop || !shop.Shop || !SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item) || !shop.ShopCanBuy(itemIndex))
+            if (!shop || !shop.Shop || !SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item) || !shop.ShopCanBuy(item))
             {
                 player.svPlayer.SendGameMessage("Not suitable");
                 return true;
