@@ -1789,6 +1789,7 @@ namespace BrokeProtocol.GameSource.Types
                     player.GetPlace,
                     position,
                     rotation,
+                    Vector3.one,
                     false,
                     placeableEntity.data,
                     spawnDelay);
