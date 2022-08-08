@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -319,12 +320,13 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(offensesKey, out List<CrimeSave> offensesList))
+                if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(offensesKey, out string offensesJSON))
                 {
+                    var offensesList = JsonConvert.DeserializeObject<List<CrimeSave>>(offensesJSON);
                     var wearables = new ShWearable[player.curWearables.Length];
                     foreach (var crimeSave in offensesList)
                     {
-                        for (int i = 0; i < wearables.Length; i++)
+                        for (var i = 0; i < wearables.Length; i++)
                         {
                             // Future/mod-proofing
                             if (i < crimeSave.wearables.Length &&
@@ -360,7 +362,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     pluginPlayer.UpdateWantedLevel(true);
                 }
-                
+
                 if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(jailtimeKey, out float jailtime) && jailtime > 0f)
                 {
                     pluginPlayer.StartJailTimer(jailtime);
@@ -384,7 +386,7 @@ namespace BrokeProtocol.GameSource.Types
                     offensesList.Add(new CrimeSave(offense.crime.index, offense.wearables, Time.time - offense.commitTime, offense.witness));
                 }
 
-                player.svPlayer.PlayerData.Character.CustomData.AddOrUpdate(offensesKey, offensesList);
+                player.svPlayer.PlayerData.Character.CustomData.AddOrUpdate(offensesKey, JsonConvert.SerializeObject(offensesList));
                 player.svPlayer.PlayerData.Character.CustomData.AddOrUpdate(jailtimeKey, Mathf.Max(0f, pluginPlayer.jailExitTime - Time.time));
             }
 
