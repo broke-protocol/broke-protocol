@@ -676,7 +676,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (!player.isHuman)
             {
-                amount /= player.svPlayer.svManager.settings.difficulty;
+                amount /= SvManager.Instance.settings.difficulty;
             }
 
             amount -= amount * (player.armorLevel / 200f);
@@ -1216,7 +1216,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool ServerInfo(ShPlayer player)
         {
-            player.svPlayer.SendTextMenu("&7Server Info", player.svPlayer.svManager.serverInfo);
+            player.svPlayer.SendTextMenu("&7Server Info", SvManager.Instance.serverInfo);
             return true;
         }
 
@@ -1784,17 +1784,18 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (spawnDelay > 0f)
             {
-                player.svPlayer.svManager.AddNewEntityDelay(
+                SvManager.Instance.AddNewEntityDelay(
                     placeableEntity,
                     player.GetPlace,
                     position,
                     rotation,
                     false,
+                    placeableEntity.data,
                     spawnDelay);
             }
             else
             {
-                player.svPlayer.svManager.AddNewEntity(
+                SvManager.Instance.AddNewEntity(
                     placeableEntity,
                     player.GetPlace,
                     position,
