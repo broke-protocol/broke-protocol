@@ -28,11 +28,18 @@ namespace BrokeProtocol.GameSource.Jobs
         Prisoner
     }
 
+    public struct Transports
+    {
+        public string[] transports;
+        public Transports(string[] transports) { this.transports = transports; }
+    }
+
     public class MyJobInfo : JobInfo
     {
         public readonly GroupIndex groupIndex;
         public readonly float spawnRate;
         public readonly int poolSize;
+        public Transports[] transports;
         public HashSet<ShEntity>[] randomEntities;
 
         public MyJobInfo(
@@ -46,11 +53,12 @@ namespace BrokeProtocol.GameSource.Jobs
             float spawnRate,
             int poolSize,
             Transports[] transports,
-            Upgrades[] upgrades) : base(jobType, jobName, jobDescription, characterType, maxCount, jobColor, transports, upgrades)
+            Upgrades[] upgrades) : base(jobType, jobName, jobDescription, characterType, maxCount, jobColor, upgrades)
         {
             this.groupIndex = groupIndex;
             this.spawnRate = spawnRate;
             this.poolSize = poolSize;
+            this.transports = transports;
         }
     }
 

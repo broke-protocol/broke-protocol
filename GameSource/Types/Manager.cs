@@ -132,7 +132,7 @@ namespace BrokeProtocol.GameSource.Types
                             if (spawnEntity)
                             {
                                 var spawnBot = spawnEntity.Player;
-                                if (spawnBot && spawnBot.characterType == CharacterType.Human && BPAPI.Jobs[jobIndex].transports[((int)waypointType) - 1].transports.Length > 0)
+                                if (spawnBot && spawnBot.characterType == CharacterType.Human && ((MyJobInfo)BPAPI.Jobs[jobIndex]).transports[((int)waypointType) - 1].transports.Length > 0)
                                 {
                                     var spawnTransport = Manager.GetAvailable(jobIndex, waypointType) as ShTransport;
 
