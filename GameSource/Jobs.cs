@@ -542,9 +542,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void Loop()
         {
-            if (!player.isHuman && !player.svPlayer.targetEntity && 
-                (Manager.warTerritory?.ownerIndex == info.shared.jobIndex || Random.value < 0.01f) && 
-                player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if (!player.isHuman && player.IsMobile && !player.svPlayer.IsBusy &&
+                (Manager.warTerritory?.ownerIndex == info.shared.jobIndex || Random.value < 0.01f))
             {
                 TryFindEnemyGang();
             }
