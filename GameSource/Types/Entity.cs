@@ -2,6 +2,7 @@
 using BrokeProtocol.API;
 using BrokeProtocol.Utility;
 using UnityEngine;
+using BrokeProtocol.GameSource.Jobs;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -16,6 +17,16 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (pluginPlayer.ApartmentTrespassing(apartmentPlace.svOwner))
                     pluginPlayer.AddCrime(CrimeIndex.Trespassing, apartmentPlace.svOwner);
+            }
+
+            return true;
+        }
+
+        public override bool Destroy(ShEntity entity)
+        {
+            if (entity.svEntity.randomSpawn)
+            {
+                ((MyJobInfo)BPAPI.Jobs[entity.svEntity.randomJobIndex]).randomEntities[entity.svEntity.randomWaypointIndex].Remove(entity);
             }
 
             return true;

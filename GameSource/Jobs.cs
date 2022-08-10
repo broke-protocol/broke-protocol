@@ -33,6 +33,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public readonly GroupIndex groupIndex;
         public readonly float spawnRate;
         public readonly int poolSize;
+        public HashSet<ShEntity>[] randomEntities;
 
         public MyJobInfo(
             Type jobType,
@@ -1293,15 +1294,13 @@ namespace BrokeProtocol.GameSource.Jobs
                         }
                         else if (p.myItems.Count > 0)
                         {
-                            var svManager = SvManager.Instance;
-
-                            if(svManager.worldWaypoints[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
+                            if(Manager.worldWaypoints[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
                             {
                                 var randomSpawn = spawns.GetRandom();
 
                                 if (randomSpawn != null)
                                 {
-                                    worldItem = svManager.AddNewEntity(
+                                    worldItem = SvManager.Instance.AddNewEntity(
                                         p.myItems.GetRandom().Value.item,
                                         SceneManager.Instance.ExteriorPlace,
                                         randomSpawn.position,

@@ -423,7 +423,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (!(entity is ShPlayer player)) return true;
 
-            switch(deltaType)
+            switch (deltaType)
             {
                 case DeltaInv.OtherToMe:
                     var otherPlayer = player.otherEntity as ShPlayer;
@@ -494,7 +494,7 @@ namespace BrokeProtocol.GameSource.Types
 
             while (!player.IsDead)
             {
-                foreach(var offense in pluginPlayer.offenses.Values)
+                foreach (var offense in pluginPlayer.offenses.Values)
                 {
                     if (Time.time >= offense.commitTime + offense.AdjustedExpiration)
                     {
@@ -573,7 +573,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public ShPlayer SpawnInterior(ShPlayer target)
         {
-            var spawnEntity = SvManager.Instance.GetAvailable(Core.policeIndex);
+            var spawnEntity = Manager.GetAvailable(Core.policeIndex);
 
             if (spawnEntity)
             {
@@ -1058,7 +1058,7 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.SvShowTimer(vault.svVault.bombTimer);
 
-            if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
                 pluginPlayer.AddCrime(CrimeIndex.Bombing, null);
 
             vault.svVault.SvSetVault(VaultState.Bombing);
@@ -1431,7 +1431,7 @@ namespace BrokeProtocol.GameSource.Types
                 case CustomEvents.CustomEvents.crimesMenu:
                     var criminal = EntityCollections.FindByID<ShPlayer>(targetID);
 
-                    if(criminal && Manager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal) && int.TryParse(optionID, out var offenseHash) && 
+                    if (criminal && Manager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal) && int.TryParse(optionID, out var offenseHash) &&
                         pluginCriminal.offenses.TryGetValue(offenseHash, out var o))
                     {
                         var sb = new StringBuilder();
@@ -1441,9 +1441,9 @@ namespace BrokeProtocol.GameSource.Types
                         sb.AppendLine("Witness: " + (o.witness ? "&c" + o.witness.username : "&aNo Witness"));
                         sb.AppendLine(o.disguised ? "&aDisguised" : "&cNo Disguise");
                         sb.AppendLine("&fClothing during crime:");
-                        foreach(var wearableIndex in o.wearables)
+                        foreach (var wearableIndex in o.wearables)
                         {
-                            if(SceneManager.Instance.TryGetEntity<ShWearable>(wearableIndex, out var wearable))
+                            if (SceneManager.Instance.TryGetEntity<ShWearable>(wearableIndex, out var wearable))
                             {
                                 sb.AppendLine(" - " + wearable.itemName);
                             }
@@ -1451,7 +1451,7 @@ namespace BrokeProtocol.GameSource.Types
                         player.svPlayer.DestroyMenu(CustomEvents.CustomEvents.crimesMenu);
                         player.svPlayer.SendTextMenu(o.crime.crimeName, sb.ToString());
                     }
-                    
+
                     break;
 
                 default:
@@ -1548,7 +1548,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool TextPanelButton(ShPlayer player, string menuID, string optionID)
         {
-            if(menuID.StartsWith(ExampleCommand.coinFlip))
+            if (menuID.StartsWith(ExampleCommand.coinFlip))
             {
                 switch (optionID)
                 {
@@ -1752,7 +1752,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.svPlayer.ResetAI();
             }
-            else if (seat == 0 && mount.svMountable.mountLicense && !player.HasItem(mount.svMountable.mountLicense) && 
+            else if (seat == 0 && mount.svMountable.mountLicense && !player.HasItem(mount.svMountable.mountLicense) &&
                 Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 pluginPlayer.AddCrime(CrimeIndex.NoLicense, null);
@@ -1869,7 +1869,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool SetWearable(ShPlayer player, ShWearable wearable)
         {
-            if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
                 pluginPlayer.UpdateWantedLevel(true);
 
             return true;
@@ -2090,6 +2090,46 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             return true;
+        }
+
+        [Execution(ExecutionMode.Override)]
+        public override bool SameSector(ShEntity entity)
+        {
+            if (entity.isHuman && entity.IsOutside)
+            {
+                foreach (var s in entity.svEntity.localSectors.Values)
+                {
+                    if (entity.svEntity.sector != s)
+                        SpawnSector(entity.Player, s);
+                }
+            }
+
+            return true;
+        }
+
+        [Execution(ExecutionMode.Override)]
+        public override bool NewSector(ShEntity entity, List<Sector> newSectors)
+        {
+            if (entity.isHuman && entity.IsOutside)
+            {
+                foreach (var s in newSectors)
+                {
+                    if (s.humans.Count == 0)
+                    {
+                        SpawnSector(entity.Player, s);
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public void SpawnSector(ShPlayer player, Sector sector)
+        {
+            foreach (var g in Manager.worldWaypoints)
+            {
+                g.SpawnRandom(player, sector);
+            }
         }
     }
 }
