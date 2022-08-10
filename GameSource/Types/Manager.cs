@@ -192,7 +192,12 @@ namespace BrokeProtocol.GameSource.Types
             T newEntity = GameObject.Instantiate(prefab, SceneManager.Instance.ExteriorT);
             newEntity.name = prefab.name;
             newEntity.svEntity.randomSpawn = true;
-            newEntity.svEntity.randomJobIndex = randomJobIndex;
+
+            if (newEntity is ShPlayer player)
+            {
+                player.svPlayer.spawnJobIndex = randomJobIndex;
+                player.svPlayer.spawnJobRank = UnityEngine.Random.Range(0, BPAPI.Jobs[randomJobIndex].upgrades.Length);
+            }
 
             SvManager.Instance.AddNewEntityExisting(newEntity);
 
