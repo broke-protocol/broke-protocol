@@ -6,8 +6,8 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
-using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.Utility.Networking;
+using BrokeProtocol.GameSource.Jobs;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +58,7 @@ namespace BrokeProtocol.GameSource.Types
                     yield break;
                 }
 
-                if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Prisoner)
+                if (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.Prisoner)
                 {
                     JailDone();
                     yield break;
@@ -82,7 +82,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public ShPlayer GetWitness(ShPlayer victim)
         {
-            if (victim && !victim.IsDead && victim.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+            if (victim && !victim.IsDead && ((MyJobInfo)victim.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement)
             {
                 return victim;
             }
@@ -215,20 +215,20 @@ namespace BrokeProtocol.GameSource.Types
             UpdateWantedLevel(false);
 
             // Don't hand out crime penalties for criminal jobs and default job
-            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.Criminal && player.svPlayer.job.info.shared.jobIndex > 0)
+            if (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.Criminal && player.svPlayer.job.info.shared.jobIndex > 0)
             {
                 player.svPlayer.Reward(-crime.experiencePenalty, -crime.fine);
             }
         }
 
         public bool ApartmentUnlawful(ShPlayer apartmentOwner) => apartmentOwner != player && Manager.pluginPlayers.TryGetValue(apartmentOwner, out var pluginOwner) && 
-            (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement || pluginOwner.wantedLevel == 0);
+            (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || pluginOwner.wantedLevel == 0);
 
         public bool ApartmentTrespassing(ShPlayer apartmentOwner) => player.svPlayer.trespassing && ApartmentUnlawful(apartmentOwner);
 
         public int GoToJail()
         {
-            if (player.IsDead || !player.IsRestrained || player.svPlayer.job.info.shared.groupIndex == GroupIndex.Prisoner)
+            if (player.IsDead || !player.IsRestrained || ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner)
             {
                 return 0;
             }
@@ -428,7 +428,7 @@ namespace BrokeProtocol.GameSource.Types
                 case DeltaInv.OtherToMe:
                     var otherPlayer = player.otherEntity as ShPlayer;
 
-                    if (player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+                    if (((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement)
                     {
                         if (SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item) && item.illegal)
                         {
@@ -1040,7 +1040,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 foreach (var p in player.viewers)
                 {
-                    if (p.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+                    if (((MyJobInfo)p.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement)
                     {
                         pluginPlayer.AddCrime(CrimeIndex.Obstruction, null);
                         return true;
@@ -1096,8 +1096,8 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool ViewInventory(ShPlayer player, ShEntity searchee, bool force)
         {
-            if (searchee is ShPlayer playerSearchee && player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement &&
-                playerSearchee.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement && !searchee.Shop &&
+            if (searchee is ShPlayer playerSearchee && ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement &&
+                ((MyJobInfo)playerSearchee.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement && !searchee.Shop &&
                 Manager.pluginPlayers.TryGetValue(playerSearchee, out var pluginSearchee))
             {
                 foreach (var i in searchee.myItems.Values)
@@ -1689,7 +1689,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool HandsUp(ShPlayer player, ShPlayer victim)
         {
-            if (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 pluginPlayer.AddCrime(CrimeIndex.Intimidation, victim);
             }
@@ -1698,7 +1698,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (!victim.svPlayer.targetEntity)
                 {
-                    if (victim.svPlayer.job.info.shared.groupIndex != GroupIndex.Citizen || Random.value < 0.2f)
+                    if (((MyJobInfo)victim.svPlayer.job.info).groupIndex != GroupIndex.Citizen || Random.value < 0.2f)
                     {
                         victim.svPlayer.SetAttackState(player);
                     }
@@ -1884,11 +1884,11 @@ namespace BrokeProtocol.GameSource.Types
             {
                 hitPlayer.svPlayer.Restrain(player, restraint.restrained);
                 if (hitPluginPlayer.wantedLevel == 0 && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
-                    (player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement || hitPlayer.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement))
+                    (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || ((MyJobInfo)hitPlayer.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement))
                 {
                     pluginPlayer.AddCrime(CrimeIndex.FalseArrest, hitPlayer);
                 }
-                else if (!player.isHuman && player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+                else if (!player.isHuman && ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement)
                 {
                     hitPluginPlayer.GoToJail();
                 }
@@ -1938,7 +1938,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.svPlayer.SendGameMessage("You're not the correct mob type for this job");
             }
-            else if (employer.svPlayer.job.info.shared.groupIndex == GroupIndex.Criminal && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && pluginPlayer.wantedLevel > 0)
+            else if (((MyJobInfo)employer.svPlayer.job.info).groupIndex == GroupIndex.Criminal && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && pluginPlayer.wantedLevel > 0)
             {
                 player.svPlayer.SendGameMessage("We don't accept wanted criminals");
             }

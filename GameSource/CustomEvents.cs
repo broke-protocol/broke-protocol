@@ -65,7 +65,7 @@ namespace BrokeProtocol.CustomEvents
         [CustomTarget]
         public void SendToJail(ShEntity target, ShPlayer player)
         {
-            if (player.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement && target is ShPlayer criminal &&
+            if (((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement && target is ShPlayer criminal &&
                 Manager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal))
             {
                 var fine = pluginCriminal.GoToJail();
@@ -101,7 +101,7 @@ namespace BrokeProtocol.CustomEvents
         [CustomTarget]
         public void AreaWarning(Serialized trigger, ShPhysical physical)
         {
-            if (physical is ShPlayer player && player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement)
+            if (physical is ShPlayer player && ((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement)
             {
                 player.svPlayer.SendGameMessage($"Warning! You are about to enter {trigger.data}!");
             }
@@ -113,8 +113,8 @@ namespace BrokeProtocol.CustomEvents
             if (physical is ShMovable movable)
             {
                 var player = movable.controller;
-                if (player && player.isHuman && !player.IsDead && 
-                    player.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement && 
+                if (player && player.isHuman && !player.IsDead &&
+                    ((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement && 
                     Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
                 {
                     pluginPlayer.AddCrime(CrimeIndex.Trespassing, null);
@@ -145,8 +145,8 @@ namespace BrokeProtocol.CustomEvents
             if (physical is ShMovable movable)
             {
                 var player = movable.controller;
-                if (player && player.isHuman && !player.IsDead && 
-                    player.svPlayer.job.info.shared.groupIndex == GroupIndex.Prisoner && 
+                if (player && player.isHuman && !player.IsDead &&
+                    ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner && 
                     Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
                 {
                     pluginPlayer.AddCrime(CrimeIndex.PrisonBreak, null);

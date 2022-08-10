@@ -8,6 +8,8 @@ using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.Utility.Networking;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,20 +19,52 @@ using Random = UnityEngine.Random;
 
 namespace BrokeProtocol.GameSource.Jobs
 {
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum GroupIndex
+    {
+        Citizen,
+        Criminal,
+        LawEnforcement,
+        Prisoner
+    }
+
+    public class MyJobInfo : JobInfo
+    {
+        public readonly GroupIndex groupIndex;
+
+        public MyJobInfo(
+            Type jobType,
+            string jobName,
+            string jobDescription,
+            CharacterType characterType,
+            int maxCount,
+            GroupIndex groupIndex,
+            ColorStruct jobColor,
+            float spawnRate,
+            int poolSize,
+            Transports[] transports,
+            Upgrades[] upgrades) : base(jobType, jobName, jobDescription, characterType, maxCount, jobColor, spawnRate, poolSize, transports, upgrades)
+        {
+            this.groupIndex = groupIndex;
+        }
+    }
+
+
+
     public class JobRP : Job
     {
         public override bool IsValidTarget(ShPlayer chaser)
         {
             return Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
                 (
-                (chaser.svPlayer.IsFollower(player) || chaser.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement || (!player.IsRestrained && pluginPlayer.wantedLevel > 0)) &&
+                (chaser.svPlayer.IsFollower(player) || ((MyJobInfo)chaser.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || (!player.IsRestrained && pluginPlayer.wantedLevel > 0)) &&
                 (!chaser.curMount || player.GetPlaceIndex == chaser.GetPlaceIndex)
                 );
         }
 
         public override ShUsable GetBestJobWeapon()
         {
-            if (info.shared.groupIndex == GroupIndex.LawEnforcement && player.svPlayer.targetEntity is ShPlayer targetPlayer &&
+            if (((MyJobInfo)info).groupIndex == GroupIndex.LawEnforcement && player.svPlayer.targetEntity is ShPlayer targetPlayer &&
                 Manager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget) && pluginTarget.wantedLevel <= 1 && player.HasItem(targetPlayer.Handcuffs))
             {
                 return targetPlayer.Handcuffs;

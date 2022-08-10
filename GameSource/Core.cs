@@ -30,16 +30,21 @@ namespace BrokeProtocol.GameSource
             }
 
             // Use JobsAdditive if you're adding to Default jobs and not replacing them
-            JobsOverride = JsonConvert.DeserializeObject<List<JobInfo>>(File.ReadAllText(jobsFilename));
+            JobsOverride = new List<JobInfo>();
+            var myJobs = JsonConvert.DeserializeObject<List<MyJobInfo>>(File.ReadAllText(jobsFilename));
+            foreach (var job in myJobs)
+            {
+                JobsOverride.Add(job);
+            }
 
             var index = 0;
-            foreach (var info in JobsOverride)
+            foreach (var info in myJobs)
             {
-                if (prisonerIndex < 0 && info.shared.groupIndex == GroupIndex.Prisoner)
+                if (prisonerIndex < 0 && info.groupIndex == GroupIndex.Prisoner)
                 {
                     prisonerIndex = index;
                 }
-                else if (policeIndex < 0 && info.shared.groupIndex == GroupIndex.LawEnforcement)
+                else if (policeIndex < 0 && info.groupIndex == GroupIndex.LawEnforcement)
                 {
                     policeIndex = index;
                 }
@@ -79,8 +84,8 @@ namespace BrokeProtocol.GameSource
                 }),
             */
 
-        private List<JobInfo> GetJobs => new List<JobInfo> {
-            new JobInfo(
+        private List<MyJobInfo> GetJobs => new List<MyJobInfo> {
+            new MyJobInfo(
                 typeof(Citizen), "Citizen",
                 "Get money by robbing, looting, and trading with NPCs and players or get a job by visiting map icons",
                 CharacterType.All, 0, GroupIndex.Citizen, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
@@ -134,7 +139,7 @@ namespace BrokeProtocol.GameSource
                         "Boat3"})
                 },
                 new Upgrades[0]),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Prisoner), "Prisoner",
                 "The prison door can be bombed and the guard might have a key",
                 CharacterType.Human, 0, GroupIndex.Prisoner, new ColorStruct(1f, 0.5f, 0f), 0f, 0,
@@ -148,7 +153,7 @@ namespace BrokeProtocol.GameSource
                         new InventoryStruct[] {
                             new InventoryStruct("TopPrisoner", 1),
                             new InventoryStruct("PantsPrisoner", 1)})}),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Hitman), "Hitman",
                 "Assasinate designated targets to earn bounty rewards",
                 CharacterType.Human, 0, GroupIndex.Criminal, new ColorStruct(0f, 0f, 0f), 0.01f, 3,
@@ -176,7 +181,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("LaserRed", 1),
                             new InventoryStruct("Silencer", 1)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Police), "Police",
                 "Search others for illegal items, arrest criminals, put the them in your car, and bring to jail for cash rewards",
                 CharacterType.Human, 0, GroupIndex.LawEnforcement, new ColorStruct(0f, 1f, 1f), 0.03f, 10,
@@ -212,7 +217,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("GlovesDark", 1),
                             new InventoryStruct("KeyPrison", 1)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Paramedic), "Paramedic",
                 "Use map to find hurt and knocked out players to heal and revive",
                 CharacterType.Human, 0, GroupIndex.Citizen, new ColorStruct(1f, 0.75f, 0.75f), 0.02f, 5,
@@ -240,7 +245,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Morphine", 6),
                             new InventoryStruct("Bandage", 6)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Firefighter), "Firefighter",
                 "Use map to find fires to extinguish",
                 CharacterType.Human, 0, GroupIndex.Citizen, new ColorStruct(1f, 1f, 0f), 0.01f, 3,
@@ -267,7 +272,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("PantsFireBlack", 1),
                             new InventoryStruct("FireHose", 1)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Gangster), "Rojo Loco",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Human, 0, GroupIndex.Criminal, new ColorStruct(1f, 0f, 0f), 0.1f, 8,
@@ -292,7 +297,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Mac", 1),
                             new InventoryStruct("AmmoSMG", 90)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Gangster), "Green St. Fam",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Human, 0, GroupIndex.Criminal, new ColorStruct(0f, 1f, 0f), 0.1f, 8,
@@ -317,7 +322,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("MP5SD", 1),
                             new InventoryStruct("AmmoSMG", 60)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Gangster), "Borgata Blu",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Human, 0, GroupIndex.Criminal, new ColorStruct(0f, 0f, 1f), 0.1f, 8,
@@ -344,7 +349,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Shotgun", 1),
                             new InventoryStruct("AmmoShotgun", 32)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Mayor), "Mayor",
                 "You're the Mayor: Accept or reject license requests",
                 CharacterType.Human, 1, GroupIndex.Citizen, new ColorStruct(1f, 0f, 1f), 0f, 0,
@@ -365,7 +370,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("LicensePilots", 1),
                             new InventoryStruct("LicenseGun", 1)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(DeliveryMan), "Delivery Man",
                 "Deliver food to hungry players and NPCs on your map (M) for rewards",
                 CharacterType.Human, 0, GroupIndex.Citizen, new ColorStruct(0.5f, 0.25f, 0f), 0f, 0,
@@ -389,7 +394,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("CapRacerRed", 1),
                             new InventoryStruct("GlovesFingerlessWhite", 1)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(TaxiDriver), "Taxi Driver",
                 "Bring NPCs to destinations on your map (M) for rewards",
                 CharacterType.Human, 0, GroupIndex.Citizen, new ColorStruct(0f, 0f, 0.5f), 0f, 0,
@@ -414,7 +419,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("PantsChauffeur", 1),
                             new InventoryStruct("CapChauffeur", 1)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(SpecOps), "SpecOps",
                 "Hunt down the most wanted players on the server for rewards",
                 CharacterType.Human, 0, GroupIndex.LawEnforcement, new ColorStruct(0.75f, 0.75f, 0.25f), 0.015f, 8,
@@ -459,7 +464,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("M4", 1),
                             new InventoryStruct("AmmoRifle", 60)})
                 }),
-            new JobInfo(
+            new MyJobInfo(
                 typeof(Retriever), "Retriever",
                 "Return lost or dropped items to their rightful owner in time for rewards",
                 CharacterType.Mob, 0, GroupIndex.Citizen, new ColorStruct(0.25f, 0.75f, 0.25f), 0f, 0,
