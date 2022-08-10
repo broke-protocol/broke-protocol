@@ -37,7 +37,7 @@ namespace BrokeProtocol.GameSource.Types
         public static int defendersKilled;
         public static ShTerritory warTerritory;
 
-        public static ShTerritory GetTerritory(ShEntity entity)
+        public static bool TryGetTerritory(ShEntity entity, out ShTerritory territory)
         {
             const float extent = 0.5f;
             var pos = entity.mainT.position;
@@ -53,11 +53,13 @@ namespace BrokeProtocol.GameSource.Types
                     localPos.z < extent &&
                     localPos.z > -extent)
                 {
-                    return t;
+                    territory = t;
+                    return true;
                 }
             }
 
-            return null;
+            territory = null;
+            return false;
         }
 
         public static void StartGangWar(ShTerritory startT, int attackerJob)

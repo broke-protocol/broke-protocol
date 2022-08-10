@@ -36,7 +36,7 @@ namespace BrokeProtocol.WarSource.Types
         {
             foreach(var p in players.ToArray())
             {
-                if (!p.isActiveAndEnabled || p.IsDead || Manager.GetTerritory(p) != territory)
+                if (!p.isActiveAndEnabled || p.IsDead || !Manager.TryGetTerritory(p, out var t) || t != territory)
                 {
                     p.svPlayer.SvProgressStop(territoryProgressBarID);
                     players.Remove(p);
@@ -168,14 +168,10 @@ namespace BrokeProtocol.WarSource.Types
 
             foreach(var p in EntityCollections.Players)
             {
-                if(p.isActiveAndEnabled && !p.IsDead)
+                if(p.isActiveAndEnabled && !p.IsDead && Manager.TryGetTerritory(p, out var territory) && 
+                    territoryStates.TryGetValue(territory, out var state) && state.players.TryAdd(p))
                 {
-                    var territory = Manager.GetTerritory(p);
-
-                    if(territory && territoryStates.TryGetValue(territory, out var state) && state.players.TryAdd(p))
-                    {
-                        p.svPlayer.SvProgressBar(state.captureState, state.lastSpeed, TerritoryState.territoryProgressBarID);
-                    }
+                    p.svPlayer.SvProgressBar(state.captureState, state.lastSpeed, TerritoryState.territoryProgressBarID);
                 }
             }
 
