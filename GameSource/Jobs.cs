@@ -31,6 +31,8 @@ namespace BrokeProtocol.GameSource.Jobs
     public class MyJobInfo : JobInfo
     {
         public readonly GroupIndex groupIndex;
+        public readonly float spawnRate;
+        public readonly int poolSize;
 
         public MyJobInfo(
             Type jobType,
@@ -43,9 +45,11 @@ namespace BrokeProtocol.GameSource.Jobs
             float spawnRate,
             int poolSize,
             Transports[] transports,
-            Upgrades[] upgrades) : base(jobType, jobName, jobDescription, characterType, maxCount, jobColor, spawnRate, poolSize, transports, upgrades)
+            Upgrades[] upgrades) : base(jobType, jobName, jobDescription, characterType, maxCount, jobColor, transports, upgrades)
         {
             this.groupIndex = groupIndex;
+            this.spawnRate = spawnRate;
+            this.poolSize = poolSize;
         }
     }
 
@@ -110,6 +114,8 @@ namespace BrokeProtocol.GameSource.Jobs
                 }
             }
         }
+
+        public override float GetSpawnRate() => ((MyJobInfo)info).spawnRate;
     }
 
 
@@ -593,7 +599,7 @@ namespace BrokeProtocol.GameSource.Jobs
             if (Manager.TryGetTerritory(player.svPlayer.spawner, out var territory) && territory.ownerIndex == info.shared.jobIndex)
             {
                 // Boost gangster spawn rate if territory under attack
-                return (territory.attackerIndex < 0) ? info.spawnRate : 8f;
+                return (territory.attackerIndex < 0) ? ((MyJobInfo)info).spawnRate : 8f;
             }
             return 0f;
         }

@@ -163,22 +163,22 @@ namespace BrokeProtocol.GameSource.Types
 
             for (byte jobIndex = 0; jobIndex < BPAPI.Jobs.Count; jobIndex++)
             {
-                var job = BPAPI.Jobs[jobIndex];
+                var info = BPAPI.Jobs[jobIndex];
 
-                job.randomEntities = new HashSet<ShEntity>[waypointTypes];
+                info.randomEntities = new HashSet<ShEntity>[waypointTypes];
 
                 for (int i = 0; i < waypointTypes; i++)
                 {
-                    job.randomEntities[i] = new HashSet<ShEntity>();
+                    info.randomEntities[i] = new HashSet<ShEntity>();
                 }
 
                 int count = 0;
                 int limit = 0;
-                while (count < job.poolSize && limit < 100)
+                while (count < ((MyJobInfo)info).poolSize && limit < 100)
                 {
                     var randomSkin = skinPrefabs.GetRandom();
 
-                    if (job.characterType == CharacterType.All || randomSkin.characterType == job.characterType)
+                    if (info.characterType == CharacterType.All || randomSkin.characterType == info.characterType)
                     {
                         SvManager.Instance.AddRandomSpawn(randomSkin, jobIndex, (int)WaypointType.Player);
                         count++;
@@ -190,11 +190,11 @@ namespace BrokeProtocol.GameSource.Types
                 }
 
                 int waypointIndex = 1; // PlayerWaypoints has no transports
-                foreach (var transportArray in job.transports)
+                foreach (var transportArray in info.transports)
                 {
                     if (transportArray.transports.Length > 0)
                     {
-                        for (int i = 0; i < job.poolSize; i++)
+                        for (int i = 0; i < ((MyJobInfo)info).poolSize; i++)
                         {
                             if (SceneManager.Instance.TryGetEntity<ShTransport>(transportArray.transports.GetRandom(), out var t))
                                 SvManager.Instance.AddRandomSpawn(t, jobIndex, waypointIndex);
