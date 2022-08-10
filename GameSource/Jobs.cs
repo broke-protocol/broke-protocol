@@ -69,7 +69,11 @@ namespace BrokeProtocol.GameSource.Jobs
                 pluginVictim.wantedLevel == 0 && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 pluginPlayer.AddCrime(victim.characterType == CharacterType.Human ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
-                victim.svPlayer.SendMurderedMessage(player);
+
+                if (victim.isHuman && player.isHuman)
+                {
+                    victim.svPlayer.SendGameMessage(player.username + " murdered " + victim.username);
+                }
             }
         }
     }
