@@ -24,7 +24,9 @@ namespace BrokeProtocol.GameSource.Types
 
         public float jailExitTime;
 
-        public Dictionary<int, Offense> offenses = new Dictionary<int, Offense>();
+        public readonly Dictionary<int, Offense> offenses = new Dictionary<int, Offense>();
+
+        public readonly Dictionary<ShPlayer, int> witnessedPlayers = new Dictionary<ShPlayer, int>();
 
         public int wantedLevel;
         public float wantedNormalized;
@@ -76,6 +78,27 @@ namespace BrokeProtocol.GameSource.Types
             return fine;
         }
 
+        public void AddWitnessedCriminal(ShPlayer criminal) => witnessedPlayers[criminal] = witnessedPlayers.TryGetValue(criminal, out var value) ? value + 1 : 1;
+
+        public ShPlayer GetWitness(ShPlayer victim)
+        {
+            if (victim && !victim.IsDead && victim.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement)
+            {
+                return victim;
+            }
+
+            ShPlayer w = null;
+
+            const float witnessDistance = 100f;
+            const float proximityDistanceSqr = 20f * 20f;
+
+            player.svPlayer.LocalEntitiesOne(
+                e => e != victim && e is ShPlayer && !e.IsDead && (player.DistanceSqr(e) <= proximityDistanceSqr || player.CanSeeEntity(e, witnessDistance)),
+                e => w = e.Player);
+
+            return w;
+        }
+
         public bool InvalidCrime(CrimeIndex crimeIndex)
         {
             foreach (var o in offenses.Values)
@@ -93,7 +116,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             foreach (var o in offenses.Values)
             {
-                if (o.witness) o.witness.svPlayer.witnessedPlayers.Remove(player);
+                if (o.witness && Manager.pluginPlayers.TryGetValue(o.witness, out var pluginWitness)) pluginWitness.witnessedPlayers.Remove(player);
             }
             
             offenses.Clear();
@@ -103,7 +126,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public void ClearWitnessed()
         {
-            foreach (var criminal in player.svPlayer.witnessedPlayers.Keys)
+            foreach (var criminal in witnessedPlayers.Keys)
             {
                 if(Manager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal))
                 {
@@ -111,7 +134,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            player.svPlayer.witnessedPlayers.Clear();
+            witnessedPlayers.Clear();
         }
 
         public void RemoveWitness(ShPlayer witness)
@@ -177,13 +200,13 @@ namespace BrokeProtocol.GameSource.Types
             }
             else
             {
-                witness = player.svPlayer.GetWitness(victim);
+                witness = GetWitness(victim);
                 if (!witness) return;
             }
 
-            if (witness)
+            if (witness && Manager.pluginPlayers.TryGetValue(witness, out var pluginWitness))
             {
-                witness.svPlayer.AddWitnessedCriminal(player);
+                pluginWitness.AddWitnessedCriminal(player);
             }
 
             var offense = new Offense(crime, player.curWearables, witness);
@@ -477,10 +500,10 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         var witness = offense.witness;
 
-                        if (witness && witness.svPlayer.witnessedPlayers.TryGetValue(player, out var value))
+                        if (witness && Manager.pluginPlayers.TryGetValue(witness, out var pluginWitnesS) && pluginWitnesS.witnessedPlayers.TryGetValue(player, out var value))
                         {
-                            if (value <= 1) witness.svPlayer.witnessedPlayers.Remove(player);
-                            else witness.svPlayer.witnessedPlayers[player] = value - 1;
+                            if (value <= 1) pluginWitnesS.witnessedPlayers.Remove(player);
+                            else pluginWitnesS.witnessedPlayers[player] = value - 1;
                         }
 
                         removeOffenseList.Add(offense);
