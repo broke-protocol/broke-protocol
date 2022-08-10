@@ -21,24 +21,11 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         public override bool IsValidTarget(ShPlayer chaser)
         {
-            if (!Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                return false;
-
-            if ((!chaser.svPlayer.IsFollower(player) && chaser.svPlayer.job.info.shared.groupIndex == GroupIndex.LawEnforcement && (player.IsRestrained || pluginPlayer.wantedLevel == 0)))
-            {
-                return false;
-            }
-
-            if (player.GetPlaceIndex != chaser.GetPlaceIndex)
-            {
-                if (chaser.svPlayer.IsFollower(player))
-                {
-                    chaser.svPlayer.SvRelocate(player.GetPositionT, player.GetParent);
-                }
-                else return false;
-            }
-
-            return true;
+            return Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+                (
+                (chaser.svPlayer.IsFollower(player) || chaser.svPlayer.job.info.shared.groupIndex != GroupIndex.LawEnforcement || (!player.IsRestrained && pluginPlayer.wantedLevel > 0)) &&
+                (!chaser.curMount || player.GetPlaceIndex == chaser.GetPlaceIndex)
+                );
         }
 
         public override ShUsable GetBestJobWeapon()
