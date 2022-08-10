@@ -524,7 +524,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     if (!player.IsOutside && Random.value < pluginPlayer.wantedNormalized * 0.08f)
                     {
-                        SpawnAttack(player);
+                        SpawnInterior(player);
                     }
 
                     if (player.otherEntity && (!player.otherEntity.isActiveAndEnabled || !player.InActionRange(player.otherEntity)))
@@ -548,9 +548,9 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        public ShPlayer SpawnAttack(ShPlayer target)
+        public ShPlayer SpawnInterior(ShPlayer target)
         {
-            var spawnEntity = target.svEntity.svManager.GetAvailable(Core.policeIndex);
+            var spawnEntity = SvManager.Instance.GetAvailable(Core.policeIndex);
 
             if (spawnEntity)
             {
