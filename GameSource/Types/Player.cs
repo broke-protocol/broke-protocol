@@ -2099,8 +2099,10 @@ namespace BrokeProtocol.GameSource.Types
             {
                 foreach (var s in entity.svEntity.localSectors.Values)
                 {
-                    if (entity.svEntity.sector != s)
+                    if (s.humans.Count == 0)
+                    {
                         SpawnSector(entity.Player, s);
+                    }
                 }
             }
 
