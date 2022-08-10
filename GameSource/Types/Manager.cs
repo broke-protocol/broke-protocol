@@ -187,17 +187,16 @@ namespace BrokeProtocol.GameSource.Types
         public static int defendersKilled;
         public static ShTerritory warTerritory;
 
-        public void AddRandomSpawn<T>(T prefab, int randomJobIndex, int randomWaypointIndex) where T : ShEntity
+        public void AddRandomSpawn<T>(T prefab, int randomJobIndex) where T : ShEntity
         {
             T newEntity = GameObject.Instantiate(prefab, SceneManager.Instance.ExteriorT);
             newEntity.name = prefab.name;
             newEntity.svEntity.randomSpawn = true;
             newEntity.svEntity.randomJobIndex = randomJobIndex;
-            newEntity.svEntity.randomWaypointIndex = randomWaypointIndex;
 
             SvManager.Instance.AddNewEntityExisting(newEntity);
 
-            ((MyJobInfo)BPAPI.Jobs[randomJobIndex]).randomEntities[randomWaypointIndex].Add(newEntity);
+            ((MyJobInfo)BPAPI.Jobs[randomJobIndex]).randomEntities[(int)newEntity.svEntity.WaypointProperty].Add(newEntity);
         }
 
         public static bool TryGetTerritory(ShEntity entity, out ShTerritory territory)
@@ -418,7 +417,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     if (info.characterType == CharacterType.All || randomSkin.characterType == info.characterType)
                     {
-                        AddRandomSpawn(randomSkin, jobIndex, (int)WaypointType.Player);
+                        AddRandomSpawn(randomSkin, jobIndex);
                         count++;
                     }
                     else
@@ -427,7 +426,6 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
 
-                int waypointIndex = 1; // PlayerWaypoints has no transports
                 foreach (var transportArray in myInfo.transports)
                 {
                     if (transportArray.transports.Length > 0)
@@ -435,10 +433,9 @@ namespace BrokeProtocol.GameSource.Types
                         for (int i = 0; i < myInfo.poolSize; i++)
                         {
                             if (SceneManager.Instance.TryGetEntity<ShTransport>(transportArray.transports.GetRandom(), out var t))
-                                AddRandomSpawn(t, jobIndex, waypointIndex);
+                                AddRandomSpawn(t, jobIndex);
                         }
                     }
-                    waypointIndex++;
                 }
             }
 

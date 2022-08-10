@@ -26,7 +26,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (entity.svEntity.randomSpawn)
             {
-                ((MyJobInfo)BPAPI.Jobs[entity.svEntity.randomJobIndex]).randomEntities[entity.svEntity.randomWaypointIndex].Remove(entity);
+                ((MyJobInfo)BPAPI.Jobs[entity.svEntity.randomJobIndex]).randomEntities[(int)entity.svEntity.WaypointProperty].Remove(entity);
             }
 
             return true;
