@@ -136,20 +136,6 @@ namespace BrokeProtocol.WarSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Start()
         {
-            var skins = new HashSet<string>();
-
-            for (var i = 0; i <= 1; i++)
-            {
-                SvManager.Instance.ParseFile(ref skins, Paths.AbsolutePath($"skins{i}.txt"));
-                skinPrefabs[i] = skins.ToEntityList<ShPlayer>();
-            }
-
-            for (var i = 0; i < 20; i++)
-            {
-                Utility.GetSpawn(out var position, out var rotation, out var place);
-                SvManager.Instance.AddNewEntity(skinPrefabs[i % 2].GetRandom(), place, position, rotation, true);
-            }
-
             foreach (Transform place in SceneManager.Instance.mTransform)
             {
                 foreach (Transform child in place)
@@ -164,6 +150,20 @@ namespace BrokeProtocol.WarSource.Types
             {
                 if(t.capturable)
                     territoryStates.Add(t, new TerritoryState(t));
+            }
+
+            var skins = new HashSet<string>();
+
+            for (var i = 0; i <= 1; i++)
+            {
+                SvManager.Instance.ParseFile(ref skins, Paths.AbsolutePath($"skins{i}.txt"));
+                skinPrefabs[i] = skins.ToEntityList<ShPlayer>();
+            }
+
+            for (var i = 0; i < 20; i++)
+            {
+                Utility.GetSpawn(out var position, out var rotation, out var place);
+                SvManager.Instance.AddNewEntity(skinPrefabs[i % 2].GetRandom(), place, position, rotation, true);
             }
 
             return true;
