@@ -13,9 +13,9 @@ namespace BrokeProtocol.WarSource.Jobs
     {
         public override void OnDestroyEntity(ShEntity destroyed)
         {
-            if (destroyed is ShPlayer victim)
+            if (destroyed is ShPlayer victim && victim.isHuman && player.isHuman)
             {
-                victim.svPlayer.SendMurderedMessage(player);
+                victim.svPlayer.SendGameMessage(player.username + " murdered " + victim.username);
             }
         }
     }

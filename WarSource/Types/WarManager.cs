@@ -9,6 +9,7 @@ using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Diagnostics;
 
 namespace BrokeProtocol.WarSource.Types
 {
@@ -137,19 +138,29 @@ namespace BrokeProtocol.WarSource.Types
         {
             var skins = new HashSet<string>();
 
-            for (int i = 0; i <= 1; i++)
+            for (var i = 0; i <= 1; i++)
             {
                 SvManager.Instance.ParseFile(ref skins, Paths.AbsolutePath($"skins{i}.txt"));
                 skinPrefabs[i] = skins.ToEntityList<ShPlayer>();
             }
 
-            for (int i = 0; i < 20; i++)
+            for (var i = 0; i < 20; i++)
             {
                 Utility.GetSpawn(out var position, out var rotation, out var place);
                 SvManager.Instance.AddNewEntity(skinPrefabs[i % 2].GetRandom(), place, position, rotation, true);
             }
 
-            foreach(var t in Manager.territories)
+            foreach (Transform place in SceneManager.Instance.mTransform)
+            {
+                foreach (Transform child in place)
+                {
+                    if (child.TryGetComponent(out ShTerritory t)) Manager.territories.Add(t);
+                }
+            }
+
+            if (Manager.territories.Count == 0) Debug.LogWarning("[SVR] No territories found");
+
+            foreach (var t in Manager.territories)
             {
                 if(t.capturable)
                     territoryStates.Add(t, new TerritoryState(t));
@@ -287,6 +298,7 @@ namespace BrokeProtocol.WarSource.Types
                                     var options = new List<LabelID>();
                                     foreach (var c in classes) options.Add(new LabelID(c, c));
                                     var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
+                                    SvManager.Instance.DestroyMenu(connectData.connection, selectTeam);
                                     SvManager.Instance.SendOptionMenu(connectData.connection, selectClass, 0, selectClass, options.ToArray(), actions);
                                 }
                             }
@@ -299,6 +311,7 @@ namespace BrokeProtocol.WarSource.Types
                                 {
                                     connectData.customData.AddOrUpdate(classIndexKey, classIndex);
 
+                                    SvManager.Instance.DestroyMenu(connectData.connection, selectClass);
                                     SvManager.Instance.SendRegisterMenu(connectData.connection, false, skinPrefabs[teamIndex]);
                                 }
                             }
@@ -307,9 +320,9 @@ namespace BrokeProtocol.WarSource.Types
                     break;
 
                 case SvPacket.MenuClosed:
-                    Buffers.reader.ReadString(); // skip menuID
-                    var manualClose = Buffers.reader.ReadBoolean();
-                    if(manualClose) SvManager.Instance.Disconnect(connectData.connection, DisconnectTypes.Normal);
+                    var menu = Buffers.reader.ReadString(); // skip menuID
+                    if(menu == selectClass || menu == selectTeam) 
+                        SvManager.Instance.Disconnect(connectData.connection, DisconnectTypes.Normal);
                     break;
             }
             return true;

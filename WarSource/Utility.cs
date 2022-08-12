@@ -19,6 +19,7 @@ namespace BrokeProtocol.WarSource
                 for (int i = 0; i < 10; i++)
                 {
                     var localPosition = new Vector3(Random.value - offset, 0f, Random.value - offset);
+                    
                     if(t.TransformPoint(localPosition).SafePosition(out var hit) && Mathf.Abs(hit.point.y - t.position.y) <= 10f)
                     {
                         position = hit.point;

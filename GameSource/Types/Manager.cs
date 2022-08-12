@@ -396,6 +396,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (spawnLocations.Count == 0) Debug.LogWarning("[SVR] No spawn locations found");
             if (jails.Count == 0) Debug.LogWarning("[SVR] No jails found");
+            if (territories.Count == 0) Debug.LogWarning("[SVR] No territories found");
 
             foreach (var g in worldWaypoints) g.Initialize();
 
