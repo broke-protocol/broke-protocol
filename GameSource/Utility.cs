@@ -107,7 +107,7 @@ namespace BrokeProtocol.GameSource
             this.crime = crime;
 
             this.wearables = new int[wearables.Length];
-            for (int i = 0; i < wearables.Length; i++)
+            for (var i = 0; i < wearables.Length; i++)
             {
                 this.wearables[i] = wearables[i].index;
             }
@@ -133,6 +133,8 @@ namespace BrokeProtocol.GameSource
         }
 
         public float ElapsedTime => Time.time - commitTime;
+
+        public float TimeLeft => commitTime + AdjustedExpiration - Time.time;
     }
 
     public static class Utility

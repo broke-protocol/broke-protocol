@@ -409,8 +409,10 @@ namespace BrokeProtocol.GameSource.Types
                     offensesList.Add(new CrimeSave(offense.crime.index, offense.wearables, Time.time - offense.commitTime, offense.witness));
                 }
 
-                player.svPlayer.PlayerData.Character.CustomData.AddOrUpdate(offensesKey, JsonConvert.SerializeObject(offensesList));
-                player.svPlayer.PlayerData.Character.CustomData.AddOrUpdate(jailtimeKey, Mathf.Max(0f, pluginPlayer.jailExitTime - Time.time));
+                var CustomData = player.svPlayer.PlayerData.Character.CustomData;
+
+                CustomData.AddOrUpdate(offensesKey, JsonConvert.SerializeObject(offensesList));
+                CustomData.AddOrUpdate(jailtimeKey, Mathf.Max(0f, pluginPlayer.jailExitTime - Time.time));
             }
 
             return true;
@@ -1437,7 +1439,7 @@ namespace BrokeProtocol.GameSource.Types
                         var sb = new StringBuilder();
                         sb.AppendLine(o.crime.crimeName);
                         sb.AppendLine("Time since Offense: " + o.ElapsedTime);
-                        sb.AppendLine("Expires in: " + o.AdjustedExpiration);
+                        sb.AppendLine("Expires in: " + o.TimeLeft.TimeStringFromSeconds());
                         sb.AppendLine("Witness: " + (o.witness ? "&c" + o.witness.username : "&aNo Witness"));
                         sb.AppendLine(o.disguised ? "&aDisguised" : "&cNo Disguise");
                         sb.AppendLine("&fClothing during crime:");

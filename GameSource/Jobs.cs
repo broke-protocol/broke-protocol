@@ -415,13 +415,13 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void SetJob()
         {
-            player.svPlayer.SvAddDynamicAction(drugTest, "Drug Test");
+            player.svPlayer.SvAddTypeAction(drugTest, "ShPlayer", "Drug Test");
             base.SetJob();
         }
 
         public override void RemoveJob()
         {
-            player.svPlayer.SvRemoveDynamicAction(drugTest);
+            player.svPlayer.SvRemoveTypeAction(drugTest);
             base.RemoveJob();
         }
 
@@ -1228,15 +1228,15 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void SetJob()
         {
-            player.svPlayer.SvAddDynamicAction(showCrimes, "Show Crimes");
-            player.svPlayer.SvAddDynamicAction(sendToJail, "Send to Jail");
+            player.svPlayer.SvAddTypeAction(showCrimes, "ShPlayer", "Show Crimes");
+            player.svPlayer.SvAddTypeAction(sendToJail, "ShPlayer", "Send to Jail");
             base.SetJob();
         }
 
         public override void RemoveJob()
         {
-            player.svPlayer.SvRemoveDynamicAction(showCrimes);
-            player.svPlayer.SvRemoveDynamicAction(sendToJail);
+            player.svPlayer.SvRemoveTypeAction(showCrimes);
+            player.svPlayer.SvRemoveTypeAction(sendToJail);
             base.RemoveJob();
         }
 

@@ -1,8 +1,8 @@
-﻿using BrokeProtocol.Entities;
-using BrokeProtocol.API;
+﻿using BrokeProtocol.API;
+using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Utility;
 using UnityEngine;
-using BrokeProtocol.GameSource.Jobs;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -11,7 +11,8 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool SecurityTrigger(ShEntity entity, Collider otherCollider)
         {
-            if (entity.GetPlace is ApartmentPlace apartmentPlace && otherCollider.TryGetComponent(out ShPlayer player) && player != apartmentPlace.svOwner && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (entity.GetPlace is ApartmentPlace apartmentPlace && otherCollider.TryGetComponent(out ShPlayer player) && 
+                player != apartmentPlace.svOwner && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 apartmentPlace.svOwner.svPlayer.SendGameMessage($"{entity.name} detected {player.username} in apartment");
 
@@ -33,7 +34,6 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     ((MyJobInfo)info).randomEntities[waypointIndex].Remove(entity);
                 }
-                
             }
 
             return true;

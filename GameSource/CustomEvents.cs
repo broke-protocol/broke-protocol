@@ -39,7 +39,7 @@ namespace BrokeProtocol.CustomEvents
                 {
                     var o = pair.Value;
                     options.Add(
-                        new LabelID($"{o.crime.crimeName} | {o.AdjustedExpiration.TimeStringFromSeconds()} | {(o.witness ? "&c" + o.witness.username : "&aNo Witness")} | {(o.disguised ? "&aDisguised" : "&cNo Disguise")}",
+                        new LabelID($"{o.crime.crimeName} | {o.TimeLeft.TimeStringFromSeconds()} | {(o.witness ? "&c" + o.witness.username : "&aNo Witness")} | {(o.disguised ? "&aDisguised" : "&cNo Disguise")}",
                         pair.Key.ToString())); // Send offense HashCode for lookup later
                 }
 
