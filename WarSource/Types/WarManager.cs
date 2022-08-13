@@ -55,7 +55,7 @@ namespace BrokeProtocol.WarSource.Types
                     var j = p.svPlayer.job.info.shared.jobIndex;
                     if (attackerCounts.TryGetValue(j, out var count))
                     {
-                        attackerCounts[j] = count++;
+                        attackerCounts[j] = count + 1;
                     }
                     else
                     {
@@ -74,12 +74,16 @@ namespace BrokeProtocol.WarSource.Types
                     }
                 }
 
-                newSpeed = highestCount - (players.Count - highestCount);
+                newSpeed = Mathf.Min(1, highestCount - (players.Count - highestCount));
             }
 
             newSpeed *= 0.05f;
 
-            if (attackerIndex == territory.ownerIndex) newSpeed = -newSpeed;
+            if (territory.ownerIndex    >= 0 && territory.ownerIndex    < BPAPI.Jobs.Count && attackerIndex == territory.ownerIndex ||
+                territory.attackerIndex >= 0 && territory.attackerIndex < BPAPI.Jobs.Count && attackerIndex != territory.attackerIndex)
+            {
+                newSpeed = -newSpeed;
+            }
 
             //Debug.Log(territory.ID + " " + territory.ownerIndex + " " + territory.attackerIndex + " " + newSpeed + " " + captureState + " " + players.Count);
 
@@ -96,14 +100,14 @@ namespace BrokeProtocol.WarSource.Types
                 {
                     // Set to Gray (unowned) area before transitioning to attackerIndex
                     if (territory.ownerIndex >= 0 && territory.ownerIndex < BPAPI.Jobs.Count)
-                        territory.svTerritory.SvSetTerritory(territory.ownerIndex, BPAPI.Jobs.Count);
+                        territory.svTerritory.SvSetTerritory(territory.ownerIndex, int.MaxValue);
                     else
                         territory.svTerritory.SvSetTerritory(territory.ownerIndex, attackerIndex);
                 }
 
                 if (captureState >= 1f)
                 {
-                    territory.svTerritory.SvSetTerritory(territory.attackerIndex);
+                    territory.svTerritory.SvSetTerritory(territory.attackerIndex == int.MaxValue ? -1 : territory.attackerIndex);
                     ResetCaptureState();
                     return;
                 }
@@ -183,18 +187,18 @@ namespace BrokeProtocol.WarSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Update()
         {
-            foreach(var t in territoryStates.Values)
-            {
-                t.Update();
-            }
-
             foreach(var p in EntityCollections.Players)
             {
-                if(p.isActiveAndEnabled && !p.IsDead && Manager.TryGetTerritory(p, out var territory) && 
-                    territoryStates.TryGetValue(territory, out var state) && state.captureState != 0f && state.players.TryAdd(p))
+                if(p.isActiveAndEnabled && !p.IsDead && Manager.TryGetTerritory(p, out var territory) &&
+                    territoryStates.TryGetValue(territory, out var state) && state.players.TryAdd(p) && state.captureState != 0f)
                 {
                     p.svPlayer.SvProgressBar(state.captureState, state.lastSpeed, TerritoryState.territoryProgressBarID);
                 }
+            }
+
+            foreach (var t in territoryStates.Values)
+            {
+                t.Update();
             }
 
             return true;
