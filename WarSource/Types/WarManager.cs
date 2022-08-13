@@ -63,8 +63,7 @@ namespace BrokeProtocol.WarSource.Types
                     }
                 }
 
-                attackerIndex = -1;
-                var highestCount = -1;
+                var highestCount = attackerIndex = -1;
 
                 foreach (var pair in attackerCounts)
                 {
@@ -84,7 +83,7 @@ namespace BrokeProtocol.WarSource.Types
 
             //Debug.Log(territory.ID + " " + territory.ownerIndex + " " + territory.attackerIndex + " " + newSpeed + " " + captureState + " " + players.Count);
 
-            if (newSpeed <= 0f && captureState <= 0f)
+            if (newSpeed <= 0f && captureState == 0f)
             {
                 return;
             }
@@ -192,7 +191,7 @@ namespace BrokeProtocol.WarSource.Types
             foreach(var p in EntityCollections.Players)
             {
                 if(p.isActiveAndEnabled && !p.IsDead && Manager.TryGetTerritory(p, out var territory) && 
-                    territoryStates.TryGetValue(territory, out var state) && state.players.TryAdd(p) && state.captureState != 0f)
+                    territoryStates.TryGetValue(territory, out var state) && state.captureState != 0f && state.players.TryAdd(p))
                 {
                     p.svPlayer.SvProgressBar(state.captureState, state.lastSpeed, TerritoryState.territoryProgressBarID);
                 }
