@@ -9,7 +9,6 @@ using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Diagnostics;
 
 namespace BrokeProtocol.WarSource.Types
 {
@@ -30,7 +29,7 @@ namespace BrokeProtocol.WarSource.Types
         public void ResetCaptureState()
         {
             captureState = lastSpeed = 0f;
-            foreach (var p in players) p.svPlayer.SvProgressBar(0f, 0f, territoryProgressBarID);
+            foreach (var p in players) p.svPlayer.SvProgressStop(territoryProgressBarID);
         }
 
         public void Update()
@@ -44,7 +43,8 @@ namespace BrokeProtocol.WarSource.Types
                 }
             }
 
-            var newSpeed = 1f;
+            // Initialize to 1 so capture progress decays with no players
+            var newSpeed = 1f; 
             var attackerIndex = territory.ownerIndex;
 
             if (players.Count > 0)
@@ -84,7 +84,7 @@ namespace BrokeProtocol.WarSource.Types
 
             //Debug.Log(territory.ID + " " + territory.ownerIndex + " " + territory.attackerIndex + " " + newSpeed + " " + captureState + " " + players.Count);
 
-            if (newSpeed < 0f && captureState <= 0f)
+            if (newSpeed <= 0f && captureState <= 0f)
             {
                 return;
             }
@@ -93,25 +93,27 @@ namespace BrokeProtocol.WarSource.Types
             {
                 captureState += newSpeed * Time.deltaTime;
 
-                if (captureState >= 1f)
-                {
-                    territory.svTerritory.SvSetTerritory(territory.attackerIndex);
-                    ResetCaptureState();
-                    return;
-                }
-                else if (captureState <= 0f)
-                {
-                    territory.svTerritory.SvSetTerritory(territory.ownerIndex);
-                    ResetCaptureState();
-                    return;
-                }
-                else if (territory.attackerIndex < 0)
+                if (territory.attackerIndex < 0)
                 {
                     // Set to Gray (unowned) area before transitioning to attackerIndex
                     if (territory.ownerIndex >= 0 && territory.ownerIndex < BPAPI.Jobs.Count)
                         territory.svTerritory.SvSetTerritory(territory.ownerIndex, BPAPI.Jobs.Count);
                     else
                         territory.svTerritory.SvSetTerritory(territory.ownerIndex, attackerIndex);
+                }
+
+                if (captureState >= 1f)
+                {
+                    territory.svTerritory.SvSetTerritory(territory.attackerIndex);
+                    ResetCaptureState();
+                    return;
+                }
+                
+                if (captureState <= 0f)
+                {
+                    territory.svTerritory.SvSetTerritory(territory.ownerIndex);
+                    ResetCaptureState();
+                    return;
                 }
             }
 
@@ -133,6 +135,16 @@ namespace BrokeProtocol.WarSource.Types
 
         public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
 
+        public void AddBot(ShPlayer prefab, int jobIndex)
+        {
+            Utility.GetSpawn(out var position, out var rotation, out var place);
+
+            var player = GameObject.Instantiate(prefab, position, rotation, place.mTransform);
+            player.name = prefab.name;
+            player.svPlayer.spawnJobIndex = jobIndex;
+            SvManager.Instance.AddNewEntityExisting(player);
+        }
+        
         [Execution(ExecutionMode.Override)]
         public override bool Start()
         {
@@ -160,10 +172,10 @@ namespace BrokeProtocol.WarSource.Types
                 skinPrefabs[i] = skins.ToEntityList<ShPlayer>();
             }
 
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < 5; i++)
             {
-                Utility.GetSpawn(out var position, out var rotation, out var place);
-                SvManager.Instance.AddNewEntity(skinPrefabs[i % 2].GetRandom(), place, position, rotation, true);
+                var teamIndex = i % 2;
+                AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
             }
 
             return true;
@@ -180,7 +192,7 @@ namespace BrokeProtocol.WarSource.Types
             foreach(var p in EntityCollections.Players)
             {
                 if(p.isActiveAndEnabled && !p.IsDead && Manager.TryGetTerritory(p, out var territory) && 
-                    territoryStates.TryGetValue(territory, out var state) && state.players.TryAdd(p))
+                    territoryStates.TryGetValue(territory, out var state) && state.players.TryAdd(p) && state.captureState != 0f)
                 {
                     p.svPlayer.SvProgressBar(state.captureState, state.lastSpeed, TerritoryState.territoryProgressBarID);
                 }
