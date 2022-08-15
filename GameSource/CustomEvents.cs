@@ -54,6 +54,20 @@ namespace BrokeProtocol.CustomEvents
         }
 
         [CustomTarget]
+        public void HandsUp(ShEntity target, ShPlayer player)
+        {
+            if (target is ShPlayer playerTarget && playerTarget.isActiveAndEnabled && playerTarget.IsMobile)
+            {
+                if (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                {
+                    pluginPlayer.AddCrime(CrimeIndex.Intimidation, playerTarget);
+                }
+
+                playerTarget.svPlayer.CommandHandsUp(player);
+            }
+        }
+
+        [CustomTarget]
         public void ShowCrimes(ShEntity target, ShPlayer player)
         {
             if (target is ShPlayer criminal)

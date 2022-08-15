@@ -467,6 +467,7 @@ namespace BrokeProtocol.GameSource.Types
                 Manager.pluginPlayers.Add(player, new PluginPlayer(player));
                 player.svPlayer.SvAddSelfAction("MyCrimes", "My Crimes");
                 player.svPlayer.SvAddInventoryAction("GetItemValue", "ShItem", ButtonType.Sellable, "Get Sell Value");
+                player.svPlayer.SvAddTypeAction("HandsUp", "ShPlayer", "Hands Up!");
             }
 
             return true;
@@ -1684,36 +1685,6 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (destroyable is ShPlayer player && !(player.isHuman && player.IsRestrained && player.IsUp))
                 Parent.DestroySelf(player);
-
-            return true;
-        }
-
-        [Execution(ExecutionMode.Override)]
-        public override bool HandsUp(ShPlayer player, ShPlayer victim)
-        {
-            if (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                pluginPlayer.AddCrime(CrimeIndex.Intimidation, victim);
-            }
-
-            if (!victim.isHuman)
-            {
-                if (!victim.svPlayer.targetEntity)
-                {
-                    if (((MyJobInfo)victim.svPlayer.job.info).groupIndex != GroupIndex.Citizen || Random.value < 0.2f)
-                    {
-                        victim.svPlayer.SetAttackState(player);
-                    }
-                    else
-                    {
-                        victim.svPlayer.SetState(StateIndex.Freeze);
-                    }
-                }
-            }
-            else
-            {
-                victim.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.HandsUp);
-            }
 
             return true;
         }
