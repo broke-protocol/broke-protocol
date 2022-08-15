@@ -66,12 +66,16 @@ namespace BrokeProtocol.WarSource.Jobs
             player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job is Army &&
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
-                (e) => player.svPlayer.SetAttackState(e));
+                (e) =>
+                {
+                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                        pluginPlayer.SetAttackState(e);
+                });
         }
 
         public override void Loop()
         {
-            if (!player.isHuman && !player.svPlayer.targetEntity && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if (!player.isHuman && !player.svPlayer.targetEntity && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == (int)StateIndex.Waypoint)
             {
                 TryFindEnemy();
             }
@@ -128,10 +132,12 @@ namespace BrokeProtocol.WarSource.Jobs
 
             if (!goal)
             {
-                player.svPlayer.SetState(StateIndex.Null);
+                player.svPlayer.SetState((int)StateIndex.Null);
                 return;
             }
-            player.svPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent);
+
+            if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent);
         }
     }
 }

@@ -2,6 +2,7 @@
 using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -50,6 +51,29 @@ namespace BrokeProtocol.GameSource
                 }
                 index++;
             }
+
+            States = new List<State>
+            {
+                    new State (),
+                    new FreezeState (),
+                    new RestrainedState (),
+                    new WaitState (),
+                    new AirAttackState (),
+                    new UnstuckState (),
+                    new PullOverState (),
+                    new GoToState (),
+                    new WaypointState (),
+                    new FleeState (),
+                    new TakeCoverState (),
+                    new FollowState (),
+                    new RobState(),
+                    new FreeState(),
+                    new AttackState(),
+                    new ReviveState(),
+                    new ExtinguishState(),
+                    new WanderState(),
+                    new HealState(),
+                };
         }
 
         /*

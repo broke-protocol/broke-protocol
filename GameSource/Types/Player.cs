@@ -15,12 +15,15 @@ using System.Text;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Runtime.Remoting.Messaging;
 
 namespace BrokeProtocol.GameSource.Types
 {
     public class PluginPlayer
     {
         ShPlayer player;
+
+        public float lastAlertTime;
 
         public float jailExitTime;
 
@@ -265,6 +268,75 @@ namespace BrokeProtocol.GameSource.Types
 
             return fine;
         }
+
+        public void CommandHandsUp(ShPlayer source)
+        {
+            if (((MyJobInfo)source.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement && 
+                Manager.pluginPlayers.TryGetValue(source, out var pluginSource))
+            {
+                pluginSource.AddCrime(CrimeIndex.Intimidation, player);
+            }
+
+            if (player.isHuman)
+            {
+                player.svPlayer.SvShowAlert("Hands Up!", 2f);
+            }
+            else if (!player.svPlayer.currentState.IsBusy)
+            {
+                if (Random.value < 0.2f)
+                {
+                    SetAttackState(source);
+                }
+                else
+                {
+                    player.svPlayer.SetState((int)StateIndex.Freeze);
+                }
+            }
+        }
+
+        public bool SetAttackState(ShEntity target)
+        {
+            if (target == player.svPlayer.leader) player.svPlayer.ClearLeader();
+
+            player.svPlayer.targetEntity = target;
+
+            bool returnState = false;
+
+            if (player.GetControlled is ShAircraft aircraft)
+            {
+                if (aircraft.HasWeapons)
+                    returnState = player.svPlayer.SetState((int)StateIndex.AirAttack);
+            }
+            else returnState = player.svPlayer.SetState((int)StateIndex.Attack);
+
+            if (!returnState) player.svPlayer.targetEntity = null;
+
+            return returnState;
+        }
+
+        public bool SetFollowState(ShPlayer leader)
+        {
+            player.svPlayer.leader = leader;
+            player.svPlayer.targetEntity = leader;
+            leader.svPlayer.follower = player;
+
+            if (!player.svPlayer.SetState((int)StateIndex.Follow))
+            {
+                player.svPlayer.ClearLeader();
+                return false;
+            }
+
+            return true;
+        }
+
+        public void SetGoToState(Vector3 position, Quaternion rotation, Transform parent)
+        {
+            player.svPlayer.destinationPosition = position;
+            player.svPlayer.destinationRotation = rotation;
+            player.svPlayer.destinationParent = parent;
+
+            player.svPlayer.SetState((int)StateIndex.GoTo);
+        }
     }
 
     
@@ -449,7 +521,9 @@ namespace BrokeProtocol.GameSource.Types
                         pluginPlayer.AddCrime(CrimeIndex.Theft, otherPlayer);
                     }
 
-                    if (otherPlayer && !otherPlayer.isHuman && Random.value < 0.25f && otherPlayer.svPlayer.SetAttackState(player))
+                    if (otherPlayer && !otherPlayer.isHuman && Random.value < 0.25f && 
+                        Manager.pluginPlayers.TryGetValue(otherPlayer, out var pluginOtherPlayer) && 
+                        pluginOtherPlayer.SetAttackState(player))
                     {
                         player.svPlayer.SvStopInventory(true);
                     }
@@ -567,6 +641,27 @@ namespace BrokeProtocol.GameSource.Types
                     else
                     {
                         player.svPlayer.SvConsume(SceneManager.Instance.consumablesCollection.GetRandom().Value);
+                    }
+                }
+
+
+
+                if (player.IsDriving && player.curMount is ShEmergencyVehicle vehicle && vehicle.siren &&
+                    Physics.Raycast(
+                        vehicle.GetPositionT.TransformPoint(vehicle.svTransport.frontOffset),
+                        vehicle.GetPositionT.forward,
+                        out var raycastHit,
+                        50f,
+                        MaskIndex.physical))
+                {
+                    if (raycastHit.collider.TryGetComponent(out ShTransport otherTransport))
+                    {
+                        var otherDriver = otherTransport.controller;
+                        if (otherDriver && !otherDriver.isHuman && !otherDriver.svPlayer.targetEntity &&
+                            otherDriver.svPlayer.currentState.index != (int)StateIndex.PullOver)
+                        {
+                            otherDriver.svPlayer.SetState((int)StateIndex.PullOver);
+                        }
                     }
                 }
 
@@ -730,21 +825,18 @@ namespace BrokeProtocol.GameSource.Types
 
             if (attacker && attacker != player)
             {
-                if (!player.isHuman)
+                if (!player.isHuman && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
                 {
-                    player.svPlayer.SetAttackState(attacker);
+                    pluginPlayer.SetAttackState(attacker);
                 }
-                else
+                else if(player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginPlayerFollower))
                 {
-                    var playerFollower = player.svPlayer.follower;
-                    if (playerFollower) playerFollower.svPlayer.SetAttackState(attacker);
+                    pluginPlayerFollower.SetAttackState(attacker);
                 }
 
-                var attackerFollower = attacker.svPlayer.follower;
-
-                if (attackerFollower)
+                if (attacker.svPlayer.follower && Manager.pluginPlayers.TryGetValue(attacker.svPlayer.follower, out var pluginAttackerFollower))
                 {
-                    attackerFollower.svPlayer.SetAttackState(player);
+                    pluginAttackerFollower.SetAttackState(player);
                 }
             }
 
@@ -1213,7 +1305,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (!player.isHuman)
             {
-                player.svPlayer.SetState(StateIndex.Restrained);
+                player.svPlayer.SetState((int)StateIndex.Restrained);
             }
             else
             {
@@ -1318,9 +1410,10 @@ namespace BrokeProtocol.GameSource.Types
                     other.svPlayer.ResetAI();
                 }
             }
-            else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.IsBusy)
+            else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.currentState.IsBusy && 
+                Manager.pluginPlayers.TryGetValue(other, out var pluginOther))
             {
-                other.svPlayer.SetFollowState(player);
+                pluginOther.SetFollowState(player);
             }
             else
             {
@@ -1618,9 +1711,10 @@ namespace BrokeProtocol.GameSource.Types
 
             if (pointing && player.svPlayer.follower &&
                 Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) &&
-                player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
+                player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null &&
+                Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginFollower))
             {
-                player.svPlayer.follower.svPlayer.SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
+                pluginFollower.SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
             }
 
             return true;
@@ -1630,9 +1724,9 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Alert(ShPlayer player)
         {
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Alert, player.ID);
-            if (player.svPlayer.follower)
+            if (player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginFollower))
             {
-                player.svPlayer.follower.svPlayer.SetFollowState(player);
+                pluginFollower.SetFollowState(player);
             }
 
             return true;
@@ -1814,19 +1908,19 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.targetPlayer = null;
                 player.svPlayer.Respawn();
             }
-            else
+            else if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.IsKnockedOut && player.svPlayer.SetState(StateIndex.Null)) return true;
-                if (player.IsRestrained && player.svPlayer.SetState(StateIndex.Restrained)) return true;
+                if (player.IsKnockedOut && player.svPlayer.SetState((int)StateIndex.Null)) return true;
+                if (player.IsRestrained && player.svPlayer.SetState((int)StateIndex.Restrained)) return true;
                 player.svPlayer.SvTrySetEquipable(player.Hands.index);
-                if (player.svPlayer.leader && player.svPlayer.SetFollowState(player.svPlayer.leader)) return true;
-                if (player.IsPassenger && player.svPlayer.SetState(StateIndex.Null)) return true;
+                if (player.svPlayer.leader && pluginPlayer.SetFollowState(player.svPlayer.leader)) return true;
+                if (player.IsPassenger && player.svPlayer.SetState((int)StateIndex.Null)) return true;
 
                 player.svPlayer.targetEntity = null;
 
-                if (player.IsDriving && player.svPlayer.SetState(StateIndex.Waypoint)) return true;
-                if (player.svPlayer.currentState.index == StateIndex.Freeze && !player.svPlayer.stop && player.svPlayer.SetState(StateIndex.Flee)) return true;
-                if (player.svPlayer.targetPlayer && player.svPlayer.SetAttackState(player.svPlayer.targetPlayer)) return true;
+                if (player.IsDriving && player.svPlayer.SetState((int)StateIndex.Waypoint)) return true;
+                if (player.svPlayer.currentState.index == (int)StateIndex.Freeze && !player.svPlayer.stop && player.svPlayer.SetState((int)StateIndex.Flee)) return true;
+                if (player.svPlayer.targetPlayer && pluginPlayer.SetAttackState(player.svPlayer.targetPlayer)) return true;
 
                 if (player.GetParent != player.svPlayer.originalParent)
                 {
@@ -2068,6 +2162,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool SameSector(ShEntity entity)
         {
+            Parent.SameSector(entity);
             if (entity.isHuman && entity.IsOutside)
             {
                 foreach (var s in entity.svEntity.localSectors.Values)
@@ -2085,6 +2180,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool NewSector(ShEntity entity, List<Sector> newSectors)
         {
+            Parent.NewSector(entity, newSectors);
             if (entity.isHuman && entity.IsOutside)
             {
                 foreach (var s in newSectors)
@@ -2092,6 +2188,22 @@ namespace BrokeProtocol.GameSource.Types
                     if (s.humans.Count == 0)
                     {
                         SpawnSector(entity.Player, s);
+                    }
+                }
+            }
+
+            return true;
+        }
+        [Execution(ExecutionMode.Override)]
+        public override bool Fire(ShPlayer player)
+        {
+            if (player.curEquipable is ShGun)
+            {
+                foreach (var p in player.svPlayer.GetLocalInRange<ShPlayer>(20f))
+                {
+                    if (p && !p.isHuman && p.svPlayer.currentState.index == (int)StateIndex.Waypoint)
+                    {
+                        p.svPlayer.SetState((int)StateIndex.Flee);
                     }
                 }
             }

@@ -48,22 +48,15 @@ namespace BrokeProtocol.CustomEvents
         }
 
         [CustomTarget]
-        public void MyCrimes(ShPlayer player)
-        {
-            SendCrimes(player, player);
-        }
+        public void MyCrimes(ShPlayer player) => SendCrimes(player, player);
 
         [CustomTarget]
         public void HandsUp(ShEntity target, ShPlayer player)
         {
-            if (target is ShPlayer playerTarget && playerTarget.isActiveAndEnabled && playerTarget.IsMobile)
+            if (target is ShPlayer playerTarget && playerTarget.isActiveAndEnabled && 
+                playerTarget.IsMobile && Manager.pluginPlayers.TryGetValue(playerTarget, out var pluginTarget))
             {
-                if (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                {
-                    pluginPlayer.AddCrime(CrimeIndex.Intimidation, playerTarget);
-                }
-
-                playerTarget.svPlayer.CommandHandsUp(player);
+                pluginTarget.CommandHandsUp(player);
             }
         }
 

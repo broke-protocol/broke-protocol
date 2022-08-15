@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="ExampleCommand.cs" />
     <Compile Include="Jobs.cs" />

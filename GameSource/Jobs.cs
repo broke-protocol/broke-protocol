@@ -66,6 +66,13 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class JobRP : Job
     {
+        public override void ResetJobAI()
+        {
+            if (player.svPlayer.stop) player.svPlayer.SetState((int)StateIndex.GoTo);
+            else if (player.characterType == CharacterType.Human || !player.svPlayer.SetState((int)StateIndex.Wander))
+                player.svPlayer.SetState((int)StateIndex.Waypoint);
+        }
+
         public override bool IsValidTarget(ShPlayer chaser)
         {
             return Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
@@ -173,7 +180,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(StateIndex.Free);
+                    player.svPlayer.SetState((int)StateIndex.Free);
                 });
         }
 
@@ -184,13 +191,13 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(StateIndex.Rob);
+                    player.svPlayer.SetState((int)StateIndex.Rob);
                 });
         }
 
         public override void Loop()
         {
-            if (!player.isHuman && !player.svPlayer.targetEntity && !player.curMount && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+            if (!player.isHuman && !player.svPlayer.targetEntity && !player.curMount && player.IsMobile && player.svPlayer.currentState.index == (int)StateIndex.Waypoint)
             {
                 var rand = Random.value;
 
@@ -247,7 +254,7 @@ namespace BrokeProtocol.GameSource.Jobs
                         {
                             pluginPlayer.AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
                         }
-                        player.svPlayer.SetAttackState(e);
+                        pluginPlayer.SetAttackState(e);
                     }
                 });
         }
@@ -283,7 +290,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (!player.svPlayer.targetEntity && Random.value < 0.02f && player.IsMobile && player.svPlayer.currentState.index == StateIndex.Waypoint)
+                if (!player.svPlayer.targetEntity && Random.value < 0.02f && player.IsMobile && player.svPlayer.currentState.index == (int)StateIndex.Waypoint)
                 {
                     TryFindBounty();
                 }
@@ -406,7 +413,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Prisoner : JobRP
     {
-        public override void ResetJobAI() => player.svPlayer.SetState(StateIndex.Wander);
+        public override void ResetJobAI() => player.svPlayer.SetState((int)StateIndex.Wander);
     }
 
     public class Police : LawEnforcement
@@ -459,14 +466,14 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 player.svPlayer.SendGameMessage($"{requester.username} is requesting healing");
             }
-            else if(!player.isActiveAndEnabled || !player.IsUp || player.svPlayer.IsBusy)
+            else if(!player.isActiveAndEnabled || !player.IsUp || player.svPlayer.currentState.IsBusy)
             {
                 requester.svPlayer.SendGameMessage("NPC is occupied");
             }
             else
             {
                 player.svPlayer.targetEntity = requester;
-                player.svPlayer.SetState(StateIndex.Heal);
+                player.svPlayer.SetState((int)StateIndex.Heal);
             }
         }
 
@@ -477,7 +484,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(StateIndex.Revive);
+                    player.svPlayer.SetState((int)StateIndex.Revive);
                 });
         }
 
@@ -525,7 +532,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(StateIndex.Extinguish);
+                    player.svPlayer.SetState((int)StateIndex.Extinguish);
                 });
         }
 
@@ -590,12 +597,16 @@ namespace BrokeProtocol.GameSource.Jobs
             player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job is Gangster &&
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
-                (e) => player.svPlayer.SetAttackState(e));
+                (e) =>
+                {
+                    if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                        pluginPlayer.SetAttackState(e);
+                });
         }
 
         public override void Loop()
         {
-            if (!player.isHuman && player.IsMobile && !player.svPlayer.IsBusy &&
+            if (!player.isHuman && player.IsMobile && !player.svPlayer.currentState.IsBusy &&
                 (Manager.warTerritory?.ownerIndex == info.shared.jobIndex || Random.value < 0.01f))
             {
                 TryFindEnemyGang();
@@ -696,7 +707,8 @@ namespace BrokeProtocol.GameSource.Jobs
             if (target && target.IsOutside && target.svPlayer.job is Gangster &&
                 target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr &&
                 Manager.TryGetTerritory(target, out var territory) && territory.ownerIndex == info.shared.jobIndex &&
-                territory.attackerIndex >= 0 && player.svPlayer.SetAttackState(target))
+                Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+                territory.attackerIndex >= 0 && pluginPlayer.SetAttackState(target))
             {
                 return;
             }
@@ -965,10 +977,11 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             ShPlayer target = player.svPlayer.spawner;
 
-            if (target && Manager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+                target && Manager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
                 Random.value < pluginTarget.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
-                return player.svPlayer.SetAttackState(target);
+                return pluginPlayer.SetAttackState(target);
             }
             return false;
         }
@@ -977,7 +990,11 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e),
-                (e) => player.svPlayer.SetAttackState(e));
+                (e) =>
+                {
+                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                        pluginPlayer.SetAttackState(e);
+                });
         }
 
         protected override void FoundTarget(bool startGoalMarker)
