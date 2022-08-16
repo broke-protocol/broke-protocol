@@ -68,7 +68,11 @@ namespace BrokeProtocol.GameSource.Jobs
     {
         public override void ResetJobAI()
         {
-            if (player.svPlayer.stop) player.svPlayer.SetState((int)StateIndex.GoTo);
+            if (player.svPlayer.stop && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                pluginPlayer.SetGoToState(
+                    player.svPlayer.originalPosition,
+                    player.svPlayer.originalRotation,
+                    player.svPlayer.originalParent);
             else if (player.characterType == CharacterType.Human || !player.svPlayer.SetState((int)StateIndex.Wander))
                 player.svPlayer.SetState((int)StateIndex.Waypoint);
         }

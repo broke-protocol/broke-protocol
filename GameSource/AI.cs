@@ -421,10 +421,10 @@ namespace BrokeProtocol.Utility.AI
         {
             base.EnterState();
             player.svPlayer.SvDismount();
-            if (player.svPlayer.IsOffOrigin)
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && pluginPlayer.IsOffOrigin)
             {
                 onDestination = false;
-                player.svPlayer.GetPath(player.svPlayer.StopPosition);
+                player.svPlayer.GetPath(pluginPlayer.goToPosition);
             }
             else
             {
@@ -432,27 +432,20 @@ namespace BrokeProtocol.Utility.AI
             }
         }
 
-        public override void ExitState()
-        {
-            base.ExitState();
-            // Clean up so SvPlayer.HasDestination returns false
-            player.svPlayer.destinationParent = null;
-        }
-
         public override void UpdateState()
         {
             base.UpdateState();
             if (StateChanged) return;
 
-            if (onDestination)
+            if (onDestination && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.svPlayer.IsOffOrigin)
+                if (pluginPlayer.IsOffOrigin)
                 {
                     player.svPlayer.SetState(index);
                 }
                 else
                 {
-                    player.svPlayer.LookAt(player.svPlayer.StopRotation);
+                    player.svPlayer.LookAt(pluginPlayer.goToRotation);
                 }
             }
             else if (!player.GetControlled.svMountable.MoveLookNavPath())

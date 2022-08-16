@@ -2,26 +2,29 @@
 using BrokeProtocol.Collections;
 using BrokeProtocol.CustomEvents;
 using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Networking;
-using BrokeProtocol.GameSource.Jobs;
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Runtime.Remoting.Messaging;
 
 namespace BrokeProtocol.GameSource.Types
 {
     public class PluginPlayer
     {
         ShPlayer player;
+
+        public Vector3 goToPosition;
+        public Quaternion goToRotation;
+        public Transform goToParent;
 
         public float lastAlertTime;
 
@@ -38,6 +41,8 @@ namespace BrokeProtocol.GameSource.Types
         {
             this.player = player;
         }
+
+        public bool IsOffOrigin => player.GetParent != goToParent || player.DistanceSqr(goToPosition) > player.GetMount.svMountable.WaypointRangeSqr;
 
         public void StartJailTimer(float jailtime)
         {
@@ -331,9 +336,9 @@ namespace BrokeProtocol.GameSource.Types
 
         public void SetGoToState(Vector3 position, Quaternion rotation, Transform parent)
         {
-            player.svPlayer.destinationPosition = position;
-            player.svPlayer.destinationRotation = rotation;
-            player.svPlayer.destinationParent = parent;
+            goToPosition = position;
+            goToRotation = rotation;
+            goToParent = parent;
 
             player.svPlayer.SetState((int)StateIndex.GoTo);
         }
