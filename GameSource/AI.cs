@@ -1,26 +1,13 @@
 ﻿using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
-using BrokeProtocol.GameSource.Types;
-using System;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace BrokeProtocol.Utility.AI
 {
-    public sealed class BuyerType
-    {
-        public Type type;
-        public string buyMessage;
-
-        public BuyerType(Type type, string buyMessage)
-        {
-            this.type = type;
-            this.buyMessage = buyMessage;
-        }
-    }
-
     public enum StateIndex
     {
         Null,
