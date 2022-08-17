@@ -294,7 +294,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
                 else
                 {
-                    player.svPlayer.SetState((int)StateIndex.Freeze);
+                    player.svPlayer.SetState(Core.Freeze.index);
                 }
             }
         }
@@ -310,9 +310,9 @@ namespace BrokeProtocol.GameSource.Types
             if (player.GetControlled is ShAircraft aircraft)
             {
                 if (aircraft.HasWeapons)
-                    returnState = player.svPlayer.SetState((int)StateIndex.AirAttack);
+                    returnState = player.svPlayer.SetState(Core.AirAttack.index);
             }
-            else returnState = player.svPlayer.SetState((int)StateIndex.Attack);
+            else returnState = player.svPlayer.SetState(Core.Attack.index);
 
             if (!returnState) player.svPlayer.targetEntity = null;
 
@@ -325,7 +325,7 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.targetEntity = leader;
             leader.svPlayer.follower = player;
 
-            if (!player.svPlayer.SetState((int)StateIndex.Follow))
+            if (!player.svPlayer.SetState(Core.Follow.index))
             {
                 player.svPlayer.ClearLeader();
                 return false;
@@ -340,7 +340,7 @@ namespace BrokeProtocol.GameSource.Types
             goToRotation = rotation;
             goToParent = parent;
 
-            player.svPlayer.SetState((int)StateIndex.GoTo);
+            player.svPlayer.SetState(Core.GoTo.index);
         }
     }
 
@@ -663,9 +663,9 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         var otherDriver = otherTransport.controller;
                         if (otherDriver && !otherDriver.isHuman && !otherDriver.svPlayer.targetEntity &&
-                            otherDriver.svPlayer.currentState.index != (int)StateIndex.PullOver)
+                            otherDriver.svPlayer.currentState.index != Core.PullOver.index)
                         {
-                            otherDriver.svPlayer.SetState((int)StateIndex.PullOver);
+                            otherDriver.svPlayer.SetState(Core.PullOver.index);
                         }
                     }
                 }
@@ -1310,7 +1310,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (!player.isHuman)
             {
-                player.svPlayer.SetState((int)StateIndex.Restrained);
+                player.svPlayer.SetState(Core.Restrained.index);
             }
             else
             {
@@ -1915,16 +1915,16 @@ namespace BrokeProtocol.GameSource.Types
             }
             else if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.IsKnockedOut && player.svPlayer.SetState((int)StateIndex.Null)) return true;
-                if (player.IsRestrained && player.svPlayer.SetState((int)StateIndex.Restrained)) return true;
+                if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
+                if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
                 player.svPlayer.SvTrySetEquipable(player.Hands.index);
                 if (player.svPlayer.leader && pluginPlayer.SetFollowState(player.svPlayer.leader)) return true;
-                if (player.IsPassenger && player.svPlayer.SetState((int)StateIndex.Null)) return true;
+                if (player.IsPassenger && player.svPlayer.SetState(Core.Null.index)) return true;
 
                 player.svPlayer.targetEntity = null;
 
-                if (player.IsDriving && player.svPlayer.SetState((int)StateIndex.Waypoint)) return true;
-                if (player.svPlayer.currentState.index == (int)StateIndex.Freeze && !player.svPlayer.stop && player.svPlayer.SetState((int)StateIndex.Flee)) return true;
+                if (player.IsDriving && player.svPlayer.SetState(Core.Waypoint.index)) return true;
+                if (player.svPlayer.currentState.index == Core.Freeze.index && !player.svPlayer.stop && player.svPlayer.SetState(Core.Flee.index)) return true;
                 if (player.svPlayer.targetPlayer && pluginPlayer.SetAttackState(player.svPlayer.targetPlayer)) return true;
 
                 if (player.GetParent != player.svPlayer.originalParent)
@@ -2206,9 +2206,9 @@ namespace BrokeProtocol.GameSource.Types
             {
                 foreach (var p in player.svPlayer.GetLocalInRange<ShPlayer>(20f))
                 {
-                    if (p && !p.isHuman && p.svPlayer.currentState.index == (int)StateIndex.Waypoint)
+                    if (p && !p.isHuman && p.svPlayer.currentState.index == Core.Waypoint.index)
                     {
-                        p.svPlayer.SetState((int)StateIndex.Flee);
+                        p.svPlayer.SetState(Core.Flee.index);
                     }
                 }
             }

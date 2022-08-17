@@ -2,35 +2,14 @@
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
+using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.AI;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace BrokeProtocol.Utility.AI
+namespace BrokeProtocol.GameSource.AI
 {
-    public enum StateIndex
-    {
-        Null,
-        Freeze,
-        Restrained,
-        Wait,
-        AirAttack,
-        Unstuck,
-        PullOver,
-        GoTo,
-        Waypoint,
-        Flee,
-        TakeCover,
-        Follow,
-        Rob,
-        Free,
-        Attack,
-        Revive,
-        Extinguish,
-        Wander,
-        Heal,
-    }
-
     public class FreezeState : State
     {
         private float stopFreezeTime;
@@ -377,7 +356,7 @@ namespace BrokeProtocol.Utility.AI
                     }
                     else
                     {
-                        player.svPlayer.SetState((int)StateIndex.Unstuck);
+                        player.svPlayer.SetState(Core.Unstuck.index);
                         return;
                     }
                 }
@@ -816,7 +795,7 @@ namespace BrokeProtocol.Utility.AI
             }
             else if (!player.GetControlled.svMountable.MoveLookNavPath())
             {
-                player.svPlayer.SetState((int)StateIndex.Wait);
+                player.svPlayer.SetState(Core.Wait.index);
             }
         }
 
@@ -840,7 +819,7 @@ namespace BrokeProtocol.Utility.AI
                     {
                         player.Fire(projectile.index);
                         player.svPlayer.SetBestWeapon();
-                        player.svPlayer.SetState((int)StateIndex.TakeCover);
+                        player.svPlayer.SetState(Core.TakeCover.index);
                     }
                 }
                 else
@@ -860,7 +839,7 @@ namespace BrokeProtocol.Utility.AI
                         
                         if (r < 0.01f)
                         {
-                            player.svPlayer.SetState((int)StateIndex.TakeCover);
+                            player.svPlayer.SetState(Core.TakeCover.index);
                             return;
                         }
                     }

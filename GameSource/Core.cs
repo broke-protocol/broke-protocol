@@ -1,4 +1,5 @@
 ﻿using BrokeProtocol.API;
+using BrokeProtocol.GameSource.AI;
 using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
@@ -14,6 +15,26 @@ namespace BrokeProtocol.GameSource
     {
         public static int prisonerIndex = -1;
         public static int policeIndex = -1;
+
+        public static State Null;
+        public static State Freeze;
+        public static State Restrained;
+        public static State Wait;
+        public static State AirAttack;
+        public static State Unstuck;
+        public static State PullOver;
+        public static State GoTo;
+        public static State Waypoint;
+        public static State Flee;
+        public static State TakeCover;
+        public static State Follow;
+        public static State Rob;
+        public static State Free;
+        public static State Attack;
+        public static State Revive;
+        public static State Extinguish;
+        public static State Wander;
+        public static State Heal;
 
         public Core()
         {
@@ -52,28 +73,48 @@ namespace BrokeProtocol.GameSource
                 index++;
             }
 
-            States = new List<State>
+            Null = new State();
+            Freeze = new FreezeState();
+            Restrained = new RestrainedState();
+            Wait = new WaitState();
+            AirAttack = new AirAttackState();
+            Unstuck = new UnstuckState();
+            PullOver = new PullOverState();
+            GoTo = new GoToState();
+            Waypoint = new WaypointState();
+            Flee = new FleeState();
+            TakeCover = new TakeCoverState();
+            Follow = new FollowState();
+            Rob = new RobState();
+            Free = new FreeState();
+            Attack = new AttackState();
+            Revive = new ReviveState();
+            Extinguish = new ExtinguishState();
+            Wander = new WanderState();
+            Heal = new HealState();
+
+            StatesOverride = new List<State>
             {
-                    new State (),
-                    new FreezeState (),
-                    new RestrainedState (),
-                    new WaitState (),
-                    new AirAttackState (),
-                    new UnstuckState (),
-                    new PullOverState (),
-                    new GoToState (),
-                    new WaypointState (),
-                    new FleeState (),
-                    new TakeCoverState (),
-                    new FollowState (),
-                    new RobState(),
-                    new FreeState(),
-                    new AttackState(),
-                    new ReviveState(),
-                    new ExtinguishState(),
-                    new WanderState(),
-                    new HealState(),
-                };
+                Null,
+                Freeze,
+                Restrained,
+                Wait,
+                AirAttack,
+                Unstuck,
+                PullOver,
+                GoTo,
+                Waypoint,
+                Flee,
+                TakeCover,
+                Follow,
+                Rob,
+                Free,
+                Attack,
+                Revive,
+                Extinguish,
+                Wander,
+                Heal,
+            };
         }
 
         /*

@@ -73,8 +73,8 @@ namespace BrokeProtocol.GameSource.Jobs
                     player.svPlayer.originalPosition,
                     player.svPlayer.originalRotation,
                     player.svPlayer.originalParent);
-            else if (player.characterType == CharacterType.Human || !player.svPlayer.SetState((int)StateIndex.Wander))
-                player.svPlayer.SetState((int)StateIndex.Waypoint);
+            else if (player.characterType == CharacterType.Human || !player.svPlayer.SetState(Core.Wander.index))
+                player.svPlayer.SetState(Core.Waypoint.index);
         }
 
         public override bool IsValidTarget(ShPlayer chaser)
@@ -180,11 +180,12 @@ namespace BrokeProtocol.GameSource.Jobs
         protected void TryFindInnocent()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginPlayer) && !p.curMount && !p.IsDead && p.IsRestrained && pluginPlayer.wantedLevel == 0 && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginPlayer) && !p.curMount && 
+                !p.IsDead && p.IsRestrained && pluginPlayer.wantedLevel == 0 && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState((int)StateIndex.Free);
+                    player.svPlayer.SetState(Core.Free.index);
                 });
         }
 
@@ -195,13 +196,14 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState((int)StateIndex.Rob);
+                    player.svPlayer.SetState(Core.Rob.index);
                 });
         }
 
         public override void Loop()
         {
-            if (!player.isHuman && !player.svPlayer.targetEntity && !player.curMount && player.IsMobile && player.svPlayer.currentState.index == (int)StateIndex.Waypoint)
+            if (!player.isHuman && !player.svPlayer.targetEntity && !player.curMount && player.IsMobile && 
+                player.svPlayer.currentState.index == Core.Waypoint.index)
             {
                 var rand = Random.value;
 
@@ -294,7 +296,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
             if (!player.isHuman)
             {
-                if (!player.svPlayer.targetEntity && Random.value < 0.02f && player.IsMobile && player.svPlayer.currentState.index == (int)StateIndex.Waypoint)
+                if (!player.svPlayer.targetEntity && Random.value < 0.02f && player.IsMobile && player.svPlayer.currentState.index == Core.Waypoint.index)
                 {
                     TryFindBounty();
                 }
@@ -417,7 +419,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
     public class Prisoner : JobRP
     {
-        public override void ResetJobAI() => player.svPlayer.SetState((int)StateIndex.Wander);
+        public override void ResetJobAI() => player.svPlayer.SetState(Core.Wander.index);
     }
 
     public class Police : LawEnforcement
@@ -477,7 +479,7 @@ namespace BrokeProtocol.GameSource.Jobs
             else
             {
                 player.svPlayer.targetEntity = requester;
-                player.svPlayer.SetState((int)StateIndex.Heal);
+                player.svPlayer.SetState(Core.Heal.index);
             }
         }
 
@@ -488,7 +490,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState((int)StateIndex.Revive);
+                    player.svPlayer.SetState(Core.Revive.index);
                 });
         }
 
@@ -536,7 +538,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState((int)StateIndex.Extinguish);
+                    player.svPlayer.SetState(Core.Extinguish.index);
                 });
         }
 
