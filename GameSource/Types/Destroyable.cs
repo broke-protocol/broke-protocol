@@ -8,7 +8,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Destroyable : DestroyableEvents
     {
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
             if (attacker && attacker != destroyable)
@@ -19,7 +19,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
             if (destroyable.IsDead) return true;
@@ -44,7 +44,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool DestroySelf(ShDestroyable destroyable)
         {
             if (!destroyable.IsDead)

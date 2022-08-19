@@ -10,7 +10,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Movable : MovableEvents
     {
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
             Parent.Damage(destroyable, damageIndex, amount, attacker, collider, source, hitPoint);
@@ -42,7 +42,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
             Parent.Death(destroyable, attacker);
@@ -59,7 +59,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
             Parent.Respawn(entity);

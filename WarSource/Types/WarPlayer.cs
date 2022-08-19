@@ -7,7 +7,7 @@ namespace BrokeProtocol.WarSource.Types
 {
     public class WarPlayer : PlayerEvents
     {
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
             Parent.Spawn(entity);
@@ -22,7 +22,7 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
             if (Utility.GetSpawn(out var position, out var rotation, out var place))

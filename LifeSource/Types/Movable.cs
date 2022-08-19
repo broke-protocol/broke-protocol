@@ -2,7 +2,8 @@
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class Physical : PhysicalEvents
+    public class LifeMovable : MovableEvents
     {
+        
     }
 }

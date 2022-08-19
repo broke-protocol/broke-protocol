@@ -6,7 +6,7 @@ namespace BrokeProtocol.WarSource.Types
 {
     public class WarMovable : MovableEvents
     {
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
             Parent.Respawn(entity);

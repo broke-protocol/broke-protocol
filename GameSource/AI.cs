@@ -4,7 +4,6 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
-using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -677,72 +676,6 @@ namespace BrokeProtocol.GameSource.AI
             base.ExitState();
 
             if (player.IsDriving) player.svPlayer.SvSetSiren(false);
-        }
-    }
-
-    public class RobState : AimState
-    {
-        private float stopTime;
-        private bool threatened;
-
-        public override void EnterState()
-        {
-            base.EnterState();
-            threatened = false;
-        }
-
-        public override void UpdateState()
-        {
-            base.UpdateState();
-            if (StateChanged) return;
-
-            var targetPlayer = player.svPlayer.targetEntity.Player;
-
-            if(!targetPlayer)
-            {
-                player.svPlayer.ResetAI();
-                return;
-            }
-
-            if (threatened)
-            {
-                if (Time.time > stopTime)
-                {
-                    if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                        pluginPlayer.SetAttackState(targetPlayer);
-                }
-                else if (targetPlayer.IsSurrendered && !targetPlayer.switching && player.svPlayer.TargetNear)
-                {
-                    player.otherEntity = targetPlayer;
-                    foreach (var i in targetPlayer.myItems.Values.ToArray())
-                    {
-                        if (Random.value < 0.25f)
-                        {
-                            var randomCount = Random.Range(1, i.count);
-                            player.TransferItem(DeltaInv.OtherToMe, i.item, randomCount);
-
-                        }
-                    }
-                    player.otherEntity = null;
-                    player.svPlayer.ResetAI();
-                }
-            }
-            else if (player.svPlayer.TargetNear && Manager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget))
-            {
-                threatened = true;
-                stopTime = Time.time + 8f;
-                player.svPlayer.SvAlert();
-                player.svPlayer.SvPoint(true);
-
-                pluginTarget.CommandHandsUp(player);
-            }
-        }
-
-        public override void ExitState()
-        {
-            base.ExitState();
-
-            if (player.pointing) player.svPlayer.SvPoint(false);
         }
     }
 

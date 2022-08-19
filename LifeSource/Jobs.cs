@@ -5,7 +5,6 @@ using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
-using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.Utility.Networking;
 using Newtonsoft.Json;
@@ -79,7 +78,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override bool IsValidTarget(ShPlayer chaser)
         {
-            return Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+            return LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
                 (
                 (chaser.svPlayer.IsFollower(player) || ((MyJobInfo)chaser.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || (!player.IsRestrained && pluginPlayer.wantedLevel > 0)) &&
                 (!chaser.curMount || player.GetPlaceIndex == chaser.GetPlaceIndex)
@@ -89,7 +88,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override ShUsable GetBestJobWeapon()
         {
             if (((MyJobInfo)info).groupIndex == GroupIndex.LawEnforcement && player.svPlayer.targetEntity is ShPlayer targetPlayer &&
-                Manager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget) && pluginTarget.wantedLevel <= 1 && player.HasItem(targetPlayer.Handcuffs))
+                LifeManager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget) && pluginTarget.wantedLevel <= 1 && player.HasItem(targetPlayer.Handcuffs))
             {
                 return targetPlayer.Handcuffs;
             }
@@ -99,8 +98,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void OnDamageEntity(ShEntity damaged)
         {
-            if (damaged is ShPlayer victim && Manager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
-                pluginVictim.wantedLevel == 0 && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (damaged is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
+                pluginVictim.wantedLevel == 0 && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 if (victim.characterType == CharacterType.Mob)
                 {
@@ -123,8 +122,8 @@ namespace BrokeProtocol.GameSource.Jobs
 
         public override void OnDestroyEntity(ShEntity destroyed)
         {
-            if (destroyed is ShPlayer victim && Manager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
-                pluginVictim.wantedLevel == 0 && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (destroyed is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
+                pluginVictim.wantedLevel == 0 && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 pluginPlayer.AddCrime(victim.characterType == CharacterType.Human ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
 
@@ -180,7 +179,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected void TryFindInnocent()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginPlayer) && !p.curMount && 
+                (e) => e is ShPlayer p && LifeManager.pluginPlayers.TryGetValue(p, out var pluginPlayer) && !p.curMount && 
                 !p.IsDead && p.IsRestrained && pluginPlayer.wantedLevel == 0 && player.CanSeeEntity(e),
                 (e) =>
                 {
@@ -196,7 +195,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(Core.Rob.index);
+                    player.svPlayer.SetState(LifeCore.Rob.index);
                 });
         }
 
@@ -253,12 +252,13 @@ namespace BrokeProtocol.GameSource.Jobs
                 (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e),
                 (e) =>
                 {
-                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && 
+                    LifeManager.pluginPlayers.TryGetValue(player, out var lifeSourcePlayer))
                     {
                         // Add random crimes to ensure high wanted level (targetable by SpecOps)
-                        while (pluginPlayer.wantedLevel < 3)
+                        while (lifeSourcePlayer.wantedLevel < 3)
                         {
-                            pluginPlayer.AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
+                            lifeSourcePlayer.AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
                         }
                         pluginPlayer.SetAttackState(e);
                     }
@@ -613,7 +613,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void Loop()
         {
             if (!player.isHuman && player.IsMobile && !player.svPlayer.currentState.IsBusy &&
-                (Manager.warTerritory?.ownerIndex == info.shared.jobIndex || Random.value < 0.01f))
+                (LifeManager.warTerritory?.ownerIndex == info.shared.jobIndex || Random.value < 0.01f))
             {
                 TryFindEnemyGang();
             }
@@ -667,13 +667,13 @@ namespace BrokeProtocol.GameSource.Jobs
         {
             if (IsEnemyGangster(entity))
             {
-                if (!Manager.warTerritory)
+                if (!LifeManager.warTerritory)
                 {
                     if (player.isHuman)
                     {
                         if (Manager.TryGetTerritory(player, out var t) && t.ownerIndex != info.shared.jobIndex && gangstersKilled >= 1)
                         {
-                            Manager.StartGangWar(t, info.shared.jobIndex);
+                            LifeManager.StartGangWar(t, info.shared.jobIndex);
                             gangstersKilled = 0;
                         }
                         else
@@ -688,14 +688,14 @@ namespace BrokeProtocol.GameSource.Jobs
                 {
                     if (victim.svPlayer.job.info.shared.jobIndex == t.ownerIndex)
                     {
-                        Manager.defendersKilled++;
-                        Manager.SendTerritoryStats();
+                        LifeManager.defendersKilled++;
+                        LifeManager.SendTerritoryStats();
                         player.svPlayer.Reward(3, 100);
                     }
                     else if (victim.svPlayer.job.info.shared.jobIndex == t.attackerIndex)
                     {
-                        Manager.attackersKilled++;
-                        Manager.SendTerritoryStats();
+                        LifeManager.attackersKilled++;
+                        LifeManager.SendTerritoryStats();
                         player.svPlayer.Reward(3, 100);
                     }
                 }
@@ -984,7 +984,7 @@ namespace BrokeProtocol.GameSource.Jobs
             ShPlayer target = player.svPlayer.spawner;
 
             if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
-                target && Manager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
+                target && LifeManager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
                 Random.value < pluginTarget.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 return pluginPlayer.SetAttackState(target);
@@ -995,7 +995,7 @@ namespace BrokeProtocol.GameSource.Jobs
         protected void TryFindCriminal()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && LifeManager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e),
                 (e) =>
                 {
                     if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
@@ -1010,7 +1010,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
 
         protected override bool ValidTarget(ShEntity target) => 
-            base.ValidTarget(target) && target is ShPlayer p && Manager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel;
+            base.ValidTarget(target) && target is ShPlayer p && LifeManager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel;
 
         protected override GetEntityCallback GetTargetHandler()
         {
@@ -1041,7 +1041,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public override void OnDestroyEntity(ShEntity entity)
         {
             base.OnDestroyEntity(entity);
-            if (entity is ShPlayer victim && Manager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && targetPlayer == victim && pluginVictim.wantedLevel > 0 && pluginVictim.wantedLevel >= AttackLevel)
+            if (entity is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && targetPlayer == victim && pluginVictim.wantedLevel > 0 && pluginVictim.wantedLevel >= AttackLevel)
             {
                 player.svPlayer.Reward(3, 300);
             }
@@ -1325,7 +1325,7 @@ namespace BrokeProtocol.GameSource.Jobs
                         }
                         else if (p.myItems.Count > 0)
                         {
-                            if(Manager.worldWaypoints[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
+                            if(LifeManager.worldWaypoints[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
                             {
                                 var randomSpawn = spawns.GetRandom();
 

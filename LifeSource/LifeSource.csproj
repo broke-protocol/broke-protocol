@@ -7,10 +7,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB}</ProjectGuid>
+    <ProjectGuid>{2706A6D6-BD0F-43D6-9159-54E8DBB4BC32}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>BrokeProtocol.GameSource</RootNamespace>
-    <AssemblyName>_GameSource</AssemblyName>
+    <RootNamespace>BrokeProtocol.LifeSource</RootNamespace>
+    <AssemblyName>_LifeSource</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -77,11 +77,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\broke-protocol-game2\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
+    <Reference Include="_GameSource">
+      <HintPath>..\GameSource\bin\Release\_GameSource.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AI.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="ExampleCommand.cs" />
+    <Compile Include="Jobs.cs" />
     <Compile Include="Types\Entity.cs" />
     <Compile Include="Types\Manager.cs" />
     <Compile Include="Types\Destroyable.cs" />

@@ -148,7 +148,7 @@ namespace BrokeProtocol.WarSource.Types
             SvManager.Instance.AddNewEntityExisting(player);
         }
         
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Start()
         {
             foreach (Transform place in SceneManager.Instance.mTransform)
@@ -184,7 +184,7 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool Update()
         {
             foreach(var p in EntityCollections.Players)
@@ -204,7 +204,7 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool TryLogin(ConnectionData connectData)
         {
             // Logins disabled here
@@ -213,7 +213,7 @@ namespace BrokeProtocol.WarSource.Types
         }
 
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool TryRegister(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
@@ -259,7 +259,7 @@ namespace BrokeProtocol.WarSource.Types
         public const string selectTeam = "Select Team";
         public const string selectClass = "Select Class";
 
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool PlayerLoaded(ConnectionData connectData)
         {
             connectData.connectionStatus = ConnectionStatus.LoadedMap;
@@ -294,7 +294,7 @@ namespace BrokeProtocol.WarSource.Types
         public const string classIndexKey = "classIndex";
 
         // Read packet data from Buffers.reader
-        [Execution(ExecutionMode.Override)]
+        [Execution(ExecutionMode.Additive)]
         public override bool CustomPacket(ConnectionData connectData, SvPacket packet)
         {
             switch(packet)
