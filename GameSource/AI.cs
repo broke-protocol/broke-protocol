@@ -141,7 +141,7 @@ namespace BrokeProtocol.GameSource.AI
         {
             Vector3 safePos;
 
-            player.svPlayer.SetBestWeaponSet();
+            player.svPlayer.SetBestMountWeapon();
 
             if (player.svPlayer.AimSmart())
             {
@@ -736,7 +736,7 @@ namespace BrokeProtocol.GameSource.AI
         {
             base.EnterState();
             projectile = null;
-            player.svPlayer.SetBestWeapon();
+            player.svPlayer.SetBestWeapons();
         }
 
         public override void UpdateState()
@@ -751,7 +751,7 @@ namespace BrokeProtocol.GameSource.AI
                     if (!player.switching)
                     {
                         player.Fire(projectile.index);
-                        player.svPlayer.SetBestWeapon();
+                        player.svPlayer.SetBestWeapons();
                         player.svPlayer.SetState(Core.TakeCover.index);
                     }
                 }
@@ -781,7 +781,7 @@ namespace BrokeProtocol.GameSource.AI
                         player.svPlayer.SvCrouch(player.Perlin(0.1f) < 0.3f);
                     
                     if (player.CurrentAmmoTotal == 0)
-                        player.svPlayer.SetBestWeapon();
+                        player.svPlayer.SetBestWeapons();
                 }
             }
         }

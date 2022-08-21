@@ -40,7 +40,7 @@ namespace BrokeProtocol.GameSource.Types
                             {
                                 mount.weaponIndex = index;
                                 if (mount.CanUse()) mount.MountFire();
-                                controller.svPlayer.SetBestWeaponSet();
+                                controller.svPlayer.SetBestMountWeapon();
                             }
 
                             index++;
