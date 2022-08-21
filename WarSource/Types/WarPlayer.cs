@@ -41,5 +41,10 @@ namespace BrokeProtocol.WarSource.Types
 
             return true;
         }
+
+        // Test Event (disallow losing Exp/Job in PvP)
+        [Execution(ExecutionMode.Test)]
+        public override bool Reward(ShPlayer player, int experienceDelta, int moneyDelta) => 
+            experienceDelta >= 0;
     }
 }
