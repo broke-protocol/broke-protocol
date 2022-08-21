@@ -74,7 +74,9 @@ namespace BrokeProtocol.WarSource.Types
                     }
                 }
 
-                newSpeed = Mathf.Min(1, highestCount - (players.Count - highestCount));
+                // Clamp capture speed to sane levels
+                // highestCount - (players.Count - highestCount)
+                newSpeed = Mathf.Clamp(2 * highestCount - players.Count, 1 , 5);
             }
 
             newSpeed *= 0.05f;
