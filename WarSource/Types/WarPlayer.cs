@@ -1,7 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
-using UnityEngine;
 
 namespace BrokeProtocol.WarSource.Types
 {
@@ -18,7 +17,7 @@ namespace BrokeProtocol.WarSource.Types
             {
                 player.svPlayer.SvSetJob(BPAPI.Jobs[teamIndex], true, false);
             }
-            player.svPlayer.SvForceEquipable(player.svPlayer.GetBestWeapon().index);
+            player.svPlayer.SetBestEquipable();
             return true;
         }
 

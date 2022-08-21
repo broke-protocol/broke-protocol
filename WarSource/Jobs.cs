@@ -1,6 +1,6 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.Utility;
-using BrokeProtocol.Utility.AI;
+using BrokeProtocol.GameSource;
 using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.GameSource.Types;
 using System.Collections;
@@ -75,7 +75,7 @@ namespace BrokeProtocol.WarSource.Jobs
 
         public override void Loop()
         {
-            if (!player.isHuman && !player.svPlayer.targetEntity && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == (int)StateIndex.Waypoint)
+            if (!player.isHuman && !player.svPlayer.targetEntity && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == Core.Waypoint.index)
             {
                 TryFindEnemy();
             }
@@ -132,7 +132,7 @@ namespace BrokeProtocol.WarSource.Jobs
 
             if (!goal)
             {
-                player.svPlayer.SetState((int)StateIndex.Null);
+                player.svPlayer.SetState(0);
                 return;
             }
 

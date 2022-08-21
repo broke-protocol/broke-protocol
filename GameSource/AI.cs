@@ -780,7 +780,8 @@ namespace BrokeProtocol.GameSource.AI
                     if(player.stances[(int)StanceIndex.Crouch].input > 0f)
                         player.svPlayer.SvCrouch(player.Perlin(0.1f) < 0.3f);
                     
-                    if (player.CurrentAmmoTotal == 0) player.svPlayer.SetBestWeapon();
+                    if (player.CurrentAmmoTotal == 0)
+                        player.svPlayer.SetBestWeapon();
                 }
             }
         }
