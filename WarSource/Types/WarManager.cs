@@ -7,15 +7,17 @@ using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
+using System.Text;
 
 namespace BrokeProtocol.WarSource.Types
 {
     public class TerritoryState
     {
         public const string territoryProgressBarID = "territory";
-        private ShTerritory territory;
+        public ShTerritory territory;
         public float lastSpeed;
         public float captureState;
         public IDCollection<ShPlayer> players = new IDCollection<ShPlayer>();
@@ -149,7 +151,7 @@ namespace BrokeProtocol.WarSource.Types
             player.svPlayer.spawnJobIndex = jobIndex;
             SvManager.Instance.AddNewEntityExisting(player);
         }
-        
+
         [Execution(ExecutionMode.Additive)]
         public override bool Start()
         {
@@ -165,7 +167,7 @@ namespace BrokeProtocol.WarSource.Types
 
             foreach (var t in Manager.territories)
             {
-                if(t.capturable)
+                if (t.capturable)
                     territoryStates.Add(t, new TerritoryState(t));
             }
 
@@ -183,7 +185,76 @@ namespace BrokeProtocol.WarSource.Types
                 AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
             }
 
+            ResetGame();
+
+            SvManager.Instance.StartCoroutine(GameLoop());
+
             return true;
+        }
+
+        private IEnumerator GameLoop()
+        {
+            var delay = new WaitForSeconds(1f);
+
+            while(true)
+            {
+                foreach(var team in tickets)
+                {
+                    if(team.Value <= 0f)
+                    {
+                        var winner = -1;
+                        var highest = -1f;
+
+                        foreach(var otherTeam in tickets)
+                        {
+                            if(otherTeam.Value > highest)
+                            {
+                                highest = otherTeam.Value;
+                                winner = otherTeam.Key;
+                            }
+                        }
+
+                        ChatHandler.SendAlertToAll($"{BPAPI.Jobs[winner].shared.jobName} have won the battle", 1f);
+
+                        ResetGame();
+                        break;
+                    }
+                }
+
+                var sb = new StringBuilder();
+                foreach(var team in tickets)
+                {
+                    var jobInfo = BPAPI.Jobs[team.Key].shared;
+                    sb.Append("<color=#").
+                        Append(ColorUtility.ToHtmlStringRGB(jobInfo.GetColor())).
+                        Append(">").
+                        Append(jobInfo.jobName).
+                        Append("</color>: ").
+                        AppendLine(((int)team.Value).ToString());
+                }
+                ChatHandler.SendTextPanelToAll(sb.ToString(), "WarPlugin");
+
+                yield return delay;
+            }
+        }
+
+
+        private Dictionary<int, int> controlledTerritories = new Dictionary<int, int>();
+        private Dictionary<int, float> tickets = new Dictionary<int, float>();
+        private Dictionary<int, float> tempTickets = new Dictionary<int, float>();
+
+        public void ResetGame()
+        {
+            tickets.Clear();
+            foreach(var t in BPAPI.Jobs)
+            {
+                tickets.Add(t.shared.jobIndex, 1000f);
+            }
+
+            foreach(var player in EntityCollections.Players)
+            {
+                player.svPlayer.Respawn();
+            }
         }
 
         [Execution(ExecutionMode.Additive)]
@@ -198,9 +269,45 @@ namespace BrokeProtocol.WarSource.Types
                 }
             }
 
+            controlledTerritories.Clear();
             foreach (var t in territoryStates.Values)
             {
                 t.Update();
+
+                var ownerIndex = t.territory.ownerIndex;
+
+                if (ownerIndex >= 0)
+                {
+                    if (controlledTerritories.TryGetValue(ownerIndex, out var count))
+                    {
+                        controlledTerritories[ownerIndex] = count + 1;
+                    }
+                    else
+                    {
+                        controlledTerritories[ownerIndex] = 1;
+                    }
+                }
+            }
+
+            const float burnScalar = 3f;
+
+            tempTickets.Clear();
+            foreach (var team in tickets)
+            {
+                var burn = burnScalar;
+                if (controlledTerritories.TryGetValue(team.Key, out var count))
+                {
+                    burn = burnScalar * (1f - count / territoryStates.Count);
+                }
+
+                tempTickets.Add(
+                    team.Key,
+                    Mathf.Max(0f, team.Value - burn * Time.deltaTime));
+            }
+
+            foreach(var pair in tempTickets)
+            {
+                tickets.Add(pair.Key, pair.Value);
             }
 
             return true;
