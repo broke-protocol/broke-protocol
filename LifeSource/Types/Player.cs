@@ -370,12 +370,12 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Destroy(ShEntity entity)
         {
             Parent.Destroy(entity);
-            if (entity is ShPlayer player && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (LifeManager.pluginPlayers.TryGetValue(entity, out var pluginPlayer))
             {
                 pluginPlayer.ClearWitnessed();
                 pluginPlayer.ClearCrimes();
 
-                LifeManager.pluginPlayers.Remove(player);
+                LifeManager.pluginPlayers.Remove(entity);
             }
             return true;
         }

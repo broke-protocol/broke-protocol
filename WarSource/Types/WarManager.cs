@@ -138,6 +138,8 @@ namespace BrokeProtocol.WarSource.Types
 
     public class WarManager : ManagerEvents
     {
+        public static Dictionary<ShEntity, WarSourcePlayer> pluginPlayers = new Dictionary<ShEntity, WarSourcePlayer>();
+
         public Dictionary<ShTerritory, TerritoryState> territoryStates = new Dictionary<ShTerritory, TerritoryState>();
 
         public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];

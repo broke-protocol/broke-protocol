@@ -82,11 +82,7 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Initialize(ShEntity entity)
         {
             Parent.Initialize(entity);
-            if (entity is ShPlayer player)
-            {
-                Manager.pluginPlayers.Add(player, new GameSourcePlayer(player));
-            }
-
+            Manager.pluginPlayers.Add(entity, new GameSourcePlayer(entity as ShPlayer));
             return true;
         }
 
@@ -94,10 +90,7 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Destroy(ShEntity entity)
         {
             Parent.Destroy(entity);
-            if (entity is ShPlayer player && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                Manager.pluginPlayers.Remove(player);
-            }
+            Manager.pluginPlayers.Remove(entity);
             return true;
         }
 
