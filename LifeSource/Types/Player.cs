@@ -20,6 +20,8 @@ namespace BrokeProtocol.GameSource.Types
     {
         ShPlayer player;
 
+        public bool trespassing;
+
         public float jailExitTime;
 
         public readonly Dictionary<int, Offense> offenses = new Dictionary<int, Offense>();
@@ -222,7 +224,9 @@ namespace BrokeProtocol.GameSource.Types
         public bool ApartmentUnlawful(ShPlayer apartmentOwner) => apartmentOwner != player && LifeManager.pluginPlayers.TryGetValue(apartmentOwner, out var pluginOwner) && 
             (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || pluginOwner.wantedLevel == 0);
 
-        public bool ApartmentTrespassing(ShPlayer apartmentOwner) => player.svPlayer.trespassing && ApartmentUnlawful(apartmentOwner);
+        public bool ApartmentTrespassing(ShPlayer apartmentOwner) => 
+            LifeManager.pluginPlayers.TryGetValue(player, out var lifeSourcePlayer) && 
+            lifeSourcePlayer.trespassing && ApartmentUnlawful(apartmentOwner);
 
         public int GoToJail()
         {
@@ -613,7 +617,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
-            if (LifeManager.pluginPlayers.TryGetValue(destroyable as ShPlayer, out var pluginPlayer))
+            if (LifeManager.pluginPlayers.TryGetValue(destroyable, out var pluginPlayer))
             {
                 pluginPlayer.ClearWitnessed();
             }
@@ -1115,11 +1119,23 @@ namespace BrokeProtocol.GameSource.Types
         {
             yield return new WaitForSeconds(delay);
 
-            if (EntityCollections.TryGetPlayerByNameOrID(senderName, out var sender))
+            if (EntityCollections.TryGetPlayerByNameOrID(senderName, out var sender) && 
+                LifeManager.pluginPlayers.TryGetValue(player, out var lifeSourcePlayer))
             {
-                player.svPlayer.trespassing = trespassing;
+                lifeSourcePlayer.trespassing = trespassing;
                 player.svPlayer.SvEnterDoor(doorID, sender, true);
             }
+        }
+
+        public override bool SetParent(ShEntity entity, Transform parent)
+        {
+            Parent.SetParent(entity, parent);
+
+            if (parent == SceneManager.Instance.ExteriorT && 
+                LifeManager.pluginPlayers.TryGetValue(entity, out var lifeSourcePlayer))
+                lifeSourcePlayer.trespassing = false;
+
+            return true;
         }
 
         private IEnumerator OpenInventoryDelay(ShPlayer player, int entityID, float delay, bool force = false)

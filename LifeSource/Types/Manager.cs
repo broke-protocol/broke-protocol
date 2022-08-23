@@ -158,7 +158,7 @@ namespace BrokeProtocol.GameSource.Types
 
     public class LifeManager : ManagerEvents
     {
-        public static Dictionary<ShPlayer, LifeSourcePlayer> pluginPlayers = new Dictionary<ShPlayer, LifeSourcePlayer>();
+        public static Dictionary<ShEntity, LifeSourcePlayer> pluginPlayers = new Dictionary<ShEntity, LifeSourcePlayer>();
 
         public static readonly WaypointGroup[] worldWaypoints = new WaypointGroup[]
         {

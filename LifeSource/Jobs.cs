@@ -518,7 +518,7 @@ namespace BrokeProtocol.GameSource.Jobs
             targetPlayer.svPlayer.SendGameMessage("Paramedic alerted to your location");
         }
 
-        protected override bool ValidTarget(ShEntity target) => base.ValidTarget(target) && (target as ShPlayer).IsKnockedOut;
+        protected override bool ValidTarget(ShEntity target) => base.ValidTarget(target) && target is ShPlayer p && p.IsKnockedOut;
 
         public override void OnHealEntity(ShEntity entity)
         {
@@ -1010,7 +1010,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
 
         protected override bool ValidTarget(ShEntity target) => 
-            base.ValidTarget(target) && target is ShPlayer p && LifeManager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel;
+            base.ValidTarget(target) && LifeManager.pluginPlayers.TryGetValue(target, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel;
 
         protected override GetEntityCallback GetTargetHandler()
         {
