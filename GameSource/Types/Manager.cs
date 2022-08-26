@@ -55,7 +55,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Start()
         {
-            Debug.Log("SKINS ASSIGNED");
             var skins = new HashSet<string>();
             SvManager.Instance.ParseFile(ref skins, Paths.AbsolutePath("skins.txt"));
             skinPrefabs = skins.ToEntityList<ShPlayer>();

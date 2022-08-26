@@ -82,7 +82,10 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Initialize(ShEntity entity)
         {
             Parent.Initialize(entity);
-            Manager.pluginPlayers.Add(entity, new GameSourcePlayer(entity as ShPlayer));
+            if (entity.Player)
+            {
+                Manager.pluginPlayers.Add(entity, new GameSourcePlayer(entity.Player));
+            }
             return true;
         }
 

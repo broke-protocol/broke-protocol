@@ -355,12 +355,12 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Initialize(ShEntity entity)
         {
             Parent.Initialize(entity);
-            if (entity is ShPlayer player)
+            if (entity.Player)
             {
-                LifeManager.pluginPlayers.Add(player, new LifeSourcePlayer(player));
-                player.svPlayer.SvAddSelfAction("MyCrimes", "My Crimes");
-                player.svPlayer.SvAddInventoryAction("GetItemValue", "ShItem", ButtonType.Sellable, "Get Sell Value");
-                player.svPlayer.SvAddTypeAction("HandsUp", "ShPlayer", "Hands Up!");
+                LifeManager.pluginPlayers.Add(entity.Player, new LifeSourcePlayer(entity.Player));
+                entity.Player.svPlayer.SvAddSelfAction("MyCrimes", "My Crimes");
+                entity.Player.svPlayer.SvAddInventoryAction("GetItemValue", "ShItem", ButtonType.Sellable, "Get Sell Value");
+                entity.Player.svPlayer.SvAddTypeAction("HandsUp", "ShPlayer", "Hands Up!");
             }
 
             return true;

@@ -1,13 +1,16 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
-using BrokeProtocol.Utility;
+using System.Collections.Generic;
 
 namespace BrokeProtocol.WarSource.Types
 {
     public class WarSourcePlayer
     {
-        ShPlayer player;
+        public ShPlayer player;
+
+        public int spawnTerritoryIndex;
 
         public WarSourcePlayer(ShPlayer player)
         {
@@ -21,7 +24,10 @@ namespace BrokeProtocol.WarSource.Types
         public override bool Initialize(ShEntity entity)
         {
             Parent.Initialize(entity);
-            WarManager.pluginPlayers.Add(entity, new WarSourcePlayer(entity as ShPlayer));
+            if (entity.Player)
+            {
+                WarManager.pluginPlayers.Add(entity, new WarSourcePlayer(entity.Player));
+            }
             return true;
         }
 
@@ -48,22 +54,65 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
+        public static IEnumerable<int> GetTerritories(int team)
+        {
+            var territories = new List<int>();
+            var index = 0;
+            foreach (var t in Manager.territories)
+            {
+                if (t.ownerIndex == team)
+                {
+                    territories.Add(index);
+                }
+                index++;
+            }
+
+            return territories;
+        }
+
+        public const string spawnMenuID = "SpawnMenu";
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool TextPanelButton(ShPlayer player, string menuID, string optionID)
+        {
+            if (WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
+            {
+                if (menuID.StartsWith(spawnMenuID))
+                {
+                    if (int.TryParse(optionID, out var index) && 
+                        index < Manager.territories.Count && 
+                        Manager.territories[index].ownerIndex == player.svPlayer.spawnJobIndex)
+                    {
+                        warSourcePlayer.spawnTerritoryIndex = index;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            if (Utility.GetSpawn(out var position, out var rotation, out var place))
+            if (WarManager.pluginPlayers.TryGetValue(entity, out var warSourcePlayer))
             {
-                entity.svEntity.originalPosition = position;
-                entity.svEntity.originalRotation = rotation;
-                entity.svEntity.originalParent = place.mTransform;
-            }
+                var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
-            Parent.Respawn(entity);
+                if (Utility.GetSpawn(territoryIndex, out var position, out var rotation, out var place))
+                {
+                    entity.svEntity.originalPosition = position;
+                    entity.svEntity.originalRotation = rotation;
+                    entity.svEntity.originalParent = place.mTransform;
+                }
 
-            if(entity.isHuman && entity is ShPlayer player)
-            {
-                // Back to spectate self on Respawn
-                player.svPlayer.SvSpectate(player);
+                Parent.Respawn(entity);
+
+                if (entity.isHuman && entity is ShPlayer player)
+                {
+                    // Back to spectate self on Respawn
+                    player.svPlayer.SvSpectate(player);
+                }
             }
 
             return true;

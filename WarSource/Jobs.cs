@@ -65,7 +65,7 @@ namespace BrokeProtocol.WarSource.Jobs
         {
             player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job is Army &&
-                        p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
+                        p.svPlayer.spawnJobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
                 (e) =>
                 {
                     if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))

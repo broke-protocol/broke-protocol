@@ -6,11 +6,11 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using System.Text;
+using UnityEngine;
 
 namespace BrokeProtocol.WarSource.Types
 {
@@ -54,7 +54,7 @@ namespace BrokeProtocol.WarSource.Types
                 attackerCounts.Clear();
                 foreach (var p in players)
                 {
-                    var j = p.svPlayer.job.info.shared.jobIndex;
+                    var j = p.svPlayer.spawnJobIndex;
                     if (attackerCounts.TryGetValue(j, out var count))
                     {
                         attackerCounts[j] = count + 1;
@@ -78,7 +78,8 @@ namespace BrokeProtocol.WarSource.Types
 
                 // Clamp capture speed to sane levels
                 // highestCount - (players.Count - highestCount)
-                newSpeed = Mathf.Clamp(2 * highestCount - players.Count, 1 , 5);
+                const int range = 5;
+                newSpeed = Mathf.Clamp(2 * highestCount - players.Count, -range, range);
             }
 
             newSpeed *= 0.05f;
@@ -146,9 +147,7 @@ namespace BrokeProtocol.WarSource.Types
 
         public void AddBot(ShPlayer prefab, int jobIndex)
         {
-            Utility.GetSpawn(out var position, out var rotation, out var place);
-
-            var player = GameObject.Instantiate(prefab, position, rotation, place.mTransform);
+            var player = GameObject.Instantiate(prefab, SceneManager.Instance.ExteriorT);
             player.name = prefab.name;
             player.svPlayer.spawnJobIndex = jobIndex;
             SvManager.Instance.AddNewEntityExisting(player);
@@ -157,19 +156,9 @@ namespace BrokeProtocol.WarSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Start()
         {
-            foreach (Transform place in SceneManager.Instance.mTransform)
-            {
-                foreach (Transform child in place)
-                {
-                    if (child.TryGetComponent(out ShTerritory t)) Manager.territories.Add(t);
-                }
-            }
-
-            if (Manager.territories.Count == 0) Debug.LogWarning("[SVR] No territories found");
-
             foreach (var t in Manager.territories)
             {
-                if (t.capturable)
+                if(t.capturable)
                     territoryStates.Add(t, new TerritoryState(t));
             }
 
@@ -307,6 +296,7 @@ namespace BrokeProtocol.WarSource.Types
                     Mathf.Max(0f, team.Value - burn * Time.deltaTime));
             }
 
+            tickets.Clear();
             foreach(var pair in tempTickets)
             {
                 tickets.Add(pair.Key, pair.Value);
@@ -315,7 +305,7 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Additive)]
+        [Execution(ExecutionMode.Override)]
         public override bool TryLogin(ConnectionData connectData)
         {
             // Logins disabled here
@@ -324,7 +314,7 @@ namespace BrokeProtocol.WarSource.Types
         }
 
 
-        [Execution(ExecutionMode.Additive)]
+        [Execution(ExecutionMode.Override)]
         public override bool TryRegister(ConnectionData connectData)
         {
             if (ValidateUser(connectData))
@@ -346,13 +336,16 @@ namespace BrokeProtocol.WarSource.Types
 
                 if (connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex) && connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs[teamIndex].Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
                 {
-                    if (Utility.GetSpawn(out var position, out var rotation, out var place))
+                    var territories = WarPlayer.GetTerritories(teamIndex);
+
+                    if (territories.Count() > 0 &&
+                        Utility.GetSpawn(territories.GetRandom(), out var position, out var rotation, out var place))
                     {
-                        SvManager.Instance.AddNewPlayer(skinPrefabs[teamIndex][connectData.skinIndex], connectData, playerData?.Persistent, position, rotation, place.mTransform);
+                        SvManager.Instance.AddNewPlayer(skinPrefabs[teamIndex][connectData.skinIndex], connectData, playerData?.Persistent, position, rotation, place.mTransform, teamIndex);
                     }
                     else
                     {
-                        SvManager.Instance.RegisterFail(connectData.connection, "No spawn territories");
+                        SvManager.Instance.RegisterFail(connectData.connection, "No spawn territories for this team");
                     }
                 }
                 else
@@ -370,7 +363,7 @@ namespace BrokeProtocol.WarSource.Types
         public const string selectTeam = "Select Team";
         public const string selectClass = "Select Class";
 
-        [Execution(ExecutionMode.Additive)]
+        [Execution(ExecutionMode.Override)]
         public override bool PlayerLoaded(ConnectionData connectData)
         {
             connectData.connectionStatus = ConnectionStatus.LoadedMap;

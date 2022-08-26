@@ -6,10 +6,9 @@ namespace BrokeProtocol.WarSource
 {
     public static class Utility
     {
-        public static bool GetSpawn(out Vector3 position, out Quaternion rotation, out Place place)
+        public static bool GetSpawn(int territoryIndex, out Vector3 position, out Quaternion rotation, out Place place)
         {
-            var territory = Manager.territories.GetRandom();
-
+            var territory = Manager.territories[territoryIndex];
             if (territory)
             {
                 var t = territory.mainT;
@@ -37,6 +36,21 @@ namespace BrokeProtocol.WarSource
             rotation = default;
             place = default;
             return false;
+        }
+
+        public static string GetTerritoryName(int territoryIndex)
+        {
+            var territory = Manager.territories[territoryIndex];
+
+            if (string.IsNullOrWhiteSpace(territory.locationName))
+            {
+                // Just show # if map designer didn't name territories
+                return territoryIndex.ToString();
+            }
+            else
+            {
+                return territory.locationName;
+            }
         }
     }
 }
