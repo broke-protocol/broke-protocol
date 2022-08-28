@@ -343,7 +343,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            if (!(entity is ShPlayer player)) return true;
+            var player = entity.Player;
 
             if (player.isHuman)
             {
@@ -354,12 +354,6 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             Parent.Respawn(player);
-
-            if (player.isHuman)
-            {
-                // Back to spectate self on Respawn
-                player.svPlayer.SvSpectate(player);
-            }
 
             player.svPlayer.SvForceEquipable(player.Hands.index);
 

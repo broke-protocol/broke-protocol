@@ -92,7 +92,7 @@ namespace BrokeProtocol.WarSource.Types
         }
 
 
-        [Execution(ExecutionMode.Additive)]
+        [Execution(ExecutionMode.Override)]
         public override bool Respawn(ShEntity entity)
         {
             if (WarManager.pluginPlayers.TryGetValue(entity, out var warSourcePlayer))
@@ -107,12 +107,6 @@ namespace BrokeProtocol.WarSource.Types
                 }
 
                 Parent.Respawn(entity);
-
-                if (entity.isHuman && entity is ShPlayer player)
-                {
-                    // Back to spectate self on Respawn
-                    player.svPlayer.SvSpectate(player);
-                }
             }
 
             return true;

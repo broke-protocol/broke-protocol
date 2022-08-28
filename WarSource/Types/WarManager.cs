@@ -78,13 +78,12 @@ namespace BrokeProtocol.WarSource.Types
 
                 // Clamp capture speed to sane levels
                 // highestCount - (players.Count - highestCount)
-                const int range = 5;
-                newSpeed = Mathf.Clamp(2 * highestCount - players.Count, -range, range);
+                newSpeed = Mathf.Clamp(2 * highestCount - players.Count, 1, 5);
             }
 
             newSpeed *= 0.05f;
 
-            if (territory.ownerIndex    >= 0 && territory.ownerIndex    < BPAPI.Jobs.Count && attackerIndex == territory.ownerIndex ||
+            if (attackerIndex == territory.ownerIndex ||
                 territory.attackerIndex >= 0 && territory.attackerIndex < BPAPI.Jobs.Count && attackerIndex != territory.attackerIndex)
             {
                 newSpeed = -newSpeed;
@@ -153,9 +152,19 @@ namespace BrokeProtocol.WarSource.Types
             SvManager.Instance.AddNewEntityExisting(player);
         }
 
-        [Execution(ExecutionMode.Additive)]
+        [Execution(ExecutionMode.Override)]
         public override bool Start()
         {
+            foreach (Transform place in SceneManager.Instance.mTransform)
+            {
+                foreach (Transform child in place)
+                {
+                    if (child.TryGetComponent(out ShTerritory t)) Manager.territories.Add(t);
+                }
+            }
+
+            if (Manager.territories.Count == 0) Debug.LogWarning("[SVR] No territories found");
+
             foreach (var t in Manager.territories)
             {
                 if(t.capturable)
@@ -173,7 +182,7 @@ namespace BrokeProtocol.WarSource.Types
             for (var i = 0; i < 5; i++)
             {
                 var teamIndex = i % 2;
-                AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
+                //AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
             }
 
             ResetGame();
