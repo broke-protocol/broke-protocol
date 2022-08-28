@@ -182,7 +182,7 @@ namespace BrokeProtocol.WarSource.Types
             for (var i = 0; i < 5; i++)
             {
                 var teamIndex = i % 2;
-                //AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
+                AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
             }
 
             ResetGame();

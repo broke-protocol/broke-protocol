@@ -104,7 +104,7 @@ namespace BrokeProtocol.WarSource.Types
 
             while (destroyable && destroyable.IsDead)
             {
-                if (SetSpawnTerritory(warSourcePlayer))
+                if (destroyable.Player && SetSpawnTerritory(warSourcePlayer))
                 {
                     SendSpawnMenu(warSourcePlayer);
                 }
@@ -115,12 +115,18 @@ namespace BrokeProtocol.WarSource.Types
                     {
                         destroyable.svDestroyable.Disappear();
                         destroyable.svDestroyable.Respawn();
-                        yield break;
+                        break;
                     }
                 }
 
                 yield return null;
             }
+
+            if (destroyable.Player)
+            {
+                destroyable.Player.svPlayer.DestroyTextPanel(WarPlayer.spawnMenuID);
+            }
+            
         }
     }
 }
