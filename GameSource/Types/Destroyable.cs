@@ -47,12 +47,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool DestroySelf(ShDestroyable destroyable)
         {
-            if (!destroyable.IsDead)
-            {
-                destroyable.ShDie();
-                destroyable.svDestroyable.Send(SvSendType.Local, Channel.Reliable, ClPacket.UpdateHealth, destroyable.ID, destroyable.health);
-            }
-
+            destroyable.svDestroyable.Damage(DamageIndex.Null, float.MaxValue);
             return true;
         }
     }
