@@ -37,19 +37,19 @@ namespace BrokeProtocol.WarSource
                 CharacterType.Human, 0, new ColorStruct(1f, 0f, 0f),
                 new Upgrades[] {
                     new Upgrades(
-                        new InventoryStruct[] {
-                            new InventoryStruct("GangJacketRed", 1),
-                            new InventoryStruct("PantsLightBlue", 1),
-                            new InventoryStruct("BackwardsCapRed", 1),
-                            new InventoryStruct("Machete", 1)}),
+                        new InventoryStruct[] { } ),
                     new Upgrades(
                         new InventoryStruct[] {
-                            new InventoryStruct("Sig", 1),
-                            new InventoryStruct("AmmoPistol", 48)}),
+                            new InventoryStruct("GrenadeSmoke", 3)}),
                     new Upgrades(
                         new InventoryStruct[] {
-                            new InventoryStruct("Mac", 1),
-                            new InventoryStruct("AmmoSMG", 90)})
+                            new InventoryStruct("KevlarVest", 1)}),
+                    new Upgrades(
+                        new InventoryStruct[] {
+                            new InventoryStruct("Grenade", 3)}),
+                    new Upgrades(
+                        new InventoryStruct[] {
+                            new InventoryStruct("HelmetCombat", 1)})
                 }),
             new JobInfo(
                 typeof(Army), "OpFor",
@@ -57,19 +57,19 @@ namespace BrokeProtocol.WarSource
                 CharacterType.Human, 0, new ColorStruct(0f, 1f, 0f),
                 new Upgrades[] {
                     new Upgrades(
-                        new InventoryStruct[] {
-                            new InventoryStruct("GangJacketGreen", 1),
-                            new InventoryStruct("PantsGreen", 1),
-                            new InventoryStruct("FaceScarfDark", 1),
-                            new InventoryStruct("BatMetal", 1)}),
+                        new InventoryStruct[] { } ),
                     new Upgrades(
                         new InventoryStruct[] {
-                            new InventoryStruct("Glock", 1),
-                            new InventoryStruct("AmmoPistol", 68)}),
+                            new InventoryStruct("GrenadeSmoke", 3)}),
                     new Upgrades(
                         new InventoryStruct[] {
-                            new InventoryStruct("MP5SD", 1),
-                            new InventoryStruct("AmmoSMG", 60)})
+                            new InventoryStruct("KevlarVest", 1)}),
+                    new Upgrades(
+                        new InventoryStruct[] {
+                            new InventoryStruct("Grenade", 3)}),
+                    new Upgrades(
+                        new InventoryStruct[] {
+                            new InventoryStruct("RiotHelmet", 1)})
                 }),
             };
     }
