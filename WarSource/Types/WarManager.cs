@@ -375,8 +375,6 @@ namespace BrokeProtocol.WarSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool PlayerLoaded(ConnectionData connectData)
         {
-            connectData.connectionStatus = ConnectionStatus.LoadedMap;
-
             var options = new List<LabelID>();
             foreach (var c in teams) options.Add(new LabelID(c, c));
             var actions = new LabelID[] { new LabelID(selectTeam, selectTeam)};

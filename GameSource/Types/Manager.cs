@@ -143,28 +143,11 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Additive)]
-        public override bool ReadGroups()
-        {
-            try
-            {
-                var groups = JsonConvert.DeserializeObject<List<Group>>(File.ReadAllText(Paths.groupsFile));
-                GroupHandler.Groups = groups.ToDictionary(x => x.Name, y => y);
-            }
-            catch(Exception e)
-            {
-                Debug.Log("[SVR] Error reading groups file: " + e);
-            }
-
-            return true;
-        }
 
         [Execution(ExecutionMode.Additive)]
         public override bool PlayerLoaded(ConnectionData connectData)
         {
-            connectData.connectionStatus = ConnectionStatus.LoadedMap;
             SvManager.Instance.SendRegisterMenu(connectData.connection, true, skinPrefabs);
-
             return true;
         }
 

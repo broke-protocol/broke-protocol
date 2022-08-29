@@ -422,8 +422,6 @@ namespace BrokeProtocol.GameSource.Types
             }
             SvManager.Instance.database.Data.Upsert(bountyData);
 
-            ChatHandler.SendToAll("Saving server status..");
-
             return true;
         }
 

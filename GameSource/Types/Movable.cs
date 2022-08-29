@@ -63,7 +63,6 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Respawn(ShEntity entity)
         {
             Parent.Respawn(entity);
-            entity.svEntity.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
             if (entity.svEntity.randomSpawn)
             {
                 entity.svEntity.Despawn(true);

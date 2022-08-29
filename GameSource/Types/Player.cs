@@ -205,7 +205,9 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            if (!(destroyable is ShPlayer player) || player.svPlayer.godMode || player.IsDead || player.IsShielded(damageIndex, collider)) return true;
+            var player = destroyable.Player;
+
+            if (player.svPlayer.godMode || player.IsDead || player.IsShielded(damageIndex, collider)) return true;
 
             if (damageIndex != DamageIndex.Null)
             {
@@ -317,7 +319,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
-            if (!(destroyable is ShPlayer player)) return true;
+            var player = destroyable.Player;
 
             if (attacker && attacker != player)
             {
@@ -330,9 +332,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.RemoveItemsDeath(false);
             }
 
-            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, player.svPlayer.RespawnTime);
-
-            player.SetStance(StanceIndex.Dead);
+            player.svPlayer.SvShowTimer(player.svPlayer.RespawnTime);
 
             Parent.Death(destroyable, attacker);
 
@@ -506,7 +506,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             ChatHandler.SendToAll($"{target.displayName} Kicked: {reason}");
 
-            player.manager.svManager.KickConnection(target.svPlayer.connection);
+            SvManager.Instance.KickConnection(target.svPlayer.connection);
 
             return true;
         }
@@ -517,7 +517,7 @@ namespace BrokeProtocol.GameSource.Types
             ChatHandler.SendToAll($"{target.displayName} Banned: {reason}");
 
             player.svPlayer.SvBanDatabase(target.username, reason);
-            player.manager.svManager.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
+            SvManager.Instance.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
 
             return true;
         }
@@ -786,7 +786,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Alert(ShPlayer player)
         {
-            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Alert, player.ID);
             if (player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginFollower))
             {
                 pluginFollower.SetFollowState(player);
@@ -815,45 +814,6 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Additive)]
-        public override bool Mount(ShPlayer player, ShMountable mount, byte seat)
-        {
-            player.svPlayer.SvDismount();
-            player.Mount(mount, seat);
-            player.SetStance(mount.seats[seat].stanceIndex);
-
-            if (!player.isHuman)
-            {
-                player.svPlayer.ResetAI();
-            }
-
-            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.CurrentClip);
-
-            return true;
-        }
-
-        [Execution(ExecutionMode.Additive)]
-        public override bool Dismount(ShPlayer player)
-        {
-            if (player.IsDriving)
-            {
-                // Send serverside transport position to override client-side predicted location while it was driven
-                player.curMount.svMountable.SvRepositionSelf();
-            }
-
-            player.SetStance(StanceIndex.Stand);
-            player.Dismount();
-
-            // Start locking behavior after exiting vehicle
-            if (player.curEquipable.ThrownHasGuidance)
-            {
-                player.svPlayer.StartLocking(player.curEquipable);
-            }
-
-            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
-
-            return true;
-        }
 
         [Execution(ExecutionMode.Additive)]
         public override bool PlaceItem(ShPlayer player, ShEntity placeableEntity, Vector3 position, Quaternion rotation, float spawnDelay)
