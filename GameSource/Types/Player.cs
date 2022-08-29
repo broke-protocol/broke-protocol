@@ -355,6 +355,12 @@ namespace BrokeProtocol.GameSource.Types
 
             Parent.Respawn(player);
 
+            if (player.isHuman)
+            {
+                // Back to spectate self on Respawn
+                player.svPlayer.SvSpectate(player);
+            }
+
             player.svPlayer.SvForceEquipable(player.Hands.index);
 
             return true;

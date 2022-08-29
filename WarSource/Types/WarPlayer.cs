@@ -97,16 +97,24 @@ namespace BrokeProtocol.WarSource.Types
         {
             if (WarManager.pluginPlayers.TryGetValue(entity, out var warSourcePlayer))
             {
+                var player = entity.Player;
+
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
                 if (Utility.GetSpawn(territoryIndex, out var position, out var rotation, out var place))
                 {
-                    entity.svEntity.originalPosition = position;
-                    entity.svEntity.originalRotation = rotation;
-                    entity.svEntity.originalParent = place.mTransform;
+                    player.svEntity.originalPosition = position;
+                    player.svEntity.originalRotation = rotation;
+                    player.svEntity.originalParent = place.mTransform;
                 }
 
                 Parent.Respawn(entity);
+
+                if (player.isHuman)
+                {
+                    // Back to spectate self on Respawn
+                    player.svPlayer.SvSpectate(player);
+                }
             }
 
             return true;
