@@ -43,13 +43,14 @@ namespace BrokeProtocol.WarSource.Types
         public override bool Spawn(ShEntity entity)
         {
             Parent.Spawn(entity);
-            var player = entity as ShPlayer;
+            var player = entity.Player;
             if (SvManager.Instance.connections.TryGetValue(player.svPlayer.connection, out var connectData) &&
                 connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) &&
                 connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
             {
                 player.svPlayer.SvSetJob(BPAPI.Jobs[teamIndex], true, false);
             }
+            player.svPlayer.Restock();
             player.svPlayer.SetBestEquipable();
             return true;
         }

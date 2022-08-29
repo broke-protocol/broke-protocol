@@ -3,11 +3,42 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using UnityEngine;
+using System.Collections;
 
 namespace BrokeProtocol.GameSource.Types
 {
     public class Entity : EntityEvents
     {
+        public override bool Spawn(ShEntity entity)
+        {
+            var svEntity = entity.svEntity;
+
+            if (!svEntity.respawnable)
+            {
+                if (svEntity.destroyAfter > 0f)
+                {
+                    svEntity.StartDestroyDelay(svEntity.destroyAfter);
+                }
+                else if (!entity.InApartment)
+                {
+                    svEntity.StartDestroyDelay(60f * 60f * 2f);
+                }
+            }
+            else if (!entity.isHuman && entity.HasInventory) entity.StartCoroutine(RestockItems(entity));
+
+            return true;
+        }
+
+        public IEnumerator RestockItems(ShEntity entity)
+        {
+            var delay = new WaitForSeconds(60f);
+            while (true)
+            {
+                yield return delay;
+                entity.svEntity.Restock(0.1f);
+            }
+        }
+
         public override bool MissileAlert(ShEntity entity, ShThrown missile)
         {
             const float alertDelay = 1f;
