@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.WarSource
 {
-    public static class Utility
+    public static class WarUtility
     {
         public static bool GetSpawn(int territoryIndex, out Vector3 position, out Quaternion rotation, out Place place)
         {

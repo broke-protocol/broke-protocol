@@ -51,7 +51,7 @@ namespace BrokeProtocol.WarSource.Types
             var options = new List<LabelID>();
             foreach (var territoryIndex in WarPlayer.GetTerritories(player.svPlayer.spawnJobIndex))
             {
-                var locationName = Utility.GetTerritoryName(territoryIndex);
+                var locationName = WarUtility.GetTerritoryName(territoryIndex);
 
                 options.Add(new LabelID(locationName, territoryIndex.ToString()));
             }
@@ -84,7 +84,7 @@ namespace BrokeProtocol.WarSource.Types
             sb.AppendLine("Current Spawn:");
             if(warPlayer.spawnTerritoryIndex >= 0)
             {
-                sb.AppendLine(Utility.GetTerritoryName(warPlayer.spawnTerritoryIndex));
+                sb.AppendLine(WarUtility.GetTerritoryName(warPlayer.spawnTerritoryIndex));
             }
             else
             {

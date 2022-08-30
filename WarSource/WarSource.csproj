@@ -82,9 +82,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Utility.cs" />
+    <Compile Include="WarUtility.cs" />
     <Compile Include="WarCore.cs" />
-    <Compile Include="Jobs.cs" />
+    <Compile Include="WarJobs.cs" />
     <Compile Include="Types\WarManager.cs" />
     <Compile Include="Types\WarMovable.cs" />
     <Compile Include="Types\WarPlayer.cs" />

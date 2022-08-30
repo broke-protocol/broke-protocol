@@ -82,19 +82,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AI.cs" />
-    <Compile Include="Core.cs" />
-    <Compile Include="ExampleCommand.cs" />
-    <Compile Include="Jobs.cs" />
+    <Compile Include="LifeAI.cs" />
+    <Compile Include="LifeCore.cs" />
+    <Compile Include="LifeCommands.cs" />
+    <Compile Include="LifeJobs.cs" />
     <Compile Include="Types\LifeEntity.cs" />
     <Compile Include="Types\LifeManager.cs" />
     <Compile Include="Types\LifeDestroyable.cs" />
     <Compile Include="Types\LifeMountable.cs" />
     <Compile Include="Types\LifeMovable.cs" />
-    <Compile Include="CustomEvents.cs" />
+    <Compile Include="LifeEvents.cs" />
     <Compile Include="Types\LifePhysical.cs" />
     <Compile Include="Types\LifePlayer.cs" />
-    <Compile Include="Utility.cs" />
+    <Compile Include="LifeUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

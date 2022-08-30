@@ -102,7 +102,7 @@ namespace BrokeProtocol.WarSource.Types
 
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
-                if (Utility.GetSpawn(territoryIndex, out var position, out var rotation, out var place))
+                if (WarUtility.GetSpawn(territoryIndex, out var position, out var rotation, out var place))
                 {
                     player.svEntity.originalPosition = position;
                     player.svEntity.originalRotation = rotation;

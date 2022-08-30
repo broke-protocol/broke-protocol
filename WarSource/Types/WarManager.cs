@@ -348,7 +348,7 @@ namespace BrokeProtocol.WarSource.Types
                     var territories = WarPlayer.GetTerritories(teamIndex);
 
                     if (territories.Count() > 0 &&
-                        Utility.GetSpawn(territories.GetRandom(), out var position, out var rotation, out var place))
+                        WarUtility.GetSpawn(territories.GetRandom(), out var position, out var rotation, out var place))
                     {
                         SvManager.Instance.AddNewPlayer(skinPrefabs[teamIndex][connectData.skinIndex], connectData, playerData?.Persistent, position, rotation, place.mTransform, teamIndex);
                     }
