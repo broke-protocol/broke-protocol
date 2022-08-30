@@ -86,14 +86,14 @@
     <Compile Include="Core.cs" />
     <Compile Include="ExampleCommand.cs" />
     <Compile Include="Jobs.cs" />
-    <Compile Include="Types\Entity.cs" />
-    <Compile Include="Types\Manager.cs" />
-    <Compile Include="Types\Destroyable.cs" />
-    <Compile Include="Types\Mountable.cs" />
-    <Compile Include="Types\Movable.cs" />
+    <Compile Include="Types\LifeEntity.cs" />
+    <Compile Include="Types\LifeManager.cs" />
+    <Compile Include="Types\LifeDestroyable.cs" />
+    <Compile Include="Types\LifeMountable.cs" />
+    <Compile Include="Types\LifeMovable.cs" />
     <Compile Include="CustomEvents.cs" />
-    <Compile Include="Types\Physical.cs" />
-    <Compile Include="Types\Player.cs" />
+    <Compile Include="Types\LifePhysical.cs" />
+    <Compile Include="Types\LifePlayer.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,9 +5,9 @@ using System;
 
 namespace BrokeProtocol.CustomEvents
 {
-    public class ExampleCommand : IScript
+    public class LifeCommands : IScript
     {
-        public ExampleCommand()
+        public LifeCommands()
         {
             CommandHandler.RegisterCommand("ClearCrimes", new Action<ShPlayer, ShPlayer>(ClearCrimes), null, "example.clearcrimes");
         }

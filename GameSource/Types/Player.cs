@@ -707,17 +707,17 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool TextPanelButton(ShPlayer player, string menuID, string optionID)
         {
-            if (menuID.StartsWith(ExampleCommand.coinFlip))
+            if (menuID.StartsWith(Commands.coinFlip))
             {
                 switch (optionID)
                 {
-                    case ExampleCommand.heads:
-                        player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.heads, menuID));
+                    case Commands.heads:
+                        player.StartCoroutine(DelayCoinFlip(player, Commands.heads, menuID));
                         break;
-                    case ExampleCommand.tails:
-                        player.StartCoroutine(DelayCoinFlip(player, ExampleCommand.tails, menuID));
+                    case Commands.tails:
+                        player.StartCoroutine(DelayCoinFlip(player, Commands.tails, menuID));
                         break;
-                    case ExampleCommand.cancel:
+                    case Commands.cancel:
                         player.svPlayer.DestroyTextPanel(menuID);
                         break;
                 }
@@ -740,7 +740,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else
             {
-                var coin = Random.value >= 0.5f ? ExampleCommand.heads : ExampleCommand.tails;
+                var coin = Random.value >= 0.5f ? Commands.heads : Commands.tails;
 
                 if (coin == prediction)
                 {

@@ -5,14 +5,14 @@ using System;
 
 namespace BrokeProtocol.CustomEvents
 {
-    public class ExampleCommand : IScript
+    public class Commands : IScript
     {
         public const string coinFlip = "coinflip";
         public const string heads = "heads";
         public const string tails = "tails";
         public const string cancel = "cancel";
 
-        public ExampleCommand()
+        public Commands()
         {
             CommandHandler.RegisterCommand("Example", new Action<ShPlayer, ShPlayer, byte, int, float, string, string>(Command1), (player, command) =>
             {
