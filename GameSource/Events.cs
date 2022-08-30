@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.CustomEvents
 {
-    public class CustomEvents : IScript
+    public class Events : IScript
     {
         [CustomTarget]
         public void GetItemValue(ShPlayer player, ShItem item)
