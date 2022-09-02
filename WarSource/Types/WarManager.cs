@@ -6,8 +6,10 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -144,6 +146,69 @@ namespace BrokeProtocol.WarSource.Types
 
         public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
 
+        public static List<List<ClassInfo>> classes;
+
+        private List<ClassInfo>[] GetClasses => new List<ClassInfo>[] {
+            new List<ClassInfo>
+            {
+                new ClassInfo("Rifleman", new InventoryStruct[] {
+                    new InventoryStruct("M4", 1),
+                    new InventoryStruct("AmmoRifle", 150),
+                }),
+                new ClassInfo("Officer", new InventoryStruct[] {
+                    new InventoryStruct("MP5SD", 1),
+                    new InventoryStruct("AmmoSMG", 150),
+                }),
+                new ClassInfo("Sniper", new InventoryStruct[] {
+                    new InventoryStruct("Winchester", 1),
+                    new InventoryStruct("AmmoRifle", 80),
+                }),
+                new ClassInfo("Support", new InventoryStruct[] {
+                    new InventoryStruct("MachineGun", 1),
+                    new InventoryStruct("AmmoMG", 250),
+                }),
+                new ClassInfo("Medic", new InventoryStruct[] {
+                    new InventoryStruct("Mac", 1),
+                    new InventoryStruct("AmmoSMG", 150),
+                }),
+                new ClassInfo("Anti-Tank", new InventoryStruct[] {
+                    new InventoryStruct("Springfield", 1),
+                    new InventoryStruct("AmmoRifle", 80),
+                }),
+            },
+            new List<ClassInfo>
+            {
+                new ClassInfo("Rifleman", new InventoryStruct[] {
+                    new InventoryStruct("AK47", 1),
+                    new InventoryStruct("AmmoRifle", 150),
+                }),
+                new ClassInfo("Officer", new InventoryStruct[] {
+                    new InventoryStruct("P90", 1),
+                    new InventoryStruct("AmmoSMG", 150),
+                }),
+                new ClassInfo("Sniper", new InventoryStruct[] {
+                    new InventoryStruct("Winchester", 1),
+                    new InventoryStruct("AmmoRifle", 80),
+                }),
+                new ClassInfo("Support", new InventoryStruct[] {
+                    new InventoryStruct("PKM", 1),
+                    new InventoryStruct("AmmoMG", 250),
+                }),
+                new ClassInfo("Medic", new InventoryStruct[] {
+                    new InventoryStruct("Mac", 1),
+                    new InventoryStruct("AmmoSMG", 150),
+                    new InventoryStruct("Defibrillator", 1),
+                    new InventoryStruct("MedicBox", 5),
+                }),
+                new ClassInfo("Anti-Tank", new InventoryStruct[] {
+                    new InventoryStruct("Springfield", 1),
+                    new InventoryStruct("AmmoRifle", 80),
+                    new InventoryStruct("Bazooka", 1),
+                    new InventoryStruct("Rocket", 12),
+                }),
+            }
+        };
+
         public void AddBot(ShPlayer prefab, int jobIndex)
         {
             var player = GameObject.Instantiate(prefab, SceneManager.Instance.ExteriorT);
@@ -178,6 +243,15 @@ namespace BrokeProtocol.WarSource.Types
                 SvManager.Instance.ParseFile(ref skins, Paths.AbsolutePath($"skins{i}.txt"));
                 skinPrefabs[i] = skins.ToEntityList<ShPlayer>();
             }
+
+            var classesFilename = "Classes.json";
+
+            if (!File.Exists(classesFilename))
+            {
+                File.WriteAllText(classesFilename, JsonConvert.SerializeObject(GetClasses, Formatting.Indented));
+            }
+
+            classes = JsonConvert.DeserializeObject<List<List<ClassInfo>>>(File.ReadAllText(classesFilename));
 
             for (var i = 0; i < 5; i++)
             {
@@ -367,8 +441,6 @@ namespace BrokeProtocol.WarSource.Types
 
         public readonly List<string> teams = new List<string> { "SpecOps", "OpFor" };
 
-        public readonly List<string> classes = new List<string> { "Rifleman", "Officer", "Sniper", "Support", "Medic", "Anti-Tank" };
-
         public const string selectTeam = "Select Team";
         public const string selectClass = "Select Class";
 
@@ -418,11 +490,11 @@ namespace BrokeProtocol.WarSource.Types
                         case selectTeam:
                             {
                                 var teamIndex = teams.IndexOf(optionID);
-                                if (teamIndex >= 0)
+                                if (teamIndex >= 0 && teamIndex < classes.Count)
                                 {
                                     connectData.customData.AddOrUpdate(teamIndexKey, teamIndex);
                                     var options = new List<LabelID>();
-                                    foreach (var c in classes) options.Add(new LabelID(c, c));
+                                    foreach (var c in classes[teamIndex]) options.Add(new LabelID(c.className, c.className));
                                     var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
                                     SvManager.Instance.DestroyMenu(connectData.connection, selectTeam);
                                     SvManager.Instance.SendOptionMenu(connectData.connection, selectClass, 0, selectClass, options.ToArray(), actions);
@@ -432,13 +504,20 @@ namespace BrokeProtocol.WarSource.Types
 
                         case selectClass:
                             {
-                                var classIndex = classes.IndexOf(optionID);
-                                if (classIndex >= 0 && connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex))
+                                if (connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex))
                                 {
-                                    connectData.customData.AddOrUpdate(classIndexKey, classIndex);
-
-                                    SvManager.Instance.DestroyMenu(connectData.connection, selectClass);
-                                    SvManager.Instance.SendRegisterMenu(connectData.connection, false, skinPrefabs[teamIndex]);
+                                    int classIndex = 0;
+                                    foreach(var c in classes[teamIndex])
+                                    {
+                                        if(c.className == optionID)
+                                        {
+                                            connectData.customData.AddOrUpdate(classIndexKey, classIndex);
+                                            SvManager.Instance.DestroyMenu(connectData.connection, selectClass);
+                                            SvManager.Instance.SendRegisterMenu(connectData.connection, false, skinPrefabs[teamIndex]);
+                                            break;
+                                        }
+                                        classIndex++;
+                                    }
                                 }
                             }
                             break;

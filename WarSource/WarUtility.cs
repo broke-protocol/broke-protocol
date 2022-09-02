@@ -1,9 +1,22 @@
 ﻿using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Utility;
+using BrokeProtocol.Required;
 using UnityEngine;
 
 namespace BrokeProtocol.WarSource
 {
+    public class ClassInfo
+    {
+        public readonly string className;
+        public readonly InventoryStruct[] equipment;
+
+        public ClassInfo(string className, InventoryStruct[] equipment)
+        {
+            this.className = className;
+            this.equipment = equipment;
+        }
+    }
+
     public static class WarUtility
     {
         public static bool GetSpawn(int territoryIndex, out Vector3 position, out Quaternion rotation, out Place place)

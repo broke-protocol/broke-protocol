@@ -2,6 +2,7 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
+using BrokeProtocol.Utility;
 using System.Collections.Generic;
 
 namespace BrokeProtocol.WarSource.Types
@@ -49,8 +50,18 @@ namespace BrokeProtocol.WarSource.Types
                 connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
             {
                 player.svPlayer.SvSetJob(BPAPI.Jobs[teamIndex], true, false);
+
+                foreach (var i in WarManager.classes[teamIndex][classIndex].equipment)
+                {
+                    if (SceneManager.Instance.TryGetEntity<ShItem>(i.itemName, out var item))
+                    {
+                        var count = i.count - player.MyItemCount(item);
+                        if (i.count > 0)
+                            player.TransferItem(DeltaInv.AddToMe, item, count);
+                    }
+                }
             }
-            player.svPlayer.Restock();
+            
             player.svPlayer.SetBestEquipable();
             return true;
         }
@@ -116,6 +127,9 @@ namespace BrokeProtocol.WarSource.Types
                     // Back to spectate self on Respawn
                     player.svPlayer.SvSpectate(player);
                 }
+
+                player.svPlayer.Restock();
+                player.svPlayer.SetBestEquipable();
             }
 
             return true;
