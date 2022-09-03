@@ -295,23 +295,6 @@ namespace BrokeProtocol.GameSource.AI
         }
     }
 
-    public class PullOverState : TimedState
-    {
-        public override float RunTime => 3f;
-
-        public override void EnterState()
-        {
-            player.TrySetInput(0f, 0f, -0.5f);
-            base.EnterState();
-        }
-
-        public override void ExitState()
-        {
-            base.ExitState();
-            player.ZeroInputs();
-        }
-    }
-
     public abstract class MovingState : State
     {
         private bool jumped;

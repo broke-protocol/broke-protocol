@@ -7,6 +7,7 @@ using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
 using Newtonsoft.Json;
+using Pathfinding.RVO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -572,9 +573,9 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         var otherDriver = otherTransport.controller;
                         if (otherDriver && !otherDriver.isHuman && !otherDriver.svPlayer.targetEntity &&
-                            otherDriver.svPlayer.currentState.index != Core.PullOver.index)
+                            otherDriver.svPlayer.currentState.index != LifeCore.PullOver.index)
                         {
-                            otherDriver.svPlayer.SetState(Core.PullOver.index);
+                            otherDriver.svPlayer.SetState(LifeCore.PullOver.index);
                         }
                     }
                 }
@@ -1127,6 +1128,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
+        [Execution(ExecutionMode.Additive)]
         public override bool SetParent(ShEntity entity, Transform parent)
         {
             Parent.SetParent(entity, parent);

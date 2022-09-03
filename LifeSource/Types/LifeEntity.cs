@@ -23,7 +23,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-
+        [Execution(ExecutionMode.Additive)]
         public override bool Destroy(ShEntity entity)
         {
             if (entity.svEntity.randomSpawn)
@@ -40,6 +40,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
+        [Execution(ExecutionMode.Additive)]
         public override bool SameSector(ShEntity e)
         {
             if (e.svEntity.randomSpawn && e.svEntity.spectators.Count == 0 && (!e.Player || !e.Player.svPlayer.currentState.IsBusy) && !e.svEntity.sector.HumanControlled())

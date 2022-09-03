@@ -13,7 +13,6 @@ namespace BrokeProtocol.GameSource
         public static State Wait;
         public static State AirAttack;
         public static State Unstuck;
-        public static State PullOver;
         public static State GoTo;
         public static State Waypoint;
         public static State Flee;
@@ -40,7 +39,6 @@ namespace BrokeProtocol.GameSource
             Wait = new WaitState();
             AirAttack = new AirAttackState();
             Unstuck = new UnstuckState();
-            PullOver = new PullOverState();
             GoTo = new GoToState();
             Waypoint = new WaypointState();
             Flee = new FleeState();
@@ -61,7 +59,6 @@ namespace BrokeProtocol.GameSource
                 Wait,
                 AirAttack,
                 Unstuck,
-                PullOver,
                 GoTo,
                 Waypoint,
                 Flee,

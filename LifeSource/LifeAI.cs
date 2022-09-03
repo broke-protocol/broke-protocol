@@ -1,5 +1,6 @@
 ﻿using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.AI;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -68,6 +69,23 @@ namespace BrokeProtocol.GameSource.AI
             base.ExitState();
 
             if (player.pointing) player.svPlayer.SvPoint(false);
+        }
+    }
+
+    public class PullOverState : TimedState
+    {
+        public override float RunTime => 3f;
+
+        public override void EnterState()
+        {
+            player.TrySetInput(0f, 0f, -0.5f);
+            base.EnterState();
+        }
+
+        public override void ExitState()
+        {
+            base.ExitState();
+            player.ZeroInputs();
         }
     }
 }
