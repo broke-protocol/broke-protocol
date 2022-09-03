@@ -75,7 +75,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Additive)]
-        public override bool TryLogin(ConnectionData connectData)
+        public override bool TryLogin(ConnectData connectData)
         {
             if (ValidateUser(connectData))
             {
@@ -97,7 +97,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Additive)]
-        public override bool TryRegister(ConnectionData connectData)
+        public override bool TryRegister(ConnectData connectData)
         {
             if (ValidateUser(connectData))
             {
@@ -145,13 +145,13 @@ namespace BrokeProtocol.GameSource.Types
 
 
         [Execution(ExecutionMode.Additive)]
-        public override bool PlayerLoaded(ConnectionData connectData)
+        public override bool PlayerLoaded(ConnectData connectData)
         {
             SvManager.Instance.SendRegisterMenu(connectData.connection, true, skinPrefabs);
             return true;
         }
 
-        private bool ValidateUser(ConnectionData connectData)
+        private bool ValidateUser(ConnectData connectData)
         {
             if (!SvManager.Instance.HandleWhitelist(connectData.username))
             {

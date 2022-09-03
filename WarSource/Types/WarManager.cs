@@ -170,10 +170,14 @@ namespace BrokeProtocol.WarSource.Types
                 new ClassInfo("Medic", new InventoryStruct[] {
                     new InventoryStruct("Mac", 1),
                     new InventoryStruct("AmmoSMG", 150),
+                    new InventoryStruct("Defibrillator", 1),
+                    new InventoryStruct("MedicBox", 5),
                 }),
                 new ClassInfo("Anti-Tank", new InventoryStruct[] {
                     new InventoryStruct("Springfield", 1),
                     new InventoryStruct("AmmoRifle", 80),
+                    new InventoryStruct("Bazooka", 1),
+                    new InventoryStruct("Rocket", 12),
                 }),
             },
             new List<ClassInfo>
@@ -389,7 +393,7 @@ namespace BrokeProtocol.WarSource.Types
         }
 
         [Execution(ExecutionMode.Override)]
-        public override bool TryLogin(ConnectionData connectData)
+        public override bool TryLogin(ConnectData connectData)
         {
             // Logins disabled here
             SvManager.Instance.Disconnect(connectData.connection, DisconnectTypes.ClientIssue);
@@ -398,7 +402,7 @@ namespace BrokeProtocol.WarSource.Types
 
 
         [Execution(ExecutionMode.Override)]
-        public override bool TryRegister(ConnectionData connectData)
+        public override bool TryRegister(ConnectData connectData)
         {
             if (ValidateUser(connectData))
             {
@@ -439,23 +443,35 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
-        public readonly List<string> teams = new List<string> { "SpecOps", "OpFor" };
+        public static readonly List<string> teams = new List<string> { "SpecOps", "OpFor" };
 
         public const string selectTeam = "Select Team";
         public const string selectClass = "Select Class";
 
         [Execution(ExecutionMode.Override)]
-        public override bool PlayerLoaded(ConnectionData connectData)
+        public override bool PlayerLoaded(ConnectData connectData)
         {
-            var options = new List<LabelID>();
-            foreach (var c in teams) options.Add(new LabelID(c, c));
-            var actions = new LabelID[] { new LabelID(selectTeam, selectTeam)};
-
-            SvManager.Instance.SendOptionMenu(connectData.connection, selectTeam, 0, selectTeam, options.ToArray(), actions);
+            SendTeamSelectMenu(connectData.connection);
             return true;
         }
 
-        private bool ValidateUser(ConnectionData connectData)
+        public static void SendTeamSelectMenu(ENet.Peer connection)
+        {
+            var options = new List<LabelID>();
+            foreach (var c in teams) options.Add(new LabelID(c, c));
+            var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
+            SvManager.Instance.SendOptionMenu(connection, selectTeam, 0, selectTeam, options.ToArray(), actions);
+        }
+
+        public static void SendClassSelectMenu(ENet.Peer connection, int teamIndex)
+        {
+            var options = new List<LabelID>();
+            foreach (var c in classes[teamIndex]) options.Add(new LabelID(c.className, c.className));
+            var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
+            SvManager.Instance.SendOptionMenu(connection, selectClass, 0, selectClass, options.ToArray(), actions);
+        }
+
+        private bool ValidateUser(ConnectData connectData)
         {
             if (!SvManager.Instance.HandleWhitelist(connectData.username))
             {
@@ -478,7 +494,7 @@ namespace BrokeProtocol.WarSource.Types
 
         // Read packet data from Buffers.reader
         [Execution(ExecutionMode.Additive)]
-        public override bool CustomPacket(ConnectionData connectData, SvPacket packet)
+        public override bool CustomPacket(ConnectData connectData, SvPacket packet)
         {
             switch(packet)
             {
@@ -493,11 +509,8 @@ namespace BrokeProtocol.WarSource.Types
                                 if (teamIndex >= 0 && teamIndex < classes.Count)
                                 {
                                     connectData.customData.AddOrUpdate(teamIndexKey, teamIndex);
-                                    var options = new List<LabelID>();
-                                    foreach (var c in classes[teamIndex]) options.Add(new LabelID(c.className, c.className));
-                                    var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
                                     SvManager.Instance.DestroyMenu(connectData.connection, selectTeam);
-                                    SvManager.Instance.SendOptionMenu(connectData.connection, selectClass, 0, selectClass, options.ToArray(), actions);
+                                    SendClassSelectMenu(connectData.connection, teamIndex);
                                 }
                             }
                             break;

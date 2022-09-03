@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
+using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
@@ -42,7 +43,7 @@ namespace BrokeProtocol.WarSource.Types
         {
             Parent.Death(destroyable, attacker);
 
-            destroyable.StartCoroutine(DeathLoop(destroyable));
+            ShManager.Instance.StartCoroutine(DeathLoop(destroyable));
             return true;
         }
 
@@ -122,7 +123,7 @@ namespace BrokeProtocol.WarSource.Types
                 yield return null;
             }
 
-            if (destroyable.Player)
+            if (destroyable && destroyable.Player)
             {
                 destroyable.Player.svPlayer.DestroyTextPanel(WarPlayer.spawnMenuID);
             }

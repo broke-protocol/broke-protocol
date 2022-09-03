@@ -86,6 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WarCommands.cs" />
     <Compile Include="WarUtility.cs" />
     <Compile Include="WarCore.cs" />
     <Compile Include="WarJobs.cs" />

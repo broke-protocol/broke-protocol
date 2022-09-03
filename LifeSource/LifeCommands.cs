@@ -9,7 +9,7 @@ namespace BrokeProtocol.CustomEvents
     {
         public LifeCommands()
         {
-            CommandHandler.RegisterCommand("ClearCrimes", new Action<ShPlayer, ShPlayer>(ClearCrimes), null, "example.clearcrimes");
+            CommandHandler.RegisterCommand("ClearCrimes", new Action<ShPlayer, ShPlayer>(ClearCrimes));
         }
 
         public void ClearCrimes(ShPlayer player, ShPlayer target = null)

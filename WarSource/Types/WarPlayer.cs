@@ -1,4 +1,5 @@
 ﻿using BrokeProtocol.API;
+using BrokeProtocol.Client.UI;
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
@@ -139,5 +140,47 @@ namespace BrokeProtocol.WarSource.Types
         [Execution(ExecutionMode.Test)]
         public override bool Reward(ShPlayer player, int experienceDelta, int moneyDelta) => 
             experienceDelta >= 0;
+
+
+
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool OptionAction(ShPlayer player, int targetID, string id, string optionID, string actionID)
+        {
+            switch (id)
+            {
+                case WarManager.selectTeam:
+                    {
+                        var teamIndex = WarManager.teams.IndexOf(optionID);
+                        if (teamIndex >= 0 && teamIndex < WarManager.classes.Count)
+                        {
+                            player.svPlayer.connectData.customData.AddOrUpdate(WarManager.teamIndexKey, teamIndex);
+                            player.svPlayer.DestroyMenu(WarManager.selectTeam);
+                            WarManager.SendClassSelectMenu(player.svPlayer.connection, teamIndex);
+                        }
+                    }
+                    break;
+
+                case WarManager.selectClass:
+                    {
+                        if (player.svPlayer.connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex))
+                        {
+                            int classIndex = 0;
+                            foreach (var c in WarManager.classes[teamIndex])
+                            {
+                                if (c.className == optionID)
+                                {
+                                    player.svPlayer.connectData.customData.AddOrUpdate(WarManager.classIndexKey, classIndex);
+                                    player.svPlayer.DestroyMenu(WarManager.selectClass);
+                                    break;
+                                }
+                                classIndex++;
+                            }
+                        }
+                    }
+                    break;
+            }
+            return true;
+        }
     }
 }

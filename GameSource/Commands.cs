@@ -25,11 +25,11 @@ namespace BrokeProtocol.CustomEvents
                 return true;
             });
 
-            CommandHandler.RegisterCommand("ExampleInt", new Action<ShPlayer, int>(Command2), null, "example.int");
-            CommandHandler.RegisterCommand("ExampleString", new Action<ShPlayer, string>(Command3), null, "example.string");
-            CommandHandler.RegisterCommand("ExamplePlayer", new Action<ShPlayer, ShPlayer>(Command4), null, "example.player");
-            CommandHandler.RegisterCommand("ExampleDiscord", new Action<ShPlayer>(Command5), null, "example.discord");
-            CommandHandler.RegisterCommand("CoinFlip", new Action<ShPlayer>(CoinFlip), null, "example.coinflip");
+            CommandHandler.RegisterCommand("ExampleInt", new Action<ShPlayer, int>(Command2));
+            CommandHandler.RegisterCommand("ExampleString", new Action<ShPlayer, string>(Command3));
+            CommandHandler.RegisterCommand("ExamplePlayer", new Action<ShPlayer, ShPlayer>(Command4));
+            CommandHandler.RegisterCommand("ExampleDiscord", new Action<ShPlayer>(Command5));
+            CommandHandler.RegisterCommand("CoinFlip", new Action<ShPlayer>(CoinFlip));
         }
 
         // Any optional parameters here will be optional with in-game commands too
