@@ -288,7 +288,7 @@ namespace BrokeProtocol.WarSource.Types
                             }
                         }
 
-                        ChatHandler.SendAlertToAll($"{BPAPI.Jobs[winner].shared.jobName} have won the battle", 1f);
+                        InterfaceHandler.SendTextToAll($"{BPAPI.Jobs[winner].shared.jobName} have won the battle", 1f, new Vector2(0.5f, 0.75f));
 
                         ResetGame();
                         break;
@@ -306,7 +306,7 @@ namespace BrokeProtocol.WarSource.Types
                         Append("</color>: ").
                         AppendLine(((int)team.Value).ToString());
                 }
-                ChatHandler.SendTextPanelToAll(sb.ToString(), "WarPlugin");
+                InterfaceHandler.SendTextPanelToAll(sb.ToString(), "WarPlugin");
 
                 yield return delay;
             }

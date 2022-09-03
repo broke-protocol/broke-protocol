@@ -126,7 +126,7 @@ namespace BrokeProtocol.CustomEvents
                 {
                     pluginPlayer.AddCrime(CrimeIndex.PrisonBreak, null);
                     player.svPlayer.SvResetJob();
-                    player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.DestroyTimer);
+                    player.svPlayer.DestroyText();
                 }
             }
         }

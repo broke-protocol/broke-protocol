@@ -332,7 +332,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.RemoveItemsDeath(false);
             }
 
-            player.svPlayer.SvShowTimer(player.svPlayer.RespawnTime);
+            player.svPlayer.SendTimer(player.svPlayer.RespawnTime, new Vector2(0.5f, 0.15f));
 
             Parent.Death(destroyable, attacker);
 
@@ -459,7 +459,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.bomb.index);
 
-            player.svPlayer.SvShowTimer(vault.svVault.bombTimer);
+            player.svPlayer.SendTimer(vault.svVault.bombTimer, new Vector2(0.5f, 0.15f));
 
             vault.svVault.SvSetVault(VaultState.Bombing);
             vault.svVault.instigator = player;
@@ -504,7 +504,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Kick(ShPlayer player, ShPlayer target, string reason)
         {
-            ChatHandler.SendToAll($"{target.displayName} Kicked: {reason}");
+            InterfaceHandler.SendGameMessageToAll($"{target.displayName} Kicked: {reason}");
 
             SvManager.Instance.KickConnection(target.svPlayer.connection);
 
@@ -514,7 +514,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Ban(ShPlayer player, ShPlayer target, string reason)
         {
-            ChatHandler.SendToAll($"{target.displayName} Banned: {reason}");
+            InterfaceHandler.SendGameMessageToAll($"{target.displayName} Banned: {reason}");
 
             player.svPlayer.SvBanDatabase(target.username, reason);
             SvManager.Instance.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);

@@ -272,7 +272,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 player.svPlayer.Reward(3, 1000);
                 bounties.Remove(victim.username);
-                ChatHandler.SendToAll($"{player.username} assassinated {victim.username}");
+                InterfaceHandler.SendGameMessageToAll($"{player.username} assassinated {victim.username}");
 
                 if (victim == aiTarget) aiTarget = null;
             }
@@ -385,7 +385,7 @@ namespace BrokeProtocol.GameSource.Jobs
         public void AddBounty(string bountyName)
         {
             bounties[bountyName] = Util.CurrentTime;
-            ChatHandler.SendToAll("Bounty Placed on " + bountyName);
+            InterfaceHandler.SendGameMessageToAll("Bounty Placed on " + bountyName);
         }
 
         public void CancelBounty(int sourceID, string bountyName)
@@ -408,7 +408,7 @@ namespace BrokeProtocol.GameSource.Jobs
             else
             {
                 bounties.Remove(bountyName);
-                ChatHandler.SendToAll("Bounty Canceled on " + bountyName);
+                InterfaceHandler.SendGameMessageToAll("Bounty Canceled on " + bountyName);
                 requester.TransferMoney(DeltaInv.RemoveFromMe, cancelCost);
                 BountyListAction(requester);
 
@@ -744,7 +744,7 @@ namespace BrokeProtocol.GameSource.Jobs
             player.svPlayer.SvAddDynamicAction(requestItemMenu, "Request Item");
             player.svPlayer.SvAddSelfAction(requestListMenu, "Request List");
 
-            if (player.isHuman) ChatHandler.SendToAll("New Mayor: " + player.username);
+            if (player.isHuman) InterfaceHandler.SendGameMessageToAll("New Mayor: " + player.username);
             base.SetJob();
         }
 
@@ -753,7 +753,7 @@ namespace BrokeProtocol.GameSource.Jobs
             player.svPlayer.SvRemoveDynamicAction(requestItemMenu);
             player.svPlayer.SvRemoveSelfAction(requestListMenu);
 
-            if (player.isHuman) ChatHandler.SendToAll("Mayor Left: " + player.username);
+            if (player.isHuman) InterfaceHandler.SendGameMessageToAll("Mayor Left: " + player.username);
             base.RemoveJob();
         }
 
@@ -1084,7 +1084,7 @@ namespace BrokeProtocol.GameSource.Jobs
                     player.TransferItem(DeltaInv.RemoveFromMe, deliveryItem);
                 }
                 deliveryItem = null;
-                player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.DestroyTimer);
+                player.svPlayer.DestroyText();
             }
 
             base.ResetTarget();
@@ -1175,8 +1175,7 @@ namespace BrokeProtocol.GameSource.Jobs
             {
                 destinationMarker.Destroy();
                 destinationMarker = null;
-
-                player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.DestroyTimer);
+                player.svPlayer.DestroyText();
             }
 
             base.ResetTarget();
@@ -1387,7 +1386,7 @@ namespace BrokeProtocol.GameSource.Jobs
                 collectedItems = null;
             }
 
-            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.DestroyTimer);
+            player.svPlayer.DestroyText();
             stage = Stage.NotSet;
             base.ResetTarget();
         }

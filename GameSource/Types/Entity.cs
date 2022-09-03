@@ -9,6 +9,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Entity : EntityEvents
     {
+        [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
             var svEntity = entity.svEntity;
@@ -39,7 +40,8 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        public override bool MissileAlert(ShEntity entity, ShThrown missile)
+        [Execution(ExecutionMode.Additive)]
+        public override bool MissileLocked(ShEntity entity, ShThrown missile)
         {
             const float alertDelay = 1f;
             var controller = entity.Controller;
@@ -51,7 +53,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (controller.isHuman)
                 {
-                    controller.svPlayer.SvShowAlert("&cMISSILE LOCKED", alertDelay);
+                    controller.svPlayer.SendText("&cMISSILE LOCKED", alertDelay, new Vector2(0.5f, 0.75f));
                 }
                 else if (controller.IsMountArmed)
                 {

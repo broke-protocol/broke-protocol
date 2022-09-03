@@ -38,7 +38,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public void StartJailTimer(float jailtime)
         {
-            player.svPlayer.SvShowTimer(jailtime);
+            player.svPlayer.SendTimer(jailtime, new Vector2(0.5f, 0.15f));
             player.StartCoroutine(JailTimer(jailtime));
         }
 
@@ -278,7 +278,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.isHuman)
             {
-                player.svPlayer.SvShowAlert("Hands Up!", 2f);
+                player.svPlayer.SendText("Hands Up!", 2f, new Vector2(0.5f, 0.75f));
             }
             else if (!player.svPlayer.currentState.IsBusy)
             {

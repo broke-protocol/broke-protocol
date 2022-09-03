@@ -23,6 +23,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
+
         public override bool Destroy(ShEntity entity)
         {
             if (entity.svEntity.randomSpawn)

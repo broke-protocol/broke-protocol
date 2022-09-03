@@ -219,7 +219,7 @@ namespace BrokeProtocol.GameSource.Types
                 attackerLimit = Mathf.CeilToInt((total - count) * 0.25f);
 
                 var jobs = BPAPI.Jobs;
-                ChatHandler.SendToAll($"{jobs[attackerJob].shared.jobName} Attacking {jobs[startT.ownerIndex].shared.jobName}");
+                InterfaceHandler.SendGameMessageToAll($"{jobs[attackerJob].shared.jobName} Attacking {jobs[startT.ownerIndex].shared.jobName}");
 
                 startT.svTerritory.SvSetTerritory(startT.ownerIndex, attackerJob);
                 startT.StartCoroutine(Defend());
@@ -239,12 +239,12 @@ namespace BrokeProtocol.GameSource.Types
             var jobs = BPAPI.Jobs;
             if (warTerritory.ownerIndex == owner)
             {
-                ChatHandler.SendToAll(
+                InterfaceHandler.SendGameMessageToAll(
                     $"{jobs[owner].shared.jobName} Defended Against {jobs[warTerritory.attackerIndex].shared.jobName}");
             }
             else
             {
-                ChatHandler.SendToAll(
+                InterfaceHandler.SendGameMessageToAll(
                     $"{jobs[owner].shared.jobName} Won Against {jobs[warTerritory.ownerIndex].shared.jobName}");
             }
 
