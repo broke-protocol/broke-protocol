@@ -595,6 +595,10 @@ namespace BrokeProtocol.GameSource.AI
             else player.svPlayer.PathToTarget();
         }
 
+        protected virtual void HandleNearTarget()
+        {
+        }
+
         protected virtual void HandleDistantTarget()
         {
             if (player.svPlayer.TargetMoved()) player.svPlayer.PathToTarget();
@@ -606,7 +610,10 @@ namespace BrokeProtocol.GameSource.AI
             base.UpdateState();
             if (StateChanged) return;
 
-            if (!player.svPlayer.TargetNear) HandleDistantTarget();
+            if (player.svPlayer.TargetNear)
+                HandleNearTarget();
+            else
+                HandleDistantTarget();
         }
     }
 
@@ -746,6 +753,8 @@ namespace BrokeProtocol.GameSource.AI
 
             if (player.CanFireEquipable)
             {
+                player.svPlayer.SvUpdateMode(player.Perlin(0.4f) < 0.4f ? MoveMode.Zoom : StateMoveMode);
+
                 if (projectile)
                 {
                     if (!player.switching)
@@ -778,11 +787,15 @@ namespace BrokeProtocol.GameSource.AI
                     }
 
                     if(player.stances[(int)StanceIndex.Crouch].input > 0f)
-                        player.svPlayer.SvCrouch(player.Perlin(0.1f) < 0.3f);
+                        player.svPlayer.SvCrouch(player.Perlin(0.1f) < 0.35f);
                     
                     if (player.CurrentAmmoTotal == 0)
                         player.svPlayer.SetBestWeapons();
                 }
+            }
+            else
+            {
+                player.svPlayer.SvUpdateMode(StateMoveMode);
             }
         }
 
