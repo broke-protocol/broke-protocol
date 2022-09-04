@@ -40,32 +40,6 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Additive)]
-        public override bool Spawn(ShEntity entity)
-        {
-            Parent.Spawn(entity);
-            var player = entity.Player;
-            if (SvManager.Instance.connections.TryGetValue(player.svPlayer.connectData.connection, out var connectData) &&
-                connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) &&
-                connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
-            {
-                player.svPlayer.SvSetJob(BPAPI.Jobs[teamIndex], true, false);
-
-                foreach (var i in WarManager.classes[teamIndex][classIndex].equipment)
-                {
-                    if (SceneManager.Instance.TryGetEntity<ShItem>(i.itemName, out var item))
-                    {
-                        var count = i.count - player.MyItemCount(item);
-                        if (i.count > 0)
-                            player.TransferItem(DeltaInv.AddToMe, item, count);
-                    }
-                }
-            }
-            
-            player.svPlayer.SetBestEquipable();
-            return true;
-        }
-
         [Execution(ExecutionMode.Override)]
         public override bool RemoveItemsDeath(ShPlayer player, bool dropItems) => true;
 
@@ -113,6 +87,21 @@ namespace BrokeProtocol.WarSource.Types
             if (WarManager.pluginPlayers.TryGetValue(entity, out var warSourcePlayer))
             {
                 var player = entity.Player;
+                if (SvManager.Instance.connections.TryGetValue(player.svPlayer.connectData.connection, out var connectData) &&
+                    connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) &&
+                    connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
+                {
+                    player.svPlayer.SvSetJob(BPAPI.Jobs[teamIndex], true, false);
+
+                    player.svPlayer.defaultItems.Clear();
+                    foreach (var i in WarManager.classes[teamIndex][classIndex].equipment)
+                    {
+                        if (SceneManager.Instance.TryGetEntity<ShItem>(i.itemName, out var item))
+                        {
+                            player.svPlayer.defaultItems.Add(i.itemName.GetPrefabIndex(), new InventoryItem(item, i.count));
+                        }
+                    }
+                }
 
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
