@@ -332,7 +332,10 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.RemoveItemsDeath(false);
             }
 
-            player.svPlayer.SendTimer(player.svPlayer.RespawnTime, new Vector2(0.5f, 0.15f));
+            if (player.isHuman)
+            {
+                player.svPlayer.SendTimer(player.svPlayer.RespawnTime, new Vector2(0.5f, 0.15f));
+            }
 
             Parent.Death(destroyable, attacker);
 
@@ -506,7 +509,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             InterfaceHandler.SendGameMessageToAll($"{target.displayName} Kicked: {reason}");
 
-            SvManager.Instance.KickConnection(target.svPlayer.connection);
+            SvManager.Instance.KickConnection(target.svPlayer.connectData.connection);
 
             return true;
         }
@@ -517,7 +520,7 @@ namespace BrokeProtocol.GameSource.Types
             InterfaceHandler.SendGameMessageToAll($"{target.displayName} Banned: {reason}");
 
             player.svPlayer.SvBanDatabase(target.username, reason);
-            SvManager.Instance.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
+            SvManager.Instance.Disconnect(target.svPlayer.connectData.connection, DisconnectTypes.Banned);
 
             return true;
         }

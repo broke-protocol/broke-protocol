@@ -16,17 +16,16 @@ namespace BrokeProtocol.CustomEvents
 
         public void TeamSelect(ShPlayer player)
         {
-            WarManager.SendTeamSelectMenu(player.svPlayer.connection);
+            WarManager.SendTeamSelectMenu(player.svPlayer.connectData.connection);
         }
 
         public void ClassSelect(ShPlayer player)
         {
-            if(SvManager.Instance.connections.TryGetValue(player.svPlayer.connection, out var connectData) &&
+            if(SvManager.Instance.connections.TryGetValue(player.svPlayer.connectData.connection, out var connectData) &&
                 connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex))
             {
-                WarManager.SendClassSelectMenu(player.svPlayer.connection, teamIndex);
+                WarManager.SendClassSelectMenu(player.svPlayer.connectData.connection, teamIndex);
             }
-            
         }
     }
 }

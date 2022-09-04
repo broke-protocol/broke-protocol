@@ -127,7 +127,6 @@ namespace BrokeProtocol.WarSource.Types
             {
                 destroyable.Player.svPlayer.DestroyTextPanel(WarPlayer.spawnMenuID);
             }
-            
         }
     }
 }
