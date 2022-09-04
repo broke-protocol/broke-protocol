@@ -154,12 +154,17 @@ namespace BrokeProtocol.WarSource.Types
             {
                 case WarManager.selectTeam:
                     {
-                        var teamIndex = WarManager.teams.IndexOf(optionID);
-                        if (teamIndex >= 0 && teamIndex < WarManager.classes.Count)
+                        int teamIndex = 0;
+                        foreach (var c in BPAPI.Jobs)
                         {
-                            player.svPlayer.connectData.customData.AddOrUpdate(WarManager.teamIndexKey, teamIndex);
-                            player.svPlayer.DestroyMenu(WarManager.selectTeam);
-                            WarManager.SendClassSelectMenu(player.svPlayer.connectData.connection, teamIndex);
+                            if (c.shared.jobName == optionID)
+                            {
+                                player.svPlayer.connectData.customData.AddOrUpdate(WarManager.teamIndexKey, teamIndex);
+                                player.svPlayer.DestroyMenu(WarManager.selectTeam);
+                                WarManager.SendClassSelectMenu(player.svPlayer.connectData.connection, teamIndex);
+                                break;
+                            }
+                            teamIndex++;
                         }
                     }
                     break;
