@@ -75,7 +75,7 @@ namespace BrokeProtocol.CustomEvents
         }
 
 
-        bool voidRunning;
+        private bool voidRunning;
         [CustomTarget]
         public void ButtonPush(ShEntity target, ShPlayer caller)
         {

@@ -473,7 +473,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Repair(ShPlayer player, ShTransport transport)
         {
-            if (transport.svTransport.SvHeal(transport.maxStat, player))
+            if (transport.svTransport.HealFull(player))
                 player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.toolkit);
 
             return true;

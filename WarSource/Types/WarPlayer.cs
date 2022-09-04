@@ -67,6 +67,9 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
+        [Execution(ExecutionMode.Override)]
+        public override bool RemoveItemsDeath(ShPlayer player, bool dropItems) => true;
+
         public static IEnumerable<int> GetTerritories(int team)
         {
             var territories = new List<int>();
