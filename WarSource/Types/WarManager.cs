@@ -148,8 +148,8 @@ namespace BrokeProtocol.WarSource.Types
 
         public static List<List<ClassInfo>> classes;
 
-        private List<ClassInfo>[] GetClasses => new List<ClassInfo>[] {
-            new List<ClassInfo>
+        private ClassInfo[][] GetClasses => new ClassInfo[][] {
+            new ClassInfo[]
             {
                 new ClassInfo("Rifleman", new InventoryStruct[] {
                     new InventoryStruct("M4", 1),
@@ -180,7 +180,7 @@ namespace BrokeProtocol.WarSource.Types
                     new InventoryStruct("Rocket", 12),
                 }),
             },
-            new List<ClassInfo>
+            new ClassInfo[]
             {
                 new ClassInfo("Rifleman", new InventoryStruct[] {
                     new InventoryStruct("AK47", 1),
