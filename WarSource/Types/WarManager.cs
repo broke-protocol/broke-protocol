@@ -332,6 +332,7 @@ namespace BrokeProtocol.WarSource.Types
             foreach(var player in EntityCollections.Players)
             {
                 player.svPlayer.HealFull();
+                player.svPlayer.SvClearInjuries();
                 player.svPlayer.Respawn();
             }
         }
