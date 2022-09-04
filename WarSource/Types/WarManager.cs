@@ -444,8 +444,6 @@ namespace BrokeProtocol.WarSource.Types
             return true;
         }
 
-        public static readonly List<string> teams = new List<string> { "SpecOps", "OpFor" };
-
         public const string selectTeam = "Select Team";
         public const string selectClass = "Select Class";
 
@@ -459,7 +457,7 @@ namespace BrokeProtocol.WarSource.Types
         public static void SendTeamSelectMenu(ENet.Peer connection)
         {
             var options = new List<LabelID>();
-            foreach (var c in teams) options.Add(new LabelID(c, c));
+            foreach (var c in BPAPI.Jobs) options.Add(new LabelID(c.shared.jobName, c.shared.jobName));
             var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
             SvManager.Instance.SendOptionMenu(connection, selectTeam, 0, selectTeam, options.ToArray(), actions);
         }
@@ -506,12 +504,17 @@ namespace BrokeProtocol.WarSource.Types
                     {
                         case selectTeam:
                             {
-                                var teamIndex = teams.IndexOf(optionID);
-                                if (teamIndex >= 0 && teamIndex < classes.Count)
+                                int teamIndex = 0;
+                                foreach (var c in BPAPI.Jobs)
                                 {
-                                    connectData.customData.AddOrUpdate(teamIndexKey, teamIndex);
-                                    SvManager.Instance.DestroyMenu(connectData.connection, selectTeam);
-                                    SendClassSelectMenu(connectData.connection, teamIndex);
+                                    if (c.shared.jobName == optionID)
+                                    {
+                                        connectData.customData.AddOrUpdate(teamIndexKey, teamIndex);
+                                        SvManager.Instance.DestroyMenu(connectData.connection, selectTeam);
+                                        SendClassSelectMenu(connectData.connection, teamIndex);
+                                        break;
+                                    }
+                                    teamIndex++;
                                 }
                             }
                             break;
