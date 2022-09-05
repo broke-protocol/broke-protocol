@@ -39,7 +39,10 @@ namespace BrokeProtocol.GameSource.Types
 
         public void StartJailTimer(float jailtime)
         {
-            player.svPlayer.SendTimer(jailtime, new Vector2(0.5f, 0.15f));
+            if (player.isHuman)
+            {
+                player.svPlayer.SendTimer(jailtime, new Vector2(0.5f, 0.15f));
+            }
             player.StartCoroutine(JailTimer(jailtime));
         }
 
