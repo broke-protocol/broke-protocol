@@ -3,7 +3,9 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Utility;
+using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BrokeProtocol.WarSource.Types
 {
@@ -11,6 +13,7 @@ namespace BrokeProtocol.WarSource.Types
     {
         public ShPlayer player;
 
+        public bool teamChangePending;
         public int spawnTerritoryIndex;
 
         public WarSourcePlayer(ShPlayer player)
@@ -91,7 +94,33 @@ namespace BrokeProtocol.WarSource.Types
                     connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) &&
                     connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
                 {
-                    player.svPlayer.SvSetJob(BPAPI.Jobs[teamIndex], true, false);
+                    if(warSourcePlayer.teamChangePending)
+                    {
+                        warSourcePlayer.teamChangePending = false;
+
+                        player.svPlayer.spawnJobIndex = teamIndex;
+
+                        // Remove all clothing so it can be replaced with new team stuff
+                        foreach(var i in player.myItems.ToArray())
+                        {
+                            if(i.Value.item is ShWearable)
+                                player.TransferItem(DeltaInv.RemoveFromMe, i.Key, i.Value.count);
+                        }
+
+                        var newPlayer = WarManager.skinPrefabs[teamIndex].GetRandom();
+
+                        foreach (var options in newPlayer.wearableOptions)
+                        {
+                            var optionIndex = Random.Range(0, options.wearableNames.Length);
+                            player.svPlayer.AddSetWearable(options.wearableNames[optionIndex].GetPrefabIndex());
+                        }
+
+                        player.svPlayer.SvSetJob(BPAPI.Jobs[teamIndex], true, false);
+                    }
+                    else
+                    {
+                        player.svPlayer.AddJobItems(player.svPlayer.job.info, player.rank, false);
+                    }
 
                     player.svPlayer.defaultItems.Clear();
                     foreach (var i in WarManager.classes[teamIndex][classIndex].equipment)
@@ -132,9 +161,6 @@ namespace BrokeProtocol.WarSource.Types
         public override bool Reward(ShPlayer player, int experienceDelta, int moneyDelta) => 
             experienceDelta >= 0;
 
-
-
-
         [Execution(ExecutionMode.Additive)]
         public override bool OptionAction(ShPlayer player, int targetID, string id, string optionID, string actionID)
         {
@@ -142,17 +168,21 @@ namespace BrokeProtocol.WarSource.Types
             {
                 case WarManager.selectTeam:
                     {
-                        int teamIndex = 0;
-                        foreach (var c in BPAPI.Jobs)
+                        if (WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
                         {
-                            if (c.shared.jobName == optionID)
+                            int teamIndex = 0;
+                            foreach (var c in BPAPI.Jobs)
                             {
-                                player.svPlayer.connectData.customData.AddOrUpdate(WarManager.teamIndexKey, teamIndex);
-                                player.svPlayer.DestroyMenu(WarManager.selectTeam);
-                                WarManager.SendClassSelectMenu(player.svPlayer.connectData.connection, teamIndex);
-                                break;
+                                if (c.shared.jobName == optionID)
+                                {
+                                    player.svPlayer.connectData.customData.AddOrUpdate(WarManager.teamIndexKey, teamIndex);
+                                    player.svPlayer.DestroyMenu(WarManager.selectTeam);
+                                    WarManager.SendClassSelectMenu(player.svPlayer.connectData.connection, teamIndex);
+                                    warSourcePlayer.teamChangePending = true;
+                                    break;
+                                }
+                                teamIndex++;
                             }
-                            teamIndex++;
                         }
                     }
                     break;

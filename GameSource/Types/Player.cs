@@ -402,7 +402,7 @@ namespace BrokeProtocol.GameSource.Types
                 else
                 {
                     var newRank = player.rank + 1;
-                    player.svPlayer.AddJobItems(player.svPlayer.job.info, player.rank, newRank, false);
+                    player.svPlayer.AddJobItems(player.svPlayer.job.info, newRank, false);
                     player.svPlayer.SetRank(newRank);
                     player.svPlayer.SetExperience(experience - Util.maxExperience, false);
                 }

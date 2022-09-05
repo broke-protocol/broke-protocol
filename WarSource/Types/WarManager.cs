@@ -142,9 +142,9 @@ namespace BrokeProtocol.WarSource.Types
     {
         public static Dictionary<ShEntity, WarSourcePlayer> pluginPlayers = new Dictionary<ShEntity, WarSourcePlayer>();
 
-        public Dictionary<ShTerritory, TerritoryState> territoryStates = new Dictionary<ShTerritory, TerritoryState>();
+        public static Dictionary<ShTerritory, TerritoryState> territoryStates = new Dictionary<ShTerritory, TerritoryState>();
 
-        public List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
+        public static List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
 
         public static List<List<ClassInfo>> classes;
 
