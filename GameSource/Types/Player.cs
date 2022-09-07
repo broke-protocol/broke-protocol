@@ -1044,10 +1044,10 @@ namespace BrokeProtocol.GameSource.Types
             if (textDisplay.editableLength > 0)
             {
                 player.svPlayer.SendInputMenu(
-                    $"Update Text (${updateTextCost}",
+                    $"Update Text (${updateTextCost})",
                     textDisplay.ID,
                     updateTextMenu,
-                    InputField.ContentType.Alphanumeric,
+                    InputField.ContentType.Standard,
                     textDisplay.editableLength);
             }
             return true;
