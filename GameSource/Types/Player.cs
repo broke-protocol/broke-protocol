@@ -16,6 +16,8 @@ namespace BrokeProtocol.GameSource.Types
     {
         ShPlayer player;
 
+        public Coroutine jobCoroutine;
+
         public Vector3 goToPosition;
         public Quaternion goToRotation;
         public Transform goToParent;

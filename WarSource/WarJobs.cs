@@ -36,10 +36,10 @@ namespace BrokeProtocol.WarSource.Jobs
 
         private void RestartCoroutines()
         {
-            if (player.isActiveAndEnabled)
+            if (player.isActiveAndEnabled && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.jobCoroutine != null) player.StopCoroutine(player.jobCoroutine);
-                player.jobCoroutine = player.StartCoroutine(JobCoroutine());
+                if (pluginPlayer.jobCoroutine != null) player.StopCoroutine(pluginPlayer.jobCoroutine);
+                pluginPlayer.jobCoroutine = player.StartCoroutine(JobCoroutine());
             }
         }
 

@@ -63,7 +63,7 @@ namespace BrokeProtocol.GameSource.Jobs
 
 
 
-    public class JobRP : Job
+    public class JobLife : Job
     {
         public override void ResetJobAI()
         {
@@ -138,7 +138,7 @@ namespace BrokeProtocol.GameSource.Jobs
     }
 
 
-    public abstract class LoopJob : JobRP
+    public abstract class LoopJob : JobLife
     {
         public override void SetJob()
         {
@@ -153,10 +153,10 @@ namespace BrokeProtocol.GameSource.Jobs
 
         private void RestartCoroutines()
         {
-            if (player.isActiveAndEnabled)
+            if (player.isActiveAndEnabled && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.jobCoroutine != null) player.StopCoroutine(player.jobCoroutine);
-                player.jobCoroutine = player.StartCoroutine(JobCoroutine());
+                if (pluginPlayer.jobCoroutine != null) player.StopCoroutine(pluginPlayer.jobCoroutine);
+                pluginPlayer.jobCoroutine = player.StartCoroutine(JobCoroutine());
             }
         }
 
@@ -417,7 +417,7 @@ namespace BrokeProtocol.GameSource.Jobs
         }
     }
 
-    public class Prisoner : JobRP
+    public class Prisoner : JobLife
     {
         public override void ResetJobAI() => player.svPlayer.SetState(Core.Wander.index);
     }

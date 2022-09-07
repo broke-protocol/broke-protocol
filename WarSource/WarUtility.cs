@@ -55,14 +55,14 @@ namespace BrokeProtocol.WarSource
         {
             var territory = Manager.territories[territoryIndex];
 
-            if (string.IsNullOrWhiteSpace(territory.locationName))
+            if (string.IsNullOrWhiteSpace(territory.text))
             {
                 // Just show # if map designer didn't name territories
                 return territoryIndex.ToString();
             }
             else
             {
-                return territory.locationName;
+                return territory.text;
             }
         }
     }
