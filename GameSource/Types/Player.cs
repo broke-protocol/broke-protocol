@@ -1,4 +1,6 @@
 ﻿using BrokeProtocol.API;
+using BrokeProtocol.Client.UI;
+using BrokeProtocol.Collections;
 using BrokeProtocol.CustomEvents;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
@@ -9,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -77,7 +80,7 @@ namespace BrokeProtocol.GameSource.Types
         }
     }
 
-    
+
     public class Player : PlayerEvents
     {
         [Execution(ExecutionMode.Additive)]
@@ -164,7 +167,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        
+
 
         [Execution(ExecutionMode.Additive)]
         public override bool GlobalChatMessage(ShPlayer player, string message)
@@ -298,7 +301,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     pluginPlayer.SetAttackState(attacker);
                 }
-                else if(player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginPlayerFollower))
+                else if (player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginPlayerFollower))
                 {
                     pluginPlayerFollower.SetAttackState(attacker);
                 }
@@ -344,7 +347,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        
+
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
@@ -696,7 +699,7 @@ namespace BrokeProtocol.GameSource.Types
                     other.svPlayer.ResetAI();
                 }
             }
-            else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.currentState.IsBusy && 
+            else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.currentState.IsBusy &&
                 Manager.pluginPlayers.TryGetValue(other, out var pluginOther))
             {
                 pluginOther.SetFollowState(player);
@@ -858,7 +861,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.targetPlayer = null;
                 player.svPlayer.Respawn();
             }
-            else if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            else if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
                 if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
@@ -1028,6 +1031,58 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (difference > 0) otherPlayer.TransferMoney(DeltaInv.MeToTrade, difference, true);
                 else if (difference < 0) otherPlayer.TransferMoney(DeltaInv.TradeToMe, -difference, true);
+            }
+
+            return true;
+        }
+
+        private const string updateTextMenu = "UpdateTextMenu";
+        private const int updateTextCost = 3000;
+        [Execution(ExecutionMode.Additive)]
+        public override bool UpdateTextDisplay(ShPlayer player, ShTextDisplay textDisplay)
+        {
+            if (textDisplay.editableLength > 0)
+            {
+                player.svPlayer.SendInputMenu(
+                    $"Update Text (${updateTextCost}",
+                    textDisplay.ID,
+                    updateTextMenu,
+                    InputField.ContentType.Alphanumeric,
+                    textDisplay.editableLength);
+            }
+            return true;
+        }
+
+        public override bool SubmitInput(ShPlayer player, int targetID, string id, string input)
+        {
+            switch (id)
+            {
+                case updateTextMenu:
+                    var textDisplay = EntityCollections.FindByID<ShTextDisplay>(targetID);
+
+                    if (textDisplay && textDisplay.editableLength > 0)
+                    {
+                        var text = input.Trim();
+
+                        if (text.Length > 0 && text.Length <= textDisplay.editableLength)
+                        {
+                            if (player.MyMoneyCount >= updateTextCost)
+                            {
+                                textDisplay.svTextDisplay.UpdateText(text);
+                                player.TransferMoney(DeltaInv.RemoveFromMe, updateTextCost);
+                                InterfaceHandler.SendGameMessageToAll(player.username + " updated a Text Sign");
+                            }
+                            else
+                            {
+                                player.svPlayer.SendGameMessage("Insufficient Funds");
+                            }
+                        }
+                        else
+                        {
+                            player.svPlayer.SendGameMessage("Invalid Input");
+                        }
+                    }
+                    break;
             }
 
             return true;
