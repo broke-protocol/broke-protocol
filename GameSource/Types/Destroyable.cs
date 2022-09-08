@@ -46,7 +46,8 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool DestroySelf(ShDestroyable destroyable)
         {
-            destroyable.svDestroyable.Damage(DamageIndex.Null, float.MaxValue);
+            // Overkill damage due to armor, but don't use float.maxValue because of underflow
+            destroyable.svDestroyable.Damage(DamageIndex.Null, destroyable.health * 10f);
             return true;
         }
 

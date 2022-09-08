@@ -114,10 +114,6 @@ namespace BrokeProtocol.GameSource
                     pluginPlayer.AddCrime(CrimeIndex.Assault, victim);
                 }
             }
-            else
-            {
-                base.OnDamageEntity(damaged);
-            }
         }
 
         public override void OnDestroyEntity(ShEntity destroyed)
