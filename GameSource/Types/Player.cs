@@ -142,7 +142,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
 
                 if (totalDamage > 0f) player.svPlayer.Damage(DamageIndex.Null, totalDamage);
-                else if (totalDamage < 0f && player.health < player.maxStat * 0.5f) player.svPlayer.SvHeal(-totalDamage);
+                else if (totalDamage < 0f && player.health < player.maxStat * 0.5f) player.svPlayer.Heal(-totalDamage);
 
                 if (player.isHuman)
                 {
@@ -478,8 +478,11 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Repair(ShPlayer player, ShTransport transport)
         {
-            if (transport.svTransport.HealFull(player))
+            if (transport.CanHeal)
+            {
+                transport.svTransport.HealFull(player);
                 player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.toolkit);
+            }
 
             return true;
         }

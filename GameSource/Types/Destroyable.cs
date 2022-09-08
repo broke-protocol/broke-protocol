@@ -50,5 +50,19 @@ namespace BrokeProtocol.GameSource.Types
             destroyable.svDestroyable.Damage(DamageIndex.Null, float.MaxValue);
             return true;
         }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool Heal(ShDestroyable destroyable, float amount, ShPlayer healer)
+        {
+            if (destroyable.CanHeal)
+            {
+                if (healer) healer.svPlayer.job.OnHealEntity(destroyable);
+
+                destroyable.health = Mathf.Min(destroyable.health + amount, destroyable.maxStat);
+                // Must send to local because health is required info
+                destroyable.svDestroyable.UpdateHealth();
+            }
+            return true;
+        }
     }
 }

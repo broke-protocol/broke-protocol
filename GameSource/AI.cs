@@ -333,7 +333,7 @@ namespace BrokeProtocol.GameSource.AI
                     }
                     else if(SvManager.Instance.unstuck.Limit(player))
                     {
-                        player.svPlayer.SvDestroySelf();
+                        player.svPlayer.DestroySelf();
                         return;
                     }
                     else

@@ -69,7 +69,7 @@ namespace BrokeProtocol.CustomEvents
             var delay = new WaitForSeconds(2f);
             while (transport.svMovable.currentTriggers.Contains(trigger))
             {
-                transport.svTransport.SvHeal(transport.maxStat * 0.1f); // Heal 10% of maxStat
+                transport.svTransport.Heal(transport.maxStat * 0.1f); // Heal 10% of maxStat
                 yield return delay;
             }
         }
