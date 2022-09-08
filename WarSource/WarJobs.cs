@@ -28,10 +28,7 @@ namespace BrokeProtocol.GameSource
             RestartCoroutines();
         }
 
-        public override void OnSpawn()
-        {
-            RestartCoroutines();
-        }
+        public override void OnSpawn() => RestartCoroutines();
 
         private void RestartCoroutines()
         {

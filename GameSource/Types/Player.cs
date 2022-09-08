@@ -104,12 +104,7 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Spawn(ShEntity entity)
         {
             Parent.Spawn(entity);
-            if (entity is ShPlayer player)
-            {
-                player.StartCoroutine(Maintenance(player));
-                player.svPlayer.job.OnSpawn();
-            }
-            
+            entity.StartCoroutine(Maintenance(entity.Player));
             return true;
         }
 

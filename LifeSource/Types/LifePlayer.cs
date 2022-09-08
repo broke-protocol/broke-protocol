@@ -508,10 +508,10 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Spawn(ShEntity entity)
         {
             Parent.Spawn(entity);
-            if (entity is ShPlayer player && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (LifeManager.pluginPlayers.TryGetValue(entity.Player, out var pluginPlayer))
             {
                 pluginPlayer.ClearCrimes();
-                player.StartCoroutine(Maintenance(player));
+                entity.StartCoroutine(Maintenance(entity.Player));
             }
             return true;
         }

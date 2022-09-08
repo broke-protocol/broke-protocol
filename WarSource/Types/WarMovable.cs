@@ -23,12 +23,7 @@ namespace BrokeProtocol.GameSource.Types
             entity.svEntity.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
             if (entity.IsDead)
             {
-                entity.svEntity.Send(SvSendType.Local, Channel.Reliable, ClPacket.Spawn,
-                    entity.ID,
-                    entity.svEntity.originalPosition,
-                    entity.svEntity.originalRotation,
-                    entity.svEntity.originalParent.GetSiblingIndex());
-                entity.Spawn(entity.svEntity.originalPosition, entity.svEntity.originalRotation, entity.svEntity.originalParent);
+                entity.svEntity.SpawnOriginal();
             }
             else
             {
