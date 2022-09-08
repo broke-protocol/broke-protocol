@@ -1,7 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
-using BrokeProtocol.Utility.Networking;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -61,8 +60,10 @@ namespace BrokeProtocol.GameSource.Types
                 destroyable.health = Mathf.Min(destroyable.health + amount, destroyable.maxStat);
                 // Must send to local because health is required info
                 destroyable.svDestroyable.UpdateHealth();
+                return true;
             }
-            return true;
+
+            return false;
         }
     }
 }
