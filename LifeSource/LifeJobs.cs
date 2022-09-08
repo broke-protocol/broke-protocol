@@ -464,9 +464,9 @@ namespace BrokeProtocol.GameSource
 
         public void RequestHeal(ShPlayer requester)
         {
-            if (requester.health >= requester.maxStat)
+            if (!requester.CanHeal)
             {
-                requester.svPlayer.SendGameMessage("Already at max HP");
+                requester.svPlayer.SendGameMessage("Cannot heal");
             }
             else if (player.isHuman)
             {
