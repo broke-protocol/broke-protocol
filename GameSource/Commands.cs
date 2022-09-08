@@ -3,7 +3,7 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
 using System;
 
-namespace BrokeProtocol.CustomEvents
+namespace BrokeProtocol.GameSource
 {
     public class Commands : IScript
     {

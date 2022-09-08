@@ -3,7 +3,7 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using System;
 
-namespace BrokeProtocol.CustomEvents
+namespace BrokeProtocol.GameSource
 {
     public class LifeCommands : IScript
     {

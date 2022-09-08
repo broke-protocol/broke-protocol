@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace BrokeProtocol.GameSource.AI
+namespace BrokeProtocol.GameSource
 {
     public class RobState : AimState
     {

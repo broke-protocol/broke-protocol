@@ -1,13 +1,12 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Utility;
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-namespace BrokeProtocol.WarSource.Types
+namespace BrokeProtocol.GameSource.Types
 {
     public class WarSourcePlayer
     {

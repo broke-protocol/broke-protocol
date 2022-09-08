@@ -1,14 +1,11 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource;
-using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
-using BrokeProtocol.Utility.Networking;
 using System.Collections.Generic;
 
-namespace BrokeProtocol.CustomEvents
+namespace BrokeProtocol.GameSource
 {
     public class LifeEvents : IScript
     {

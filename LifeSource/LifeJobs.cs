@@ -16,7 +16,7 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace BrokeProtocol.GameSource.Jobs
+namespace BrokeProtocol.GameSource
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum GroupIndex

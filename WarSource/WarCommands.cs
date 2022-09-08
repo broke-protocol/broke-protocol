@@ -1,10 +1,10 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.WarSource.Types;
+using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using System;
 
-namespace BrokeProtocol.CustomEvents
+namespace BrokeProtocol.GameSource
 {
     public class WarCommands : IScript
     {

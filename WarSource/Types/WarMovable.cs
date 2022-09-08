@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace BrokeProtocol.WarSource.Types
+namespace BrokeProtocol.GameSource.Types
 {
     public class WarMovable : MovableEvents
     {

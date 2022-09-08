@@ -1,6 +1,4 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.GameSource.AI;
-using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;

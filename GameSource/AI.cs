@@ -7,7 +7,7 @@ using BrokeProtocol.Utility.AI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace BrokeProtocol.GameSource.AI
+namespace BrokeProtocol.GameSource
 {
     public class FreezeState : State
     {

@@ -1,6 +1,5 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.LiteDB;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;

@@ -2,12 +2,11 @@
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
-using BrokeProtocol.WarSource.Jobs;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 
-namespace BrokeProtocol.WarSource
+namespace BrokeProtocol.GameSource
 {
     public class WarCore : Plugin
     {

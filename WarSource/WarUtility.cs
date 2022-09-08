@@ -3,7 +3,7 @@ using BrokeProtocol.Utility;
 using BrokeProtocol.Required;
 using UnityEngine;
 
-namespace BrokeProtocol.WarSource
+namespace BrokeProtocol.GameSource
 {
     public class ClassInfo
     {

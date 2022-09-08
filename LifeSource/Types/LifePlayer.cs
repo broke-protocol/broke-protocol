@@ -1,13 +1,11 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource.Jobs;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
 using Newtonsoft.Json;
-using Pathfinding.RVO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -933,7 +931,7 @@ namespace BrokeProtocol.GameSource.Types
                     }
                     break;
 
-                case CustomEvents.LifeEvents.crimesMenu:
+                case LifeEvents.crimesMenu:
                     var criminal = EntityCollections.FindByID<ShPlayer>(targetID);
 
                     if (criminal && LifeManager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal) && int.TryParse(optionID, out var offenseHash) &&
@@ -953,7 +951,7 @@ namespace BrokeProtocol.GameSource.Types
                                 sb.AppendLine(" - " + wearable.itemName);
                             }
                         }
-                        player.svPlayer.DestroyMenu(CustomEvents.LifeEvents.crimesMenu);
+                        player.svPlayer.DestroyMenu(LifeEvents.crimesMenu);
                         player.svPlayer.SendTextMenu(o.crime.crimeName, sb.ToString());
                     }
 

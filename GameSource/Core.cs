@@ -1,5 +1,4 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.GameSource.AI;
 using BrokeProtocol.Utility.AI;
 using System.Collections.Generic;
 

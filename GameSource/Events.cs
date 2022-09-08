@@ -5,7 +5,7 @@ using BrokeProtocol.Utility;
 using System.Collections;
 using UnityEngine;
 
-namespace BrokeProtocol.CustomEvents
+namespace BrokeProtocol.GameSource
 {
     public class Events : IScript
     {

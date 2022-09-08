@@ -1,13 +1,12 @@
 ﻿using BrokeProtocol.Entities;
-using BrokeProtocol.Utility;
-using BrokeProtocol.GameSource;
-using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.GameSource.Types;
+using BrokeProtocol.Utility.Jobs;
+using BrokeProtocol.Utility;
 using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace BrokeProtocol.WarSource.Jobs
+namespace BrokeProtocol.GameSource
 {
     public class JobWar : Job
     {
