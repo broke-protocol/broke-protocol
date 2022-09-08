@@ -331,7 +331,7 @@ namespace BrokeProtocol.GameSource
                         player.svPlayer.SvJump();
                         jumped = true;
                     }
-                    else if(SvManager.Instance.unstuck.Limit(player))
+                    else if(Utility.unstuck.Limit(player))
                     {
                         player.svPlayer.DestroySelf();
                         return;

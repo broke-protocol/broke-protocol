@@ -1129,7 +1129,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (player.CanHeal)
                 {
-                    if (healer && SvManager.Instance.healed.Limit(player))
+                    if (healer && Utility.healed.Limit(player))
                     {
                         const string message = "Heal Limit Reached!";
                         player.svPlayer.SendGameMessage(message);
