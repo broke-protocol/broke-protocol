@@ -28,7 +28,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (destroyable.health <= 0f)
             {
-                destroyable.ShDie(attacker);
+                destroyable.Die(attacker);
             }
             else if (attacker && attacker != destroyable)
             {
