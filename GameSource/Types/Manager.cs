@@ -3,11 +3,8 @@ using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Utility;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types

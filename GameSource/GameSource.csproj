@@ -86,7 +86,6 @@
     <Compile Include="AI.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Commands.cs" />
-    <Compile Include="Jobs.cs" />
     <Compile Include="Types\Entity.cs" />
     <Compile Include="Types\Manager.cs" />
     <Compile Include="Types\Destroyable.cs" />
