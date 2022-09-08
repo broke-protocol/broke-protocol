@@ -15,12 +15,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             Parent.Damage(destroyable, damageIndex, amount, attacker, collider, source, hitPoint);
 
-            destroyable.svDestroyable.Send(SvSendType.Local,
-                Channel.Reliable,
-                ClPacket.UpdateHealth,
-                destroyable.ID,
-                destroyable.health,
-                (hitPoint == default) ? 0f : destroyable.OutsideController ? destroyable.controller.GetFlatAngle(source) : destroyable.GetFlatAngle(source));
+            destroyable.svDestroyable.UpdateHealth(source, hitPoint);
 
             return true;
         }

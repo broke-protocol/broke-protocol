@@ -1037,14 +1037,13 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         private const string updateTextMenu = "UpdateTextMenu";
-        private const int updateTextCost = 3000;
         [Execution(ExecutionMode.Additive)]
         public override bool UpdateTextDisplay(ShPlayer player, ShTextDisplay textDisplay)
         {
             if (textDisplay.editableLength > 0)
             {
                 player.svPlayer.SendInputMenu(
-                    $"Update Text (${updateTextCost})",
+                    $"Update Text (${textDisplay.value})",
                     textDisplay.ID,
                     updateTextMenu,
                     InputField.ContentType.Standard,
@@ -1066,10 +1065,10 @@ namespace BrokeProtocol.GameSource.Types
 
                         if (text.Length > 0 && text.Length <= textDisplay.editableLength)
                         {
-                            if (player.MyMoneyCount >= updateTextCost)
+                            if (player.MyMoneyCount >= textDisplay.value)
                             {
                                 textDisplay.svTextDisplay.UpdateText(text);
-                                player.TransferMoney(DeltaInv.RemoveFromMe, updateTextCost);
+                                player.TransferMoney(DeltaInv.RemoveFromMe, textDisplay.value);
                                 InterfaceHandler.SendGameMessageToAll(player.username + " updated a Text Sign");
                             }
                             else
