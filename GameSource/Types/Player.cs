@@ -1,5 +1,4 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.Client.UI;
 using BrokeProtocol.Collections;
 using BrokeProtocol.CustomEvents;
 using BrokeProtocol.Entities;
@@ -7,6 +6,7 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
+using Pathfinding.RVO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,7 +109,9 @@ namespace BrokeProtocol.GameSource.Types
             if (entity is ShPlayer player)
             {
                 player.StartCoroutine(Maintenance(player));
+                player.svPlayer.job.OnSpawn();
             }
+            
             return true;
         }
 
