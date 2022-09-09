@@ -35,18 +35,18 @@ namespace BrokeProtocol.GameSource
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Human, 0, new ColorStruct(1f, 0f, 0f),
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(10,
                         new InventoryStruct[] { } ),
-                    new Upgrades(
+                    new Upgrades(15,
                         new InventoryStruct[] {
                             new InventoryStruct("GrenadeSmoke", 3)}),
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("KevlarVest", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("Grenade", 3)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("HelmetCombat", 1)})
                 }),
@@ -55,18 +55,18 @@ namespace BrokeProtocol.GameSource
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Human, 0, new ColorStruct(0f, 1f, 0f),
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(10,
                         new InventoryStruct[] { } ),
-                    new Upgrades(
+                    new Upgrades(15,
                         new InventoryStruct[] {
                             new InventoryStruct("GrenadeSmoke", 3)}),
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("KevlarVest", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("Grenade", 3)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("RiotHelmet", 1)})
                 }),

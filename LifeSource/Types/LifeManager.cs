@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -186,7 +187,7 @@ namespace BrokeProtocol.GameSource.Types
             if (newEntity is ShPlayer player)
             {
                 player.svPlayer.spawnJobIndex = randomJobIndex;
-                player.svPlayer.spawnJobRank = UnityEngine.Random.Range(0, BPAPI.Jobs[randomJobIndex].upgrades.Length);
+                player.svPlayer.spawnJobRank = Random.Range(0, BPAPI.Jobs[randomJobIndex].shared.upgrades.Length);
             }
 
             SvManager.Instance.AddNewEntityExisting(newEntity);

@@ -383,17 +383,19 @@ namespace BrokeProtocol.GameSource.Types
                 player.TransferMoney(DeltaInv.RemoveFromMe, -moneyDelta);
             }
 
-            if (player.svPlayer.job.info.upgrades.Length <= 1) return true;
+            if (player.svPlayer.job.info.shared.upgrades.Length <= 1) return true;
 
             var experience = player.experience + experienceDelta;
 
-            if (experience > Util.maxExperience)
+            var previousMaxExperience = player.GetMaxExperience();
+
+            if (experience >= previousMaxExperience)
             {
-                if (player.rank >= player.svPlayer.job.info.upgrades.Length - 1)
+                if (player.rank + 1 >= player.svPlayer.job.info.shared.upgrades.Length)
                 {
-                    if (player.experience != Util.maxExperience)
+                    if (player.experience != previousMaxExperience)
                     {
-                        player.svPlayer.SetExperience(Util.maxExperience, true);
+                        player.svPlayer.SetExperience(previousMaxExperience, true);
                     }
                 }
                 else
@@ -401,10 +403,10 @@ namespace BrokeProtocol.GameSource.Types
                     var newRank = player.rank + 1;
                     player.svPlayer.AddJobItems(player.svPlayer.job.info, newRank, false);
                     player.svPlayer.SetRank(newRank);
-                    player.svPlayer.SetExperience(experience - Util.maxExperience, false);
+                    player.svPlayer.SetExperience(experience - previousMaxExperience, false);
                 }
             }
-            else if (experience <= 0)
+            else if (experience < 0)
             {
                 if (player.rank <= 0)
                 {
@@ -414,7 +416,7 @@ namespace BrokeProtocol.GameSource.Types
                 else
                 {
                     player.svPlayer.SetRank(player.rank - 1);
-                    player.svPlayer.SetExperience(experience + Util.maxExperience, false);
+                    player.svPlayer.SetExperience(experience + player.GetMaxExperience(), false);
                 }
             }
             else
@@ -532,13 +534,15 @@ namespace BrokeProtocol.GameSource.Types
             // Allows players to keep items/rewards from job ranks
             foreach (var myItem in player.myItems.Values.ToArray())
             {
-                int extra = myItem.count;
+                var extra = myItem.count;
 
-                if (player.svPlayer.job.info.upgrades.Length > player.rank)
+                var upgrades = player.svPlayer.job.info.shared.upgrades;
+
+                if (upgrades.Length > player.rank)
                 {
                     for (int rankIndex = player.rank; rankIndex >= 0; rankIndex--)
                     {
-                        foreach (var i in player.svPlayer.job.info.upgrades[rankIndex].items)
+                        foreach (var i in upgrades[rankIndex].items)
                         {
                             if (myItem.item.name == i.itemName)
                             {

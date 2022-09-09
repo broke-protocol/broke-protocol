@@ -161,7 +161,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(0,
                         new InventoryStruct[] {
                             new InventoryStruct("TopPrisoner", 1),
                             new InventoryStruct("PantsPrisoner", 1)})}),
@@ -175,19 +175,19 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("TopStriped", 1),
                             new InventoryStruct("SkiMaskDark", 1),
                             new InventoryStruct("GlovesFingerlessDark", 1),
                             new InventoryStruct("Knife", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("SkiMaskLight", 1),
                             new InventoryStruct("Winchester", 1),
                             new InventoryStruct("AmmoRifle", 30)})
                     ,
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("SkiMaskPattern", 1),
                             new InventoryStruct("LaserRed", 1),
@@ -203,7 +203,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[] { "PoliceBoat" })
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("TopPolice", 1),
                             new InventoryStruct("PantsPolice", 1),
@@ -214,13 +214,13 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Muzzle", 2),
                             new InventoryStruct("LicenseGun", 1),
                             new InventoryStruct("ShoesBrown", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("Glock", 1),
                             new InventoryStruct("AmmoPistol", 68),
                             new InventoryStruct("Baton", 1),
                             new InventoryStruct("LicenseDrivers", 1)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("TopSheriff", 1),
                             new InventoryStruct("PantsSheriff", 1),
@@ -239,18 +239,18 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("TopParamedic", 1),
                             new InventoryStruct("PantsParamedic", 1),
                             new InventoryStruct("GlovesMedical", 1),
                             new InventoryStruct("HealthPack", 8)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("Splint", 8),
                             new InventoryStruct("Defibrillator", 1),
                             new InventoryStruct("LicenseDrivers", 1)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("TopDoctor", 1),
                             new InventoryStruct("PantsDoctor", 1),
@@ -267,18 +267,18 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("JacketFire", 1),
                             new InventoryStruct("PantsFire", 1),
                             new InventoryStruct("HatHazard", 1),
                             new InventoryStruct("FireExtinguisher", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("HatFire", 1),
                             new InventoryStruct("GlovesMedium", 1),
                             new InventoryStruct("LicenseDrivers", 1)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("JacketFireBlack", 1),
                             new InventoryStruct("PantsFireBlack", 1),
@@ -294,17 +294,17 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("GangJacketRed", 1),
                             new InventoryStruct("PantsLightBlue", 1),
                             new InventoryStruct("BackwardsCapRed", 1),
                             new InventoryStruct("Machete", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("Sig", 1),
                             new InventoryStruct("AmmoPistol", 48)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("Mac", 1),
                             new InventoryStruct("AmmoSMG", 90)})
@@ -319,17 +319,17 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("GangJacketGreen", 1),
                             new InventoryStruct("PantsGreen", 1),
                             new InventoryStruct("FaceScarfDark", 1),
                             new InventoryStruct("BatMetal", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("Glock", 1),
                             new InventoryStruct("AmmoPistol", 68)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("MP5SD", 1),
                             new InventoryStruct("AmmoSMG", 60)})
@@ -344,7 +344,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("JacketBusinessBlack", 1),
                             new InventoryStruct("SlacksGray", 1),
@@ -352,11 +352,11 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Crowbar", 1),
                             new InventoryStruct("GlovesFingerlessDark", 1),
                             new InventoryStruct("ShoesBlack", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("PPK", 1),
                             new InventoryStruct("AmmoPistol", 49)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("Shotgun", 1),
                             new InventoryStruct("AmmoShotgun", 32)})
@@ -371,7 +371,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(0,
                         new InventoryStruct[] {
                             new InventoryStruct("JacketBusinessRed", 1),
                             new InventoryStruct("SlacksGray", 1),
@@ -392,14 +392,14 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("TeePizza", 1),
                             new InventoryStruct("CapPizza", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("LicenseDrivers", 1)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("JacketRacerRed", 1),
                             new InventoryStruct("PantsRacerRed", 1),
@@ -416,16 +416,16 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("CapFlat", 1),
                             new InventoryStruct("SuspendersBrown", 1),
                             new InventoryStruct("LicenseDrivers", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("GlovesWhite", 1),
                             new InventoryStruct("LicensePilots", 1)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("TopChauffeur", 1),
                             new InventoryStruct("PantsChauffeur", 1),
@@ -457,7 +457,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("TopCombat", 1),
                             new InventoryStruct("PantsCombat", 1),
@@ -466,12 +466,12 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("AmmoPistol", 49),
                             new InventoryStruct("Smoke", 1),
                             new InventoryStruct("LicenseGun", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("Kabar", 1),
                             new InventoryStruct("GlovesFingerlessDark", 1),
                             new InventoryStruct("LicenseDrivers", 1)}),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("M4", 1),
                             new InventoryStruct("AmmoRifle", 60)})
@@ -486,12 +486,12 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0])
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("CapMob", 1)}),
-                    new Upgrades(
+                    new Upgrades(25,
                         new InventoryStruct[] { }),
-                    new Upgrades(
+                    new Upgrades(30,
                         new InventoryStruct[] { })
                 }),
             };
