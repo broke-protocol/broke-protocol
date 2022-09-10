@@ -202,78 +202,12 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            var player = destroyable.Player;
+            Parent.Damage(destroyable, damageIndex, amount, attacker, collider, source, hitPoint);
 
-            if (player.svPlayer.godMode || player.IsDead || player.IsShielded(damageIndex, collider)) return true;
-
-            if (damageIndex != DamageIndex.Null)
-            {
-                BodyEffect effect;
-                var random = Random.value;
-
-                if (random < 0.6f)
-                    effect = BodyEffect.Null;
-                else if (random < 0.8f)
-                    effect = BodyEffect.Pain;
-                else if (random < 0.925f)
-                    effect = BodyEffect.Bloodloss;
-                else
-                    effect = BodyEffect.Fracture;
-
-                BodyPart part;
-
-                var capsuleHeight = player.capsule.direction == 1 ? player.capsule.height : player.capsule.radius * 2f;
-
-                var hitY = player.GetLocalY(hitPoint);
-
-                if (damageIndex == DamageIndex.Random)
-                {
-                    part = (BodyPart)Random.Range(0, (int)BodyPart.Count);
-                }
-                else if (damageIndex == DamageIndex.Melee && player.IsBlocking(damageIndex))
-                {
-                    part = BodyPart.Arms;
-                    amount *= 0.3f;
-                }
-                else if (collider == player.headCollider) // Headshot
-                {
-                    part = BodyPart.Head;
-                    amount *= 2f;
-                }
-                else if (hitY >= capsuleHeight * 0.75f)
-                {
-                    part = Random.value < 0.5f ? BodyPart.Arms : BodyPart.Chest;
-                }
-                else if (hitY >= capsuleHeight * 0.5f)
-                {
-                    part = BodyPart.Abdomen;
-                    amount *= 0.8f;
-                }
-                else
-                {
-                    part = BodyPart.Legs;
-                    amount *= 0.5f;
-                }
-
-                if (effect != BodyEffect.Null)
-                {
-                    player.svPlayer.SvAddInjury(part, effect, (byte)Random.Range(10, 50));
-                }
-            }
-
-            if (!player.isHuman)
-            {
-                amount /= SvManager.Instance.settings.difficulty;
-            }
-
-            amount -= amount * (player.armorLevel / 200f);
-
-            Parent.Damage(player, damageIndex, amount, attacker, collider, source, hitPoint);
-
-            if (player.IsDead) return true;
+            if (destroyable.IsDead) return true;
 
             // Still alive, do knockdown and AI retaliation
-
+            var player = destroyable.Player;
             if (player.stance.setable)
             {
                 if (player.isHuman && player.health < 15f)
@@ -343,17 +277,9 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
+            Parent.Respawn(entity);
+
             var player = entity.Player;
-
-            if (player.isHuman)
-            {
-                var newSpawn = Manager.spawnLocations.GetRandom().mainT;
-                player.svPlayer.originalPosition = newSpawn.position;
-                player.svPlayer.originalRotation = newSpawn.rotation;
-                player.svPlayer.originalParent = newSpawn.parent;
-            }
-
-            Parent.Respawn(player);
 
             if (player.isHuman)
             {
@@ -796,15 +722,6 @@ namespace BrokeProtocol.GameSource.Types
             {
                 pluginFollower.SetFollowState(player);
             }
-
-            return true;
-        }
-
-        [Execution(ExecutionMode.Additive)]
-        public override bool DestroySelf(ShDestroyable destroyable)
-        {
-            if (destroyable is ShPlayer player && !(player.isHuman && player.IsRestrained && player.IsUp))
-                Parent.DestroySelf(player);
 
             return true;
         }

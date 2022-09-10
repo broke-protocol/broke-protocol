@@ -5,6 +5,7 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Utility.Networking;
 using UnityEngine;
 using System.Collections;
+using BrokeProtocol.Utility;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -58,6 +59,17 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Respawn(ShEntity entity)
         {
             Parent.Respawn(entity);
+
+            var player = entity.Player;
+
+            if (player && player.isHuman)
+            {
+                var newSpawn = Manager.spawnLocations.GetRandom().mainT;
+                player.svPlayer.originalPosition = newSpawn.position;
+                player.svPlayer.originalRotation = newSpawn.rotation;
+                player.svPlayer.originalParent = newSpawn.parent;
+            }
+
             if (entity.svEntity.randomSpawn)
             {
                 entity.svEntity.Despawn(true);

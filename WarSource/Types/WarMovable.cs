@@ -1,10 +1,8 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
-using BrokeProtocol.Utility.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +17,61 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Respawn(ShEntity entity)
         {
             Parent.Respawn(entity);
+
+            var player = entity.Player;
+
+            if (player && WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
+            {
+                if (warSourcePlayer.teamChangePending)
+                {
+                    warSourcePlayer.teamChangePending = false;
+
+                    player.svPlayer.spawnJobIndex = warSourcePlayer.teamIndex;
+
+                    // Remove all clothing so it can be replaced with new team stuff
+                    foreach (var i in player.myItems.ToArray())
+                    {
+                        if (i.Value.item is ShWearable)
+                            player.TransferItem(DeltaInv.RemoveFromMe, i.Key, i.Value.count);
+                    }
+
+                    var newPlayer = WarManager.skinPrefabs[warSourcePlayer.teamIndex].GetRandom();
+
+                    foreach (var options in newPlayer.wearableOptions)
+                    {
+                        var optionIndex = Random.Range(0, options.wearableNames.Length);
+                        player.svPlayer.AddSetWearable(options.wearableNames[optionIndex].GetPrefabIndex());
+                    }
+
+                    player.svPlayer.SvSetJob(BPAPI.Jobs[warSourcePlayer.teamIndex], true, false);
+
+                    // Clamp class if it's outside the range on team change
+                    warSourcePlayer.classIndex = Mathf.Clamp(
+                        warSourcePlayer.classIndex,
+                        0,
+                        WarManager.classes[warSourcePlayer.teamIndex].Count - 1);
+                }
+
+                player.svPlayer.AddJobItems(player.svPlayer.job.info, player.rank, false);
+                player.svPlayer.defaultItems.Clear();
+                foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
+                {
+                    if (SceneManager.Instance.TryGetEntity<ShItem>(i.itemName, out var item))
+                    {
+                        player.svPlayer.defaultItems.Add(i.itemName.GetPrefabIndex(), new InventoryItem(item, i.count));
+                    }
+                }
+
+                var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
+
+                if (WarUtility.GetSpawn(territoryIndex, out var position, out var rotation, out var place))
+                {
+                    player.svEntity.originalPosition = position;
+                    player.svEntity.originalRotation = rotation;
+                    player.svEntity.originalParent = place.mTransform;
+                }
+            }
+            
 
             entity.svEntity.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
             if (entity.IsDead)
