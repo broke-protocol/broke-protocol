@@ -14,10 +14,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            Parent.Damage(destroyable, damageIndex, amount, attacker, collider, source, hitPoint);
-
             destroyable.svDestroyable.UpdateHealth(source, hitPoint);
-
             return true;
         }
 
@@ -41,8 +38,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
-            Parent.Death(destroyable, attacker);
-
             if (destroyable.svDestroyable.respawnable)
             {
                 // Must start coroutine on the manager because the movable will be disabled during killcam/spec mode
@@ -58,8 +53,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            Parent.Respawn(entity);
-
             var player = entity.Player;
 
             if (player && player.isHuman)

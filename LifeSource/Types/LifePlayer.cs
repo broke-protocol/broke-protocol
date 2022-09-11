@@ -356,7 +356,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Initialize(ShEntity entity)
         {
-            Parent.Initialize(entity);
             if (entity.Player)
             {
                 LifeManager.pluginPlayers.Add(entity.Player, new LifeSourcePlayer(entity.Player));
@@ -371,7 +370,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Destroy(ShEntity entity)
         {
-            Parent.Destroy(entity);
             if (LifeManager.pluginPlayers.TryGetValue(entity, out var pluginPlayer))
             {
                 pluginPlayer.ClearWitnessed();
@@ -465,9 +463,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool TransferItem(ShEntity entity, byte deltaType, int itemIndex, int amount, bool dispatch)
         {
-            Parent.TransferItem(entity, deltaType, itemIndex, amount, dispatch);
-
-            if (!(entity is ShPlayer player)) return true;
+            var player = entity.Player;
 
             switch (deltaType)
             {
@@ -507,7 +503,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
-            Parent.Spawn(entity);
             if (LifeManager.pluginPlayers.TryGetValue(entity.Player, out var pluginPlayer))
             {
                 pluginPlayer.ClearCrimes();
@@ -623,8 +618,6 @@ namespace BrokeProtocol.GameSource.Types
             {
                 pluginPlayer.ClearWitnessed();
             }
-
-            Parent.Death(destroyable, attacker);
 
             return true;
         }
@@ -1132,8 +1125,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool SetParent(ShEntity entity, Transform parent)
         {
-            Parent.SetParent(entity, parent);
-
             if (parent == SceneManager.Instance.ExteriorT && 
                 LifeManager.pluginPlayers.TryGetValue(entity, out var lifeSourcePlayer))
                 lifeSourcePlayer.trespassing = false;
@@ -1179,7 +1170,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool SameSector(ShEntity entity)
         {
-            Parent.SameSector(entity);
             if (entity.isHuman && entity.IsOutside)
             {
                 foreach (var s in entity.svEntity.localSectors.Values)
@@ -1197,7 +1187,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool NewSector(ShEntity entity, List<Sector> newSectors)
         {
-            Parent.NewSector(entity, newSectors);
             if (entity.isHuman && entity.IsOutside)
             {
                 foreach (var s in newSectors)

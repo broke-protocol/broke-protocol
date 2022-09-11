@@ -84,7 +84,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Initialize(ShEntity entity)
         {
-            Parent.Initialize(entity);
             Manager.pluginPlayers.Add(entity, new GameSourcePlayer(entity.Player));
             return true;
         }
@@ -92,7 +91,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Destroy(ShEntity entity)
         {
-            Parent.Destroy(entity);
             Manager.pluginPlayers.Remove(entity);
             return true;
         }
@@ -100,7 +98,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
-            Parent.Spawn(entity);
             entity.StartCoroutine(Maintenance(entity.Player));
             return true;
         }
@@ -202,8 +199,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            Parent.Damage(destroyable, damageIndex, amount, attacker, collider, source, hitPoint);
-
             if (destroyable.IsDead) return true;
 
             // Still alive, do knockdown and AI retaliation
@@ -267,9 +262,6 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.svPlayer.SendTimer(player.svPlayer.RespawnTime, new Vector2(0.5f, 0.15f));
             }
-
-            Parent.Death(destroyable, attacker);
-
             return true;
         }
 
@@ -277,8 +269,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            Parent.Respawn(entity);
-
             var player = entity.Player;
 
             if (player.isHuman)

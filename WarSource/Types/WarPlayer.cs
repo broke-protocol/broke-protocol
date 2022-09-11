@@ -30,7 +30,6 @@ namespace BrokeProtocol.GameSource.Types
         {
             var player = entity.Player;
 
-            Parent.Initialize(entity);
             if (player)
             {
                 var warSourcePlayer = new WarSourcePlayer(player);
@@ -54,7 +53,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Destroy(ShEntity entity)
         {
-            Parent.Destroy(entity);
             WarManager.pluginPlayers.Remove(entity);
             return true;
         }
@@ -103,8 +101,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Respawn(ShEntity entity)
         {
-            Parent.Respawn(entity);
-
             var player = entity.Player;
 
             if (player.isHuman)

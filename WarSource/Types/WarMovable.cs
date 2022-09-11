@@ -16,8 +16,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            Parent.Respawn(entity);
-
             var player = entity.Player;
 
             if (player && WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
@@ -89,8 +87,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Override)]
         public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
         {
-            Parent.Death(destroyable, attacker);
-
             ShManager.Instance.StartCoroutine(DeathLoop(destroyable));
             return true;
         }
