@@ -9,7 +9,17 @@ using Random = UnityEngine.Random;
 
 namespace BrokeProtocol.GameSource
 {
-    public class FreezeState : State
+    public class BaseState : State
+    {
+        public override bool UpdateState()
+        {
+            if (!base.UpdateState()) return false;
+            if (player.IsPassenger) player.svPlayer.LookAt(player.curMountT.rotation);
+            return true;
+        }
+    }
+
+    public class FreezeState : BaseState
     {
         private float stopFreezeTime;
 
@@ -22,19 +32,21 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.SvSetEquipable(player.Surrender);
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (Time.time > stopFreezeTime && player.viewers.Count == 0)
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
-    public class RestrainedState : State
+    public class RestrainedState : BaseState
     {
         private float stopRestrainTime;
 
@@ -44,25 +56,28 @@ namespace BrokeProtocol.GameSource
             stopRestrainTime = Time.time + Random.Range(60f, 180f);
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (!player.IsRestrained)
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
             else if (Time.time >= stopRestrainTime)
             {
                 player.svPlayer.SvSetEquipable(player.Hands);
                 player.svPlayer.SvDismount();
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
-    public class WaitState : State
+    public class WaitState : BaseState
     {
         private float waitTime;
 
@@ -72,28 +87,30 @@ namespace BrokeProtocol.GameSource
             waitTime = Time.time + 5f;
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (!player.svPlayer.IsTargetValid() || Time.time > waitTime)
             {
                 player.svPlayer.ResetAI();
-                return;
+                return false;
             }
 
             var target = player.svPlayer.targetEntity;
 
             if (player.CanSeeEntity(target) && 
-                Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+                pluginPlayer.SetAttackState(target))
             {
-                pluginPlayer.SetAttackState(target);
+                return false;
             }
+
+            return true;
         }
     }
 
-    public class AirAttackState : State
+    public class AirAttackState : BaseState
     {
         private ShAircraft aircraft;
 
@@ -163,15 +180,14 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.LookAt(safePos - player.GetOrigin);
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (!player.svPlayer.IsTargetValid() || player.curMount != aircraft)
             {
                 player.svPlayer.ResetAI();
-                return;
+                return false;
             }
 
             var enemyMount = player.svPlayer.targetEntity.GetMount;
@@ -179,7 +195,7 @@ namespace BrokeProtocol.GameSource
             if (!enemyMount)
             {
                 player.svPlayer.ResetAI();
-                return;
+                return false;
             }
 
             var enemyPosition = enemyMount.GetWeaponPosition();
@@ -236,10 +252,12 @@ namespace BrokeProtocol.GameSource
 #if TEST
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.LocalChatMessage, player.ID, airState.ToString());
 #endif
+
+            return true;
         }
     }
 
-    public abstract class TimedState : State
+    public abstract class TimedState : BaseState
     {
         public virtual float RunTime => 1f;
 
@@ -258,15 +276,17 @@ namespace BrokeProtocol.GameSource
             exitTime = Time.time + RunTime;
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (Time.time > exitTime && !player.svPlayer.SetState(previousState.index))
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
@@ -295,7 +315,7 @@ namespace BrokeProtocol.GameSource
         }
     }
 
-    public abstract class MovingState : State
+    public abstract class MovingState : BaseState
     {
         private bool jumped;
         private Vector3 lastCheckPosition;
@@ -315,10 +335,9 @@ namespace BrokeProtocol.GameSource
             base.EnterState();
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             var controlled = player.GetControlled;
 
@@ -334,12 +353,11 @@ namespace BrokeProtocol.GameSource
                     else if(Utility.unstuck.Limit(player))
                     {
                         player.svPlayer.DestroySelf();
-                        return;
+                        return false;
                     }
-                    else
+                    else if(player.svPlayer.SetState(Core.Unstuck.index))
                     {
-                        player.svPlayer.SetState(Core.Unstuck.index);
-                        return;
+                        return false;
                     }
                 }
                 else
@@ -348,6 +366,8 @@ namespace BrokeProtocol.GameSource
                 }
                 UpdateChecks();
             }
+
+            return true;
         }
 
         public override void ExitState(State nextState)
@@ -380,15 +400,15 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (onDestination && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 if (pluginPlayer.IsOffOrigin)
                 {
+                    // Restart state
                     player.svPlayer.SetState(index);
                 }
                 else
@@ -401,6 +421,8 @@ namespace BrokeProtocol.GameSource
                 player.ZeroInputs();
                 onDestination = true;
             }
+
+            return true;
         }
     }
 
@@ -414,10 +436,9 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.GetPathToWaypoints();
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             // Move on waypointPath, else navigate back to waypointPath
             if (player.svPlayer.onWaypoints)
@@ -428,6 +449,8 @@ namespace BrokeProtocol.GameSource
             {
                 player.svPlayer.onWaypoints = true;
             }
+
+            return true;
         }
 
         public override void ExitState(State nextState)
@@ -452,15 +475,17 @@ namespace BrokeProtocol.GameSource
 
         public override byte StateMoveMode => MoveMode.Positive;
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (Time.time > stopFleeTime)
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
@@ -468,15 +493,17 @@ namespace BrokeProtocol.GameSource
     {
         public override bool EnterTest() => base.EnterTest() && player.svPlayer.IsTargetValid();
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (!player.svPlayer.IsTargetValid())
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
@@ -529,17 +556,17 @@ namespace BrokeProtocol.GameSource
             return false;
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (reachedCover)
             {
-                if (player.CanSeeEntity(player.svPlayer.targetEntity) && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                if (player.CanSeeEntity(player.svPlayer.targetEntity) && 
+                    Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+                    pluginPlayer.SetAttackState(player.svPlayer.targetEntity))
                 {
-                    pluginPlayer.SetAttackState(player.svPlayer.targetEntity);
-                    return;
+                    return false;
                 }
 
                 if (Time.time > waitTime)
@@ -552,7 +579,7 @@ namespace BrokeProtocol.GameSource
                     {
                         player.svPlayer.ResetAI();
                     }
-                    return;
+                    return false;
                 }
 
                 player.svPlayer.LookAt(coverOrientation);
@@ -564,6 +591,8 @@ namespace BrokeProtocol.GameSource
                 reachedCover = true;
                 waitTime = Time.time + 5f;
             }
+
+            return true;
         }
 
         public override void ExitState(State nextState)
@@ -595,15 +624,16 @@ namespace BrokeProtocol.GameSource
             else if(!player.GetControlled.svMountable.MoveLookNavPath()) player.ZeroInputs();
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (player.svPlayer.TargetNear)
                 HandleNearTarget();
             else
                 HandleDistantTarget();
+
+            return true;
         }
     }
 
@@ -611,10 +641,9 @@ namespace BrokeProtocol.GameSource
     {
         public override byte StateMoveMode => MoveMode.Positive;
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (player.svPlayer.TargetNear) player.ZeroInputs();
 
@@ -633,6 +662,8 @@ namespace BrokeProtocol.GameSource
             {
                 player.svPlayer.SvDismount();
             }
+
+            return true;
         }
     }
 
@@ -645,10 +676,9 @@ namespace BrokeProtocol.GameSource
             if (player.IsDriving) player.svPlayer.SvSetSiren(true);
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             var targetEntity = player.svPlayer.targetEntity;
 
@@ -666,6 +696,8 @@ namespace BrokeProtocol.GameSource
                     0f,
                     player.Perlin(0.25f) - 0.5f);
             }
+
+            return true;
         }
 
         public override void ExitState(State nextState)
@@ -678,36 +710,41 @@ namespace BrokeProtocol.GameSource
 
     public class FreeState : AimState
     {
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (player.svPlayer.TargetNear)
             {
                 player.svPlayer.SvFree(player.svPlayer.targetEntity.ID);
                 player.svPlayer.ResetAI();
+                return false;
             }
             else if (!(player.svPlayer.targetEntity is ShPlayer targetPlayer) || !targetPlayer.IsRestrained)
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
     public abstract class FireState : AimState
     {
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             player.svPlayer.FireLogic();
 
             if (!player.svPlayer.IsTargetValid())
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
@@ -736,10 +773,9 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.SetBestWeapons();
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (player.CanFireEquipable)
             {
@@ -766,13 +802,13 @@ namespace BrokeProtocol.GameSource
                             Util.AimVector(targetEntity.GetOrigin - player.GetOrigin, targetEntity.Velocity - player.Velocity, projectile.WeaponVelocity, projectile.WeaponGravity, out _))
                         {
                             player.svPlayer.SvTrySetEquipable(projectile.index);
-                            return;
+                            return true;
                         }
                         
                         if (r < 0.01f)
                         {
                             player.svPlayer.SetState(Core.TakeCover.index);
-                            return;
+                            return false;
                         }
                     }
 
@@ -787,6 +823,8 @@ namespace BrokeProtocol.GameSource
             {
                 player.svPlayer.SvUpdateMode(StateMoveMode);
             }
+
+            return true;
         }
 
         public override void ExitState(State nextState)
@@ -805,16 +843,18 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.SvSetEquipable(ShManager.Instance.defibrillator);
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (player.curEquipable.index != ShManager.Instance.defibrillator.index ||
                 !(player.svPlayer.targetEntity is ShPlayer targetPlayer) || !targetPlayer.IsKnockedOut)
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
@@ -826,16 +866,18 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.SvSetEquipable(ShManager.Instance.healthPack);
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (player.curEquipable.index != ShManager.Instance.healthPack.index ||
                 !(player.svPlayer.targetEntity is ShPlayer targetPlayer) || (targetPlayer.health >= targetPlayer.maxStat))
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
@@ -848,15 +890,17 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.SvSetEquipable(ShManager.Instance.extinguisher);
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             if (player.curEquipable.index != ShManager.Instance.extinguisher.index)
             {
                 player.svPlayer.ResetAI();
+                return false;
             }
+
+            return true;
         }
     }
 
@@ -866,12 +910,12 @@ namespace BrokeProtocol.GameSource
 
         public override bool EnterTest() => base.EnterTest() && player.svPlayer.SelectNextNode();
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             player.GetControlled.svMountable.MoveLookNodePath();
+            return true;
         }
     }
 }

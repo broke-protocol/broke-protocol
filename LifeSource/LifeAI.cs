@@ -18,25 +18,25 @@ namespace BrokeProtocol.GameSource
             threatened = false;
         }
 
-        public override void UpdateState()
+        public override bool UpdateState()
         {
-            base.UpdateState();
-            if (StateChanged) return;
+            if (!base.UpdateState()) return false;
 
             var targetPlayer = player.svPlayer.targetEntity.Player;
 
             if (!targetPlayer)
             {
                 player.svPlayer.ResetAI();
-                return;
+                return false;
             }
 
             if (threatened)
             {
                 if (Time.time > stopTime)
                 {
-                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                        pluginPlayer.SetAttackState(targetPlayer);
+                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
+                        pluginPlayer.SetAttackState(targetPlayer))
+                        return false;
                 }
                 else if (targetPlayer.IsSurrendered && !targetPlayer.switching && player.svPlayer.TargetNear)
                 {
@@ -47,11 +47,11 @@ namespace BrokeProtocol.GameSource
                         {
                             var randomCount = Random.Range(1, i.count);
                             player.TransferItem(DeltaInv.OtherToMe, i.item, randomCount);
-
                         }
                     }
                     player.otherEntity = null;
                     player.svPlayer.ResetAI();
+                    return false;
                 }
             }
             else if (player.svPlayer.TargetNear && LifeManager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget))
@@ -62,6 +62,8 @@ namespace BrokeProtocol.GameSource
                 player.svPlayer.SvPoint(true);
                 pluginTarget.CommandHandsUp(player);
             }
+
+            return true;
         }
 
         public override void ExitState(State nextState)
