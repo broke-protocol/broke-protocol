@@ -565,6 +565,12 @@ namespace BrokeProtocol.GameSource
                 waitTime = Time.time + 5f;
             }
         }
+
+        public override void ExitState(State nextState)
+        {
+            base.ExitState(nextState);
+            reachedCover = false;
+        }
     }
 
     public abstract class ChaseState : TargetState

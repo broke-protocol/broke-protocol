@@ -763,6 +763,8 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
+                player.svPlayer.targetEntity = null;
+
                 if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
                 if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
                 player.svPlayer.SvTrySetEquipable(player.Hands.index);
@@ -771,7 +773,6 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (player.svPlayer.spawnTarget && pluginPlayer.SetAttackState(player.svPlayer.spawnTarget)) return true;
                 player.svPlayer.spawnTarget = null;
-                player.svPlayer.targetEntity = null;
                 
                 player.svPlayer.job.ResetJobAI();
             }
