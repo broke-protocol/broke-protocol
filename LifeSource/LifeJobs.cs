@@ -67,13 +67,23 @@ namespace BrokeProtocol.GameSource
     {
         public override void ResetJobAI()
         {
-            if (player.svPlayer.stop && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                pluginPlayer.SetGoToState(
-                    player.svPlayer.originalPosition,
-                    player.svPlayer.originalRotation,
-                    player.svPlayer.originalParent);
-            else if (player.characterType == CharacterType.Human || !player.svPlayer.SetState(Core.Wander.index))
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                if (player.svPlayer.stop &&
+                    pluginPlayer.SetGoToState(
+                        player.svPlayer.originalPosition,
+                        player.svPlayer.originalRotation,
+                        player.svPlayer.originalParent))
+                    return;
+
+                if (player.svPlayer.currentState.index == Core.Freeze.index && player.svPlayer.SetState(Core.Flee.index))
+                    return;
+
+                if (player.characterType != CharacterType.Human && player.svPlayer.SetState(Core.Wander.index))
+                    return;
+
                 player.svPlayer.SetState(Core.Waypoint.index);
+            }
         }
 
         public override bool IsValidTarget(ShPlayer chaser)
@@ -974,7 +984,7 @@ namespace BrokeProtocol.GameSource
 
         protected bool SetSpawnTarget()
         {
-            ShPlayer target = player.svPlayer.spawner;
+            var target = player.svPlayer.spawner;
 
             if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
                 target && LifeManager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&

@@ -68,13 +68,13 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        public void SetGoToState(Vector3 position, Quaternion rotation, Transform parent)
+        public bool SetGoToState(Vector3 position, Quaternion rotation, Transform parent)
         {
             goToPosition = position;
             goToRotation = rotation;
             goToParent = parent;
 
-            player.svPlayer.SetState(Core.GoTo.index);
+            return player.svPlayer.SetState(Core.GoTo.index);
         }
     }
 
@@ -772,10 +772,6 @@ namespace BrokeProtocol.GameSource.Types
                 if (player.svPlayer.spawnTarget && pluginPlayer.SetAttackState(player.svPlayer.spawnTarget)) return true;
                 player.svPlayer.spawnTarget = null;
                 player.svPlayer.targetEntity = null;
-
-                if (player.IsDriving && player.svPlayer.SetState(Core.Waypoint.index)) return true;
-                if (player.svPlayer.currentState.index == Core.Freeze.index && !player.svPlayer.stop && player.svPlayer.SetState(Core.Flee.index)) return true;
-                
                 
                 player.svPlayer.job.ResetJobAI();
             }
