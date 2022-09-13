@@ -761,12 +761,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool ResetAI(ShPlayer player)
         {
-            if (player.svPlayer.targetPlayer && !player.svPlayer.preFrame)
-            {
-                player.svPlayer.targetPlayer = null;
-                player.svPlayer.Respawn();
-            }
-            else if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
                 if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
@@ -774,17 +769,14 @@ namespace BrokeProtocol.GameSource.Types
                 if (player.svPlayer.leader && pluginPlayer.SetFollowState(player.svPlayer.leader)) return true;
                 if (player.IsPassenger && player.svPlayer.SetState(Core.Null.index)) return true;
 
+                if (player.svPlayer.spawnTarget && pluginPlayer.SetAttackState(player.svPlayer.spawnTarget)) return true;
+                player.svPlayer.spawnTarget = null;
                 player.svPlayer.targetEntity = null;
 
                 if (player.IsDriving && player.svPlayer.SetState(Core.Waypoint.index)) return true;
                 if (player.svPlayer.currentState.index == Core.Freeze.index && !player.svPlayer.stop && player.svPlayer.SetState(Core.Flee.index)) return true;
-                if (player.svPlayer.targetPlayer && pluginPlayer.SetAttackState(player.svPlayer.targetPlayer)) return true;
-
-                if (player.GetParent != player.svPlayer.originalParent)
-                {
-                    player.svPlayer.ResetOriginal();
-                }
-
+                
+                
                 player.svPlayer.job.ResetJobAI();
             }
 

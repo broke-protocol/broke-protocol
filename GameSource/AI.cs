@@ -288,9 +288,9 @@ namespace BrokeProtocol.GameSource
             base.EnterState();
         }
 
-        public override void ExitState()
+        public override void ExitState(State nextState)
         {
-            base.ExitState();
+            base.ExitState(nextState);
             player.ZeroInputs();
         }
     }
@@ -350,9 +350,9 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        public override void ExitState()
+        public override void ExitState(State nextState)
         {
-            base.ExitState();
+            base.ExitState(nextState);
             player.ZeroInputs();
         }
     }
@@ -430,12 +430,13 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        public override void ExitState()
+        public override void ExitState(State nextState)
         {
-            base.ExitState();
-
-            // Handle the case where AI are switched into cars, ResetAI is called twice
-            if (!player.svPlayer.preFrame) player.svPlayer.onWaypoints = false;
+            base.ExitState(nextState);
+            if (!(nextState is WaypointState))
+            {
+                player.svPlayer.onWaypoints = false;
+            }
         }
     }
 
@@ -661,9 +662,9 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        public override void ExitState()
+        public override void ExitState(State nextState)
         {
-            base.ExitState();
+            base.ExitState(nextState);
 
             if (player.IsDriving) player.svPlayer.SvSetSiren(false);
         }
@@ -782,9 +783,9 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        public override void ExitState()
+        public override void ExitState(State nextState)
         {
-            base.ExitState();
+            base.ExitState(nextState);
             //Don't need to reset to hands (ResetAI will do that)
             player.svPlayer.SvCrouch(false);
         }

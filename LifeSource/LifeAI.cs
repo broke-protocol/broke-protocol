@@ -64,9 +64,9 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        public override void ExitState()
+        public override void ExitState(State nextState)
         {
-            base.ExitState();
+            base.ExitState(nextState);
 
             if (player.pointing) player.svPlayer.SvPoint(false);
         }
@@ -82,9 +82,9 @@ namespace BrokeProtocol.GameSource
             base.EnterState();
         }
 
-        public override void ExitState()
+        public override void ExitState(State nextState)
         {
-            base.ExitState();
+            base.ExitState(nextState);
             player.ZeroInputs();
         }
     }
