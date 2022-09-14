@@ -700,7 +700,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else if (apartment.svApartment.BuyEntity(player))
             {
-                apartment.svApartment.SvSetApartmentOwner(player);
+                player.svPlayer.BuyApartment(apartment);
             }
 
             return true;
@@ -717,7 +717,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.TransferMoney(DeltaInv.AddToMe, apartment.value / 2);
                 player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.SellApartment, apartment.ID);
-                player.svPlayer.CleanupApartment(place);
+                player.svPlayer.SellApartment(place);
             }
 
             return true;
