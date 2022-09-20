@@ -166,5 +166,24 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool PrepareMap()
+        {
+            // Prepare the map and mapHash before navmesh generation and static analysis
+
+            // Clone all apartments up to the max playerCount (needed for proper AI navigation)
+            var playerCount = SvManager.Instance.settings.players;
+            foreach (var apartment in SvManager.Instance.apartments)
+            {
+                SceneManager.Instance.CloneInterior(apartment.Key, playerCount);
+            }
+
+            // MapHash is used for caching on both server and clients
+            SceneManager.Instance.mapHash = SceneManager.Instance.mapData.GetChecksum() + playerCount + Util.navVersion;
+            // Since playerCounts will affect the navmesh (see loop above) it's included as part of the mapHash
+
+            return true;
+        }
     }
 }
