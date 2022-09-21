@@ -124,6 +124,9 @@ namespace BrokeProtocol.GameSource.Types
 
         private void SendSpawnMenu(WarSourcePlayer warPlayer)
         {
+            if (!warPlayer.player.isHuman)
+                return;
+
             var sb = new StringBuilder();
             sb.AppendLine("Spawn Select");
             sb.AppendLine("Current Spawn:");
@@ -167,7 +170,7 @@ namespace BrokeProtocol.GameSource.Types
                 yield return null;
             }
 
-            if (destroyable && destroyable.Player)
+            if (destroyable && destroyable.Player && destroyable.isHuman)
             {
                 destroyable.Player.svPlayer.DestroyTextPanel(WarPlayer.spawnMenuID);
             }

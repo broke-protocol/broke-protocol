@@ -40,7 +40,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             foreach(var p in players.ToArray())
             {
-                if (!p.isActiveAndEnabled || p.IsDead || !Manager.TryGetTerritory(p, out var t) || t != territory)
+                if (!p || !p.isActiveAndEnabled || p.IsDead || !Manager.TryGetTerritory(p, out var t) || t != territory)
                 {
                     p.svPlayer.SvProgressStop(territoryProgressBarID);
                     players.Remove(p);

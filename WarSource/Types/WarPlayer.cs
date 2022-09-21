@@ -36,7 +36,8 @@ namespace BrokeProtocol.GameSource.Types
 
                 WarManager.pluginPlayers.Add(entity, warSourcePlayer);
 
-                if (!SvManager.Instance.connections.TryGetValue(player.svPlayer.connectData.connection, out var connectData) ||
+                if (!player.isHuman ||
+                    !SvManager.Instance.connections.TryGetValue(player.svPlayer.connectData.connection, out var connectData) ||
                     !connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) ||
                     !connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
                 {
