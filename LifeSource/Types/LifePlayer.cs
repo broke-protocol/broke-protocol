@@ -884,7 +884,7 @@ namespace BrokeProtocol.GameSource.Types
                             break;
                         case hackPanel:
                             var options = new List<LabelID>();
-                            foreach (var clone in apartment.svApartment.clones.Values)
+                            foreach (var clone in apartment.svApartment.clones)
                             {
                                 options.Add(new LabelID($"{clone.svOwner.username} - Difficulty: {clone.svSecurity.ToPercent()}", clone.svOwner.username));
                             }
@@ -1000,7 +1000,7 @@ namespace BrokeProtocol.GameSource.Types
                 case enterPasscode:
                     var a1 = EntityCollections.FindByID<ShApartment>(targetID);
 
-                    foreach (var a in a1.svApartment.clones.Values)
+                    foreach (var a in a1.svApartment.clones)
                     {
                         if (a.svPasscode != null && a.svPasscode == input)
                         {

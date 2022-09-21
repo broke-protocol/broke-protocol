@@ -180,7 +180,7 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             // MapHash is used for caching on both server and clients
-            SceneManager.Instance.mapHash = SceneManager.Instance.mapData.GetChecksum() + playerCount + Util.navVersion;
+            SceneManager.Instance.mapHash = SceneManager.Instance.mapData.GetChecksum() + playerCount;
             // Since playerCounts will affect the navmesh (see loop above) it's included as part of the mapHash
 
             return true;
