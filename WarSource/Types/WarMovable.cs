@@ -13,7 +13,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class WarMovable : MovableEvents
     {
-        [Execution(ExecutionMode.Additive)]
+        [Execution(ExecutionMode.Override)]
         public override bool Respawn(ShEntity entity)
         {
             var player = entity.Player;

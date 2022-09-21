@@ -146,9 +146,9 @@ namespace BrokeProtocol.GameSource
 
     public abstract class LoopJob : JobLife
     {
-        public override void SetJob()
+        public override void ResetJob()
         {
-            base.SetJob();
+            base.ResetJob();
             RestartCoroutines();
         }
 
