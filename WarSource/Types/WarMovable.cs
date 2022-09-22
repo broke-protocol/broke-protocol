@@ -51,13 +51,21 @@ namespace BrokeProtocol.GameSource.Types
                 }
 
                 player.svPlayer.AddJobItems(player.svPlayer.job.info, player.rank, false);
-                player.svPlayer.defaultItems.Clear();
+
+                // Reset default items
+                var defaultItems = player.svPlayer.defaultItems;
+                defaultItems.Clear();
                 foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
                 {
                     if (SceneManager.Instance.TryGetEntity<ShItem>(i.itemName, out var item))
                     {
-                        player.svPlayer.defaultItems.Add(i.itemName.GetPrefabIndex(), new InventoryItem(item, i.count));
+                        defaultItems.Add(i.itemName.GetPrefabIndex(), new InventoryItem(item, i.count));
                     }
+                }
+                foreach (var i in player.curWearables)
+                {
+                    if(!defaultItems.ContainsKey(i.index))
+                        defaultItems.Add(i.index, new InventoryItem(i, 1));
                 }
 
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;

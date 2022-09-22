@@ -1,9 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
-using BrokeProtocol.Utility;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -130,7 +128,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         if (WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
                         {
-                            int teamIndex = 0;
+                            var teamIndex = 0;
                             foreach (var c in BPAPI.Jobs)
                             {
                                 if (c.shared.jobName == optionID)
@@ -151,7 +149,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         if (WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
                         {
-                            int classIndex = 0;
+                            var classIndex = 0;
                             foreach (var c in WarManager.classes[warSourcePlayer.teamIndex])
                             {
                                 if (c.className == optionID)
