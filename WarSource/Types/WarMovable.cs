@@ -49,8 +49,6 @@ namespace BrokeProtocol.GameSource.Types
                     player.svPlayer.defaultItems = null;
                 }
 
-                if(cla)
-
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
                 if (WarUtility.GetSpawn(territoryIndex, out var position, out var rotation, out var place))

@@ -18,6 +18,8 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class TerritoryState
     {
+        // Used for territory transition state (gray) between 2 teams
+        public const int transitionTeamIndex = int.MaxValue;
         public const string territoryProgressBarID = "territory";
         public ShTerritory territory;
         public float lastSpeed;
@@ -106,14 +108,14 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     // Set to Gray (unowned) area before transitioning to attackerIndex
                     if (territory.ownerIndex >= 0 && territory.ownerIndex < BPAPI.Jobs.Count)
-                        territory.svTerritory.SvSetTerritory(territory.ownerIndex, int.MaxValue);
+                        territory.svTerritory.SvSetTerritory(territory.ownerIndex, transitionTeamIndex);
                     else
                         territory.svTerritory.SvSetTerritory(territory.ownerIndex, attackerIndex);
                 }
 
                 if (captureState >= 1f)
                 {
-                    territory.svTerritory.SvSetTerritory(territory.attackerIndex == int.MaxValue ? -1 : territory.attackerIndex);
+                    territory.svTerritory.SvSetTerritory(territory.attackerIndex == transitionTeamIndex ? -1 : territory.attackerIndex);
                     ResetCaptureState();
                     return;
                 }
@@ -377,7 +379,7 @@ namespace BrokeProtocol.GameSource.Types
                 var burn = burnScalar;
                 if (controlledTerritories.TryGetValue(team.Key, out var count))
                 {
-                    burn = burnScalar * (1f - count / territoryStates.Count);
+                    burn = burnScalar * (1f - (float)count / territoryStates.Count);
                 }
 
                 tempTickets.Add(
