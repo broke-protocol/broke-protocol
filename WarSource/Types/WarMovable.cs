@@ -34,13 +34,7 @@ namespace BrokeProtocol.GameSource.Types
                     }
 
                     var newPlayer = WarManager.skinPrefabs[warSourcePlayer.teamIndex].GetRandom();
-
-                    foreach (var options in newPlayer.wearableOptions)
-                    {
-                        var optionIndex = Random.Range(0, options.wearableNames.Length);
-                        player.svPlayer.AddSetWearable(options.wearableNames[optionIndex].GetPrefabIndex());
-                    }
-
+                    player.svPlayer.ApplyWearableIndices(newPlayer.wearableOptions);
                     player.svPlayer.SvSetJob(BPAPI.Jobs[warSourcePlayer.teamIndex], true, false);
 
                     // Clamp class if it's outside the range on team change
