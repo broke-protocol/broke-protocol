@@ -11,7 +11,7 @@ namespace BrokeProtocol.GameSource.Types
     {
         public ShPlayer player;
 
-        public bool teamChangePending;
+        public bool changePending;
         public int spawnTerritoryIndex;
         public int teamIndex;
         public int classIndex;
@@ -148,7 +148,7 @@ namespace BrokeProtocol.GameSource.Types
                                     warSourcePlayer.teamIndex = teamIndex;
                                     player.svPlayer.DestroyMenu(WarManager.selectTeam);
                                     WarManager.SendClassSelectMenu(player.svPlayer.connectData.connection, teamIndex);
-                                    warSourcePlayer.teamChangePending = true;
+                                    warSourcePlayer.changePending = true;
                                     break;
                                 }
                                 teamIndex++;
@@ -168,6 +168,7 @@ namespace BrokeProtocol.GameSource.Types
                                 {
                                     warSourcePlayer.classIndex = classIndex;
                                     player.svPlayer.DestroyMenu(WarManager.selectClass);
+                                    warSourcePlayer.changePending = true;
                                     break;
                                 }
                                 classIndex++;

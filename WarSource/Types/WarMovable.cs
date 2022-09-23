@@ -20,9 +20,9 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player && WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
             {
-                if (warSourcePlayer.teamChangePending)
+                if (warSourcePlayer.changePending)
                 {
-                    warSourcePlayer.teamChangePending = false;
+                    warSourcePlayer.changePending = false;
 
                     player.svPlayer.spawnJobIndex = warSourcePlayer.teamIndex;
 
@@ -48,6 +48,8 @@ namespace BrokeProtocol.GameSource.Types
                     // Set null so it will be reset on Spawn
                     player.svPlayer.defaultItems = null;
                 }
+
+                if(cla)
 
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
