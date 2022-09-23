@@ -287,7 +287,7 @@ namespace BrokeProtocol.GameSource.Types
 
             for (int i = 0; i < 5; i++) // Try just a few times to find an available Random Entity
             {
-                var index = UnityEngine.Random.Range(0, randomEntities.Count);
+                var index = Random.Range(0, randomEntities.Count);
 
                 var randomEntity = randomEntities.ElementAt(index);
                 if (!randomEntity.isActiveAndEnabled)
@@ -321,7 +321,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            var spawnValue = UnityEngine.Random.value * total;
+            var spawnValue = Random.value * total;
 
             foreach (var p in options)
             {

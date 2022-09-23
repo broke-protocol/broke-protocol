@@ -110,8 +110,18 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
+        // Override because we don't want to switch back to Hands
+        [Execution(ExecutionMode.Override)]
         public override bool Respawn(ShEntity entity)
         {
+            var player = entity.Player;
+
+            if (player.isHuman)
+            {
+                // Back to spectate self on Respawn
+                player.svPlayer.SvSpectate(player);
+            }
+
             entity.svEntity.Restock(); // Will put on any suitable clothing
             return true;
         }
