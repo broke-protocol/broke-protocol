@@ -52,22 +52,6 @@ namespace BrokeProtocol.GameSource.Types
 
                 player.svPlayer.AddJobItems(player.svPlayer.job.info, player.rank, false);
 
-                // Reset default items
-                var defaultItems = player.svPlayer.defaultItems;
-                defaultItems.Clear();
-                foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
-                {
-                    if (SceneManager.Instance.TryGetEntity<ShItem>(i.itemName, out var item))
-                    {
-                        defaultItems.Add(i.itemName.GetPrefabIndex(), new InventoryItem(item, i.count));
-                    }
-                }
-                foreach (var i in player.curWearables)
-                {
-                    if(!defaultItems.ContainsKey(i.index))
-                        defaultItems.Add(i.index, new InventoryItem(i, 1));
-                }
-
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
                 if (WarUtility.GetSpawn(territoryIndex, out var position, out var rotation, out var place))
@@ -77,17 +61,10 @@ namespace BrokeProtocol.GameSource.Types
                     player.svEntity.originalParent = place.mTransform;
                 }
             }
-            
 
             entity.svEntity.instigator = null; // So players aren't charged with Murder crimes after vehicles reset
-            if (entity.IsDead)
-            {
-                entity.svEntity.SpawnOriginal();
-            }
-            else
-            {
-                entity.svEntity.ResetOriginal();
-            }
+
+            entity.svEntity.SpawnOriginal();
 
             return true;
         }

@@ -1,11 +1,10 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Required;
 using BrokeProtocol.Managers;
-using BrokeProtocol.Utility.Networking;
-using UnityEngine;
-using System.Collections;
+using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
+using System.Collections;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -67,13 +66,9 @@ namespace BrokeProtocol.GameSource.Types
             {
                 entity.svEntity.Despawn(true);
             }
-            else if (entity.IsDead)
-            {
-                entity.svEntity.SpawnOriginal();
-            }
             else
             {
-                entity.svEntity.ResetOriginal();
+                entity.svEntity.SpawnOriginal();
             }
 
             return true;

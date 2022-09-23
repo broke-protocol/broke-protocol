@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
+using BrokeProtocol.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -97,19 +98,21 @@ namespace BrokeProtocol.GameSource.Types
         }
 
 
-        [Execution(ExecutionMode.Override)]
-        public override bool Respawn(ShEntity entity)
+        [Execution(ExecutionMode.Additive)]
+        public override bool Spawn(ShEntity entity)
         {
             var player = entity.Player;
 
-            if (player.isHuman)
+            if (player && WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
             {
-                // Back to spectate self on Respawn
-                player.svPlayer.SvSpectate(player);
+                foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
+                {
+                    player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
+                }
+                player.svPlayer.UpdateDefaultItems();
+                player.svPlayer.Restock(); // Will put on any suitable clothing
+                player.svPlayer.SetBestEquipable();
             }
-
-            player.svPlayer.Restock();
-            player.svPlayer.SetBestEquipable();
 
             return true;
         }
