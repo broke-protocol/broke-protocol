@@ -26,25 +26,28 @@ namespace BrokeProtocol.GameSource.Types
 
                     player.svPlayer.spawnJobIndex = warSourcePlayer.teamIndex;
 
-                    // Remove all clothing so it can be replaced with new team stuff
+                    // Remove all inventory (will be re-added either here or on spawn)
                     foreach (var i in player.myItems.ToArray())
                     {
-                        if (i.Value.item is ShWearable)
-                            player.TransferItem(DeltaInv.RemoveFromMe, i.Key, i.Value.count);
+                        player.TransferItem(DeltaInv.RemoveFromMe, i.Key, i.Value.count);
                     }
-
                     var newPlayer = WarManager.skinPrefabs[warSourcePlayer.teamIndex].GetRandom();
                     player.svPlayer.ApplyWearableIndices(newPlayer.wearableOptions);
-                    player.svPlayer.SvSetJob(BPAPI.Jobs[warSourcePlayer.teamIndex], true, false);
 
                     // Clamp class if it's outside the range on team change
                     warSourcePlayer.classIndex = Mathf.Clamp(
                         warSourcePlayer.classIndex,
                         0,
                         WarManager.classes[warSourcePlayer.teamIndex].Count - 1);
-                }
 
-                player.svPlayer.AddJobItems(player.svPlayer.job.info, player.rank, false);
+                    foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
+                    {
+                        player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
+                    }
+
+                    // Set null so it will be reset on Spawn
+                    player.svPlayer.defaultItems = null;
+                }
 
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 

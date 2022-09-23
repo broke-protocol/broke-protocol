@@ -46,6 +46,11 @@ namespace BrokeProtocol.GameSource.Types
 
                 warSourcePlayer.teamIndex = teamIndex;
                 warSourcePlayer.classIndex = classIndex;
+
+                foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
+                {
+                    player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
+                }
             }
             return true;
         }
@@ -101,19 +106,13 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
-            var player = entity.Player;
+            entity.Player.svPlayer.SetBestEquipable();
+            return true;
+        }
 
-            if (player && WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
-            {
-                foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
-                {
-                    player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
-                }
-                player.svPlayer.UpdateDefaultItems();
-                player.svPlayer.Restock(); // Will put on any suitable clothing
-                player.svPlayer.SetBestEquipable();
-            }
-
+        public override bool Respawn(ShEntity entity)
+        {
+            entity.svEntity.Restock(); // Will put on any suitable clothing
             return true;
         }
 
