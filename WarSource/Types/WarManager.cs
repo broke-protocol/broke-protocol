@@ -5,13 +5,13 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Networking;
+using ENet;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ENet;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -32,6 +32,26 @@ namespace BrokeProtocol.GameSource.Types
         {
             this.territory = territory;
             initialOwner = territory.ownerIndex;
+        }
+
+        public StringBuilder PrettyString()
+        {
+            const char barCharacter = '|';
+            const int segments = 20;
+            var sb = new StringBuilder();
+            
+            sb.Append("[");
+
+            var capSegments = Mathf.RoundToInt(captureState * segments);
+            if(capSegments > 0)
+                sb.AppendColorText(new string(barCharacter, capSegments), Util.GetJobColor(BPAPI.JobInfoShared, territory.attackerIndex));
+            
+            var endSegments = segments - capSegments;
+            if(endSegments > 0)
+                sb.AppendColorText(new string(barCharacter, endSegments), Util.GetJobColor(BPAPI.JobInfoShared, territory.ownerIndex));
+            
+            sb.Append("]");
+            return sb;
         }
 
         public void ResetCaptureState()
@@ -261,9 +281,9 @@ namespace BrokeProtocol.GameSource.Types
 
             classes = JsonConvert.DeserializeObject<List<List<ClassInfo>>>(File.ReadAllText(classesFilename));
 
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < 10; i++)
             {
-                var teamIndex = i % 2;
+                var teamIndex = i % skinPrefabs.Length;
                 AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
             }
 
@@ -311,6 +331,15 @@ namespace BrokeProtocol.GameSource.Types
                         .Append(": ")
                         .AppendLine(((int)team.Value).ToString());
                 }
+
+                var index = 0;
+                foreach(var t in territoryStates.Values)
+                {
+                    sb.AppendLine(WarUtility.GetTerritoryName(index));
+                    sb.Append(t.PrettyString()).AppendLine();
+                    index++;
+                }
+
                 InterfaceHandler.SendTextPanelToAll(sb.ToString(), "WarPlugin");
 
                 yield return delay;
