@@ -1,7 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
@@ -12,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ENet;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -307,12 +307,9 @@ namespace BrokeProtocol.GameSource.Types
                 foreach(var team in tickets)
                 {
                     var jobInfo = BPAPI.Jobs[team.Key].shared;
-                    sb.Append("<color=#").
-                        Append(ColorUtility.ToHtmlStringRGB(jobInfo.GetColor())).
-                        Append(">").
-                        Append(jobInfo.jobName).
-                        Append("</color>: ").
-                        AppendLine(((int)team.Value).ToString());
+                    sb.AppendColorText(jobInfo.jobName, jobInfo.GetColor())
+                        .Append(": ")
+                        .AppendLine(((int)team.Value).ToString());
                 }
                 InterfaceHandler.SendTextPanelToAll(sb.ToString(), "WarPlugin");
 
@@ -464,18 +461,40 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        public static void SendTeamSelectMenu(ENet.Peer connection)
+        public static void SendTeamSelectMenu(Peer connection)
         {
             var options = new List<LabelID>();
-            foreach (var c in BPAPI.Jobs) options.Add(new LabelID(c.shared.jobName, c.shared.jobName));
+            foreach (var j in BPAPI.Jobs)
+            {
+                var sb = new StringBuilder();
+                sb.AppendColorText(j.shared.jobName, j.shared.GetColor())
+                .Append($" ({j.members.Count} players)");
+                options.Add(new LabelID(sb.ToString(), j.shared.jobName));
+            }
             var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
             SvManager.Instance.SendOptionMenu(connection, selectTeam, 0, selectTeam, options.ToArray(), actions);
         }
 
-        public static void SendClassSelectMenu(ENet.Peer connection, int teamIndex)
+        public static void SendClassSelectMenu(Peer connection, int teamIndex)
         {
+            var teamJob = BPAPI.Jobs[teamIndex];
             var options = new List<LabelID>();
-            foreach (var c in classes[teamIndex]) options.Add(new LabelID(c.className, c.className));
+            var classIndex = 0;
+            foreach (var c in classes[teamIndex])
+            {
+                var classCount = 0;
+                foreach(var m in teamJob.members)
+                {
+                    if(pluginPlayers.TryGetValue(m, out var warSourcePlayer) &&
+                        warSourcePlayer.classIndex == classIndex)
+                    {
+                        classCount++;
+                    }
+                }
+                options.Add(new LabelID($"{c.className} ({classCount} players)", c.className));
+
+                classIndex++;
+            }
             var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
             SvManager.Instance.SendOptionMenu(connection, selectClass, 0, selectClass, options.ToArray(), actions);
         }
