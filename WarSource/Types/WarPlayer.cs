@@ -55,7 +55,7 @@ namespace BrokeProtocol.GameSource.Types
                 WarManager.pluginPlayers.Add(player, warSourcePlayer);
 
                 if (!player.isHuman ||
-                    !SvManager.Instance.connections.TryGetValue(player.svPlayer.connectData.connection, out var connectData) ||
+                    !SvManager.Instance.connections.TryGetValue(player.svPlayer.connection, out var connectData) ||
                     !connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) ||
                     !connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
                 {
@@ -166,7 +166,7 @@ namespace BrokeProtocol.GameSource.Types
                                 {
                                     warSourcePlayer.teamIndex = teamIndex;
                                     player.svPlayer.DestroyMenu(WarManager.selectTeam);
-                                    WarManager.SendClassSelectMenu(player.svPlayer.connectData.connection, teamIndex);
+                                    WarManager.SendClassSelectMenu(player.svPlayer.connection, teamIndex);
                                     warSourcePlayer.changePending = true;
                                     break;
                                 }

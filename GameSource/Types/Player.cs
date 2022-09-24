@@ -426,7 +426,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             InterfaceHandler.SendGameMessageToAll($"{target.displayName} Kicked: {reason}");
 
-            SvManager.Instance.KickConnection(target.svPlayer.connectData.connection);
+            SvManager.Instance.KickConnection(target.svPlayer.connection);
 
             return true;
         }
@@ -437,7 +437,7 @@ namespace BrokeProtocol.GameSource.Types
             InterfaceHandler.SendGameMessageToAll($"{target.displayName} Banned: {reason}");
 
             player.svPlayer.SvBanDatabase(target.username, reason);
-            SvManager.Instance.Disconnect(target.svPlayer.connectData.connection, DisconnectTypes.Banned);
+            SvManager.Instance.Disconnect(target.svPlayer.connection, DisconnectTypes.Banned);
 
             return true;
         }
