@@ -49,6 +49,13 @@ namespace BrokeProtocol.GameSource.Types
                     player.svPlayer.defaultItems = null;
                 }
 
+                if(!player.isHuman)
+                {
+                    // Pick a new random spawn territory for NPCs
+                    warSourcePlayer.spawnTerritoryIndex = -1;
+                    warSourcePlayer.SetSpawnTerritory();
+                }
+
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
                 if (WarUtility.GetSpawn(territoryIndex, out var position, out var rotation, out var place))
@@ -86,24 +93,6 @@ namespace BrokeProtocol.GameSource.Types
             return options.ToArray();
         }
 
-        private bool SetSpawnTerritory(WarSourcePlayer warPlayer)
-        {
-            var curSpawnIndex = warPlayer.spawnTerritoryIndex;
-
-            if (curSpawnIndex < 0 ||
-                Manager.territories[curSpawnIndex].ownerIndex != warPlayer.player.svPlayer.spawnJobIndex)
-            {
-                var territories = WarPlayer.GetTerritories(warPlayer.player.svPlayer.spawnJobIndex);
-                if (territories.Count() > 0)
-                    warPlayer.spawnTerritoryIndex = territories.GetRandom();
-                else
-                    warPlayer.spawnTerritoryIndex = -1;
-
-                return warPlayer.spawnTerritoryIndex != curSpawnIndex;
-            }
-            return false;
-        }
-
         private void SendSpawnMenu(WarSourcePlayer warPlayer)
         {
             if (!warPlayer.player.isHuman)
@@ -125,7 +114,7 @@ namespace BrokeProtocol.GameSource.Types
 
         private IEnumerator DeathLoop(ShDestroyable destroyable)
         {
-            if(WarManager.pluginPlayers.TryGetValue(destroyable, out var warSourcePlayer))
+            if(WarManager.pluginPlayers.TryGetValue(destroyable.Player, out var warSourcePlayer))
             {
                 SendSpawnMenu (warSourcePlayer);
             }
@@ -134,7 +123,7 @@ namespace BrokeProtocol.GameSource.Types
 
             while (destroyable && destroyable.IsDead)
             {
-                if (destroyable.Player && SetSpawnTerritory(warSourcePlayer))
+                if (destroyable.Player && warSourcePlayer.SetSpawnTerritory())
                 {
                     SendSpawnMenu(warSourcePlayer);
                 }

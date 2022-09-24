@@ -3,6 +3,7 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Utility;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -20,6 +21,24 @@ namespace BrokeProtocol.GameSource.Types
         {
             this.player = player;
         }
+
+        public bool SetSpawnTerritory()
+        {
+            var curSpawnIndex = spawnTerritoryIndex;
+
+            if (curSpawnIndex < 0 ||
+                Manager.territories[curSpawnIndex].ownerIndex != player.svPlayer.spawnJobIndex)
+            {
+                var territories = WarPlayer.GetTerritories(player.svPlayer.spawnJobIndex);
+                if (territories.Count() > 0)
+                    spawnTerritoryIndex = territories.GetRandom();
+                else
+                    spawnTerritoryIndex = -1;
+
+                return spawnTerritoryIndex != curSpawnIndex;
+            }
+            return false;
+        }
     }
     
     public class WarPlayer : PlayerEvents
@@ -33,7 +52,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 var warSourcePlayer = new WarSourcePlayer(player);
 
-                WarManager.pluginPlayers.Add(entity, warSourcePlayer);
+                WarManager.pluginPlayers.Add(player, warSourcePlayer);
 
                 if (!player.isHuman ||
                     !SvManager.Instance.connections.TryGetValue(player.svPlayer.connectData.connection, out var connectData) ||
@@ -58,7 +77,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Destroy(ShEntity entity)
         {
-            WarManager.pluginPlayers.Remove(entity);
+            WarManager.pluginPlayers.Remove(entity.Player);
             return true;
         }
 

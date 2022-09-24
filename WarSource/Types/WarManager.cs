@@ -19,6 +19,7 @@ namespace BrokeProtocol.GameSource.Types
     public class TerritoryState
     {
         // Used for territory transition state (gray) between 2 teams
+        public readonly int initialOwner;
         public const int transitionTeamIndex = int.MaxValue;
         public const string territoryProgressBarID = "territory";
         public ShTerritory territory;
@@ -30,6 +31,7 @@ namespace BrokeProtocol.GameSource.Types
         public TerritoryState(ShTerritory territory)
         {
             this.territory = territory;
+            initialOwner = territory.ownerIndex;
         }
 
         public void ResetCaptureState()
@@ -142,7 +144,7 @@ namespace BrokeProtocol.GameSource.Types
 
     public class WarManager : ManagerEvents
     {
-        public static Dictionary<ShEntity, WarSourcePlayer> pluginPlayers = new Dictionary<ShEntity, WarSourcePlayer>();
+        public static Dictionary<ShPlayer, WarSourcePlayer> pluginPlayers = new Dictionary<ShPlayer, WarSourcePlayer>();
 
         public static Dictionary<ShTerritory, TerritoryState> territoryStates = new Dictionary<ShTerritory, TerritoryState>();
 
@@ -325,17 +327,22 @@ namespace BrokeProtocol.GameSource.Types
 
         public void ResetGame()
         {
+            foreach (var pair in territoryStates)
+            {
+                pair.Key.svTerritory.SvSetTerritory(pair.Value.initialOwner);
+            }
+
             tickets.Clear();
             foreach(var t in BPAPI.Jobs)
             {
-                tickets.Add(t.shared.jobIndex, 1000f);
+                tickets.Add(t.shared.jobIndex, 100f);
             }
 
-            foreach(var player in EntityCollections.Players)
+            foreach(var pair in pluginPlayers)
             {
-                player.svPlayer.HealFull();
-                player.svPlayer.SvClearInjuries();
-                player.svPlayer.Respawn();
+                pair.Key.svPlayer.HealFull();
+                pair.Key.svPlayer.SvClearInjuries();
+                pair.Key.svPlayer.Respawn();
             }
         }
 
