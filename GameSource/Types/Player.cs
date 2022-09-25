@@ -31,7 +31,6 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         public bool IsOffOrigin => player.DistanceSqr(goToPosition) > player.GetMount.svMountable.WaypointRangeSqr;
-
         
         public bool SetAttackState(ShEntity target)
         {

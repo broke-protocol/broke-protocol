@@ -28,11 +28,12 @@ namespace BrokeProtocol.GameSource
                 const float offset = 0.5f;
                 place = territory.GetPlace;
 
-                for (int i = 0; i < 10; i++)
+                for (var i = 0; i < 10; i++)
                 {
                     var localPosition = new Vector3(Random.value - offset, 0f, Random.value - offset);
                     
-                    if(t.TransformPoint(localPosition).SafePosition(out var hit) && Mathf.Abs(hit.point.y - t.position.y) <= 10f)
+                    // Raycast down from far above and make sure hit location is vertically near territory
+                    if(t.TransformPoint(localPosition).SafePosition(out var hit, 128f) && Mathf.Abs(hit.point.y - t.position.y) <= 3f)
                     {
                         position = hit.point;
                         rotation = (-position).SafeLookRotation(Vector3.up);
