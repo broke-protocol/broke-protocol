@@ -22,13 +22,14 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            if (destroyable.IsDead) return true;
+            if (destroyable.IsDead) return false;
 
             var player = destroyable.Player;
 
             if (player)
             {
-                if (player.svPlayer.godMode || player.IsShielded(damageIndex, collider)) return true;
+                if (player.svPlayer.godMode || player.IsShielded(damageIndex, collider))
+                    return false;
 
                 if (damageIndex != DamageIndex.Null)
                 {
