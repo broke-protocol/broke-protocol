@@ -79,7 +79,7 @@ namespace BrokeProtocol.GameSource
                 if (player.svPlayer.currentState.index == Core.Freeze.index && player.svPlayer.SetState(Core.Flee.index))
                     return;
 
-                if (player.characterType != CharacterType.Human && player.svPlayer.SetState(Core.Wander.index))
+                if (player.characterType != CharacterType.Humanoid && player.svPlayer.SetState(Core.Wander.index))
                     return;
 
                 player.svPlayer.SetState(Core.Waypoint.index);
@@ -131,7 +131,7 @@ namespace BrokeProtocol.GameSource
             if (destroyed is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
                 pluginVictim.wantedLevel == 0 && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                pluginPlayer.AddCrime(victim.characterType == CharacterType.Human ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
+                pluginPlayer.AddCrime(victim.characterType == CharacterType.Humanoid ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
 
                 if (victim.isHuman && player.isHuman)
                 {
