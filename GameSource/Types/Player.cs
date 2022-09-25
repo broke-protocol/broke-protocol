@@ -710,7 +710,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginFollower))
             {
-                pluginFollower.SetFollowState(player);
+                player.svPlayer.follower.svPlayer.ResetAI();
             }
 
             return true;
