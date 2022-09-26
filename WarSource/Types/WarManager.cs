@@ -334,7 +334,7 @@ namespace BrokeProtocol.GameSource.Types
                     scoreSB.Append("   ").
                         AppendColorText(((int)team.Value).ToString(), jobInfo.GetColor());
                 }
-                InterfaceHandler.SendTextToAll(scoreSB.ToString(), 3f, new Vector2(1f, 0.265f), "Score", 32, TextAnchor.LowerRight);
+                InterfaceHandler.SendTextToAll(scoreSB.ToString(), 3f, new Vector2(1f, 0.25f), "Score", 28, TextAnchor.LowerRight);
 
                 var territoriesSB = new StringBuilder();
                 var index = 0;
@@ -350,7 +350,6 @@ namespace BrokeProtocol.GameSource.Types
                 yield return delay;
             }
         }
-
 
         private readonly Dictionary<int, int> controlledTerritories = new();
         private readonly Dictionary<int, float> tickets = new();
@@ -418,6 +417,14 @@ namespace BrokeProtocol.GameSource.Types
                 if (controlledTerritories.TryGetValue(team.Key, out var count))
                 {
                     burn = burnScalar * (1f - (float)count / territoryStates.Count);
+
+                    if (count == Manager.territories.Count && !EntityCollections.Players.Any(x =>
+                        x.svPlayer.job.info.shared.jobIndex != team.Key &&
+                        !x.IsDead))
+                    {
+                        // Super burn if all territories captured no enemies alive to retake
+                        burn *= 1000;
+                    }
                 }
 
                 tempTickets.Add(
