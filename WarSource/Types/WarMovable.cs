@@ -114,16 +114,21 @@ namespace BrokeProtocol.GameSource.Types
 
         private IEnumerator DeathLoop(ShDestroyable destroyable)
         {
-            if(WarManager.pluginPlayers.TryGetValue(destroyable.Player, out var warSourcePlayer))
+            if(destroyable.Player &&
+                WarManager.pluginPlayers.TryGetValue(destroyable.Player, out var warSourcePlayer))
             {
                 SendSpawnMenu (warSourcePlayer);
+            }
+            else
+            {
+                warSourcePlayer = null;
             }
             
             var respawnTime = Time.time + destroyable.svDestroyable.RespawnTime;
 
             while (destroyable && destroyable.IsDead)
             {
-                if (destroyable.Player && warSourcePlayer.SetSpawnTerritory())
+                if (warSourcePlayer != null && warSourcePlayer.SetSpawnTerritory())
                 {
                     SendSpawnMenu(warSourcePlayer);
                 }
