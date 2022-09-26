@@ -164,9 +164,9 @@ namespace BrokeProtocol.GameSource.Types
 
     public class WarManager : ManagerEvents
     {
-        public static Dictionary<ShPlayer, WarSourcePlayer> pluginPlayers = new Dictionary<ShPlayer, WarSourcePlayer>();
+        public static Dictionary<ShPlayer, WarSourcePlayer> pluginPlayers = new();
 
-        public static Dictionary<ShTerritory, TerritoryState> territoryStates = new Dictionary<ShTerritory, TerritoryState>();
+        public static Dictionary<ShTerritory, TerritoryState> territoryStates = new();
 
         public static List<ShPlayer>[] skinPrefabs = new List<ShPlayer>[2];
 
@@ -315,41 +315,46 @@ namespace BrokeProtocol.GameSource.Types
                                 winner = otherTeam.Key;
                             }
                         }
-
-                        InterfaceHandler.SendTextToAll($"{BPAPI.Jobs[winner].shared.jobName} have won the battle", 1f, new Vector2(0.5f, 0.75f));
+                        var winnerJobInfo = BPAPI.Jobs[winner].shared;
+                        var victorySB = new StringBuilder();
+                        victorySB.Append("Team ")
+                            .AppendColorText(winnerJobInfo.jobName, winnerJobInfo.GetColor())
+                            .Append(" win the match");
+                        InterfaceHandler.SendTextToAll(victorySB.ToString(), 3f, new Vector2(0.5f, 0.75f));
 
                         ResetGame();
                         break;
                     }
                 }
 
-                var sb = new StringBuilder();
-                foreach(var team in tickets)
+                var scoreSB = new StringBuilder();
+                foreach (var team in tickets)
                 {
                     var jobInfo = BPAPI.Jobs[team.Key].shared;
-                    sb.AppendColorText(jobInfo.jobName, jobInfo.GetColor())
-                        .Append(": ")
-                        .AppendLine(((int)team.Value).ToString());
+                    scoreSB.Append("   ").
+                        AppendColorText(((int)team.Value).ToString(), jobInfo.GetColor());
                 }
+                InterfaceHandler.SendTextToAll(scoreSB.ToString(), 3f, new Vector2(1f, 0.265f), "Score", 32, TextAnchor.LowerRight);
 
+                var territoriesSB = new StringBuilder();
                 var index = 0;
                 foreach(var t in territoryStates.Values)
                 {
-                    sb.AppendLine(WarUtility.GetTerritoryName(index));
-                    sb.Append(t.PrettyString()).AppendLine();
+                    territoriesSB.AppendLine(WarUtility.GetTerritoryName(index));
+                    territoriesSB.Append(t.PrettyString()).AppendLine();
                     index++;
                 }
 
-                InterfaceHandler.SendTextPanelToAll(sb.ToString(), "WarPlugin");
+                InterfaceHandler.SendTextPanelToAll(territoriesSB.ToString(), "WarPlugin");
 
                 yield return delay;
             }
         }
 
 
-        private Dictionary<int, int> controlledTerritories = new Dictionary<int, int>();
-        private Dictionary<int, float> tickets = new Dictionary<int, float>();
-        private Dictionary<int, float> tempTickets = new Dictionary<int, float>();
+        private readonly Dictionary<int, int> controlledTerritories = new();
+        private readonly Dictionary<int, float> tickets = new();
+        private readonly Dictionary<int, float> tempTickets = new();
 
         public void ResetGame()
         {
@@ -501,7 +506,7 @@ namespace BrokeProtocol.GameSource.Types
                 options.Add(new LabelID(sb.ToString(), j.shared.jobName));
             }
             var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
-            SvManager.Instance.SendOptionMenu(connection, selectTeam, 0, selectTeam, options.ToArray(), actions);
+            SvManager.Instance.SendOptionMenu(connection, selectTeam, 0, selectTeam, options.ToArray(), actions, 0.3f, 0.2f, 0.7f, 0.6f);
         }
 
         public static void SendClassSelectMenu(Peer connection, int teamIndex)
