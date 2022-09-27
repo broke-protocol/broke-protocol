@@ -10,7 +10,7 @@
     <ProjectGuid>{2706A6D6-BD0F-43D6-9159-54E8DBB4BC32}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>BrokeProtocol.LifeSource</RootNamespace>
-    <AssemblyName>_LifeSource</AssemblyName>
+    <AssemblyName>!LifeSource</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -40,6 +40,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="!GameSource">
+      <HintPath>..\GameSource\bin\Release\!GameSource.dll</HintPath>
+    </Reference>
     <Reference Include="AstarPathfindingProject">
       <HintPath>..\..\broke-protocol-game2\Library\ScriptAssemblies\AstarPathfindingProject.dll</HintPath>
     </Reference>
@@ -73,16 +76,12 @@
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\broke-protocol-game2\BrokeProtocol\BrokeProtocol_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\GameSource\bin\Release\UnityEngine.TextRenderingModule.dll</HintPath>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\..\2022.1.14f1\Editor\Data\Managed\UnityEngine\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\broke-protocol-game2\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="_GameSource">
-      <HintPath>..\GameSource\bin\Release\_GameSource.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

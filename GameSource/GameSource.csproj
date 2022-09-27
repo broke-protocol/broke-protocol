@@ -10,7 +10,7 @@
     <ProjectGuid>{C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>BrokeProtocol.GameSource</RootNamespace>
-    <AssemblyName>_GameSource</AssemblyName>
+    <AssemblyName>!GameSource</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -73,9 +73,8 @@
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\broke-protocol-game2\BrokeProtocol\BrokeProtocol_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Release\UnityEngine.TextRenderingModule.dll</HintPath>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\..\2022.1.14f1\Editor\Data\Managed\UnityEngine\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
