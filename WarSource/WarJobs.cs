@@ -7,25 +7,8 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource
 {
-    public abstract class Army : Job
+    public class Army : Job
     {
-        public override void OnDestroyEntity(ShEntity destroyed)
-        {
-            if (destroyed is ShPlayer victim && victim.isHuman && player.isHuman)
-            {
-                victim.svPlayer.SendGameMessage(player.username + " murdered " + victim.username);
-            }
-
-            if (IsEnemy(destroyed))
-            {
-
-            }
-            else
-            {
-                base.OnDestroyEntity(destroyed);
-            }    
-        }
-
         public override void SetJob()
         {
             base.SetJob();
@@ -37,6 +20,18 @@ namespace BrokeProtocol.GameSource
                 }
             }
             RestartCoroutines();
+        }
+
+        public override void RemoveJob()
+        {
+            if (player.isHuman)
+            {
+                foreach (var territory in Manager.territories)
+                {
+                    territory.svEntity.RemoveSubscribedPlayer(player, true);
+                }
+            }
+            base.RemoveJob();
         }
 
         public override void OnSpawn()
@@ -64,13 +59,43 @@ namespace BrokeProtocol.GameSource
             } while (true);
         }
 
+        public void Loop()
+        {
+            if (!player.isHuman && player.IsMobile)
+            {
+                TryFindEnemy();
+            }
+        }
+
+        protected bool IsEnemy(ShPlayer target) => this != target.svPlayer.job;
+
+        public override void ResetJobAI()
+        {
+            //Debug.Log("territories: " + Manager.territories.Count);
+            var goal = Manager.territories.GetRandom();
+
+            if (!goal)
+            {
+                player.svPlayer.SetState(0);
+                return;
+            }
+
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                if (!pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
+                {
+                    base.ResetJobAI();
+                }
+            }
+        }
+
         public void TryFindEnemy()
         {
             player.svPlayer.LocalEntitiesOne(
                 (e) =>
                 {
                     var p = e.Player;
-                    if (p && p.IsCapable && p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && player.CanSeeEntity(e, true))
+                    if (p && p.IsCapable && IsEnemy(p) && player.CanSeeEntity(e, true))
                     {
                         if (!player.svPlayer.targetEntity)
                             return true;
@@ -87,51 +112,20 @@ namespace BrokeProtocol.GameSource
                 });
         }
 
-        public void Loop()
+        public override void OnDestroyEntity(ShEntity destroyed)
         {
-            if (!player.isHuman && player.IsMobile)
+            base.OnDestroyEntity(destroyed);
+            var victim = destroyed.Player;
+            if (victim)
             {
-                TryFindEnemy();
-            }
-        }
-
-
-
-    
-
-
-
-
-        public override void RemoveJob()
-        {
-            if (player.isHuman)
-            {
-                foreach (var territory in Manager.territories)
+                if (victim.isHuman && player.isHuman)
                 {
-                    territory.svEntity.RemoveSubscribedPlayer(player, true);
+                    victim.svPlayer.SendGameMessage(player.username + " murdered " + victim.username);
                 }
-            }
-            base.RemoveJob();
-        }
 
-        protected bool IsEnemy(ShEntity target) => target is ShPlayer victim && this != victim.svPlayer.job;
-
-        public override void ResetJobAI()
-        {
-            //Debug.Log("territories: " + Manager.territories.Count);
-            var goal = Manager.territories.GetRandom();
-
-            if (!goal)
-            {
-                player.svPlayer.SetState(0);
-                return;
-            }
-
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                if(!pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
+                if (IsEnemy(victim))
                 {
-                    base.ResetJobAI();
+
                 }
             }
         }

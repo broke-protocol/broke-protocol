@@ -133,7 +133,8 @@ namespace BrokeProtocol.GameSource
         public override void OnDestroyEntity(ShEntity destroyed)
         {
             base.OnDestroyEntity(destroyed);
-            if (destroyed is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
+            var victim = destroyed.Player;
+            if (victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
                 pluginVictim.wantedLevel == 0 && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 pluginPlayer.AddCrime(victim.characterType == CharacterType.Humanoid ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
@@ -277,10 +278,11 @@ namespace BrokeProtocol.GameSource
                 });
         }
 
-        public override void OnDestroyEntity(ShEntity entity)
+        public override void OnDestroyEntity(ShEntity destroyed)
         {
-            base.OnDestroyEntity(entity);
-            if (entity is ShPlayer victim && bounties.ContainsKey(victim.username))
+            base.OnDestroyEntity(destroyed);
+            var victim = destroyed.Player;
+            if (victim && bounties.ContainsKey(victim.username))
             {
                 player.svPlayer.Reward(3, 1000);
                 bounties.Remove(victim.username);
@@ -679,17 +681,18 @@ namespace BrokeProtocol.GameSource
             base.RemoveJob();
         }
 
-        protected bool IsEnemyGangster(ShEntity target) => target is ShPlayer victim && victim.svPlayer.job is Gangster && this != victim.svPlayer.job;
+        protected bool IsEnemyGangster(ShPlayer target) => target.svPlayer.job is Gangster && this != target.svPlayer.job;
 
         public override void OnDamageEntity(ShEntity damaged)
         {
-            if (!IsEnemyGangster(damaged))
+            if (!(damaged is ShPlayer victim) || !IsEnemyGangster(victim))
                 base.OnDamageEntity(damaged);
         }
 
-        public override void OnDestroyEntity(ShEntity entity)
+        public override void OnDestroyEntity(ShEntity destroyed)
         {
-            if (IsEnemyGangster(entity))
+            var victim = destroyed.Player;
+            if (victim && IsEnemyGangster(victim))
             {
                 if (!LifeManager.warTerritory)
                 {
@@ -708,7 +711,7 @@ namespace BrokeProtocol.GameSource
                         player.svPlayer.Reward(2, 50);
                     }
                 }
-                else if (Manager.TryGetTerritory(player, out var t) && t.attackerIndex >= 0 && entity is ShPlayer victim)
+                else if (Manager.TryGetTerritory(player, out var t) && t.attackerIndex >= 0)
                 {
                     if (victim.svPlayer.job.info.shared.jobIndex == t.ownerIndex)
                     {
@@ -726,7 +729,7 @@ namespace BrokeProtocol.GameSource
             }
             else
             {
-                base.OnDestroyEntity(entity);
+                base.OnDestroyEntity(destroyed);
             }
         }
 
@@ -1063,10 +1066,11 @@ namespace BrokeProtocol.GameSource
             targetPlayer.svPlayer.SendGameMessage("SpecOps dispatched!");
         }
 
-        public override void OnDestroyEntity(ShEntity entity)
+        public override void OnDestroyEntity(ShEntity destroyed)
         {
-            base.OnDestroyEntity(entity);
-            if (entity is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && targetPlayer == victim && pluginVictim.wantedLevel > 0 && pluginVictim.wantedLevel >= AttackLevel)
+            base.OnDestroyEntity(destroyed);
+            var victim = destroyed.Player;
+            if (victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && targetPlayer == victim && pluginVictim.wantedLevel > 0 && pluginVictim.wantedLevel >= AttackLevel)
             {
                 player.svPlayer.Reward(3, 300);
             }
