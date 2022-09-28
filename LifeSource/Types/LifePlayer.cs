@@ -95,7 +95,7 @@ namespace BrokeProtocol.GameSource.Types
             const float proximityDistanceSqr = 20f * 20f;
 
             player.svPlayer.LocalEntitiesOne(
-                e => e != victim && e is ShPlayer && !e.IsDead && (player.DistanceSqr(e) <= proximityDistanceSqr || player.CanSeeEntity(e, witnessDistance)),
+                e => e != victim && e is ShPlayer && !e.IsDead && (player.DistanceSqr(e) <= proximityDistanceSqr || player.CanSeeEntity(e, false, witnessDistance)),
                 e => w = e.Player);
 
             return w;

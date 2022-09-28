@@ -1,14 +1,13 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
-using BrokeProtocol.Utility.Jobs;
 using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.Jobs;
 using System.Collections;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace BrokeProtocol.GameSource
 {
-    public class JobWar : Job
+    public abstract class Army : Job
     {
         public override void OnDestroyEntity(ShEntity destroyed)
         {
@@ -16,19 +15,35 @@ namespace BrokeProtocol.GameSource
             {
                 victim.svPlayer.SendGameMessage(player.username + " murdered " + victim.username);
             }
+
+            if (IsEnemy(destroyed))
+            {
+
+            }
+            else
+            {
+                base.OnDestroyEntity(destroyed);
+            }    
         }
-    }
 
-
-    public abstract class LoopJob : JobWar
-    {
         public override void SetJob()
         {
             base.SetJob();
+            if (player.isHuman)
+            {
+                foreach (var territory in Manager.territories)
+                {
+                    territory.svEntity.AddSubscribedPlayer(player);
+                }
+            }
             RestartCoroutines();
         }
 
-        public override void OnSpawn() => RestartCoroutines();
+        public override void OnSpawn()
+        {
+            base.OnSpawn();
+            RestartCoroutines();
+        }
 
         private void RestartCoroutines()
         {
@@ -49,19 +64,22 @@ namespace BrokeProtocol.GameSource
             } while (true);
         }
 
-        public virtual void Loop() { }
-    }
-
-
-    
-
-    public class Army : LoopJob
-    {
         public void TryFindEnemy()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job is Army &&
-                        p.svPlayer.spawnJobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
+                (e) =>
+                {
+                    var p = e.Player;
+                    if (p && p.IsCapable && p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && player.CanSeeEntity(e, true))
+                    {
+                        if (!player.svPlayer.targetEntity)
+                            return true;
+
+                        return player.DistanceSqr(e) <
+                        0.5f * player.DistanceSqr(player.svPlayer.targetEntity);
+                    }
+                    return false;
+                },
                 (e) =>
                 {
                     if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
@@ -69,25 +87,20 @@ namespace BrokeProtocol.GameSource
                 });
         }
 
-        public override void Loop()
+        public void Loop()
         {
-            if (!player.isHuman && !player.svPlayer.targetEntity && Random.value < 0.01f && player.IsMobile && player.svPlayer.currentState.index == Core.Waypoint.index)
+            if (!player.isHuman && player.IsMobile)
             {
                 TryFindEnemy();
             }
         }
 
-        public override void SetJob()
-        {
-            if (player.isHuman)
-            {
-                foreach (var territory in Manager.territories)
-                {
-                    territory.svEntity.AddSubscribedPlayer(player);
-                }
-            }
-            base.SetJob();
-        }
+
+
+    
+
+
+
 
         public override void RemoveJob()
         {
@@ -103,24 +116,6 @@ namespace BrokeProtocol.GameSource
 
         protected bool IsEnemy(ShEntity target) => target is ShPlayer victim && this != victim.svPlayer.job;
 
-        public override void OnDamageEntity(ShEntity damaged)
-        {
-            if (!IsEnemy(damaged))
-                base.OnDamageEntity(damaged);
-        }
-
-        public override void OnDestroyEntity(ShEntity entity)
-        {
-            if (IsEnemy(entity))
-            {
-                //
-            }
-            else
-            {
-                base.OnDestroyEntity(entity);
-            }
-        }
-
         public override void ResetJobAI()
         {
             //Debug.Log("territories: " + Manager.territories.Count);
@@ -132,8 +127,13 @@ namespace BrokeProtocol.GameSource
                 return;
             }
 
-            if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent);
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            {
+                if(!pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
+                {
+                    base.ResetJobAI();
+                }
+            }
         }
     }
 }

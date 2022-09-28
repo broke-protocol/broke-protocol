@@ -82,8 +82,11 @@ namespace BrokeProtocol.GameSource
                 if (player.characterType != CharacterType.Humanoid && player.svPlayer.SetState(Core.Wander.index))
                     return;
 
-                player.svPlayer.SetState(Core.Waypoint.index);
+                if (player.svPlayer.SetState(Core.Waypoint.index))
+                    return;
             }
+
+            base.ResetJobAI();
         }
 
         public override bool IsValidTarget(ShPlayer chaser)
@@ -108,6 +111,7 @@ namespace BrokeProtocol.GameSource
 
         public override void OnDamageEntity(ShEntity damaged)
         {
+            base.OnDamageEntity(damaged);
             if (damaged is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
                 pluginVictim.wantedLevel == 0 && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
@@ -128,6 +132,7 @@ namespace BrokeProtocol.GameSource
 
         public override void OnDestroyEntity(ShEntity destroyed)
         {
+            base.OnDestroyEntity(destroyed);
             if (destroyed is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
                 pluginVictim.wantedLevel == 0 && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
@@ -152,7 +157,11 @@ namespace BrokeProtocol.GameSource
             RestartCoroutines();
         }
 
-        public override void OnSpawn() => RestartCoroutines();
+        public override void OnSpawn()
+        {
+            base.OnSpawn();
+            RestartCoroutines();
+        }
 
         private void RestartCoroutines()
         {
@@ -194,7 +203,7 @@ namespace BrokeProtocol.GameSource
         public void TryFindVictim()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.curMount && !p.IsDead && !p.IsRestrained && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && !p.curMount && p.IsCapable && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
@@ -252,7 +261,7 @@ namespace BrokeProtocol.GameSource
         protected void TryFindBounty()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e, true),
                 (e) =>
                 {
                     if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && 
@@ -347,6 +356,7 @@ namespace BrokeProtocol.GameSource
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
         {
+            base.OnOptionMenuAction(targetID, menuID, optionID, actionID);
             switch(menuID)
             {
                 case placeBountyMenu:
@@ -422,7 +432,13 @@ namespace BrokeProtocol.GameSource
 
     public class Prisoner : JobLife
     {
-        public override void ResetJobAI() => player.svPlayer.SetState(Core.Wander.index);
+        public override void ResetJobAI()
+        {
+            if (!player.svPlayer.SetState(Core.Wander.index))
+            {
+                base.ResetJobAI();
+            }
+        }
     }
 
     public class Police : LawEnforcement
@@ -525,11 +541,16 @@ namespace BrokeProtocol.GameSource
 
         public override void OnHealEntity(ShEntity entity)
         {
+            base.OnHealEntity(entity);
             // Make sure not a transport being fixed
             if(entity is ShPlayer) player.svPlayer.Reward(2, 100);
         }
 
-        public override void OnRevivePlayer(ShPlayer entity) => player.svPlayer.Reward(3, 250);
+        public override void OnRevivePlayer(ShPlayer player)
+        {
+            base.OnRevivePlayer(player);
+            base.player.svPlayer.Reward(3, 250);
+        }
     }
 
     public class Firefighter : TargetEntityJob
@@ -604,8 +625,8 @@ namespace BrokeProtocol.GameSource
         public void TryFindEnemyGang()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.IsDead && p.svPlayer.job is Gangster &&
-                        p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && !p.IsRestrained && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && p.IsCapable && p.svPlayer.job is Gangster &&
+                        p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && player.CanSeeEntity(e, true),
                 (e) =>
                 {
                     if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
@@ -817,7 +838,8 @@ namespace BrokeProtocol.GameSource
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
         {
-            switch(menuID)
+            base.OnOptionMenuAction(targetID, menuID, optionID, actionID);
+            switch (menuID)
             {
                 case requestItemMenu:
                     RequestAdd(targetID, optionID); // actionID doesn't matter here
@@ -998,7 +1020,7 @@ namespace BrokeProtocol.GameSource
         protected void TryFindCriminal()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.IsDead && !p.IsRestrained && LifeManager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && p.IsCapable && LifeManager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e, true),
                 (e) =>
                 {
                     if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
