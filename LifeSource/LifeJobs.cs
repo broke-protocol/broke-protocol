@@ -63,7 +63,7 @@ namespace BrokeProtocol.GameSource
 
 
 
-    public class JobLife : Job
+    public abstract class JobLife : LoopJob
     {
         public override void ResetJobAI()
         {
@@ -149,45 +149,7 @@ namespace BrokeProtocol.GameSource
         public override float GetSpawnRate() => ((MyJobInfo)info).spawnRate;
     }
 
-
-    public abstract class LoopJob : JobLife
-    {
-        public override void ResetJob()
-        {
-            base.ResetJob();
-            RestartCoroutines();
-        }
-
-        public override void OnSpawn()
-        {
-            base.OnSpawn();
-            RestartCoroutines();
-        }
-
-        private void RestartCoroutines()
-        {
-            if (player.isActiveAndEnabled && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                if (pluginPlayer.jobCoroutine != null) player.StopCoroutine(pluginPlayer.jobCoroutine);
-                pluginPlayer.jobCoroutine = player.StartCoroutine(JobCoroutine());
-            }
-        }
-
-        private IEnumerator JobCoroutine()
-        {
-            var delay = new WaitForSeconds(1f);
-            do
-            {
-                yield return delay;
-                Loop();
-            } while (true);
-        }
-
-        public abstract void Loop();
-    }
-
-
-    public class Citizen : LoopJob
+    public class Citizen : JobLife
     {
         protected void TryFindInnocent()
         {
@@ -225,7 +187,7 @@ namespace BrokeProtocol.GameSource
         }
     }
 
-    public class Hitman : LoopJob
+    public class Hitman : JobLife
     {
         public const string bountiesKey = "bounties";
         public static readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
@@ -441,6 +403,8 @@ namespace BrokeProtocol.GameSource
                 base.ResetJobAI();
             }
         }
+
+        public override void Loop() { }
     }
 
     public class Police : LawEnforcement
@@ -620,7 +584,7 @@ namespace BrokeProtocol.GameSource
         }
     }
 
-    public class Gangster : LoopJob
+    public class Gangster : JobLife
     {
         protected int gangstersKilled;
 
@@ -749,7 +713,7 @@ namespace BrokeProtocol.GameSource
         }
     }
 
-    public class Mayor : LoopJob
+    public class Mayor : JobLife
     {
         private static readonly Dictionary<string, string> requests = new Dictionary<string, string>();
 
@@ -940,7 +904,7 @@ namespace BrokeProtocol.GameSource
         }
     }
 
-    public abstract class TargetEntityJob : LoopJob
+    public abstract class TargetEntityJob : JobLife
     {
         [NonSerialized]
         public ShEntity target;

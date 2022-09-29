@@ -1,13 +1,10 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Utility;
-using BrokeProtocol.Utility.Jobs;
-using System.Collections;
-using UnityEngine;
 
 namespace BrokeProtocol.GameSource
 {
-    public class Army : Job
+    public class Army : LoopJob
     {
         public override void SetJob()
         {
@@ -19,7 +16,6 @@ namespace BrokeProtocol.GameSource
                     territory.svEntity.AddSubscribedPlayer(player);
                 }
             }
-            RestartCoroutines();
         }
 
         public override void RemoveJob()
@@ -34,32 +30,7 @@ namespace BrokeProtocol.GameSource
             base.RemoveJob();
         }
 
-        public override void OnSpawn()
-        {
-            base.OnSpawn();
-            RestartCoroutines();
-        }
-
-        private void RestartCoroutines()
-        {
-            if (player.isActiveAndEnabled && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                if (pluginPlayer.jobCoroutine != null) player.StopCoroutine(pluginPlayer.jobCoroutine);
-                pluginPlayer.jobCoroutine = player.StartCoroutine(JobCoroutine());
-            }
-        }
-
-        private IEnumerator JobCoroutine()
-        {
-            var delay = new WaitForSeconds(1f);
-            do
-            {
-                yield return delay;
-                Loop();
-            } while (true);
-        }
-
-        public void Loop()
+        public override void Loop()
         {
             if (!player.isHuman && player.IsMobile)
             {
