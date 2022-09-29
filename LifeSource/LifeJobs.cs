@@ -1196,8 +1196,7 @@ namespace BrokeProtocol.GameSource
         {
             if (targetPlayer)
             {
-                targetPlayer.svPlayer.SvDismount();
-                targetPlayer.svPlayer.ResetAI();
+                targetPlayer.svPlayer.SvDismount(true);
             }
 
             if (destinationMarker)

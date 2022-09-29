@@ -68,8 +68,7 @@ namespace BrokeProtocol.GameSource
             else if (Time.time >= stopRestrainTime)
             {
                 player.svPlayer.SvSetEquipable(player.Hands);
-                player.svPlayer.SvDismount();
-                player.svPlayer.ResetAI();
+                player.svPlayer.SvDismount(true);
                 return false;
             }
 

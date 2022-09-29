@@ -524,8 +524,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (!player.isHuman)
             {
-                player.svPlayer.SvDismount();
-                player.svPlayer.ResetAI();
+                player.svPlayer.SvDismount(true);
             }
             else
             {
@@ -607,9 +606,8 @@ namespace BrokeProtocol.GameSource.Types
                 }
                 else
                 {
-                    other.svPlayer.SvDismount();
                     other.svPlayer.ClearLeader();
-                    other.svPlayer.ResetAI();
+                    other.svPlayer.SvDismount(true);
                 }
             }
             else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.currentState.IsBusy &&
