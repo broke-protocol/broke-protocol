@@ -583,7 +583,7 @@ namespace BrokeProtocol.GameSource
 
                 player.svPlayer.LookAt(coverOrientation);
             }
-            // Move on waypointPath, else navigate back to waypointPath
+            // Move on Path, else navigate back to Path
             else if (!player.svPlayer.MoveLookNavPath())
             {
                 player.ZeroInputs();
