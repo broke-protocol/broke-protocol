@@ -30,7 +30,7 @@ namespace BrokeProtocol.GameSource.Types
             this.player = player;
         }
 
-        public bool IsOffOrigin => player.DistanceSqr(goToPosition) > player.GetMount.svMountable.WaypointRangeSqr;
+        public bool IsOffOrigin => player.DistanceSqr(goToPosition) > player.GetMount.svMountable.NavRangeSqr;
         
         public bool SetAttackState(ShEntity target)
         {
@@ -766,8 +766,8 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
                 if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
-                player.svPlayer.SvTrySetEquipable(player.Hands.index);
                 if (player.svPlayer.leader && pluginPlayer.SetFollowState(player.svPlayer.leader)) return true;
+                player.svPlayer.SvTrySetEquipable(player.Hands.index);
                 if (player.IsPassenger && player.svPlayer.SetState(Core.Null.index)) return true;
 
                 if (player.svPlayer.spawnTarget && pluginPlayer.SetAttackState(player.svPlayer.spawnTarget)) return true;

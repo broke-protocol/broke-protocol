@@ -74,19 +74,22 @@ namespace BrokeProtocol.GameSource
             //Debug.Log("territories: " + Manager.territories.Count);
             var goal = Manager.territories.GetRandom();
 
-            if (!goal)
+            if (!goal && player.svPlayer.SetState(0))
             {
-                player.svPlayer.SetState(0);
                 return;
             }
 
+            player.svPlayer.SetBestWeapons();
+
             if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (!pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
+                if (pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
                 {
-                    base.ResetJobAI();
+                    return;
                 }
             }
+
+            base.ResetJobAI();
         }
 
         public void TryFindEnemy()
@@ -125,7 +128,7 @@ namespace BrokeProtocol.GameSource
 
                 if (IsEnemy(victim))
                 {
-
+                    // Ticket burn
                 }
             }
         }

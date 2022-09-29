@@ -416,7 +416,7 @@ namespace BrokeProtocol.GameSource
                     player.svPlayer.LookAt(pluginPlayer.goToRotation);
                 }
             }
-            else if (!player.GetControlled.svMountable.MoveLookNavPath())
+            else if (!player.svPlayer.MoveLookNavPath())
             {
                 player.ZeroInputs();
                 onDestination = true;
@@ -443,9 +443,9 @@ namespace BrokeProtocol.GameSource
             // Move on waypointPath, else navigate back to waypointPath
             if (player.svPlayer.onWaypoints)
             {
-                player.GetControlled.svMountable.MoveLookWaypointPath();
+                player.svPlayer.MoveLookWaypointPath();
             }
-            else if (!player.GetControlled.svMountable.MoveLookNavPath())
+            else if (!player.svPlayer.MoveLookNavPath())
             {
                 player.svPlayer.onWaypoints = true;
             }
@@ -585,7 +585,7 @@ namespace BrokeProtocol.GameSource
                 player.svPlayer.LookAt(coverOrientation);
             }
             // Move on waypointPath, else navigate back to waypointPath
-            else if (!player.GetControlled.svMountable.MoveLookNavPath())
+            else if (!player.svPlayer.MoveLookNavPath())
             {
                 player.ZeroInputs();
                 reachedCover = true;
@@ -621,7 +621,7 @@ namespace BrokeProtocol.GameSource
         protected virtual void HandleDistantTarget()
         {
             if (player.svPlayer.TargetMoved()) player.svPlayer.PathToTarget();
-            else if(!player.GetControlled.svMountable.MoveLookNavPath()) player.ZeroInputs();
+            else if(!player.svPlayer.MoveLookNavPath()) player.ZeroInputs();
         }
 
         public override bool UpdateState()
@@ -760,7 +760,7 @@ namespace BrokeProtocol.GameSource
             {
                 player.svPlayer.PathToTarget();
             }
-            else if (!player.GetControlled.svMountable.MoveLookNavPath())
+            else if (!player.svPlayer.MoveLookNavPath())
             {
                 player.svPlayer.SetState(Core.Wait.index);
             }
@@ -914,7 +914,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            player.GetControlled.svMountable.MoveLookNodePath();
+            player.svPlayer.MoveLookNodePath();
             return true;
         }
     }
