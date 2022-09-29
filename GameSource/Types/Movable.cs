@@ -26,7 +26,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (Time.time >= respawnTime)
                 {
-                    destroyable.svDestroyable.Disappear();
+                    destroyable.svDestroyable.DestroyEffect();
                     destroyable.svDestroyable.Respawn();
                     yield break;
                 }

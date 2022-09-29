@@ -351,9 +351,9 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        private readonly Dictionary<int, int> controlledTerritories = new();
-        private readonly Dictionary<int, float> tickets = new();
-        private readonly Dictionary<int, float> tempTickets = new();
+        public static readonly Dictionary<int, int> controlledTerritories = new();
+        public static readonly Dictionary<int, float> tickets = new();
+        public static readonly Dictionary<int, float> tempTickets = new();
 
         public void ResetGame()
         {

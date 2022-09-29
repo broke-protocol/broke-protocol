@@ -121,14 +121,21 @@ namespace BrokeProtocol.GameSource
             var victim = destroyed.Player;
             if (victim)
             {
-                if (victim.isHuman && player.isHuman)
-                {
-                    victim.svPlayer.SendGameMessage(player.username + " murdered " + victim.username);
-                }
-
                 if (IsEnemy(victim))
                 {
                     // Ticket burn
+                    var victimIndex = victim.svPlayer.job.info.shared.jobIndex;
+
+                    WarManager.tickets[victimIndex] -= 1f;
+
+                    if (victim.isHuman && player.isHuman)
+                    {
+                        victim.svPlayer.SendGameMessage($"{player.username} killed  {victim.username}");
+                    }
+                }
+                else if (player.isHuman)
+                {
+                    victim.svPlayer.SendGameMessage($"&4{player.username} team-killed  {victim.username}");
                 }
             }
         }

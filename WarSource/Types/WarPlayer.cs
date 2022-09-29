@@ -81,9 +81,6 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Override)]
-        public override bool RemoveItemsDeath(ShPlayer player, bool dropItems) => true;
-
         public static IEnumerable<int> GetTerritories(int team)
         {
             var territories = new List<int>();
@@ -196,6 +193,31 @@ namespace BrokeProtocol.GameSource.Types
                     }
                     break;
             }
+            return true;
+        }
+
+
+        // Override to Drop items without removing them from player
+        [Execution(ExecutionMode.Override)]
+        public override bool RemoveItemsDeath(ShPlayer player, bool dropItems)
+        {
+            if (dropItems)
+            {
+                var briefcase = player.svPlayer.SpawnBriefcase();
+
+                if (briefcase)
+                {
+                    foreach (var invItem in player.myItems.Values)
+                    {
+                        if (Random.value < 0.8f)
+                        {
+                            invItem.count = Mathf.CeilToInt(invItem.count * Random.Range(0.05f, 0.3f));
+                            briefcase.myItems.Add(invItem.item.index, invItem);
+                        }
+                    }
+                }
+            }
+
             return true;
         }
     }

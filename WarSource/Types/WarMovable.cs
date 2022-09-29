@@ -137,7 +137,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     if (warSourcePlayer == null || warSourcePlayer.spawnTerritoryIndex >= 0)
                     {
-                        destroyable.svDestroyable.Disappear();
+                        destroyable.svDestroyable.DestroyEffect();
                         destroyable.svDestroyable.Respawn();
                         break;
                     }
