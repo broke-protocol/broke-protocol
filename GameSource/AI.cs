@@ -606,13 +606,14 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.PathToTarget();
         }
 
-        protected virtual void HandleNearTarget()
+        protected virtual bool HandleNearTarget()
         {
             player.svPlayer.ResetTargetPosition();
             player.svPlayer.LookTactical(player.WorldPositionToDirection(player.svPlayer.targetEntity.GetPosition));
+            return true;
         }
 
-        protected virtual void HandleDistantTarget()
+        protected virtual bool HandleDistantTarget()
         {
             if (player.svPlayer.TargetMoved())
             {
@@ -620,7 +621,9 @@ namespace BrokeProtocol.GameSource
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
+                // Try something else here?
             }
+            return true;
         }
 
         public override bool UpdateState()
@@ -628,11 +631,9 @@ namespace BrokeProtocol.GameSource
             if (!base.UpdateState()) return false;
 
             if (player.svPlayer.TargetNear)
-                HandleNearTarget();
-            else
-                HandleDistantTarget();
-
-            return true;
+                return HandleNearTarget();
+            
+            return HandleDistantTarget();
         }
     }
 
@@ -752,13 +753,14 @@ namespace BrokeProtocol.GameSource
         protected bool hunting;
         protected ShProjectile projectile;
 
-        protected override void HandleNearTarget()
+        protected override bool HandleNearTarget()
         {
             base.HandleNearTarget();
             hunting = false;
+            return true;
         }
 
-        protected override void HandleDistantTarget()
+        protected override bool HandleDistantTarget()
         {
             if(!hunting && player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete
                 && player.svPlayer.GetOverwatchNearest(player.svPlayer.lastTargetPosition, out var stalkPosition))
@@ -775,9 +777,18 @@ namespace BrokeProtocol.GameSource
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
-                hunting = false;
-                player.svPlayer.SetState(Core.Wait.index);
+                if (hunting)
+                {
+                    hunting = false;
+                }
+                else
+                {
+                    player.svPlayer.SetState(Core.Wait.index);
+                    return false;
+                }
             }
+
+            return true;
         }
 
         public override void EnterState()
