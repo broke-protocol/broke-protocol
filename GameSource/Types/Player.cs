@@ -34,11 +34,14 @@ namespace BrokeProtocol.GameSource.Types
         
         public bool SetAttackState(ShEntity target)
         {
+            // Sanity check
+            if (!target || target == player) return false; 
+
             if (target == player.svPlayer.leader) player.svPlayer.ClearLeader();
 
             player.svPlayer.targetEntity = target;
 
-            bool returnState = false;
+            var returnState = false;
 
             if (player.GetControlled is ShAircraft aircraft)
             {
@@ -221,7 +224,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     pluginPlayer.SetAttackState(attacker);
                 }
-                else if (player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginPlayerFollower))
+                else if (player.svPlayer.follower && attacker != player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginPlayerFollower))
                 {
                     pluginPlayerFollower.SetAttackState(attacker);
                 }
