@@ -763,7 +763,7 @@ namespace BrokeProtocol.GameSource
         protected override bool HandleDistantTarget()
         {
             if(!hunting && player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete
-                && player.svPlayer.GetOverwatchNearest(player.svPlayer.lastTargetPosition, out var stalkPosition))
+                && player.svPlayer.GetOverwatchNear(player.svPlayer.lastTargetPosition, out var stalkPosition))
             {
                 hunting = true;
                 player.svPlayer.GetPathAvoidance(stalkPosition);
