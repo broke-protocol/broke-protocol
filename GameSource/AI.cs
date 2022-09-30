@@ -686,7 +686,7 @@ namespace BrokeProtocol.GameSource
                 }
 
                 player.svPlayer.AimSmart();
-                var range = Mathf.Min(player.ActiveWeapon.Range + player.GetRotationT.localPosition.z, Util.pathfindRange) * 0.5f;
+                var range = Mathf.Min(0.5f * player.ActiveWeapon.Range + player.GetRotationT.localPosition.z, 25f);
                 player.TrySetInput(
                     Mathf.Clamp((player.Distance(targetEntity) - range) * 0.5f, -1f, 1f),
                     0f,
