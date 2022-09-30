@@ -611,6 +611,7 @@ namespace BrokeProtocol.GameSource
 
         protected virtual void HandleNearTarget()
         {
+            player.svPlayer.LookTactical(player.WorldPositionToDirection(player.svPlayer.targetEntity.GetPosition));
         }
 
         protected virtual void HandleDistantTarget()
