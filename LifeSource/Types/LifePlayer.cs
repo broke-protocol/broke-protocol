@@ -559,8 +559,8 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (player.IsDriving && player.curMount is ShEmergencyVehicle vehicle && vehicle.siren &&
                     Physics.Raycast(
-                        vehicle.GetPositionT.TransformPoint(vehicle.svTransport.frontOffset),
-                        vehicle.GetPositionT.forward,
+                        vehicle.mainT.TransformPoint(vehicle.svTransport.frontOffset),
+                        vehicle.mainT.forward,
                         out var raycastHit,
                         50f,
                         MaskIndex.physical))

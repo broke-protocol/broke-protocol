@@ -136,7 +136,7 @@ namespace BrokeProtocol.GameSource.Types
                                     if (spawnTransport && spawnTransport.CanSpawn(s.position, s.rotation))
                                     {
                                         spawnTransport.Spawn(s.position, s.rotation, SceneManager.Instance.ExteriorT);
-                                        spawnTransport.SetVelocity(0.5f * spawnTransport.maxSpeed * spawnTransport.GetPositionT.forward);
+                                        spawnTransport.SetVelocity(0.5f * spawnTransport.maxSpeed * spawnTransport.mainT.forward);
                                         spawnBot.svPlayer.SpawnBot(
                                             s.position,
                                             s.rotation,
