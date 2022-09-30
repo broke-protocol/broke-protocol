@@ -605,12 +605,12 @@ namespace BrokeProtocol.GameSource
         {
             base.EnterState();
 
-            if (player.svPlayer.TargetNear) player.svPlayer.ResetTargetPosition();
-            else player.svPlayer.PathToTarget();
+            player.svPlayer.PathToTarget();
         }
 
         protected virtual void HandleNearTarget()
         {
+            player.svPlayer.ResetTargetPosition();
             player.svPlayer.LookTactical(player.WorldPositionToDirection(player.svPlayer.targetEntity.GetPosition));
         }
 
@@ -746,7 +746,8 @@ namespace BrokeProtocol.GameSource
 
     public class AttackState : FireState
     {
-        ShProjectile projectile;
+        protected bool stalking;
+        protected ShProjectile projectile;
 
         protected override void HandleDistantTarget()
         {
@@ -765,6 +766,7 @@ namespace BrokeProtocol.GameSource
         public override void EnterState()
         {
             base.EnterState();
+            stalking = false;
             projectile = null;
             player.svPlayer.SetBestWeapons();
         }
