@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Utility;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource
 {
@@ -44,20 +45,48 @@ namespace BrokeProtocol.GameSource
         {
             player.svPlayer.SetBestWeapons();
 
-            //Debug.Log("territories: " + Manager.territories.Count);
-            var goal = Manager.territories.GetRandom();
-
-            if (!goal && player.svPlayer.SetState(0))
-            {
-                return;
-            }
-
+            // TODO: Smarter goal selection
             if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
+                var rand = Random.value;
+
+                if (rand < 0.25f)
                 {
-                    return;
+                    var goal = Manager.territories.GetRandom();
+                    if (goal && pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
+                    {
+                        return;
+                    }
                 }
+                else if(rand < 0.5f)
+                {
+                    var goal = Manager.territories.GetRandom();
+                    if (goal && pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
+                    {
+                        return;
+                    }
+
+                    if(player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var stalkPosition))
+                    {
+
+                    }
+                }
+                else if (rand < 0.75f)
+                {
+                    // enter empty vehicle
+                }
+                else
+                {
+                    // follow someone
+                }
+
+            }
+
+
+            Debug.LogWarning("[SVR] Job shouldn't end up here");
+            if (player.svPlayer.SetState(0))
+            {
+                return;
             }
 
             base.ResetJobAI();

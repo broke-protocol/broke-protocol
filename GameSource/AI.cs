@@ -4,6 +4,7 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
+using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -517,7 +518,9 @@ namespace BrokeProtocol.GameSource
 
                 var offset = controlled.bounds.size.x * 2f;
 
-                var delta = player.svPlayer.lastTargetPosition - controlled.GetOrigin;
+                var targetPosition = player.svPlayer.targetEntity.GetPosition;
+
+                var delta = targetPosition - controlled.GetOrigin;
 
                 var normal = delta.normalized;
 
@@ -526,19 +529,22 @@ namespace BrokeProtocol.GameSource
                 {
                     var startPos = player.GetOrigin - (Mathf.Abs(i) * offset * normal) + Vector3.Cross(i * offset * normal, Vector3.up);
 
-                    var currentDelta = player.svPlayer.lastTargetPosition - startPos;
-
-                    //SvManager.Instance.DrawLine(startPos, startPos + currentDelta, Color.red, 5f);
-
-                    if (Physics.Raycast(startPos, currentDelta, out var hit, currentDelta.magnitude, MaskIndex.hard) && Mathf.Abs(hit.normal.y) <= 0.5f)
+                    if (Util.SafePosition(startPos, out var startHit))
                     {
-                        var destination = hit.point + (hit.normal * controlled.bounds.extents.z);
-                        if (player.svPlayer.NodeNear(destination) != null)
+                        var currentDelta = targetPosition - startHit.point;
+
+                        //SvManager.Instance.DrawLine(startPos, startPos + currentDelta, Color.red, 5f);
+
+                        if (Physics.Raycast(startPos, currentDelta, out var hit, currentDelta.magnitude, MaskIndex.hard) && Mathf.Abs(hit.normal.y) <= 0.5f)
                         {
-                            player.svPlayer.GetPath(destination);
-                            reachedCover = false;
-                            coverOrientation = Vector3.Cross(hit.normal, Mathf.Sign(i) * Vector3.up);
-                            return true;
+                            var destination = hit.point + (hit.normal * controlled.bounds.extents.z);
+                            if (player.svPlayer.NodeNear(destination) != null)
+                            {
+                                player.svPlayer.GetPath(destination);
+                                reachedCover = false;
+                                coverOrientation = Vector3.Cross(hit.normal, Mathf.Sign(i) * Vector3.up);
+                                return true;
+                            }
                         }
                     }
 
@@ -601,27 +607,49 @@ namespace BrokeProtocol.GameSource
 
     public abstract class ChaseState : TargetState
     {
+        public Vector3 lastTargetPosition;
+
+        public void ResetTargetPosition() => lastTargetPosition = player.svPlayer.targetEntity.GetOrigin;
+
+        public bool TargetMoved() => player.svPlayer.targetEntity.DistanceSqr(lastTargetPosition) > Util.pathfindRangeSqr;
+
+        public void PathToTarget()
+        {
+            if (player.svPlayer.targetEntity.Grounded)
+            {
+                ResetTargetPosition();
+                player.svPlayer.GetPathAvoidance(player.svPlayer.targetEntity.GetPosition);
+            }
+            else
+            {
+                player.ZeroInputs();
+            }
+        }
+
+
+
+
         public override byte StateMoveMode => MoveMode.Normal;
 
         public override void EnterState()
         {
             base.EnterState();
 
-            player.svPlayer.PathToTarget();
+            PathToTarget();
         }
 
         protected virtual bool HandleNearTarget()
         {
-            player.svPlayer.ResetTargetPosition();
+            ResetTargetPosition();
             player.svPlayer.LookTactical(player.WorldPositionToDirection(player.svPlayer.targetEntity.GetPosition));
             return true;
         }
 
         protected virtual bool HandleDistantTarget()
         {
-            if (player.svPlayer.TargetMoved())
+            if (TargetMoved())
             {
-                player.svPlayer.PathToTarget();
+                PathToTarget();
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
@@ -772,19 +800,19 @@ namespace BrokeProtocol.GameSource
                 hunting = true;
                 player.svPlayer.GetPathAvoidance(stalkPosition);
             }
-            else if (player.svPlayer.TargetMoved() && 
+            else if (TargetMoved() && 
                 (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || 
                 player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
                 hunting = false;
-                player.svPlayer.PathToTarget();
+                PathToTarget();
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
                 if (hunting)
                 {
                     hunting = false;
-                    player.svPlayer.PathToTarget();
+                    PathToTarget();
                 }
                 else
                 {
