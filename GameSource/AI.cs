@@ -388,14 +388,10 @@ namespace BrokeProtocol.GameSource
         {
             base.EnterState();
             player.svPlayer.SvDismount();
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && pluginPlayer.IsOffOrigin)
+            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 onDestination = false;
                 player.svPlayer.GetPath(pluginPlayer.goToPosition);
-            }
-            else
-            {
-                onDestination = true;
             }
         }
 
@@ -412,7 +408,7 @@ namespace BrokeProtocol.GameSource
                 }
                 else
                 {
-                    player.svPlayer.LookAt(pluginPlayer.goToRotation);
+                    player.svPlayer.LookTactical(pluginPlayer.goToRotation);
                 }
             }
             else if (!player.svPlayer.MoveLookNavPath())
