@@ -413,7 +413,6 @@ namespace BrokeProtocol.GameSource
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
-                player.ZeroInputs();
                 onDestination = true;
             }
 
@@ -582,7 +581,6 @@ namespace BrokeProtocol.GameSource
             // Move on Path, else navigate back to Path
             else if (!player.svPlayer.MoveLookNavPath())
             {
-                player.ZeroInputs();
                 reachedCover = true;
                 waitTime = Time.time + 5f;
             }
@@ -616,8 +614,13 @@ namespace BrokeProtocol.GameSource
 
         protected virtual void HandleDistantTarget()
         {
-            if (player.svPlayer.TargetMoved()) player.svPlayer.PathToTarget();
-            else if(!player.svPlayer.MoveLookNavPath()) player.ZeroInputs();
+            if (player.svPlayer.TargetMoved())
+            {
+                player.svPlayer.PathToTarget();
+            }
+            else if (!player.svPlayer.MoveLookNavPath())
+            {
+            }
         }
 
         public override bool UpdateState()
@@ -746,19 +749,33 @@ namespace BrokeProtocol.GameSource
 
     public class AttackState : FireState
     {
-        protected bool stalking;
+        protected bool hunting;
         protected ShProjectile projectile;
+
+        protected override void HandleNearTarget()
+        {
+            base.HandleNearTarget();
+            hunting = false;
+        }
 
         protected override void HandleDistantTarget()
         {
-            if (player.svPlayer.TargetMoved() && 
+            if(!hunting && player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete
+                && player.svPlayer.GetOverwatchNearest(player.svPlayer.lastTargetPosition, out var stalkPosition))
+            {
+                hunting = true;
+                player.svPlayer.GetPathAvoidance(stalkPosition);
+            }
+            else if (player.svPlayer.TargetMoved() && 
                 (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || 
                 player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
+                hunting = false;
                 player.svPlayer.PathToTarget();
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
+                hunting = false;
                 player.svPlayer.SetState(Core.Wait.index);
             }
         }
@@ -766,7 +783,7 @@ namespace BrokeProtocol.GameSource
         public override void EnterState()
         {
             base.EnterState();
-            stalking = false;
+            hunting = false;
             projectile = null;
             player.svPlayer.SetBestWeapons();
         }
