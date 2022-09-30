@@ -552,12 +552,12 @@ namespace BrokeProtocol.GameSource
 
         public override bool UpdateState()
         {
-            if (!base.UpdateState()) return false;
+            if (!base.UpdateState() || 
+                !Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer)) return false;
 
             if (reachedCover)
             {
                 if (player.CanSeeEntity(player.svPlayer.targetEntity) && 
-                    Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
                     pluginPlayer.SetAttackState(player.svPlayer.targetEntity))
                 {
                     return false;
@@ -565,9 +565,9 @@ namespace BrokeProtocol.GameSource
 
                 if (Time.time > waitTime)
                 {
-                    if (Random.value < 0.5f && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer2))
+                    if (Random.value < 0.5f)
                     {
-                        pluginPlayer2.SetAttackState(player.svPlayer.targetEntity);
+                        pluginPlayer.SetAttackState(player.svPlayer.targetEntity);
                     }
                     else
                     {
@@ -578,7 +578,11 @@ namespace BrokeProtocol.GameSource
 
                 player.svPlayer.LookAt(coverOrientation);
             }
-            // Move on Path, else navigate back to Path
+            else if(player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete)
+            {
+                pluginPlayer.SetAttackState(player.svPlayer.targetEntity);
+                return false;
+            }
             else if (!player.svPlayer.MoveLookNavPath())
             {
                 reachedCover = true;
@@ -763,7 +767,7 @@ namespace BrokeProtocol.GameSource
         protected override bool HandleDistantTarget()
         {
             if(!hunting && player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete
-                && player.svPlayer.GetOverwatchNear(player.svPlayer.lastTargetPosition, out var stalkPosition))
+                && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var stalkPosition))
             {
                 hunting = true;
                 player.svPlayer.GetPathAvoidance(stalkPosition);
@@ -780,6 +784,7 @@ namespace BrokeProtocol.GameSource
                 if (hunting)
                 {
                     hunting = false;
+                    player.svPlayer.PathToTarget();
                 }
                 else
                 {

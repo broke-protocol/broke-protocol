@@ -42,6 +42,8 @@ namespace BrokeProtocol.GameSource
 
         public override void ResetJobAI()
         {
+            player.svPlayer.SetBestWeapons();
+
             //Debug.Log("territories: " + Manager.territories.Count);
             var goal = Manager.territories.GetRandom();
 
@@ -49,8 +51,6 @@ namespace BrokeProtocol.GameSource
             {
                 return;
             }
-
-            player.svPlayer.SetBestWeapons();
 
             if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
