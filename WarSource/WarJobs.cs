@@ -2,7 +2,6 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Utility;
-using System.Security.Principal;
 using System.Text;
 using UnityEngine;
 
@@ -128,6 +127,7 @@ namespace BrokeProtocol.GameSource
             {
                 if (IsEnemy(victim))
                 {
+                    // TODO: Reward players for stuff other than killing
                     player.svPlayer.Reward(1, 0);
                     // Ticket burn
                     var victimIndex = victim.svPlayer.job.info.shared.jobIndex;
