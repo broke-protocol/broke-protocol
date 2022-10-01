@@ -19,7 +19,7 @@ namespace BrokeProtocol.GameSource
 
     public static class WarUtility
     {
-        public static bool GetSpawn(int territoryIndex, out Vector3 position, out Quaternion rotation, out Place place)
+        public static bool GetValidTerritoryPosition(int territoryIndex, out Vector3 position, out Quaternion rotation, out Place place)
         {
             var territory = Manager.territories[territoryIndex];
             if (territory)

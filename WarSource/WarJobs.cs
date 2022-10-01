@@ -1,6 +1,9 @@
-﻿using BrokeProtocol.Entities;
+﻿using BrokeProtocol.API;
+using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Utility;
+using System.Security.Principal;
+using System.Text;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource
@@ -52,8 +55,10 @@ namespace BrokeProtocol.GameSource
 
                 if (rand < 0.25f)
                 {
-                    var goal = Manager.territories.GetRandom();
-                    if (goal && pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
+                    var territoryIndex = Random.Range(0, Manager.territories.Count);
+
+                    if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) 
+                        && pluginPlayer.SetGoToState(pos, rot, place.mTransform))
                     {
                         return;
                     }
@@ -123,6 +128,7 @@ namespace BrokeProtocol.GameSource
             {
                 if (IsEnemy(victim))
                 {
+                    player.svPlayer.Reward(1, 0);
                     // Ticket burn
                     var victimIndex = victim.svPlayer.job.info.shared.jobIndex;
 
@@ -130,14 +136,24 @@ namespace BrokeProtocol.GameSource
 
                     if (victim.isHuman && player.isHuman)
                     {
-                        victim.svPlayer.SendGameMessage($"{player.username} killed  {victim.username}");
+                        InterfaceHandler.SendGameMessageToAll(KillString(player, victim, " killed "));
                     }
                 }
                 else if (player.isHuman)
                 {
-                    victim.svPlayer.SendGameMessage($"&4{player.username} team-killed  {victim.username}");
+                    InterfaceHandler.SendGameMessageToAll(KillString(player, victim, " &4team-killed ");
                 }
             }
+        }
+
+        private string KillString(ShPlayer attacker, ShPlayer victim, string s)
+        {
+            var sb = new StringBuilder();
+            sb.AppendColorText(attacker.username, attacker.svPlayer.job.info.shared.GetColor());
+            sb.Append(s);
+            sb.AppendColorText(victim.username, victim.svPlayer.job.info.shared.GetColor());
+
+            return sb.ToString();
         }
     }
 }
