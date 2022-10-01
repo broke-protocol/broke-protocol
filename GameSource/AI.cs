@@ -840,7 +840,10 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            if (player.CanFireEquipable)
+            if (player.CurrentAmmoTotal == 0)
+                player.svPlayer.SetBestWeapons();
+
+            if(!player.curMount)
             {
                 player.svPlayer.SvUpdateMode(player.Perlin(0.4f) < 0.4f ? MoveMode.Zoom : StateMoveMode);
 
@@ -877,9 +880,6 @@ namespace BrokeProtocol.GameSource
 
                     if(player.stances[(int)StanceIndex.Crouch].input > 0f)
                         player.svPlayer.SvCrouch(player.Perlin(0.1f) < 0.35f);
-                    
-                    if (player.CurrentAmmoTotal == 0)
-                        player.svPlayer.SetBestWeapons();
                 }
             }
             else
