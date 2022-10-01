@@ -409,7 +409,7 @@ namespace BrokeProtocol.GameSource
                 }
                 else
                 {
-                    player.svPlayer.LookTactical(pluginPlayer.goToRotation);
+                    player.svPlayer.LookTactical(pluginPlayer.goToRotation * Vector3.forward);
                 }
             }
             else if (!player.svPlayer.MoveLookNavPath())
@@ -630,7 +630,8 @@ namespace BrokeProtocol.GameSource
 
         protected virtual bool HandleNearTarget()
         {
-            player.svPlayer.LookTactical(player.WorldPositionToDirection(player.svPlayer.targetEntity.GetPosition));
+            var delta = player.svPlayer.targetEntity.GetPosition - player.GetPosition;
+            player.svPlayer.LookTactical(delta);
             return true;
         }
 
