@@ -793,7 +793,6 @@ namespace BrokeProtocol.GameSource
             if ((Random.value < 0.5f || player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete)
                 && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
             {
-                player.svPlayer.lastPathState = Pathfinding.PathCompleteState.Complete;
                 player.svPlayer.GetPathAvoidance(huntPosition);
                 ResetTargetPosition();
                 hunting = true;
