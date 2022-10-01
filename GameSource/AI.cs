@@ -615,15 +615,8 @@ namespace BrokeProtocol.GameSource
 
         public void PathToTarget()
         {
-            if (player.svPlayer.targetEntity.Grounded)
-            {
-                player.svPlayer.GetPathAvoidance(player.svPlayer.targetEntity.GetPosition);
-                ResetTargetPosition();
-            }
-            else
-            {
-                player.ZeroInputs();
-            }
+            player.svPlayer.GetPathAvoidance(player.svPlayer.targetEntity.GetPosition);
+            ResetTargetPosition();
         }
 
         public override byte StateMoveMode => MoveMode.Normal;
@@ -814,7 +807,7 @@ namespace BrokeProtocol.GameSource
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
-                if (hunting)
+                if (hunting && player.CanSeeEntity(player.svPlayer.targetEntity))
                 {
                     TryHunting();
                 }
