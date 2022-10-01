@@ -64,13 +64,11 @@ namespace BrokeProtocol.GameSource
                 }
                 else if(rand < 0.5f)
                 {
-                    var goal = Manager.territories.GetRandom();
-                    if (goal && pluginPlayer.SetGoToState(goal.mainT.position, goal.mainT.rotation, goal.mainT.parent))
-                    {
-                        return;
-                    }
+                    var territoryIndex = Random.Range(0, Manager.territories.Count);
 
-                    if(player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var stalkPosition))
+                    if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
+                        && player.svPlayer.GetOverwatchBest(player.svPlayer.targetEntity.GetPosition, out var stalkPosition) &&
+                        pluginPlayer.SetGoToState(pos, rot, place.mTransform))
                     {
 
                     }

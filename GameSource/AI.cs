@@ -4,7 +4,7 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
-using System;
+using Pathfinding;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -584,7 +584,7 @@ namespace BrokeProtocol.GameSource
 
                 player.svPlayer.LookAt(coverOrientation);
             }
-            else if(player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete)
+            else if(player.svPlayer.lastPathState != PathCompleteState.Complete)
             {
                 pluginPlayer.SetAttackState(player.svPlayer.targetEntity);
                 return false;
@@ -611,9 +611,9 @@ namespace BrokeProtocol.GameSource
 
         public void ResetTargetPosition() => lastTargetPosition = player.svPlayer.targetEntity.GetOrigin;
 
-        public bool TargetMoved() => player.svPlayer.targetEntity.DistanceSqr(lastTargetPosition) > Util.pathfindRangeSqr;
+        public bool TargetMoved => player.svPlayer.targetEntity.DistanceSqr(lastTargetPosition) > Util.pathfindRangeSqr;
 
-        public void PathToTarget()
+        public virtual void PathToTarget()
         {
             player.svPlayer.GetPathAvoidance(player.svPlayer.targetEntity.GetPosition);
             ResetTargetPosition();
@@ -624,7 +624,7 @@ namespace BrokeProtocol.GameSource
         public override void EnterState()
         {
             base.EnterState();
-
+            ResetTargetPosition();
             PathToTarget();
         }
 
@@ -637,7 +637,7 @@ namespace BrokeProtocol.GameSource
 
         protected virtual bool HandleDistantTarget()
         {
-            if (TargetMoved())
+            if (TargetMoved)
             {
                 PathToTarget();
             }
@@ -782,9 +782,15 @@ namespace BrokeProtocol.GameSource
             return true;
         }
 
-        private void TryHunting()
+        public override void PathToTarget()
         {
-            if ((Random.value < 0.5f || player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete)
+            // Cancel hunting if target moved
+            if(hunting && TargetMoved)
+            {
+                hunting = false;
+            }
+
+            if ((hunting || player.svPlayer.lastPathState != PathCompleteState.Complete || Random.value < 0.5f)
                 && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
             {
                 player.svPlayer.GetPathAvoidance(huntPosition);
@@ -793,24 +799,24 @@ namespace BrokeProtocol.GameSource
             }
             else
             {
-                PathToTarget();
+                base.PathToTarget();
                 hunting = false;
             }
         }
 
         protected override bool HandleDistantTarget()
         {
-            if (TargetMoved() && 
-                (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || 
-                player.CanSeeEntity(player.svPlayer.targetEntity)))
+            if ((player.svPlayer.lastPathState != PathCompleteState.Complete || TargetMoved)
+                &&
+                (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
-                TryHunting();
+                PathToTarget();
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
-                if (hunting && player.CanSeeEntity(player.svPlayer.targetEntity))
+                if (player.CanSeeEntity(player.svPlayer.targetEntity))
                 {
-                    TryHunting();
+                    PathToTarget();
                 }
                 else
                 {
