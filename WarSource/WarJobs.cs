@@ -141,7 +141,7 @@ namespace BrokeProtocol.GameSource
                 }
                 else if (player.isHuman)
                 {
-                    InterfaceHandler.SendGameMessageToAll(KillString(player, victim, " &4team-killed ");
+                    InterfaceHandler.SendGameMessageToAll(KillString(player, victim, " &4team-killed "));
                 }
             }
         }

@@ -617,17 +617,14 @@ namespace BrokeProtocol.GameSource
         {
             if (player.svPlayer.targetEntity.Grounded)
             {
-                ResetTargetPosition();
                 player.svPlayer.GetPathAvoidance(player.svPlayer.targetEntity.GetPosition);
+                ResetTargetPosition();
             }
             else
             {
                 player.ZeroInputs();
             }
         }
-
-
-
 
         public override byte StateMoveMode => MoveMode.Normal;
 
@@ -640,7 +637,6 @@ namespace BrokeProtocol.GameSource
 
         protected virtual bool HandleNearTarget()
         {
-            ResetTargetPosition();
             player.svPlayer.LookTactical(player.WorldPositionToDirection(player.svPlayer.targetEntity.GetPosition));
             return true;
         }
@@ -792,27 +788,36 @@ namespace BrokeProtocol.GameSource
             return true;
         }
 
+        private void TryHunting()
+        {
+            if ((Random.value < 0.5f || player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete)
+                && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
+            {
+                player.svPlayer.lastPathState = Pathfinding.PathCompleteState.Complete;
+                player.svPlayer.GetPathAvoidance(huntPosition);
+                ResetTargetPosition();
+                hunting = true;
+            }
+            else
+            {
+                PathToTarget();
+                hunting = false;
+            }
+        }
+
         protected override bool HandleDistantTarget()
         {
-            if(!hunting && player.svPlayer.lastPathState != Pathfinding.PathCompleteState.Complete
-                && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var stalkPosition))
-            {
-                hunting = true;
-                player.svPlayer.GetPathAvoidance(stalkPosition);
-            }
-            else if (TargetMoved() && 
+            if (TargetMoved() && 
                 (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || 
                 player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
-                hunting = false;
-                PathToTarget();
+                TryHunting();
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
                 if (hunting)
                 {
-                    hunting = false;
-                    PathToTarget();
+                    TryHunting();
                 }
                 else
                 {
