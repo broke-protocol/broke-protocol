@@ -660,7 +660,8 @@ namespace BrokeProtocol.GameSource
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
-                // Try something else here?
+                // This is handled better in AttackState, but little we can do here
+                player.svPlayer.ResetAI();
             }
             return true;
         }
@@ -829,33 +830,26 @@ namespace BrokeProtocol.GameSource
                 player.svPlayer.GetPathAvoidance(huntPosition);
                 ResetTargetPosition();
                 hunting = true;
-
-                if(player.svPlayer.targetEntity is ShPlayer p && p.isHuman) Debug.Log(player + " hunting");
             }
             else
             {
                 base.PathToTarget();
                 hunting = false;
-
-                if (player.svPlayer.targetEntity is ShPlayer p && p.isHuman) Debug.Log(player + " direct");
             }
         }
 
         protected override bool HandleDistantTarget()
         {
-            if (BadPath)
-            {
-                PathToTarget();
-            }
-            else if(TargetMoved &&
-                (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || player.CanSeeEntity(player.svPlayer.targetEntity)))
+            if (TargetMoved &&
+                 (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
                 PathToTarget();
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
-                if (player.CanSeeEntity(player.svPlayer.targetEntity))
+                if (BadPath || player.CanSeeEntity(player.svPlayer.targetEntity))
                 {
+                    if (player.svPlayer.targetEntity ?? player.svPlayer.targetEntity.isHuman) Debug.Log(player + " Repath!");
                     PathToTarget();
                 }
                 else
