@@ -112,6 +112,8 @@ namespace BrokeProtocol.GameSource
 
     public class AirAttackState : BaseState
     {
+        public override bool IsAttacking => true;
+
         private ShAircraft aircraft;
 
         private enum AirState
@@ -520,20 +522,22 @@ namespace BrokeProtocol.GameSource
 
                 var targetPosition = player.svPlayer.targetEntity.GetPosition;
 
-                var delta = targetPosition - controlled.GetOrigin;
+                var delta = targetPosition - controlled.GetPosition;
 
                 var normal = delta.normalized;
 
                 int i = 1;
                 while (i < 6)
                 {
-                    var startPos = player.GetOrigin - (Mathf.Abs(i) * offset * normal) + Vector3.Cross(i * offset * normal, Vector3.up);
+                    var startPos = controlled.GetPosition - (Mathf.Abs(i) * offset * normal) + Vector3.Cross(i * offset * normal, Vector3.up);
 
                     if (Util.SafePosition(startPos, out var startHit))
                     {
                         var currentDelta = targetPosition - startHit.point;
 
-                        //SvManager.Instance.DrawLine(startPos, startPos + currentDelta, Color.red, 5f);
+                        startPos = startHit.point + Vector3.up * controlled.bounds.extents.y;
+
+                        SvManager.Instance.DrawLine(startPos, startPos + currentDelta, Color.red, 5f);
 
                         if (Physics.Raycast(startPos, currentDelta, out var hit, currentDelta.magnitude, MaskIndex.hard) && Mathf.Abs(hit.normal.y) <= 0.5f)
                         {
@@ -775,6 +779,8 @@ namespace BrokeProtocol.GameSource
         protected bool hunting;
         protected ShProjectile projectile;
 
+        public override bool IsAttacking => true;
+
         protected override bool HandleNearTarget()
         {
             base.HandleNearTarget();
@@ -796,11 +802,15 @@ namespace BrokeProtocol.GameSource
                 player.svPlayer.GetPathAvoidance(huntPosition);
                 ResetTargetPosition();
                 hunting = true;
+
+                Debug.Log(player + " hunting");
             }
             else
             {
                 base.PathToTarget();
                 hunting = false;
+
+                Debug.Log(player + " direct");
             }
         }
 
