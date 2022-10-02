@@ -404,10 +404,9 @@ namespace BrokeProtocol.GameSource
 
             if (onDestination && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (pluginPlayer.IsOffOrigin)
+                if (pluginPlayer.IsOffOrigin && player.svPlayer.SetState(index)) // Restart state
                 {
-                    // Restart state
-                    player.svPlayer.SetState(index);
+                    return false;
                 }
                 else
                 {
@@ -867,7 +866,11 @@ namespace BrokeProtocol.GameSource
                     {
                         player.Fire(projectile.index);
                         player.svPlayer.SetBestWeapons();
-                        player.svPlayer.SetState(Core.TakeCover.index);
+
+                        if(player.svPlayer.SetState(Core.TakeCover.index))
+                        {
+                            return false;
+                        }
                     }
                 }
                 else
@@ -885,9 +888,8 @@ namespace BrokeProtocol.GameSource
                             return true;
                         }
                         
-                        if (r < 0.01f)
+                        if (r < 0.01f && player.svPlayer.SetState(Core.TakeCover.index))
                         {
-                            player.svPlayer.SetState(Core.TakeCover.index);
                             return false;
                         }
                     }
