@@ -12,6 +12,19 @@ namespace BrokeProtocol.GameSource
 {
     public class BaseState : State
     {
+        public bool IsTargetValid()
+        {
+            if (player.IsCapable && player.svPlayer.targetEntity && player.svPlayer.targetEntity.svEntity.IsValidTarget(player))
+                return true;
+
+            player.svPlayer.targetEntity = null;
+            return false;
+        }
+
+        public bool TargetNear => player.GetMount == player.svPlayer.targetEntity.GetMount ||
+            player.DistanceSqr(player.svPlayer.targetEntity) < Util.closeRangeSqr ||
+            player.CanSeeEntity(player.svPlayer.targetEntity, false, false, Util.pathfindRange);
+
         public override bool UpdateState()
         {
             if (!base.UpdateState()) return false;
@@ -91,7 +104,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            if (!player.svPlayer.IsTargetValid() || Time.time > waitTime)
+            if (!IsTargetValid() || Time.time > waitTime)
             {
                 player.svPlayer.ResetAI();
                 return false;
@@ -127,7 +140,7 @@ namespace BrokeProtocol.GameSource
 
         public override bool EnterTest()
         {
-            if (base.EnterTest() && player.svPlayer.IsTargetValid())
+            if (base.EnterTest() && IsTargetValid())
             {
                 aircraft = player.GetControlled as ShAircraft;
                 if (aircraft && aircraft.HasWeapons)
@@ -186,7 +199,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            if (!player.svPlayer.IsTargetValid() || player.curMount != aircraft)
+            if (!IsTargetValid() || player.curMount != aircraft)
             {
                 player.svPlayer.ResetAI();
                 return false;
@@ -322,6 +335,8 @@ namespace BrokeProtocol.GameSource
         private bool jumped;
         private Vector3 lastCheckPosition;
         private float nextCheckTime;
+
+        public bool BadPath => player.svPlayer.lastPathState != PathCompleteState.Complete;
 
         private void UpdateChecks()
         {
@@ -487,13 +502,13 @@ namespace BrokeProtocol.GameSource
 
     public abstract class TargetState : MovingState
     {
-        public override bool EnterTest() => base.EnterTest() && player.svPlayer.IsTargetValid();
+        public override bool EnterTest() => base.EnterTest() && IsTargetValid();
 
         public override bool UpdateState()
         {
             if (!base.UpdateState()) return false;
 
-            if (!player.svPlayer.IsTargetValid())
+            if (!IsTargetValid())
             {
                 player.svPlayer.ResetAI();
                 return false;
@@ -587,7 +602,7 @@ namespace BrokeProtocol.GameSource
 
                 player.svPlayer.LookAt(coverOrientation);
             }
-            else if(player.svPlayer.lastPathState != PathCompleteState.Complete)
+            else if(BadPath)
             {
                 pluginPlayer.SetAttackState(player.svPlayer.targetEntity);
                 return false;
@@ -654,7 +669,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            if (player.svPlayer.TargetNear)
+            if (TargetNear)
                 return HandleNearTarget();
             
             return HandleDistantTarget();
@@ -669,7 +684,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            if (player.svPlayer.TargetNear) player.ZeroInputs();
+            if (TargetNear) player.ZeroInputs();
 
             var target = player.svPlayer.targetEntity;
             var targetMount = target.GetMount;
@@ -712,7 +727,7 @@ namespace BrokeProtocol.GameSource
 
             var targetEntity = player.svPlayer.targetEntity;
 
-            if (player.svPlayer.TargetNear)
+            if (TargetNear)
             {
                 if (player.curMount && !player.curMount.HasWeapons && targetEntity.Velocity.sqrMagnitude <= Util.slowSpeedSqr)
                 {
@@ -743,7 +758,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            if (player.svPlayer.TargetNear)
+            if (TargetNear)
             {
                 player.svPlayer.SvFree(player.svPlayer.targetEntity.ID);
                 player.svPlayer.ResetAI();
@@ -767,7 +782,7 @@ namespace BrokeProtocol.GameSource
 
             player.svPlayer.FireLogic();
 
-            if (!player.svPlayer.IsTargetValid())
+            if (!IsTargetValid())
             {
                 player.svPlayer.ResetAI();
                 return false;
@@ -786,8 +801,16 @@ namespace BrokeProtocol.GameSource
 
         protected override bool HandleNearTarget()
         {
-            base.HandleNearTarget();
-            hunting = false;
+            if(BadPath)
+            {
+                PathToTarget();
+            }
+            else
+            {
+                base.HandleNearTarget();
+                hunting = false;
+            }
+            
             return true;
         }
 
@@ -799,28 +822,32 @@ namespace BrokeProtocol.GameSource
                 hunting = false;
             }
 
-            if ((hunting || player.svPlayer.lastPathState != PathCompleteState.Complete || Random.value < 0.5f)
+            if ((hunting || BadPath || Random.value < 0.25f)
+                && (!player.curMount || player.curMount.HasWeapons) // Don't do hunting behavior if in an unarmed vehicle
                 && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
             {
                 player.svPlayer.GetPathAvoidance(huntPosition);
                 ResetTargetPosition();
                 hunting = true;
 
-                Debug.Log(player + " hunting");
+                if(player.svPlayer.targetEntity is ShPlayer p && p.isHuman) Debug.Log(player + " hunting");
             }
             else
             {
                 base.PathToTarget();
                 hunting = false;
 
-                Debug.Log(player + " direct");
+                if (player.svPlayer.targetEntity is ShPlayer p && p.isHuman) Debug.Log(player + " direct");
             }
         }
 
         protected override bool HandleDistantTarget()
         {
-            if ((player.svPlayer.lastPathState != PathCompleteState.Complete || TargetMoved)
-                &&
+            if (BadPath)
+            {
+                PathToTarget();
+            }
+            else if(TargetMoved &&
                 (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
                 PathToTarget();

@@ -38,7 +38,7 @@ namespace BrokeProtocol.GameSource
                         pluginPlayer.SetAttackState(targetPlayer))
                         return false;
                 }
-                else if (targetPlayer.IsSurrendered && !targetPlayer.switching && player.svPlayer.TargetNear)
+                else if (targetPlayer.IsSurrendered && !targetPlayer.switching && TargetNear)
                 {
                     player.otherEntity = targetPlayer;
                     foreach (var i in targetPlayer.myItems.Values.ToArray())
@@ -54,7 +54,7 @@ namespace BrokeProtocol.GameSource
                     return false;
                 }
             }
-            else if (player.svPlayer.TargetNear && LifeManager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget))
+            else if (TargetNear && LifeManager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget))
             {
                 threatened = true;
                 stopTime = Time.time + 8f;
