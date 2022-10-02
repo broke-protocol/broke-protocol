@@ -345,7 +345,7 @@ namespace BrokeProtocol.GameSource
 
             if (!player.IsPassenger && Time.time > nextCheckTime)
             {
-                if (player.input.x > 0.1f && controlled.DistanceSqr(lastCheckPosition) <= controlled.maxSpeed * 0.4f)
+                if (player.input.sqrMagnitude > 0.1f && controlled.DistanceSqr(lastCheckPosition) <= controlled.maxSpeed * 0.4f)
                 {
                     if (!jumped && !player.curMount)
                     {
