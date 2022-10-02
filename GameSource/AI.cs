@@ -634,8 +634,7 @@ namespace BrokeProtocol.GameSource
 
         protected virtual bool HandleNearTarget()
         {
-            var delta = player.svPlayer.targetEntity.GetPosition - player.GetPosition;
-            player.svPlayer.LookTactical(delta);
+            player.svPlayer.LookTactical(player.svPlayer.targetEntity.GetOrigin - player.GetOrigin);
             return true;
         }
 
@@ -702,6 +701,12 @@ namespace BrokeProtocol.GameSource
             if (player.IsDriving) player.svPlayer.SvSetSiren(true);
         }
 
+        protected override bool HandleNearTarget()
+        {
+            player.svPlayer.AimSmart();
+            return true;
+        }
+
         public override bool UpdateState()
         {
             if (!base.UpdateState()) return false;
@@ -715,7 +720,6 @@ namespace BrokeProtocol.GameSource
                     player.svPlayer.SvDismount();
                 }
 
-                player.svPlayer.AimSmart();
                 var range = Mathf.Min(0.5f * player.ActiveWeapon.Range + player.GetRotationT.localPosition.z, 25f);
                 player.TrySetInput(
                     Mathf.Clamp((player.Distance(targetEntity) - range) * 0.5f, -1f, 1f),
