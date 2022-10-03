@@ -54,6 +54,17 @@ namespace BrokeProtocol.GameSource
                 });
         }
 
+        protected bool TryFindLeader()
+        {
+            return player.svPlayer.LocalEntitiesOne(
+                (e) => e is ShPlayer p && !p.curMount && !p.svPlayer.follower && p.IsMobile,
+                (e) =>
+                {
+                    player.svPlayer.targetEntity = e;
+                    player.svPlayer.SetState(Core.Follow.index);
+                });
+        }
+
         public override void ResetJobAI()
         {
             player.svPlayer.SetBestWeapons();
@@ -71,44 +82,29 @@ namespace BrokeProtocol.GameSource
                 return;
             }
 
-            var rand = Random.value;
-            if (rand < 0.2f) // Enter and hold a territory
+            if (!player.svPlayer.leader && Random.value < 0.2f && TryFindLeader()) // Follow a teammate
             {
-                var territoryIndex = Random.Range(0, Manager.territories.Count);
+                return;
+            }
 
-                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) &&
-                    player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal) &&
+            var territoryIndex = Random.Range(0, Manager.territories.Count);
+
+            if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place))
+            {
+                // Overwatch a territory
+                if (Random.value < 0.5f && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
                     player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
                 {
-
+                    return;
                 }
-            }
-            else if (rand < 0.4f) // Overwatch a territory
-            {
-                var territoryIndex = Random.Range(0, Manager.territories.Count);
-
-                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
-                    && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
-                    player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
+                else if (player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal2) &&
+                    player.GamePlayer().SetGoToState(goal2, rot, place.mTransform))
                 {
-
+                    return;
                 }
             }
-            else if (rand < 0.6f) // Enter a nearby vehicle
-            {
 
-            }
-            else if (rand < 0.8f) // Follow a teammate
-            {
-
-            }
-            else // Enter a static emplacement
-            {
-
-            }
-
-
-            // Nothing else to really do, maybe WanderState?
+            // Nothing else to really do, maybe a timed WanderState?
             player.svPlayer.DestroySelf();
         }
 
