@@ -368,7 +368,14 @@ namespace BrokeProtocol.GameSource
                     }
                     else if(Utility.unstuck.Limit(player))
                     {
-                        player.svPlayer.DestroySelf();
+                        if (player.curMount)
+                        {
+                            player.svPlayer.SvDismount(true);
+                        }
+                        else
+                        {
+                            player.svPlayer.DestroySelf();
+                        }
                         return false;
                     }
                     else if(player.svPlayer.SetState(Core.Unstuck.index))
