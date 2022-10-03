@@ -662,6 +662,7 @@ namespace BrokeProtocol.GameSource
             {
                 // This is handled better in AttackState, but little we can do here
                 player.svPlayer.ResetAI();
+                return false;
             }
             return true;
         }
@@ -800,9 +801,12 @@ namespace BrokeProtocol.GameSource
 
         public override bool IsAttacking => true;
 
+        // Don't do hunting behavior if in an unarmed vehicle
+        public bool ShouldHunt => !player.curMount || player.curMount.HasWeapons;
+
         protected override bool HandleNearTarget()
         {
-            if(BadPath)
+            if(BadPath && ShouldHunt && !hunting)
             {
                 PathToTarget();
             }
@@ -824,7 +828,7 @@ namespace BrokeProtocol.GameSource
             }
 
             if ((hunting || BadPath || Random.value < 0.25f)
-                && (!player.curMount || player.curMount.HasWeapons) // Don't do hunting behavior if in an unarmed vehicle
+                && ShouldHunt
                 && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
             {
                 player.svPlayer.GetPathAvoidance(huntPosition);
@@ -840,16 +844,19 @@ namespace BrokeProtocol.GameSource
 
         protected override bool HandleDistantTarget()
         {
-            if (TargetMoved &&
+            if (BadPath && ShouldHunt && !hunting)
+            {
+                PathToTarget();
+            }
+            else if (TargetMoved &&
                  (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
                 PathToTarget();
             }
             else if (!player.svPlayer.MoveLookNavPath())
             {
-                if (BadPath || player.CanSeeEntity(player.svPlayer.targetEntity))
+                if (player.CanSeeEntity(player.svPlayer.targetEntity))
                 {
-                    if (player.svPlayer.targetEntity ?? player.svPlayer.targetEntity.isHuman) Debug.Log(player + " Repath!");
                     PathToTarget();
                 }
                 else
