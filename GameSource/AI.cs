@@ -417,27 +417,27 @@ namespace BrokeProtocol.GameSource
 
             if (onDestination)
             {
-                if (player.GamePlayer().IsOffDestination && player.svPlayer.SetState(index)) // Restart state
-                {
-                    return false;
-                }
-                else
+                if (player.GamePlayer().OnDestination)
                 {
                     player.svPlayer.LookTactical(player.GamePlayer().goToRotation * Vector3.forward);
+                }
+                else if (player.svPlayer.SetState(index)) // Restart state
+                {
+                    return false;
                 }
             }
             else if(player.IsFlying)
             {
-                if (player.GamePlayer().IsOffDestination)
+                if(player.GamePlayer().OnDestination)
+                {
+                    player.svPlayer.SvDismount(true);
+                    return false;
+                }
+                else
                 {
                     var aircraft = player.curMount;
                     player.svPlayer.LookAt(player.GamePlayer().goToPosition - aircraft.GetPosition);
                     aircraft.svMountable.MoveTo(player.GamePlayer().goToPosition);
-                }
-                else
-                {
-                    player.svPlayer.SvDismount(true);
-                    return false;
                 }
             }
             else if (!player.svPlayer.MoveLookNavPath())

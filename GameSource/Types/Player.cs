@@ -30,7 +30,7 @@ namespace BrokeProtocol.GameSource.Types
             this.player = player;
         }
 
-        public bool IsOffDestination => player.GetMount.DistanceSqr(goToPosition) > player.GetMount.svMountable.NavRangeSqr;
+        public bool OnDestination => player.GetMount.DistanceSqr(goToPosition) < player.GetMount.svMountable.NavRangeSqr;
         
         public bool SetAttackState(ShEntity target)
         {
