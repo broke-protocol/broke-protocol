@@ -2,6 +2,7 @@
 using BrokeProtocol.Utility;
 using BrokeProtocol.Required;
 using UnityEngine;
+using BrokeProtocol.Entities;
 
 namespace BrokeProtocol.GameSource
 {
@@ -19,6 +20,8 @@ namespace BrokeProtocol.GameSource
 
     public static class WarUtility
     {
+        public static WarSourcePlayer WarPlayer(this ShPlayer player) => WarManager.pluginPlayers[player];
+
         public static bool GetValidTerritoryPosition(int territoryIndex, out Vector3 position, out Quaternion rotation, out Place place)
         {
             var territory = Manager.territories[territoryIndex];

@@ -47,9 +47,9 @@ namespace BrokeProtocol.GameSource.Types
             const float alertDelay = 1f;
             var controller = entity.Controller;
 
-            if (controller && Time.time - controller.PluginPlayer().lastAlertTime > alertDelay)
+            if (controller && Time.time - controller.GamePlayer().lastAlertTime > alertDelay)
             {
-                controller.PluginPlayer().lastAlertTime = Time.time;
+                controller.GamePlayer().lastAlertTime = Time.time;
 
                 if (controller.isHuman)
                 {
@@ -59,7 +59,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     if (!controller.svPlayer.currentState.IsBusy)
                     {
-                        controller.PluginPlayer().SetAttackState(missile.svEntity.instigator);
+                        controller.GamePlayer().SetAttackState(missile.svEntity.instigator);
                     }
 
                     if (Random.value < 0.4f)

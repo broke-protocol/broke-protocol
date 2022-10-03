@@ -56,7 +56,7 @@ namespace BrokeProtocol.GameSource
                 var territoryIndex = Random.Range(0, Manager.territories.Count);
 
                 if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) 
-                    && player.PluginPlayer().SetGoToState(pos, rot, place.mTransform))
+                    && player.GamePlayer().SetGoToState(pos, rot, place.mTransform))
                 {
                     return;
                 }
@@ -67,7 +67,7 @@ namespace BrokeProtocol.GameSource
 
                 if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
                     && player.svPlayer.GetOverwatchBest(player.svPlayer.targetEntity.GetPosition, out var stalkPosition) &&
-                    player.PluginPlayer().SetGoToState(pos, rot, place.mTransform))
+                    player.GamePlayer().SetGoToState(pos, rot, place.mTransform))
                 {
 
                 }
@@ -110,7 +110,7 @@ namespace BrokeProtocol.GameSource
                 },
                 (e) =>
                 {
-                    player.PluginPlayer().SetAttackState(e);
+                    player.GamePlayer().SetAttackState(e);
                 });
         }
 

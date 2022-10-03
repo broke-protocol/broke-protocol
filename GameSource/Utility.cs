@@ -7,7 +7,7 @@ namespace BrokeProtocol.GameSource
 {
     public static class Utility
     {
-        public static GameSourcePlayer PluginPlayer(this ShPlayer player) => Manager.pluginPlayers[player];
+        public static GameSourcePlayer GamePlayer(this ShPlayer player) => Manager.pluginPlayers[player];
 
         public const float slowSpeedSqr = 6f * 6f;
 

@@ -246,16 +246,16 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (!player.isHuman)
                 {
-                    player.PluginPlayer().SetAttackState(attacker);
+                    player.GamePlayer().SetAttackState(attacker);
                 }
                 else if (player.svPlayer.follower && attacker != player.svPlayer.follower)
                 {
-                    player.svPlayer.follower.PluginPlayer().SetAttackState(attacker);
+                    player.svPlayer.follower.GamePlayer().SetAttackState(attacker);
                 }
 
                 if (attacker.svPlayer.follower)
                 {
-                    attacker.svPlayer.follower.PluginPlayer().SetAttackState(player);
+                    attacker.svPlayer.follower.GamePlayer().SetAttackState(player);
                 }
             }
 
@@ -639,7 +639,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.currentState.IsBusy)
             {
-                other.PluginPlayer().SetFollowState(player);
+                other.GamePlayer().SetFollowState(player);
             }
             else
             {
@@ -721,7 +721,7 @@ namespace BrokeProtocol.GameSource.Types
                 Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) &&
                 player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
-                player.svPlayer.follower.PluginPlayer().SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
+                player.svPlayer.follower.GamePlayer().SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
             }
 
             return true;
@@ -783,7 +783,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool ResetAI(ShPlayer player)
         {
-            var pluginPlayer = player.PluginPlayer();
+            var pluginPlayer = player.GamePlayer();
 
             player.svPlayer.targetEntity = null;
 

@@ -113,7 +113,7 @@ namespace BrokeProtocol.GameSource
             var target = player.svPlayer.targetEntity;
 
             if (player.CanSeeEntity(target) && 
-                player.PluginPlayer().SetAttackState(target))
+                player.GamePlayer().SetAttackState(target))
             {
                 return false;
             }
@@ -406,7 +406,7 @@ namespace BrokeProtocol.GameSource
             base.EnterState();
             player.svPlayer.SvDismount();
             onDestination = false;
-            player.svPlayer.GetPath(player.PluginPlayer().goToPosition);
+            player.svPlayer.GetPath(player.GamePlayer().goToPosition);
         }
 
         public override bool UpdateState()
@@ -415,13 +415,13 @@ namespace BrokeProtocol.GameSource
 
             if (onDestination)
             {
-                if (player.PluginPlayer().IsOffOrigin && player.svPlayer.SetState(index)) // Restart state
+                if (player.GamePlayer().IsOffOrigin && player.svPlayer.SetState(index)) // Restart state
                 {
                     return false;
                 }
                 else
                 {
-                    player.svPlayer.LookTactical(player.PluginPlayer().goToRotation * Vector3.forward);
+                    player.svPlayer.LookTactical(player.GamePlayer().goToRotation * Vector3.forward);
                 }
             }
             else if (!player.svPlayer.MoveLookNavPath())
@@ -577,7 +577,7 @@ namespace BrokeProtocol.GameSource
             if (reachedCover)
             {
                 if (player.CanSeeEntity(player.svPlayer.targetEntity) &&
-                    player.PluginPlayer().SetAttackState(player.svPlayer.targetEntity))
+                    player.GamePlayer().SetAttackState(player.svPlayer.targetEntity))
                 {
                     return false;
                 }
@@ -586,7 +586,7 @@ namespace BrokeProtocol.GameSource
                 {
                     if (Random.value < 0.5f)
                     {
-                        player.PluginPlayer().SetAttackState(player.svPlayer.targetEntity);
+                        player.GamePlayer().SetAttackState(player.svPlayer.targetEntity);
                     }
                     else
                     {
@@ -599,7 +599,7 @@ namespace BrokeProtocol.GameSource
             }
             else if(BadPath)
             {
-                player.PluginPlayer().SetAttackState(player.svPlayer.targetEntity);
+                player.GamePlayer().SetAttackState(player.svPlayer.targetEntity);
                 return false;
             }
             else if (!player.svPlayer.MoveLookNavPath())

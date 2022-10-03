@@ -102,16 +102,13 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool TextPanelButton(ShPlayer player, string menuID, string optionID)
         {
-            if (WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
+            if (menuID.StartsWith(spawnMenuID))
             {
-                if (menuID.StartsWith(spawnMenuID))
+                if (int.TryParse(optionID, out var index) && 
+                    index < Manager.territories.Count && 
+                    Manager.territories[index].ownerIndex == player.svPlayer.spawnJobIndex)
                 {
-                    if (int.TryParse(optionID, out var index) && 
-                        index < Manager.territories.Count && 
-                        Manager.territories[index].ownerIndex == player.svPlayer.spawnJobIndex)
-                    {
-                        warSourcePlayer.spawnTerritoryIndex = index;
-                    }
+                    player.WarPlayer().spawnTerritoryIndex = index;
                 }
             }
 
@@ -154,41 +151,37 @@ namespace BrokeProtocol.GameSource.Types
             {
                 case WarManager.selectTeam:
                     {
-                        if (WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
+                        var teamIndex = 0;
+                        foreach (var c in BPAPI.Jobs)
                         {
-                            var teamIndex = 0;
-                            foreach (var c in BPAPI.Jobs)
+                            if (c.shared.jobName == optionID)
                             {
-                                if (c.shared.jobName == optionID)
-                                {
-                                    warSourcePlayer.teamIndex = teamIndex;
-                                    player.svPlayer.DestroyMenu(WarManager.selectTeam);
-                                    WarManager.SendClassSelectMenu(player.svPlayer.connection, teamIndex);
-                                    warSourcePlayer.changePending = true;
-                                    break;
-                                }
-                                teamIndex++;
+                                var warSourcePlayer = player.WarPlayer();
+                                warSourcePlayer.teamIndex = teamIndex;
+                                player.svPlayer.DestroyMenu(WarManager.selectTeam);
+                                WarManager.SendClassSelectMenu(player.svPlayer.connection, teamIndex);
+                                warSourcePlayer.changePending = true;
+                                break;
                             }
+                            teamIndex++;
                         }
                     }
                     break;
 
                 case WarManager.selectClass:
                     {
-                        if (WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
+                        var warSourcePlayer = player.WarPlayer();
+                        var classIndex = 0;
+                        foreach (var c in WarManager.classes[warSourcePlayer.teamIndex])
                         {
-                            var classIndex = 0;
-                            foreach (var c in WarManager.classes[warSourcePlayer.teamIndex])
+                            if (c.className == optionID)
                             {
-                                if (c.className == optionID)
-                                {
-                                    warSourcePlayer.classIndex = classIndex;
-                                    player.svPlayer.DestroyMenu(WarManager.selectClass);
-                                    warSourcePlayer.changePending = true;
-                                    break;
-                                }
-                                classIndex++;
+                                warSourcePlayer.classIndex = classIndex;
+                                player.svPlayer.DestroyMenu(WarManager.selectClass);
+                                warSourcePlayer.changePending = true;
+                                break;
                             }
+                            classIndex++;
                         }
                     }
                     break;

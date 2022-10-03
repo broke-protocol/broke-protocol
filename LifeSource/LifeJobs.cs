@@ -68,7 +68,7 @@ namespace BrokeProtocol.GameSource
         public override void ResetJobAI()
         {
             if (player.svPlayer.stop &&
-                player.PluginPlayer().SetGoToState(
+                player.GamePlayer().SetGoToState(
                     player.svPlayer.originalPosition,
                     player.svPlayer.originalRotation,
                     player.svPlayer.originalParent))
@@ -225,7 +225,7 @@ namespace BrokeProtocol.GameSource
                         {
                             lifeSourcePlayer.AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
                         }
-                        player.PluginPlayer().SetAttackState(e);
+                        player.GamePlayer().SetAttackState(e);
                     }
                 });
         }
@@ -585,7 +585,7 @@ namespace BrokeProtocol.GameSource
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && player.CanSeeEntity(e, true),
                 (e) =>
                 {
-                    player.PluginPlayer().SetAttackState(e);
+                    player.GamePlayer().SetAttackState(e);
                 });
         }
 
@@ -693,7 +693,7 @@ namespace BrokeProtocol.GameSource
             if (target && target.IsOutside && target.svPlayer.job is Gangster &&
                 target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr &&
                 Manager.TryGetTerritory(target, out var territory) && territory.ownerIndex == info.shared.jobIndex &&
-                territory.attackerIndex >= 0 && player.PluginPlayer().SetAttackState(target))
+                territory.attackerIndex >= 0 && player.GamePlayer().SetAttackState(target))
             {
                 return;
             }
@@ -966,7 +966,7 @@ namespace BrokeProtocol.GameSource
             if (target && LifeManager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
                 Random.value < pluginTarget.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
-                return player.PluginPlayer().SetAttackState(target);
+                return player.GamePlayer().SetAttackState(target);
             }
             return false;
         }
@@ -977,7 +977,7 @@ namespace BrokeProtocol.GameSource
                 (e) => e is ShPlayer p && p.IsCapable && LifeManager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e, true),
                 (e) =>
                 {
-                    player.PluginPlayer().SetAttackState(e);
+                    player.GamePlayer().SetAttackState(e);
                 });
         }
 
@@ -1180,14 +1180,14 @@ namespace BrokeProtocol.GameSource
                         player.svPlayer.SendGameMessage("Out of Time");
                         SetTarget();
                     }
-                    else if (player.PluginPlayer().MountWithinReach(destinationMarker))
+                    else if (player.GamePlayer().MountWithinReach(destinationMarker))
                     {
                         player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
                         SetTarget();
                     }
                 }
                 else if (
-                    targetPlayer && player.PluginPlayer().MountWithinReach(targetPlayer) &&
+                    targetPlayer && player.GamePlayer().MountWithinReach(targetPlayer) &&
                     targetPlayer.svPlayer.SvTryMount(player.curMount.ID, false))
                 {
                     player.svPlayer.DestroyGoalMarker();
@@ -1422,7 +1422,7 @@ namespace BrokeProtocol.GameSource
                             player.svPlayer.SendGameMessage("Out of Time");
                             SetTarget(false);
                         }
-                        else if (player.PluginPlayer().MountWithinReach(targetPlayer))
+                        else if (player.GamePlayer().MountWithinReach(targetPlayer))
                         {
                             foreach (var i in collectedItems)
                             {

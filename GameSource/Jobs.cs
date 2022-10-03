@@ -23,7 +23,7 @@ namespace BrokeProtocol.GameSource
         {
             if (player.isActiveAndEnabled)
             {
-                var pluginPlayer = player.PluginPlayer();
+                var pluginPlayer = player.GamePlayer();
                 if (pluginPlayer.jobCoroutine != null) player.StopCoroutine(pluginPlayer.jobCoroutine);
                 pluginPlayer.jobCoroutine = player.StartCoroutine(JobCoroutine());
             }

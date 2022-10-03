@@ -17,8 +17,9 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Respawn(ShEntity entity)
         {
             var player = entity.Player;
+            var warSourcePlayer = player.WarPlayer();
 
-            if (player && WarManager.pluginPlayers.TryGetValue(player, out var warSourcePlayer))
+            if (player)
             {
                 if (warSourcePlayer.changePending)
                 {

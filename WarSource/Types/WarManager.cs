@@ -526,8 +526,7 @@ namespace BrokeProtocol.GameSource.Types
                 var classCount = 0;
                 foreach(var m in teamJob.members)
                 {
-                    if(pluginPlayers.TryGetValue(m, out var warSourcePlayer) &&
-                        warSourcePlayer.classIndex == classIndex)
+                    if(m.WarPlayer().classIndex == classIndex)
                     {
                         classCount++;
                     }

@@ -286,7 +286,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (Random.value < 0.2f)
                 {
-                    player.PluginPlayer().SetAttackState(source);
+                    player.GamePlayer().SetAttackState(source);
                 }
                 else
                 {
@@ -490,7 +490,7 @@ namespace BrokeProtocol.GameSource.Types
                     }
 
                     if (otherPlayer && !otherPlayer.isHuman && Random.value < 0.25f && 
-                        otherPlayer.PluginPlayer().SetAttackState(player))
+                        otherPlayer.GamePlayer().SetAttackState(player))
                     {
                         player.svPlayer.SvStopInventory(true);
                     }

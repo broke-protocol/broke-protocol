@@ -115,7 +115,7 @@ namespace BrokeProtocol.GameSource
             {
                 var player = movable.controller;
                 if (player && player.isHuman && !player.IsDead &&
-                    ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner
+                    ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner)
                 {
                     player.LifePlayer().AddCrime(CrimeIndex.PrisonBreak, null);
                     player.svPlayer.SvResetJob();
