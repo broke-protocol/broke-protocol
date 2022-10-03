@@ -92,7 +92,7 @@ namespace BrokeProtocol.GameSource
         public override ShUsable GetBestJobWeapon()
         {
             if (((MyJobInfo)info).groupIndex == GroupIndex.LawEnforcement && player.svPlayer.targetEntity is ShPlayer targetPlayer &&
-                LifeManager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget) && pluginTarget.wantedLevel <= 1 && player.HasItem(targetPlayer.Handcuffs))
+                targetPlayer.LifePlayer().wantedLevel <= 1 && player.HasItem(targetPlayer.Handcuffs))
             {
                 return targetPlayer.Handcuffs;
             }
@@ -103,20 +103,19 @@ namespace BrokeProtocol.GameSource
         public override void OnDamageEntity(ShEntity damaged)
         {
             base.OnDamageEntity(damaged);
-            if (damaged is ShPlayer victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
-                pluginVictim.wantedLevel == 0 && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (damaged is ShPlayer victim && victim.LifePlayer().wantedLevel == 0)
             {
                 if (victim.characterType == CharacterType.Mob)
                 {
-                    pluginPlayer.AddCrime(CrimeIndex.AnimalCruelty, victim);
+                    player.LifePlayer().AddCrime(CrimeIndex.AnimalCruelty, victim);
                 }
                 else if (player.curEquipable is ShGun)
                 {
-                    pluginPlayer.AddCrime(CrimeIndex.ArmedAssault, victim);
+                    player.LifePlayer().AddCrime(CrimeIndex.ArmedAssault, victim);
                 }
                 else
                 {
-                    pluginPlayer.AddCrime(CrimeIndex.Assault, victim);
+                    player.LifePlayer().AddCrime(CrimeIndex.Assault, victim);
                 }
             }
         }
@@ -125,10 +124,9 @@ namespace BrokeProtocol.GameSource
         {
             base.OnDestroyEntity(destroyed);
             var victim = destroyed.Player;
-            if (victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && 
-                pluginVictim.wantedLevel == 0 && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (victim && victim.LifePlayer().wantedLevel == 0)
             {
-                pluginPlayer.AddCrime(victim.characterType == CharacterType.Humanoid ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
+                player.LifePlayer().AddCrime(victim.characterType == CharacterType.Humanoid ? CrimeIndex.Murder : CrimeIndex.AnimalKilling, victim);
 
                 if (victim.isHuman && player.isHuman)
                 {
@@ -145,8 +143,7 @@ namespace BrokeProtocol.GameSource
         protected void TryFindInnocent()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && LifeManager.pluginPlayers.TryGetValue(p, out var pluginPlayer) && !p.curMount && 
-                !p.IsDead && p.IsRestrained && pluginPlayer.wantedLevel == 0 && player.CanSeeEntity(e),
+                (e) => e is ShPlayer p && !p.curMount && !p.IsDead && p.IsRestrained && p.LifePlayer().wantedLevel == 0 && player.CanSeeEntity(e),
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
@@ -218,15 +215,12 @@ namespace BrokeProtocol.GameSource
                 (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e, true),
                 (e) =>
                 {
-                    if (LifeManager.pluginPlayers.TryGetValue(player, out var lifeSourcePlayer))
+                    // Add random crimes to ensure high wanted level (targetable by SpecOps)
+                    while (player.LifePlayer().wantedLevel < 3)
                     {
-                        // Add random crimes to ensure high wanted level (targetable by SpecOps)
-                        while (lifeSourcePlayer.wantedLevel < 3)
-                        {
-                            lifeSourcePlayer.AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
-                        }
-                        player.GamePlayer().SetAttackState(e);
+                        player.LifePlayer().AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
                     }
+                    player.GamePlayer().SetAttackState(e);
                 });
         }
 
@@ -963,8 +957,8 @@ namespace BrokeProtocol.GameSource
         {
             var target = player.svPlayer.spawner;
 
-            if (target && LifeManager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
-                Random.value < pluginTarget.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
+            if (target && target.IsOutside && target.LifePlayer().wantedLevel >= AttackLevel &&
+                Random.value < target.LifePlayer().wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 return player.GamePlayer().SetAttackState(target);
             }
@@ -974,7 +968,7 @@ namespace BrokeProtocol.GameSource
         protected void TryFindCriminal()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && p.IsCapable && LifeManager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e, true),
+                (e) => e is ShPlayer p && p.IsCapable && p.LifePlayer().wantedLevel >= AttackLevel && player.CanSeeEntity(e, true),
                 (e) =>
                 {
                     player.GamePlayer().SetAttackState(e);
@@ -1020,7 +1014,7 @@ namespace BrokeProtocol.GameSource
         {
             base.OnDestroyEntity(destroyed);
             var victim = destroyed.Player;
-            if (victim && LifeManager.pluginPlayers.TryGetValue(victim, out var pluginVictim) && targetPlayer == victim && pluginVictim.wantedLevel > 0 && pluginVictim.wantedLevel >= AttackLevel)
+            if (victim && targetPlayer == victim && victim.LifePlayer().wantedLevel > 0 && victim.LifePlayer().wantedLevel >= AttackLevel)
             {
                 player.svPlayer.Reward(3, 300);
             }
