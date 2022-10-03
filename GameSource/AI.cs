@@ -799,25 +799,82 @@ namespace BrokeProtocol.GameSource
         // Don't do hunting behavior if in an unarmed vehicle
         public bool ShouldHunt => !player.curMount || player.curMount.HasWeapons;
 
-        protected override bool HandleNearTarget()
+        public override void EnterState()
         {
-            if(BadPath && ShouldHunt && !hunting)
+            base.EnterState();
+            hunting = false;
+            projectile = null;
+            player.svPlayer.SetBestWeapons();
+        }
+
+        public override void ExitState(State nextState)
+        {
+            base.ExitState(nextState);
+            //Don't need to reset to hands (ResetAI will do that)
+            player.svPlayer.SvCrouch(false);
+        }
+
+        public override bool UpdateState()
+        {
+            if (!base.UpdateState()) return false;
+
+            if (player.CurrentAmmoTotal == 0)
+                player.svPlayer.SetBestWeapons();
+
+            if (!player.curMount)
             {
-                PathToTarget();
+                player.svPlayer.SvUpdateMode(player.Perlin(0.4f) < 0.4f ? MoveMode.Zoom : StateMoveMode);
+
+                if (projectile)
+                {
+                    if (!player.switching)
+                    {
+                        player.Fire(projectile.index);
+                        player.svPlayer.SetBestWeapons();
+
+                        if (player.svPlayer.SetState(Core.TakeCover.index))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    var targetEntity = player.svPlayer.targetEntity;
+
+                    if (targetEntity.MountHealth >= player.MountHealth && player.CanSeeEntity(targetEntity))
+                    {
+                        var r = Random.value;
+
+                        if (!player.curMount && r < 0.005f && player.TryGetCachedItem(out projectile) &&
+                            Util.AimVector(targetEntity.GetOrigin - player.GetOrigin, targetEntity.Velocity - player.Velocity, projectile.WeaponVelocity, projectile.WeaponGravity, out _))
+                        {
+                            player.svPlayer.SvTrySetEquipable(projectile.index);
+                            return true;
+                        }
+
+                        if (r < 0.01f && player.svPlayer.SetState(Core.TakeCover.index))
+                        {
+                            return false;
+                        }
+                    }
+
+                    if (player.stances[(int)StanceIndex.Crouch].input > 0f)
+                        player.svPlayer.SvCrouch(player.Perlin(0.1f) < 0.35f);
+                }
             }
             else
             {
-                base.HandleNearTarget();
-                hunting = false;
+                player.svPlayer.SvUpdateMode(StateMoveMode);
             }
-            
+
             return true;
         }
 
         public override void PathToTarget()
         {
             // Cancel hunting if target moved
-            if(hunting && TargetMoved)
+            if (hunting && TargetMoved)
             {
                 hunting = false;
             }
@@ -835,6 +892,21 @@ namespace BrokeProtocol.GameSource
                 base.PathToTarget();
                 hunting = false;
             }
+        }
+
+        protected override bool HandleNearTarget()
+        {
+            if(BadPath && ShouldHunt && !hunting)
+            {
+                PathToTarget();
+            }
+            else
+            {
+                base.HandleNearTarget();
+                hunting = false;
+            }
+            
+            return true;
         }
 
         protected override bool HandleDistantTarget()
@@ -862,78 +934,6 @@ namespace BrokeProtocol.GameSource
             }
 
             return true;
-        }
-
-        public override void EnterState()
-        {
-            base.EnterState();
-            hunting = false;
-            projectile = null;
-            player.svPlayer.SetBestWeapons();
-        }
-
-        public override bool UpdateState()
-        {
-            if (!base.UpdateState()) return false;
-
-            if (player.CurrentAmmoTotal == 0)
-                player.svPlayer.SetBestWeapons();
-
-            if(!player.curMount)
-            {
-                player.svPlayer.SvUpdateMode(player.Perlin(0.4f) < 0.4f ? MoveMode.Zoom : StateMoveMode);
-
-                if (projectile)
-                {
-                    if (!player.switching)
-                    {
-                        player.Fire(projectile.index);
-                        player.svPlayer.SetBestWeapons();
-
-                        if(player.svPlayer.SetState(Core.TakeCover.index))
-                        {
-                            return false;
-                        }
-                    }
-                }
-                else
-                {
-                    var targetEntity = player.svPlayer.targetEntity;
-
-                    if (targetEntity.MountHealth >= player.MountHealth && player.CanSeeEntity(targetEntity))
-                    {
-                        var r = Random.value;
-
-                        if (!player.curMount && r < 0.005f && player.TryGetCachedItem(out projectile) &&
-                            Util.AimVector(targetEntity.GetOrigin - player.GetOrigin, targetEntity.Velocity - player.Velocity, projectile.WeaponVelocity, projectile.WeaponGravity, out _))
-                        {
-                            player.svPlayer.SvTrySetEquipable(projectile.index);
-                            return true;
-                        }
-                        
-                        if (r < 0.01f && player.svPlayer.SetState(Core.TakeCover.index))
-                        {
-                            return false;
-                        }
-                    }
-
-                    if(player.stances[(int)StanceIndex.Crouch].input > 0f)
-                        player.svPlayer.SvCrouch(player.Perlin(0.1f) < 0.35f);
-                }
-            }
-            else
-            {
-                player.svPlayer.SvUpdateMode(StateMoveMode);
-            }
-
-            return true;
-        }
-
-        public override void ExitState(State nextState)
-        {
-            base.ExitState(nextState);
-            //Don't need to reset to hands (ResetAI will do that)
-            player.svPlayer.SvCrouch(false);
         }
     }
 
