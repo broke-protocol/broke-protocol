@@ -554,7 +554,7 @@ namespace BrokeProtocol.GameSource
                             var destination = hit.point + (hit.normal * controlled.bounds.extents.z);
                             if (player.svPlayer.NodeNear(destination) != null)
                             {
-                                player.svPlayer.GetPath(destination);
+                                player.svPlayer.GetPathAvoidance(destination);
                                 reachedCover = false;
                                 coverOrientation = Vector3.Cross(hit.normal, Mathf.Sign(i) * Vector3.up);
                                 return true;
