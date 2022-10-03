@@ -3,7 +3,6 @@ using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;
-using BrokeProtocol.WarSource;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +12,8 @@ namespace BrokeProtocol.GameSource
     public class WarCore : Plugin
     {
         public static State Mount;
+        public static State TimedWaypoint;
+        public static State TimedGoTo;
 
         public WarCore()
         {
@@ -33,10 +34,14 @@ namespace BrokeProtocol.GameSource
             JobsOverride = JsonConvert.DeserializeObject<List<JobInfo>>(File.ReadAllText(jobsFilename));
 
             Mount = new MountState();
+            TimedWaypoint = new TimedWaypointState();
+            TimedGoTo = new TimedGoToState();
 
             StatesAdditive = new List<State>
             {
                 Mount,
+                TimedWaypoint,
+                TimedGoTo,
             };
         }
 

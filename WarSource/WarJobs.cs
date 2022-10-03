@@ -69,11 +69,19 @@ namespace BrokeProtocol.GameSource
         {
             player.svPlayer.SetBestWeapons();
 
-            // TODO: Smarter goal selection
-
-            if (player.IsFlying || player.IsBoating) // WaypointState if in a boat or aircraft
+            if (player.IsFlying || player.IsBoating)
             {
-                if(player.svPlayer.SetState(Core.Waypoint.index))
+                if (player.svPlayer.currentState.index == WarCore.TimedWaypoint.index)
+                {
+                    if(!AttackTerritory())
+                    {
+                        player.svPlayer.SvDismount(true);
+                    }
+
+                    return;
+                }
+
+                if (player.svPlayer.SetState(WarCore.TimedWaypoint.index))
                     return;
             }
 
@@ -87,25 +95,35 @@ namespace BrokeProtocol.GameSource
                 return;
             }
 
+            if (AttackTerritory())
+            {
+                return;
+            }
+
+            // Nothing else to really do, maybe a timed WanderState?
+            player.svPlayer.DestroySelf();
+        }
+
+        public bool AttackTerritory()
+        {
             var territoryIndex = Random.Range(0, Manager.territories.Count);
 
             if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place))
             {
                 // Overwatch a territory
                 if (Random.value < 0.5f && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
-                    player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
+                    player.WarPlayer().SetTimedGoToState(goal, rot, place.mTransform))
                 {
-                    return;
+                    return true;
                 }
                 else if (player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal2) &&
-                    player.GamePlayer().SetGoToState(goal2, rot, place.mTransform))
+                    player.WarPlayer().SetTimedGoToState(goal2, rot, place.mTransform))
                 {
-                    return;
+                    return true;
                 }
             }
 
-            // Nothing else to really do, maybe a timed WanderState?
-            player.svPlayer.DestroySelf();
+            return false;
         }
 
         public void TryFindEnemy()

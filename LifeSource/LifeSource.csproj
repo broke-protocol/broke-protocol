@@ -9,7 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{2706A6D6-BD0F-43D6-9159-54E8DBB4BC32}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>BrokeProtocol.LifeSource</RootNamespace>
+    <RootNamespace>BrokeProtocol.GameSource</RootNamespace>
     <AssemblyName>!LifeSource</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

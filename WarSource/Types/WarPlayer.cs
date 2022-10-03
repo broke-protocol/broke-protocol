@@ -39,6 +39,15 @@ namespace BrokeProtocol.GameSource.Types
             }
             return false;
         }
+
+        public bool SetTimedGoToState(Vector3 position, Quaternion rotation, Transform parent)
+        {
+            player.svPlayer.destinationPosition = position;
+            player.svPlayer.destinationRotation = rotation;
+            player.svPlayer.destinationParent = parent;
+
+            return player.svPlayer.SetState(WarCore.TimedGoTo.index);
+        }
     }
     
     public class WarPlayer : PlayerEvents

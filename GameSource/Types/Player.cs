@@ -19,18 +19,12 @@ namespace BrokeProtocol.GameSource.Types
 
         public Coroutine jobCoroutine;
 
-        public Vector3 goToPosition;
-        public Quaternion goToRotation;
-        public Transform goToParent;
-
         public float lastAlertTime;
 
         public GameSourcePlayer(ShPlayer player)
         {
             this.player = player;
         }
-
-        public bool OnDestination => player.GetMount.DistanceSqr(goToPosition) < player.GetMount.svMountable.NavRangeSqr;
         
         public bool SetAttackState(ShEntity target)
         {
@@ -90,9 +84,9 @@ namespace BrokeProtocol.GameSource.Types
 
         public bool SetGoToState(Vector3 position, Quaternion rotation, Transform parent)
         {
-            goToPosition = position;
-            goToRotation = rotation;
-            goToParent = parent;
+            player.svPlayer.destinationPosition = position;
+            player.svPlayer.destinationRotation = rotation;
+            player.svPlayer.destinationParent = parent;
 
             return player.svPlayer.SetState(Core.GoTo.index);
         }

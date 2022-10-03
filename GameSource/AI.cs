@@ -1,5 +1,4 @@
 ﻿using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
@@ -402,7 +401,7 @@ namespace BrokeProtocol.GameSource
 
     public class GoToState : MovingState
     {
-        private bool onDestination;
+        protected bool onDestination;
 
         public override bool IsBusy => false;
 
@@ -414,7 +413,7 @@ namespace BrokeProtocol.GameSource
             onDestination = false;
             if (!player.IsFlying)
             {
-                player.svPlayer.GetPath(player.GamePlayer().goToPosition);
+                player.svPlayer.GetPath(player.svPlayer.destinationPosition);
             }
         }
 
@@ -424,9 +423,9 @@ namespace BrokeProtocol.GameSource
 
             if (onDestination)
             {
-                if (player.GamePlayer().OnDestination)
+                if (player.svPlayer.OnDestination)
                 {
-                    player.svPlayer.LookTactical(player.GamePlayer().goToRotation * Vector3.forward);
+                    player.svPlayer.LookTactical(player.svPlayer.destinationRotation * Vector3.forward);
                 }
                 else if (player.svPlayer.SetState(index)) // Restart state
                 {
@@ -435,7 +434,7 @@ namespace BrokeProtocol.GameSource
             }
             else if(player.IsFlying)
             {
-                if(player.GamePlayer().OnDestination)
+                if(player.svPlayer.OnDestination)
                 {
                     player.svPlayer.SvDismount(true);
                     return false;
@@ -443,8 +442,8 @@ namespace BrokeProtocol.GameSource
                 else
                 {
                     var aircraft = player.curMount;
-                    player.svPlayer.LookAt(player.GamePlayer().goToPosition - aircraft.GetPosition);
-                    aircraft.svMountable.MoveTo(player.GamePlayer().goToPosition);
+                    player.svPlayer.LookAt(player.svPlayer.destinationPosition - aircraft.GetPosition);
+                    aircraft.svMountable.MoveTo(player.svPlayer.destinationPosition);
                 }
             }
             else if (!player.svPlayer.MoveLookNavPath())
