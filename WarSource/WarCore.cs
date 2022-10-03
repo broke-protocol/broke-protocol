@@ -1,7 +1,9 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Jobs;
+using BrokeProtocol.WarSource;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +12,8 @@ namespace BrokeProtocol.GameSource
 {
     public class WarCore : Plugin
     {
+        public static State Mount;
+
         public WarCore()
         {
             Info = new PluginInfo(
@@ -27,6 +31,13 @@ namespace BrokeProtocol.GameSource
 
             // Use JobsAdditive if you're adding to Default jobs and not replacing them
             JobsOverride = JsonConvert.DeserializeObject<List<JobInfo>>(File.ReadAllText(jobsFilename));
+
+            Mount = new MountState();
+
+            StatesAdditive = new List<State>
+            {
+                Mount,
+            };
         }
 
         private List<JobInfo> GetJobs => new List<JobInfo> {

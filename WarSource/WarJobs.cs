@@ -43,6 +43,17 @@ namespace BrokeProtocol.GameSource
 
         protected bool IsEnemy(ShPlayer target) => this != target.svPlayer.job;
 
+        protected bool TryFindMount()
+        {
+            return player.svPlayer.LocalEntitiesOne(
+                (e) => e is ShMountable p && p.IsAccessible(player, true) && !p.occupants[0],
+                (e) =>
+                {
+                    player.svPlayer.targetEntity = e;
+                    player.svPlayer.SetState(WarCore.Mount.index);
+                });
+        }
+
         public override void ResetJobAI()
         {
             player.svPlayer.SetBestWeapons();
@@ -51,45 +62,49 @@ namespace BrokeProtocol.GameSource
 
             if (player.IsFlying || player.IsBoating) // WaypointState if in a boat or aircraft
             {
-                player.svPlayer.SetState(Core.Waypoint.index);
+                if(player.svPlayer.SetState(Core.Waypoint.index))
+                    return;
             }
-            else
+
+            if(!player.curMount && Random.value < 0.2f && TryFindMount())
             {
-                var rand = Random.value;
-                if (rand < 0.2f) // Enter and hold a territory
-                {
-                    var territoryIndex = Random.Range(0, Manager.territories.Count);
+                return;
+            }
 
-                    if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) &&
-                        player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal) &&
-                        player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
-                    {
+            var rand = Random.value;
+            if (rand < 0.2f) // Enter and hold a territory
+            {
+                var territoryIndex = Random.Range(0, Manager.territories.Count);
 
-                    }
-                }
-                else if (rand < 0.4f) // Overwatch a territory
-                {
-                    var territoryIndex = Random.Range(0, Manager.territories.Count);
-
-                    if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
-                        && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
-                        player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
-                    {
-
-                    }
-                }
-                else if (rand < 0.6f) // Enter a nearby vehicle
+                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) &&
+                    player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal) &&
+                    player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
                 {
 
                 }
-                else if (rand < 0.8f) // Follow a teammate
+            }
+            else if (rand < 0.4f) // Overwatch a territory
+            {
+                var territoryIndex = Random.Range(0, Manager.territories.Count);
+
+                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
+                    && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
+                    player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
                 {
 
                 }
-                else // Enter a static emplacement
-                {
+            }
+            else if (rand < 0.6f) // Enter a nearby vehicle
+            {
 
-                }
+            }
+            else if (rand < 0.8f) // Follow a teammate
+            {
+
+            }
+            else // Enter a static emplacement
+            {
+
             }
 
 
