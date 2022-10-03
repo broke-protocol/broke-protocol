@@ -49,37 +49,47 @@ namespace BrokeProtocol.GameSource
 
             // TODO: Smarter goal selection
 
-            var rand = Random.value;
-
-            if (rand < 0.25f)
+            if (player.IsFlying || player.IsBoating) // WaypointState if in a boat or aircraft
             {
-                var territoryIndex = Random.Range(0, Manager.territories.Count);
-
-                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) &&
-                    player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal) &&
-                    player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
-                {
-
-                }
-            }
-            else if (rand < 0.5f)
-            {
-                var territoryIndex = Random.Range(0, Manager.territories.Count);
-
-                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
-                    && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
-                    player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
-                {
-
-                }
-            }
-            else if (rand < 0.75f)
-            {
-                // enter empty vehicle
+                player.svPlayer.SetState(Core.Waypoint.index);
             }
             else
             {
-                // follow someone or enter static emplacement
+                var rand = Random.value;
+                if (rand < 0.2f) // Enter and hold a territory
+                {
+                    var territoryIndex = Random.Range(0, Manager.territories.Count);
+
+                    if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) &&
+                        player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal) &&
+                        player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
+                    {
+
+                    }
+                }
+                else if (rand < 0.4f) // Overwatch a territory
+                {
+                    var territoryIndex = Random.Range(0, Manager.territories.Count);
+
+                    if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
+                        && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
+                        player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
+                    {
+
+                    }
+                }
+                else if (rand < 0.6f) // Enter a nearby vehicle
+                {
+
+                }
+                else if (rand < 0.8f) // Follow a teammate
+                {
+
+                }
+                else // Enter a static emplacement
+                {
+
+                }
             }
 
 
