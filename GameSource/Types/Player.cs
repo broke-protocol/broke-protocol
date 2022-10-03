@@ -96,6 +96,12 @@ namespace BrokeProtocol.GameSource.Types
 
             return player.svPlayer.SetState(Core.GoTo.index);
         }
+
+        public bool MountWithinReach(ShEntity target)
+        {
+            var m = player.GetMount;
+            return m && m.Velocity.sqrMagnitude <= Utility.slowSpeedSqr && target.InActionRange(m);
+        }
     }
 
 

@@ -731,7 +731,7 @@ namespace BrokeProtocol.GameSource
 
             if (TargetNear)
             {
-                if (player.curMount && !player.curMount.HasWeapons && targetEntity.Velocity.sqrMagnitude <= Util.slowSpeedSqr)
+                if (player.curMount && !player.curMount.HasWeapons && targetEntity.Velocity.sqrMagnitude <= Utility.slowSpeedSqr)
                 {
                     player.svPlayer.SvDismount();
                 }

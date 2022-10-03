@@ -67,24 +67,21 @@ namespace BrokeProtocol.GameSource
     {
         public override void ResetJobAI()
         {
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                if (player.svPlayer.stop &&
-                    pluginPlayer.SetGoToState(
-                        player.svPlayer.originalPosition,
-                        player.svPlayer.originalRotation,
-                        player.svPlayer.originalParent))
-                    return;
+            if (player.svPlayer.stop &&
+                player.PluginPlayer().SetGoToState(
+                    player.svPlayer.originalPosition,
+                    player.svPlayer.originalRotation,
+                    player.svPlayer.originalParent))
+                return;
 
-                if (player.svPlayer.currentState.index == Core.Freeze.index && player.svPlayer.SetState(Core.Flee.index))
-                    return;
+            if (player.svPlayer.currentState.index == Core.Freeze.index && player.svPlayer.SetState(Core.Flee.index))
+                return;
 
-                if (player.characterType != CharacterType.Humanoid && player.svPlayer.SetState(Core.Wander.index))
-                    return;
+            if (player.characterType != CharacterType.Humanoid && player.svPlayer.SetState(Core.Wander.index))
+                return;
 
-                if (player.svPlayer.SetState(Core.Waypoint.index))
-                    return;
-            }
+            if (player.svPlayer.SetState(Core.Waypoint.index))
+                return;
 
             base.ResetJobAI();
         }
@@ -1194,14 +1191,14 @@ namespace BrokeProtocol.GameSource
                         player.svPlayer.SendGameMessage("Out of Time");
                         SetTarget();
                     }
-                    else if (destinationMarker.MountWithinReach(player))
+                    else if (player.PluginPlayer().MountWithinReach(destinationMarker))
                     {
                         player.svPlayer.Reward(2, Mathf.CeilToInt(timeDeadline - Time.time));
                         SetTarget();
                     }
                 }
                 else if (
-                    targetPlayer && targetPlayer.MountWithinReach(player) &&
+                    targetPlayer && player.PluginPlayer().MountWithinReach(targetPlayer) &&
                     targetPlayer.svPlayer.SvTryMount(player.curMount.ID, false))
                 {
                     player.svPlayer.DestroyGoalMarker();
@@ -1436,7 +1433,7 @@ namespace BrokeProtocol.GameSource
                             player.svPlayer.SendGameMessage("Out of Time");
                             SetTarget(false);
                         }
-                        else if (targetPlayer.MountWithinReach(player))
+                        else if (player.PluginPlayer().MountWithinReach(targetPlayer))
                         {
                             foreach (var i in collectedItems)
                             {

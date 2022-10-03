@@ -1,11 +1,16 @@
 ﻿using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Types;
 
 
 namespace BrokeProtocol.GameSource
 {
     public static class Utility
     {
+        public static GameSourcePlayer PluginPlayer(this ShPlayer player) => Manager.pluginPlayers[player];
+
+        public const float slowSpeedSqr = 6f * 6f;
+
         public static LimitQueue<ShPlayer> chatted = new LimitQueue<ShPlayer>(8, 20f);
 
         public static LimitQueue<string> tryRegister = new LimitQueue<string>(0, 5f);
