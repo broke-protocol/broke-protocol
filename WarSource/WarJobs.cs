@@ -55,19 +55,20 @@ namespace BrokeProtocol.GameSource
             {
                 var territoryIndex = Random.Range(0, Manager.territories.Count);
 
-                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) 
-                    && player.GamePlayer().SetGoToState(pos, rot, place.mTransform))
+                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) &&
+                    player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal) &&
+                    player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
                 {
-                    return;
+
                 }
             }
-            else if(rand < 0.5f)
+            else if (rand < 0.5f)
             {
                 var territoryIndex = Random.Range(0, Manager.territories.Count);
 
                 if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
-                    && player.svPlayer.GetOverwatchBest(player.svPlayer.targetEntity.GetPosition, out var stalkPosition) &&
-                    player.GamePlayer().SetGoToState(pos, rot, place.mTransform))
+                    && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
+                    player.GamePlayer().SetGoToState(goal, rot, place.mTransform))
                 {
 
                 }
@@ -78,18 +79,12 @@ namespace BrokeProtocol.GameSource
             }
             else
             {
-                // follow someone
+                // follow someone or enter static emplacement
             }
 
 
-
-            Debug.LogWarning("[SVR] Job shouldn't end up here");
-            if (player.svPlayer.SetState(0))
-            {
-                return;
-            }
-
-            base.ResetJobAI();
+            // Nothing else to really do, maybe WanderState?
+            player.svPlayer.DestroySelf();
         }
 
         public void TryFindEnemy()
