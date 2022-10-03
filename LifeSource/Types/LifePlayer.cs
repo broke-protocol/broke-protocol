@@ -284,9 +284,9 @@ namespace BrokeProtocol.GameSource.Types
             }
             else if (!player.svPlayer.currentState.IsBusy)
             {
-                if (Random.value < 0.2f && Manager.pluginPlayers.TryGetValue(player, out var gameSourcePlayer))
+                if (Random.value < 0.2f)
                 {
-                    gameSourcePlayer.SetAttackState(source);
+                    player.PluginPlayer().SetAttackState(source);
                 }
                 else
                 {
@@ -490,8 +490,7 @@ namespace BrokeProtocol.GameSource.Types
                     }
 
                     if (otherPlayer && !otherPlayer.isHuman && Random.value < 0.25f && 
-                        Manager.pluginPlayers.TryGetValue(otherPlayer, out var pluginOtherPlayer) && 
-                        pluginOtherPlayer.SetAttackState(player))
+                        otherPlayer.PluginPlayer().SetAttackState(player))
                     {
                         player.svPlayer.SvStopInventory(true);
                     }

@@ -34,8 +34,7 @@ namespace BrokeProtocol.GameSource
             {
                 if (Time.time > stopTime)
                 {
-                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
-                        pluginPlayer.SetAttackState(targetPlayer))
+                    if (player.PluginPlayer().SetAttackState(targetPlayer))
                         return false;
                 }
                 else if (targetPlayer.IsSurrendered && !targetPlayer.switching && TargetNear)

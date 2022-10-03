@@ -21,8 +21,9 @@ namespace BrokeProtocol.GameSource
 
         private void RestartCoroutines()
         {
-            if (player.isActiveAndEnabled && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (player.isActiveAndEnabled)
             {
+                var pluginPlayer = player.PluginPlayer();
                 if (pluginPlayer.jobCoroutine != null) player.StopCoroutine(pluginPlayer.jobCoroutine);
                 pluginPlayer.jobCoroutine = player.StartCoroutine(JobCoroutine());
             }

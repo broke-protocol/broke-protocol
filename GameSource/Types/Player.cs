@@ -244,18 +244,18 @@ namespace BrokeProtocol.GameSource.Types
 
             if (attacker && attacker != player)
             {
-                if (!player.isHuman && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                if (!player.isHuman)
                 {
-                    pluginPlayer.SetAttackState(attacker);
+                    player.PluginPlayer().SetAttackState(attacker);
                 }
-                else if (player.svPlayer.follower && attacker != player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginPlayerFollower))
+                else if (player.svPlayer.follower && attacker != player.svPlayer.follower)
                 {
-                    pluginPlayerFollower.SetAttackState(attacker);
+                    player.svPlayer.follower.PluginPlayer().SetAttackState(attacker);
                 }
 
-                if (attacker.svPlayer.follower && Manager.pluginPlayers.TryGetValue(attacker.svPlayer.follower, out var pluginAttackerFollower))
+                if (attacker.svPlayer.follower)
                 {
-                    pluginAttackerFollower.SetAttackState(player);
+                    attacker.svPlayer.follower.PluginPlayer().SetAttackState(player);
                 }
             }
 
@@ -425,7 +425,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Lockpick(ShPlayer player, ShTransport transport)
         {
-            if (player.CanMount(transport, false, true, out _) && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (player.CanMount(transport, false, true, out _))
             {
                 player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.lockpick);
                 transport.state = EntityState.Unlocked;
@@ -637,10 +637,9 @@ namespace BrokeProtocol.GameSource.Types
                     other.svPlayer.SvDismount(true);
                 }
             }
-            else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.currentState.IsBusy &&
-                Manager.pluginPlayers.TryGetValue(other, out var pluginOther))
+            else if (!other.svPlayer.leader && other.CanFollow && !other.svPlayer.currentState.IsBusy)
             {
-                pluginOther.SetFollowState(player);
+                other.PluginPlayer().SetFollowState(player);
             }
             else
             {
@@ -720,10 +719,9 @@ namespace BrokeProtocol.GameSource.Types
 
             if (pointing && player.svPlayer.follower &&
                 Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) &&
-                player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null &&
-                Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginFollower))
+                player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
-                pluginFollower.SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
+                player.svPlayer.follower.PluginPlayer().SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
             }
 
             return true;
@@ -732,7 +730,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Alert(ShPlayer player)
         {
-            if (player.svPlayer.follower && Manager.pluginPlayers.TryGetValue(player.svPlayer.follower, out var pluginFollower))
+            if (player.svPlayer.follower)
             {
                 player.svPlayer.follower.svPlayer.ResetAI();
             }
@@ -785,21 +783,20 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool ResetAI(ShPlayer player)
         {
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                player.svPlayer.targetEntity = null;
+            var pluginPlayer = player.PluginPlayer();
 
-                if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
-                if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
-                if (player.svPlayer.leader && pluginPlayer.SetFollowState(player.svPlayer.leader)) return true;
-                player.svPlayer.SvTrySetEquipable(player.Hands.index);
-                if (player.IsPassenger && player.svPlayer.SetState(Core.Null.index)) return true;
+            player.svPlayer.targetEntity = null;
 
-                if (player.svPlayer.spawnTarget && pluginPlayer.SetAttackState(player.svPlayer.spawnTarget)) return true;
-                player.svPlayer.spawnTarget = null;
+            if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
+            if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
+            if (player.svPlayer.leader && pluginPlayer.SetFollowState(player.svPlayer.leader)) return true;
+            player.svPlayer.SvTrySetEquipable(player.Hands.index);
+            if (player.IsPassenger && player.svPlayer.SetState(Core.Null.index)) return true;
+
+            if (player.svPlayer.spawnTarget && pluginPlayer.SetAttackState(player.svPlayer.spawnTarget)) return true;
+            player.svPlayer.spawnTarget = null;
                 
-                player.svPlayer.job.ResetJobAI();
-            }
+            player.svPlayer.job.ResetJobAI();
 
             return true;
         }

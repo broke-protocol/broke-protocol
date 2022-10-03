@@ -104,9 +104,10 @@ namespace BrokeProtocol.GameSource.Types
             {
                 var controller = destroyable.Controller;
 
-                if (controller && controller != destroyable && !controller.isHuman && !controller.svPlayer.currentState.IsBusy &&
-                    Manager.pluginPlayers.TryGetValue(controller, out var pluginController))
-                    pluginController.SetAttackState(attacker);
+                if (controller && controller != destroyable && !controller.isHuman && !controller.svPlayer.currentState.IsBusy)
+                {
+                    controller.PluginPlayer().SetAttackState(attacker);
+                }
                 
                 attacker.svPlayer.job.OnDamageEntity(destroyable);
             }

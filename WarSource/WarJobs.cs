@@ -48,41 +48,39 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.SetBestWeapons();
 
             // TODO: Smarter goal selection
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+
+            var rand = Random.value;
+
+            if (rand < 0.25f)
             {
-                var rand = Random.value;
+                var territoryIndex = Random.Range(0, Manager.territories.Count);
 
-                if (rand < 0.25f)
+                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) 
+                    && player.PluginPlayer().SetGoToState(pos, rot, place.mTransform))
                 {
-                    var territoryIndex = Random.Range(0, Manager.territories.Count);
-
-                    if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place) 
-                        && pluginPlayer.SetGoToState(pos, rot, place.mTransform))
-                    {
-                        return;
-                    }
+                    return;
                 }
-                else if(rand < 0.5f)
-                {
-                    var territoryIndex = Random.Range(0, Manager.territories.Count);
-
-                    if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
-                        && player.svPlayer.GetOverwatchBest(player.svPlayer.targetEntity.GetPosition, out var stalkPosition) &&
-                        pluginPlayer.SetGoToState(pos, rot, place.mTransform))
-                    {
-
-                    }
-                }
-                else if (rand < 0.75f)
-                {
-                    // enter empty vehicle
-                }
-                else
-                {
-                    // follow someone
-                }
-
             }
+            else if(rand < 0.5f)
+            {
+                var territoryIndex = Random.Range(0, Manager.territories.Count);
+
+                if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place)
+                    && player.svPlayer.GetOverwatchBest(player.svPlayer.targetEntity.GetPosition, out var stalkPosition) &&
+                    player.PluginPlayer().SetGoToState(pos, rot, place.mTransform))
+                {
+
+                }
+            }
+            else if (rand < 0.75f)
+            {
+                // enter empty vehicle
+            }
+            else
+            {
+                // follow someone
+            }
+
 
 
             Debug.LogWarning("[SVR] Job shouldn't end up here");
@@ -112,8 +110,7 @@ namespace BrokeProtocol.GameSource
                 },
                 (e) =>
                 {
-                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                        pluginPlayer.SetAttackState(e);
+                    player.PluginPlayer().SetAttackState(e);
                 });
         }
 

@@ -224,15 +224,14 @@ namespace BrokeProtocol.GameSource
                 (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e, true),
                 (e) =>
                 {
-                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && 
-                    LifeManager.pluginPlayers.TryGetValue(player, out var lifeSourcePlayer))
+                    if (LifeManager.pluginPlayers.TryGetValue(player, out var lifeSourcePlayer))
                     {
                         // Add random crimes to ensure high wanted level (targetable by SpecOps)
                         while (lifeSourcePlayer.wantedLevel < 3)
                         {
                             lifeSourcePlayer.AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
                         }
-                        pluginPlayer.SetAttackState(e);
+                        player.PluginPlayer().SetAttackState(e);
                     }
                 });
         }
@@ -592,8 +591,7 @@ namespace BrokeProtocol.GameSource
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && player.CanSeeEntity(e, true),
                 (e) =>
                 {
-                    if(Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                        pluginPlayer.SetAttackState(e);
+                    player.PluginPlayer().SetAttackState(e);
                 });
         }
 
@@ -701,8 +699,7 @@ namespace BrokeProtocol.GameSource
             if (target && target.IsOutside && target.svPlayer.job is Gangster &&
                 target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr &&
                 Manager.TryGetTerritory(target, out var territory) && territory.ownerIndex == info.shared.jobIndex &&
-                Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
-                territory.attackerIndex >= 0 && pluginPlayer.SetAttackState(target))
+                territory.attackerIndex >= 0 && player.PluginPlayer().SetAttackState(target))
             {
                 return;
             }
@@ -972,11 +969,10 @@ namespace BrokeProtocol.GameSource
         {
             var target = player.svPlayer.spawner;
 
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
-                target && LifeManager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
+            if (target && LifeManager.pluginPlayers.TryGetValue(target, out var pluginTarget) && target.IsOutside && pluginTarget.wantedLevel >= AttackLevel &&
                 Random.value < pluginTarget.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
-                return pluginPlayer.SetAttackState(target);
+                return player.PluginPlayer().SetAttackState(target);
             }
             return false;
         }
@@ -987,8 +983,7 @@ namespace BrokeProtocol.GameSource
                 (e) => e is ShPlayer p && p.IsCapable && LifeManager.pluginPlayers.TryGetValue(p, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel && player.CanSeeEntity(e, true),
                 (e) =>
                 {
-                    if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                        pluginPlayer.SetAttackState(e);
+                    player.PluginPlayer().SetAttackState(e);
                 });
         }
 

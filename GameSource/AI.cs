@@ -113,8 +113,7 @@ namespace BrokeProtocol.GameSource
             var target = player.svPlayer.targetEntity;
 
             if (player.CanSeeEntity(target) && 
-                Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
-                pluginPlayer.SetAttackState(target))
+                player.PluginPlayer().SetAttackState(target))
             {
                 return false;
             }
@@ -406,26 +405,23 @@ namespace BrokeProtocol.GameSource
         {
             base.EnterState();
             player.svPlayer.SvDismount();
-            if (Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-            {
-                onDestination = false;
-                player.svPlayer.GetPath(pluginPlayer.goToPosition);
-            }
+            onDestination = false;
+            player.svPlayer.GetPath(player.PluginPlayer().goToPosition);
         }
 
         public override bool UpdateState()
         {
             if (!base.UpdateState()) return false;
 
-            if (onDestination && Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (onDestination)
             {
-                if (pluginPlayer.IsOffOrigin && player.svPlayer.SetState(index)) // Restart state
+                if (player.PluginPlayer().IsOffOrigin && player.svPlayer.SetState(index)) // Restart state
                 {
                     return false;
                 }
                 else
                 {
-                    player.svPlayer.LookTactical(pluginPlayer.goToRotation * Vector3.forward);
+                    player.svPlayer.LookTactical(player.PluginPlayer().goToRotation * Vector3.forward);
                 }
             }
             else if (!player.svPlayer.MoveLookNavPath())
@@ -576,13 +572,12 @@ namespace BrokeProtocol.GameSource
 
         public override bool UpdateState()
         {
-            if (!base.UpdateState() || 
-                !Manager.pluginPlayers.TryGetValue(player, out var pluginPlayer)) return false;
+            if (!base.UpdateState()) return false;
 
             if (reachedCover)
             {
-                if (player.CanSeeEntity(player.svPlayer.targetEntity) && 
-                    pluginPlayer.SetAttackState(player.svPlayer.targetEntity))
+                if (player.CanSeeEntity(player.svPlayer.targetEntity) &&
+                    player.PluginPlayer().SetAttackState(player.svPlayer.targetEntity))
                 {
                     return false;
                 }
@@ -591,7 +586,7 @@ namespace BrokeProtocol.GameSource
                 {
                     if (Random.value < 0.5f)
                     {
-                        pluginPlayer.SetAttackState(player.svPlayer.targetEntity);
+                        player.PluginPlayer().SetAttackState(player.svPlayer.targetEntity);
                     }
                     else
                     {
@@ -604,7 +599,7 @@ namespace BrokeProtocol.GameSource
             }
             else if(BadPath)
             {
-                pluginPlayer.SetAttackState(player.svPlayer.targetEntity);
+                player.PluginPlayer().SetAttackState(player.svPlayer.targetEntity);
                 return false;
             }
             else if (!player.svPlayer.MoveLookNavPath())

@@ -4,6 +4,7 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using UnityEngine;
 using System.Collections;
+using BrokeProtocol.Utility;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -46,10 +47,9 @@ namespace BrokeProtocol.GameSource.Types
             const float alertDelay = 1f;
             var controller = entity.Controller;
 
-            if (controller && Manager.pluginPlayers.TryGetValue(controller, out var pluginPlayer) &&
-                Time.time - pluginPlayer.lastAlertTime > alertDelay)
+            if (controller && Time.time - controller.PluginPlayer().lastAlertTime > alertDelay)
             {
-                pluginPlayer.lastAlertTime = Time.time;
+                controller.PluginPlayer().lastAlertTime = Time.time;
 
                 if (controller.isHuman)
                 {
@@ -57,9 +57,9 @@ namespace BrokeProtocol.GameSource.Types
                 }
                 else if (controller.IsMountArmed)
                 {
-                    if (!controller.svPlayer.currentState.IsBusy && Manager.pluginPlayers.TryGetValue(controller, out var pluginController))
+                    if (!controller.svPlayer.currentState.IsBusy)
                     {
-                        pluginController.SetAttackState(missile.svEntity.instigator);
+                        controller.PluginPlayer().SetAttackState(missile.svEntity.instigator);
                     }
 
                     if (Random.value < 0.4f)
