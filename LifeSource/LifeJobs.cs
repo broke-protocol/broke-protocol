@@ -86,14 +86,8 @@ namespace BrokeProtocol.GameSource
             base.ResetJobAI();
         }
 
-        public override bool IsValidTarget(ShPlayer chaser)
-        {
-            return LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer) &&
-                (
-                (chaser.svPlayer.IsFollower(player) || ((MyJobInfo)chaser.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || (!player.IsRestrained && pluginPlayer.wantedLevel > 0)) &&
-                (!chaser.curMount || player.GetPlaceIndex == chaser.GetPlaceIndex)
-                );
-        }
+        public override bool IsValidTarget(ShPlayer chaser) => 
+            chaser.svPlayer.IsFollower(player) || ((MyJobInfo)chaser.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || (!player.IsRestrained && player.LifePlayer().wantedLevel > 0);
 
         public override ShUsable GetBestJobWeapon()
         {

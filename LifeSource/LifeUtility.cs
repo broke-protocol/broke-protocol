@@ -1,5 +1,6 @@
 ﻿using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
@@ -139,6 +140,8 @@ namespace BrokeProtocol.GameSource
 
     public static class LifeUtility
     {
+        public static LifeSourcePlayer LifePlayer(this ShPlayer player) => LifeManager.pluginPlayers[player];
+
         public static LimitQueue<ShPlayer> trySell = new LimitQueue<ShPlayer>(0, 5f);
 
         public const int maxWantedLevel = 5;

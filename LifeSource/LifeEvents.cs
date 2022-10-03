@@ -36,9 +36,9 @@ namespace BrokeProtocol.GameSource
         public void HandsUp(ShEntity target, ShPlayer player)
         {
             if (target is ShPlayer playerTarget && playerTarget.isActiveAndEnabled && 
-                playerTarget.IsMobile && LifeManager.pluginPlayers.TryGetValue(playerTarget, out var pluginTarget))
+                playerTarget.IsMobile)
             {
-                pluginTarget.CommandHandsUp(player);
+                playerTarget.LifePlayer().CommandHandsUp(player);
             }
         }
 
@@ -54,10 +54,9 @@ namespace BrokeProtocol.GameSource
         [CustomTarget]
         public void SendToJail(ShEntity target, ShPlayer player)
         {
-            if (((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement && target is ShPlayer criminal &&
-                LifeManager.pluginPlayers.TryGetValue(criminal, out var pluginCriminal))
+            if (((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement && target is ShPlayer criminal)
             {
-                var fine = pluginCriminal.GoToJail();
+                var fine = criminal.LifePlayer().GoToJail();
                 if (fine > 0 && player.svPlayer.job is Police) player.svPlayer.Reward(3, fine);
                 else player.svPlayer.SendGameMessage("Confirm criminal is cuffed and has crimes");
             }
@@ -66,15 +65,14 @@ namespace BrokeProtocol.GameSource
         [CustomTarget]
         public void DrugTest(ShEntity target, ShPlayer player)
         {
-            if (!(player.svPlayer.job is Police) || !(target is ShPlayer testee) || 
-                testee.IsDead || !LifeManager.pluginPlayers.TryGetValue(testee, out var pluginTestee))
+            if (!(player.svPlayer.job is Police) || !(target is ShPlayer testee) || testee.IsDead)
                 return;
 
             foreach (var i in testee.injuries)
             {
                 if (i.effect == BodyEffect.Drugged)
                 {
-                    pluginTestee.AddCrime(CrimeIndex.Intoxication, null);
+                    testee.LifePlayer().AddCrime(CrimeIndex.Intoxication, null);
                     var m = "Test Positive";
                     testee.svPlayer.SendGameMessage(m);
                     player.svPlayer.SendGameMessage(m);
@@ -103,10 +101,9 @@ namespace BrokeProtocol.GameSource
             {
                 var player = movable.controller;
                 if (player && player.isHuman && !player.IsDead &&
-                    ((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement &&
-                    LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                    ((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement)
                 {
-                    pluginPlayer.AddCrime(CrimeIndex.Trespassing, null);
+                    player.LifePlayer().AddCrime(CrimeIndex.Trespassing, null);
                 }
             }
         }
@@ -118,10 +115,9 @@ namespace BrokeProtocol.GameSource
             {
                 var player = movable.controller;
                 if (player && player.isHuman && !player.IsDead &&
-                    ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner && 
-                    LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                    ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner
                 {
-                    pluginPlayer.AddCrime(CrimeIndex.PrisonBreak, null);
+                    player.LifePlayer().AddCrime(CrimeIndex.PrisonBreak, null);
                     player.svPlayer.SvResetJob();
                     player.svPlayer.DestroyText();
                 }

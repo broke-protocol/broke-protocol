@@ -15,11 +15,8 @@ namespace BrokeProtocol.GameSource
         public void ClearCrimes(ShPlayer player, ShPlayer target = null)
         {
             if (!target) target = player;
-
-            if (LifeManager.pluginPlayers.TryGetValue(target, out var pluginPlayer))
-            {
-                pluginPlayer.ClearCrimes();
-            }
+            
+            target.LifePlayer().ClearCrimes();
         }
     }
 }

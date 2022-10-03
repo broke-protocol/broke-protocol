@@ -53,13 +53,13 @@ namespace BrokeProtocol.GameSource
                     return false;
                 }
             }
-            else if (TargetNear && LifeManager.pluginPlayers.TryGetValue(targetPlayer, out var pluginTarget))
+            else if (TargetNear)
             {
                 threatened = true;
                 stopTime = Time.time + 8f;
                 player.svPlayer.SvAlert();
                 player.svPlayer.SvPoint(true);
-                pluginTarget.CommandHandsUp(player);
+                targetPlayer.LifePlayer().CommandHandsUp(player);
             }
 
             return true;
