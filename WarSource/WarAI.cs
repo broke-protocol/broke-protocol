@@ -52,6 +52,30 @@ namespace BrokeProtocol.GameSource
         }
     }
 
+    public class TimedFollowState : FollowState
+    {
+        private float endTime;
+
+        public override void EnterState()
+        {
+            base.EnterState();
+            endTime = Time.time + Random.Range(60f, 300f);
+        }
+
+        public override bool UpdateState()
+        {
+            if (!base.UpdateState()) return false;
+
+            if (Time.time > endTime)
+            {
+                player.svPlayer.ResetAI();
+                return false;
+            }
+
+            return true;
+        }
+    }
+
 
     public class TimedGoToState : GoToState
     {

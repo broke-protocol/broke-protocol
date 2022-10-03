@@ -61,7 +61,7 @@ namespace BrokeProtocol.GameSource
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(Core.Follow.index);
+                    player.svPlayer.SetState(WarCore.TimedFollow.index);
                 });
         }
 
