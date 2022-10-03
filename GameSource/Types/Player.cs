@@ -43,18 +43,32 @@ namespace BrokeProtocol.GameSource.Types
 
             if (target == player.svPlayer.leader) player.svPlayer.ClearLeader();
 
+            var previousTarget = player.svPlayer.targetEntity;
             player.svPlayer.targetEntity = target;
 
-            var returnState = false;
+            bool returnState;
 
             if (player.GetControlled is ShAircraft aircraft)
             {
                 if (aircraft.HasWeapons)
+                {
                     returnState = player.svPlayer.SetState(Core.AirAttack.index);
+                }
+                else
+                {
+                    returnState = false;
+                }    
             }
-            else returnState = player.svPlayer.SetState(Core.Attack.index);
+            else
+            {
+                returnState = player.svPlayer.SetState(Core.Attack.index);
+            }
 
-            if (!returnState) player.svPlayer.targetEntity = null;
+            if (!returnState)
+            {
+                // Restore previous target on fail
+                player.svPlayer.targetEntity = previousTarget;
+            }
 
             return returnState;
         }
