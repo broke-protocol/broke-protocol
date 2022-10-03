@@ -67,12 +67,15 @@ namespace BrokeProtocol.GameSource
     {
         public override void ResetJobAI()
         {
-            if (player.svPlayer.stop &&
-                player.GamePlayer().SetGoToState(
+            if (player.svPlayer.stop)
+            {
+                player.svPlayer.SvDismount();
+                if (player.GamePlayer().SetGoToState(
                     player.svPlayer.originalPosition,
                     player.svPlayer.originalRotation,
                     player.svPlayer.originalParent))
-                return;
+                    return;
+            }
 
             if (player.svPlayer.currentState.index == Core.Freeze.index && player.svPlayer.SetState(Core.Flee.index))
                 return;

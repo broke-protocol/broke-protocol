@@ -404,9 +404,11 @@ namespace BrokeProtocol.GameSource
         public override void EnterState()
         {
             base.EnterState();
-            player.svPlayer.SvDismount();
             onDestination = false;
-            player.svPlayer.GetPath(player.GamePlayer().goToPosition);
+            if (!player.IsFlying)
+            {
+                player.svPlayer.GetPath(player.GamePlayer().goToPosition);
+            }
         }
 
         public override bool UpdateState()
@@ -415,13 +417,27 @@ namespace BrokeProtocol.GameSource
 
             if (onDestination)
             {
-                if (player.GamePlayer().IsOffOrigin && player.svPlayer.SetState(index)) // Restart state
+                if (player.GamePlayer().IsOffDestination && player.svPlayer.SetState(index)) // Restart state
                 {
                     return false;
                 }
                 else
                 {
                     player.svPlayer.LookTactical(player.GamePlayer().goToRotation * Vector3.forward);
+                }
+            }
+            else if(player.IsFlying)
+            {
+                if (player.GamePlayer().IsOffDestination)
+                {
+                    var aircraft = player.curMount;
+                    player.svPlayer.LookAt(player.GamePlayer().goToPosition - aircraft.GetPosition);
+                    aircraft.svMountable.MoveTo(player.GamePlayer().goToPosition);
+                }
+                else
+                {
+                    player.svPlayer.SvDismount(true);
+                    return false;
                 }
             }
             else if (!player.svPlayer.MoveLookNavPath())

@@ -30,7 +30,7 @@ namespace BrokeProtocol.GameSource.Types
             this.player = player;
         }
 
-        public bool IsOffOrigin => player.DistanceSqr(goToPosition) > player.GetMount.svMountable.NavRangeSqr;
+        public bool IsOffDestination => player.GetMount.DistanceSqr(goToPosition) > player.GetMount.svMountable.NavRangeSqr;
         
         public bool SetAttackState(ShEntity target)
         {
@@ -721,6 +721,7 @@ namespace BrokeProtocol.GameSource.Types
                 Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) &&
                 player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
+                player.svPlayer.follower.svPlayer.SvDismount();
                 player.svPlayer.follower.GamePlayer().SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
             }
 
