@@ -59,7 +59,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Machete", 1)}),
                     new Upgrades(20,
                         new InventoryStruct[] {
-                            new InventoryStruct("GrenadeSmoke", 3)}),
+                            new InventoryStruct("Smoke", 3)}),
                     new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("KevlarVest", 1)}),
@@ -84,7 +84,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Machete", 1)}),
                     new Upgrades(20,
                         new InventoryStruct[] {
-                            new InventoryStruct("GrenadeSmoke", 3)}),
+                            new InventoryStruct("Smoke", 3)}),
                     new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("KevlarVest", 1)}),
