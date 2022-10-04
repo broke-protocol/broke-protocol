@@ -195,7 +195,7 @@ namespace BrokeProtocol.GameSource.Types
                     new InventoryStruct("Mac", 1),
                     new InventoryStruct("AmmoSMG", 150),
                     new InventoryStruct("Defibrillator", 1),
-                    new InventoryStruct("MedicBox", 5),
+                    new InventoryStruct("MedicBox1", 5),
                 }),
                 new ClassInfo("Anti-Tank", new InventoryStruct[] {
                     new InventoryStruct("Springfield", 1),
