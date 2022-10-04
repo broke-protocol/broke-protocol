@@ -472,7 +472,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex) && connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs[teamIndex].Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
                 {
-                    var territories = WarPlayer.GetTerritories(teamIndex);
+                    var territories = WarUtility.GetTerritories(teamIndex);
 
                     if (territories.Count() > 0 &&
                         WarUtility.GetValidTerritoryPosition(territories.GetRandom(), out var position, out var rotation, out var place))

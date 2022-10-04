@@ -29,7 +29,7 @@ namespace BrokeProtocol.GameSource.Types
             if (curSpawnIndex < 0 ||
                 Manager.territories[curSpawnIndex].ownerIndex != player.svPlayer.spawnJobIndex)
             {
-                var territories = WarPlayer.GetTerritories(player.svPlayer.spawnJobIndex);
+                var territories = WarUtility.GetTerritories(player.svPlayer.spawnJobIndex);
                 if (territories.Count() > 0)
                     spawnTerritoryIndex = territories.GetRandom();
                 else
@@ -122,34 +122,18 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        public static IEnumerable<int> GetTerritories(int team, bool enemy = false)
-        {
-            var territories = new List<int>();
-            var index = 0;
-            foreach (var t in Manager.territories)
-            {
-                if (enemy ^ t.ownerIndex == team)
-                {
-                    territories.Add(index);
-                }
-                index++;
-            }
-
-            return territories;
-        }
-
-        public const string spawnMenuID = "SpawnMenu";
 
         [Execution(ExecutionMode.Additive)]
         public override bool TextPanelButton(ShPlayer player, string menuID, string optionID)
         {
-            if (menuID.StartsWith(spawnMenuID))
+            if (menuID.StartsWith(WarUtility.spawnMenuID))
             {
                 if (int.TryParse(optionID, out var index) && 
                     index < Manager.territories.Count && 
                     Manager.territories[index].ownerIndex == player.svPlayer.spawnJobIndex)
                 {
                     player.WarPlayer().spawnTerritoryIndex = index;
+                    WarUtility.SendSpawnMenu(player.WarPlayer());
                 }
             }
 

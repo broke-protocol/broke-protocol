@@ -3,6 +3,8 @@ using BrokeProtocol.Utility;
 using BrokeProtocol.Required;
 using UnityEngine;
 using BrokeProtocol.Entities;
+using System.Collections.Generic;
+using System.Text;
 
 namespace BrokeProtocol.GameSource
 {
@@ -20,7 +22,25 @@ namespace BrokeProtocol.GameSource
 
     public static class WarUtility
     {
+        public const string spawnMenuID = "SpawnMenu";
+
         public static WarSourcePlayer WarPlayer(this ShPlayer player) => WarManager.pluginPlayers[player];
+
+        public static IEnumerable<int> GetTerritories(int team, bool enemy = false)
+        {
+            var territories = new List<int>();
+            var index = 0;
+            foreach (var t in Manager.territories)
+            {
+                if (enemy ^ t.ownerIndex == team)
+                {
+                    territories.Add(index);
+                }
+                index++;
+            }
+
+            return territories;
+        }
 
         public static bool GetValidTerritoryPosition(int territoryIndex, out Vector3 position, out Quaternion rotation, out Place place)
         {
@@ -68,6 +88,38 @@ namespace BrokeProtocol.GameSource
             {
                 return territory.text;
             }
+        }
+
+        private static LabelID[] GetSpawnOptions(ShPlayer player)
+        {
+            var options = new List<LabelID>();
+            foreach (var territoryIndex in GetTerritories(player.svPlayer.spawnJobIndex))
+            {
+                var locationName = GetTerritoryName(territoryIndex);
+
+                options.Add(new LabelID(locationName, territoryIndex.ToString()));
+            }
+
+            return options.ToArray();
+        }
+
+        public static void SendSpawnMenu(WarSourcePlayer warPlayer)
+        {
+            if (!warPlayer.player.isHuman)
+                return;
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Spawn Select");
+            sb.AppendLine("Current Spawn:");
+            if (warPlayer.spawnTerritoryIndex >= 0)
+            {
+                sb.AppendLine(GetTerritoryName(warPlayer.spawnTerritoryIndex));
+            }
+            else
+            {
+                sb.AppendLine("None");
+            }
+            warPlayer.player.svPlayer.SendTextPanel(sb.ToString(), spawnMenuID, GetSpawnOptions(warPlayer.player));
         }
     }
 }

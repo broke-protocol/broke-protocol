@@ -81,44 +81,14 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        private LabelID[] GetSpawnOptions(ShPlayer player)
-        {
-            var options = new List<LabelID>();
-            foreach (var territoryIndex in WarPlayer.GetTerritories(player.svPlayer.spawnJobIndex))
-            {
-                var locationName = WarUtility.GetTerritoryName(territoryIndex);
-
-                options.Add(new LabelID(locationName, territoryIndex.ToString()));
-            }
-
-            return options.ToArray();
-        }
-
-        private void SendSpawnMenu(WarSourcePlayer warPlayer)
-        {
-            if (!warPlayer.player.isHuman)
-                return;
-
-            var sb = new StringBuilder();
-            sb.AppendLine("Spawn Select");
-            sb.AppendLine("Current Spawn:");
-            if(warPlayer.spawnTerritoryIndex >= 0)
-            {
-                sb.AppendLine(WarUtility.GetTerritoryName(warPlayer.spawnTerritoryIndex));
-            }
-            else
-            {
-                sb.AppendLine("None");
-            }
-            warPlayer.player.svPlayer.SendTextPanel(sb.ToString(), WarPlayer.spawnMenuID, GetSpawnOptions(warPlayer.player));
-        }
+        
 
         private IEnumerator DeathLoop(ShDestroyable destroyable)
         {
             if(destroyable.Player &&
                 WarManager.pluginPlayers.TryGetValue(destroyable.Player, out var warSourcePlayer))
             {
-                SendSpawnMenu (warSourcePlayer);
+                WarUtility.SendSpawnMenu(warSourcePlayer);
             }
             else
             {
@@ -131,7 +101,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (warSourcePlayer != null && warSourcePlayer.SetSpawnTerritory())
                 {
-                    SendSpawnMenu(warSourcePlayer);
+                    WarUtility.SendSpawnMenu(warSourcePlayer);
                 }
 
                 if (Time.time >= respawnTime)
@@ -149,7 +119,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (destroyable && destroyable.Player && destroyable.isHuman)
             {
-                destroyable.Player.svPlayer.DestroyTextPanel(WarPlayer.spawnMenuID);
+                destroyable.Player.svPlayer.DestroyTextPanel(WarUtility.spawnMenuID);
             }
         }
     }

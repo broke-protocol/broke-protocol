@@ -109,10 +109,10 @@ namespace BrokeProtocol.GameSource
 
         public bool AttackTerritory()
         {
-            var territories = WarPlayer.GetTerritories(player.svPlayer.spawnJobIndex, true);
+            var territories = WarUtility.GetTerritories(player.svPlayer.spawnJobIndex, true);
             if(territories.Count() == 0)
             {
-                territories = WarPlayer.GetTerritories(player.svPlayer.spawnJobIndex);
+                territories = WarUtility.GetTerritories(player.svPlayer.spawnJobIndex);
 
                 if(territories.Count() == 0)
                 {
