@@ -122,13 +122,13 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        public static IEnumerable<int> GetTerritories(int team)
+        public static IEnumerable<int> GetTerritories(int team, bool enemy = false)
         {
             var territories = new List<int>();
             var index = 0;
             foreach (var t in Manager.territories)
             {
-                if (t.ownerIndex == team)
+                if (enemy | t.ownerIndex == team)
                 {
                     territories.Add(index);
                 }

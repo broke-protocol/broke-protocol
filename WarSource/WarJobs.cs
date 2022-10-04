@@ -2,6 +2,7 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Utility;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -84,14 +85,17 @@ namespace BrokeProtocol.GameSource
                     return;
             }
 
-            if(!player.curMount && Random.value < 0.3f && TryFindMount())
+            if (!player.curMount)
             {
-                return;
-            }
+                if (Random.value < 0.3f && TryFindMount())
+                {
+                    return;
+                }
 
-            if (!player.svPlayer.leader && Random.value < 0.3f && TryFindLeader()) // Follow a teammate
-            {
-                return;
+                if (!player.svPlayer.leader && Random.value < 0.3f && TryFindLeader()) // Follow a teammate
+                {
+                    return;
+                }
             }
 
             if (AttackTerritory())
@@ -105,7 +109,18 @@ namespace BrokeProtocol.GameSource
 
         public bool AttackTerritory()
         {
-            var territoryIndex = Random.Range(0, Manager.territories.Count);
+            var territories = WarPlayer.GetTerritories(player.svPlayer.spawnJobIndex, true);
+            if(territories.Count() == 0)
+            {
+                territories = WarPlayer.GetTerritories(player.svPlayer.spawnJobIndex);
+
+                if(territories.Count() == 0)
+                {
+                    return false;
+                }    
+            }
+
+            var territoryIndex = territories.GetRandom();
 
             if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place))
             {
