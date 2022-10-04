@@ -149,7 +149,7 @@ namespace BrokeProtocol.GameSource
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(Core.Free.index);
+                    return player.svPlayer.SetState(Core.Free.index);
                 });
         }
 
@@ -160,7 +160,7 @@ namespace BrokeProtocol.GameSource
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(LifeCore.Rob.index);
+                    return player.svPlayer.SetState(LifeCore.Rob.index);
                 });
         }
 
@@ -222,7 +222,7 @@ namespace BrokeProtocol.GameSource
                     {
                         player.LifePlayer().AddCrime(Util.RandomEnumValue<CrimeIndex>(), e as ShPlayer);
                     }
-                    player.GamePlayer().SetAttackState(e);
+                    return player.GamePlayer().SetAttackState(e);
                 });
         }
 
@@ -461,7 +461,7 @@ namespace BrokeProtocol.GameSource
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(Core.Revive.index);
+                    return player.svPlayer.SetState(Core.Revive.index);
                 });
         }
 
@@ -514,7 +514,7 @@ namespace BrokeProtocol.GameSource
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(Core.Extinguish.index);
+                    return player.svPlayer.SetState(Core.Extinguish.index);
                 });
         }
 
@@ -579,10 +579,7 @@ namespace BrokeProtocol.GameSource
             player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && p.IsCapable && p.svPlayer.job is Gangster &&
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && player.CanSeeEntity(e, true),
-                (e) =>
-                {
-                    player.GamePlayer().SetAttackState(e);
-                });
+                (e) => player.GamePlayer().SetAttackState(e));
         }
 
         public override void Loop()
@@ -971,10 +968,7 @@ namespace BrokeProtocol.GameSource
         {
             player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && p.IsCapable && p.LifePlayer().wantedLevel >= AttackLevel && player.CanSeeEntity(e, true),
-                (e) =>
-                {
-                    player.GamePlayer().SetAttackState(e);
-                });
+                (e) => player.GamePlayer().SetAttackState(e));
         }
 
         protected override void FoundTarget(bool startGoalMarker)

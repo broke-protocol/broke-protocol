@@ -51,7 +51,7 @@ namespace BrokeProtocol.GameSource
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(WarCore.Mount.index);
+                    return player.svPlayer.SetState(WarCore.Mount.index);
                 });
         }
 
@@ -59,10 +59,7 @@ namespace BrokeProtocol.GameSource
         {
             return player.svPlayer.LocalEntitiesOne(
                 (e) => e is ShPlayer p && !p.curMount && !p.svPlayer.follower && p.IsMobile,
-                (e) =>
-                {
-                    player.WarPlayer().SetTimedFollowState(e as ShPlayer);
-                });
+                (e) => player.WarPlayer().SetTimedFollowState(e as ShPlayer));
         }
 
         public override void ResetJobAI()
@@ -103,7 +100,12 @@ namespace BrokeProtocol.GameSource
                 return;
             }
 
-            // Nothing else to really do, maybe a timed WanderState?
+            if(player.svPlayer.SetState(WarCore.TimedWander.index))
+            {
+                return;
+            }
+
+            // Should never get to this point
             player.svPlayer.DestroySelf();
         }
 
@@ -156,9 +158,7 @@ namespace BrokeProtocol.GameSource
             return false;
         }
 
-        public void TryFindEnemy()
-        {
-            player.svPlayer.LocalEntitiesOne(
+        public void TryFindEnemy() => player.svPlayer.LocalEntitiesOne(
                 (e) =>
                 {
                     var p = e.Player;
@@ -172,11 +172,7 @@ namespace BrokeProtocol.GameSource
                     }
                     return false;
                 },
-                (e) =>
-                {
-                    player.GamePlayer().SetAttackState(e);
-                });
-        }
+                (e) => player.GamePlayer().SetAttackState(e));
 
         public override void OnDestroyEntity(ShEntity destroyed)
         {

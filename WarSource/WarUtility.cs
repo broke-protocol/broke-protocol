@@ -5,6 +5,7 @@ using UnityEngine;
 using BrokeProtocol.Entities;
 using System.Collections.Generic;
 using System.Text;
+using BrokeProtocol.Managers;
 
 namespace BrokeProtocol.GameSource
 {
@@ -71,7 +72,7 @@ namespace BrokeProtocol.GameSource
 
             position = default;
             rotation = default;
-            place = default;
+            place = SceneManager.Instance.ExteriorPlace;
             return false;
         }
 

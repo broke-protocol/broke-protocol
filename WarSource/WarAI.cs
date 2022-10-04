@@ -110,4 +110,28 @@ namespace BrokeProtocol.GameSource
             return true;
         }
     }
+
+    public class TimedWanderState : WanderState
+    {
+        private float endTime;
+
+        public override void EnterState()
+        {
+            base.EnterState();
+            endTime = Time.time + Random.Range(10f, 20f);
+        }
+
+        public override bool UpdateState()
+        {
+            if (!base.UpdateState()) return false;
+
+            if (Time.time > endTime)
+            {
+                player.svPlayer.ResetAI();
+                return false;
+            }
+
+            return true;
+        }
+    }
 }
