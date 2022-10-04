@@ -125,15 +125,31 @@ namespace BrokeProtocol.GameSource
             if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place))
             {
                 // Overwatch a territory
-                if (Random.value < 0.5f && player.svPlayer.GetOverwatchBest(pos, out var goal) &&
-                    player.WarPlayer().SetTimedGoToState(goal, rot, place.mTransform))
+                if (Random.value < 0.5f && player.svPlayer.GetOverwatchBest(pos, out var best) &&
+                    player.WarPlayer().SetTimedGoToState(best, rot, place.mTransform))
                 {
                     return true;
                 }
-                else if (player.svPlayer.GetOverwatchSafe(pos, Manager.territories[territoryIndex].mainT.GetWorldBounds(), out var goal2) &&
-                    player.WarPlayer().SetTimedGoToState(goal2, rot, place.mTransform))
+                else
                 {
-                    return true;
+                    var t = Manager.territories[territoryIndex].mainT;
+
+                    var tBounds = new Bounds(t.position, default);
+                    
+                    tBounds.Encapsulate(t.TransformPoint(-1f, -1f, 0f));
+                    tBounds.Encapsulate(t.TransformPoint( 0f, -1f, -1f));
+                    tBounds.Encapsulate(t.TransformPoint( 1f, -1f, 0f));
+                    tBounds.Encapsulate(t.TransformPoint( 0f, -1f, 1f));
+                    tBounds.Encapsulate(t.TransformPoint(-1f, 1f, 0f));
+                    tBounds.Encapsulate(t.TransformPoint( 0f, 1f, -1f));
+                    tBounds.Encapsulate(t.TransformPoint( 1f, 1f, 0f));
+                    tBounds.Encapsulate(t.TransformPoint( 0f, 1f, 1f));
+
+                    if (player.svPlayer.GetOverwatchSafe(pos, tBounds, out var safe) &&
+                        player.WarPlayer().SetTimedGoToState(safe, rot, place.mTransform))
+                    {
+                        return true;
+                    }
                 }
             }
 
