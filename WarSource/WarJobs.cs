@@ -164,7 +164,8 @@ namespace BrokeProtocol.GameSource
                     var p = e.Player;
                     if (p && p.IsCapable && IsEnemy(p) && player.CanSeeEntity(e, true))
                     {
-                        if (!player.svPlayer.targetEntity)
+                        // Find enemies even when following someone
+                        if (!player.svPlayer.targetEntity || player.svPlayer.targetEntity == player.svPlayer.leader)
                             return true;
 
                         return player.DistanceSqr(e) < 0.5f * player.DistanceSqr(player.svPlayer.targetEntity);

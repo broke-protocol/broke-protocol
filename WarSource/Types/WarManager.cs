@@ -334,7 +334,7 @@ namespace BrokeProtocol.GameSource.Types
                     scoreSB.Append("   ").
                         AppendColorText(((int)team.Value).ToString(), jobInfo.GetColor());
                 }
-                InterfaceHandler.SendTextToAll(scoreSB.ToString(), 3f, new Vector2(1f, 0.25f), "Score", 28, TextAnchor.LowerRight);
+                InterfaceHandler.SendTextToAll(scoreSB.ToString(), 3f, new Vector2(1f, 0.265f), "Score", 28, TextAnchor.LowerRight);
 
                 var territoriesSB = new StringBuilder();
                 var index = 0;

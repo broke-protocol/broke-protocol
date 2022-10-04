@@ -479,6 +479,11 @@ namespace BrokeProtocol.GameSource
             {
                 player.svPlayer.MoveLookWaypointPath();
             }
+            else if (BadPath)
+            {
+                player.svPlayer.ResetAI();
+                return false;
+            }
             else if (!player.svPlayer.MoveLookNavPath())
             {
                 player.svPlayer.onWaypoints = true;
@@ -574,7 +579,7 @@ namespace BrokeProtocol.GameSource
 
                         startPos = startHit.point + Vector3.up * controlled.bounds.extents.y;
 
-                        SvManager.Instance.DrawLine(startPos, startPos + currentDelta, Color.red, 5f);
+                        //SvManager.Instance.DrawLine(startPos, startPos + currentDelta, Color.red, 5f);
 
                         if (Physics.Raycast(startPos, currentDelta, out var hit, currentDelta.magnitude, MaskIndex.hard) && Mathf.Abs(hit.normal.y) <= 0.5f)
                         {
@@ -680,7 +685,7 @@ namespace BrokeProtocol.GameSource
             {
                 PathToTarget();
             }
-            else if (!player.svPlayer.MoveLookNavPath())
+            else if (BadPath || !player.svPlayer.MoveLookNavPath())
             {
                 // This is handled better in AttackState, but little we can do here
                 player.svPlayer.ResetAI();
