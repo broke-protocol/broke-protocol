@@ -446,6 +446,11 @@ namespace BrokeProtocol.GameSource
                     aircraft.svMountable.MoveTo(player.svPlayer.destinationPosition);
                 }
             }
+            else if(BadPath)
+            {
+                player.svPlayer.ResetAI();
+                return false;
+            }
             else if (!player.svPlayer.MoveLookNavPath())
             {
                 onDestination = true;

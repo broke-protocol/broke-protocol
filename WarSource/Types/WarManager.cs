@@ -281,7 +281,7 @@ namespace BrokeProtocol.GameSource.Types
 
             classes = JsonConvert.DeserializeObject<List<List<ClassInfo>>>(File.ReadAllText(classesFilename));
 
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < 50; i++)
             {
                 var teamIndex = i % skinPrefabs.Length;
                 AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
