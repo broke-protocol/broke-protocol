@@ -52,7 +52,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Army), "SpecOps",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                CharacterType.Humanoid, 0, new ColorStruct(0.82f, 0.71f, 0.55f),
+                CharacterType.Humanoid, 0, new ColorStruct("#eb9a14"),
                 new Upgrades[] {
                     new Upgrades(10,
                         new InventoryStruct[] { 
@@ -77,7 +77,7 @@ namespace BrokeProtocol.GameSource
             new JobInfo(
                 typeof(Army), "OpFor",
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
-                CharacterType.Humanoid, 0, new ColorStruct(0.56f, 0.56f, 0.74f),
+                CharacterType.Humanoid, 0, new ColorStruct("#3673c9"),
                 new Upgrades[] {
                     new Upgrades(10,
                         new InventoryStruct[] {
