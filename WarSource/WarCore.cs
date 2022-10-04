@@ -93,7 +93,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Grenade", 3)}),
                     new Upgrades(50,
                         new InventoryStruct[] {
-                            new InventoryStruct("RiotHelmet", 1)}),
+                            new InventoryStruct("HelmetRiot", 1)}),
                     new Upgrades(60,
                         new InventoryStruct[] {
                             new InventoryStruct("AT4", 1),
