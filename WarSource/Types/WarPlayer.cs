@@ -128,7 +128,7 @@ namespace BrokeProtocol.GameSource.Types
             var index = 0;
             foreach (var t in Manager.territories)
             {
-                if (enemy | t.ownerIndex == team)
+                if (enemy ^ t.ownerIndex == team)
                 {
                     territories.Add(index);
                 }
