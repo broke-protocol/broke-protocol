@@ -17,10 +17,10 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Respawn(ShEntity entity)
         {
             var player = entity.Player;
-            var warSourcePlayer = player.WarPlayer();
-
+            
             if (player)
             {
+                var warSourcePlayer = player.WarPlayer();
                 if (warSourcePlayer.changePending)
                 {
                     warSourcePlayer.changePending = false;

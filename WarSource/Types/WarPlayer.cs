@@ -48,10 +48,42 @@ namespace BrokeProtocol.GameSource.Types
 
             return player.svPlayer.SetState(WarCore.TimedGoTo.index);
         }
+
+        public bool SetTimedFollowState(ShPlayer leader)
+        {
+            player.svPlayer.leader = leader;
+            player.svPlayer.targetEntity = leader;
+            leader.svPlayer.follower = player;
+
+            if (!player.svPlayer.SetState(WarCore.TimedFollow.index))
+            {
+                player.svPlayer.ClearLeader();
+                return false;
+            }
+
+            return true;
+        }
     }
     
     public class WarPlayer : PlayerEvents
     {
+        [Execution(ExecutionMode.Override)]
+        public override bool ResetAI(ShPlayer player)
+        {
+            var warPlayer = player.WarPlayer();
+
+            player.svPlayer.targetEntity = null;
+
+            if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
+            if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
+            if (player.svPlayer.leader && warPlayer.SetTimedFollowState(player.svPlayer.leader)) return true;
+            if (player.IsPassenger && player.svPlayer.SetState(Core.Null.index)) return true;
+
+            player.svPlayer.job.ResetJobAI();
+
+            return true;
+        }
+
         [Execution(ExecutionMode.Additive)]
         public override bool Initialize(ShEntity entity)
         {

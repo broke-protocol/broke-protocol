@@ -60,8 +60,7 @@ namespace BrokeProtocol.GameSource
                 (e) => e is ShPlayer p && !p.curMount && !p.svPlayer.follower && p.IsMobile,
                 (e) =>
                 {
-                    player.svPlayer.targetEntity = e;
-                    player.svPlayer.SetState(WarCore.TimedFollow.index);
+                    player.WarPlayer().SetTimedFollowState(e as ShPlayer);
                 });
         }
 
@@ -85,12 +84,12 @@ namespace BrokeProtocol.GameSource
                     return;
             }
 
-            if(!player.curMount && Random.value < 0.2f && TryFindMount())
+            if(!player.curMount && Random.value < 0.3f && TryFindMount())
             {
                 return;
             }
 
-            if (!player.svPlayer.leader && Random.value < 0.2f && TryFindLeader()) // Follow a teammate
+            if (!player.svPlayer.leader && Random.value < 0.3f && TryFindLeader()) // Follow a teammate
             {
                 return;
             }
@@ -137,8 +136,7 @@ namespace BrokeProtocol.GameSource
                         if (!player.svPlayer.targetEntity)
                             return true;
 
-                        return player.DistanceSqr(e) <
-                        0.5f * player.DistanceSqr(player.svPlayer.targetEntity);
+                        return player.DistanceSqr(e) < 0.5f * player.DistanceSqr(player.svPlayer.targetEntity);
                     }
                     return false;
                 },

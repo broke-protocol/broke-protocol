@@ -281,7 +281,7 @@ namespace BrokeProtocol.GameSource.Types
 
             classes = JsonConvert.DeserializeObject<List<List<ClassInfo>>>(File.ReadAllText(classesFilename));
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 20; i++)
             {
                 var teamIndex = i % skinPrefabs.Length;
                 AddBot(skinPrefabs[teamIndex].GetRandom(), teamIndex);
@@ -365,7 +365,7 @@ namespace BrokeProtocol.GameSource.Types
             tickets.Clear();
             foreach(var t in BPAPI.Jobs)
             {
-                tickets.Add(t.shared.jobIndex, 100f);
+                tickets.Add(t.shared.jobIndex, 2000f);
             }
 
             foreach(var pair in pluginPlayers)
