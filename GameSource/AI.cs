@@ -22,7 +22,7 @@ namespace BrokeProtocol.GameSource
 
         public bool TargetNear => player.GetMount == player.svPlayer.targetEntity.GetMount ||
             player.DistanceSqr(player.svPlayer.targetEntity) < Util.closeRangeSqr ||
-            player.CanSeeEntity(player.svPlayer.targetEntity, false, false, Util.pathfindRange);
+            player.CanSeeEntity(player.svPlayer.targetEntity, false, Util.pathfindRange);
 
         public override bool UpdateState()
         {
@@ -644,7 +644,7 @@ namespace BrokeProtocol.GameSource
     {
         public Vector3 lastTargetPosition;
 
-        public void ResetTargetPosition() => lastTargetPosition = player.svPlayer.targetEntity.GetOrigin;
+        public void ResetTargetPosition() => lastTargetPosition = player.svPlayer.targetEntity.GetPosition;
 
         public bool TargetMoved => player.svPlayer.targetEntity.DistanceSqr(lastTargetPosition) > Util.pathfindRangeSqr;
 
