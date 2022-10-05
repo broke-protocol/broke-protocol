@@ -228,7 +228,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         if (Random.value < 0.8f)
                         {
-                            invItem.count = Mathf.CeilToInt(invItem.count * Random.Range(0.05f, 0.3f));
+                            invItem.count = Mathf.CeilToInt(invItem.count * Random.Range(0.7f, 0.9f));
                             briefcase.myItems.Add(invItem.item.index, invItem);
                         }
                     }
