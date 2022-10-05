@@ -258,7 +258,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (i.item.illegal)
                 {
-                    player.TransferItem(DeltaInv.RemoveFromMe, i.item.index, i.count, true);
+                    player.TransferItem(DeltaInv.RemoveFromMe, i.item.index, i.count);
                 }
             }
 

@@ -226,7 +226,7 @@ namespace BrokeProtocol.GameSource.Types
                     new InventoryStruct("Mac", 1),
                     new InventoryStruct("AmmoSMG", 150),
                     new InventoryStruct("Defibrillator", 1),
-                    new InventoryStruct("MedicBox", 5),
+                    new InventoryStruct("MedicBox2", 5),
                 }),
                 new ClassInfo("Anti-Tank", new InventoryStruct[] {
                     new InventoryStruct("Springfield", 1),
@@ -242,6 +242,7 @@ namespace BrokeProtocol.GameSource.Types
             var player = GameObject.Instantiate(prefab, SceneManager.Instance.ExteriorT);
             player.name = prefab.name;
             player.svPlayer.spawnJobIndex = jobIndex;
+            player.svPlayer.spawnJobRank = Random.Range(0, BPAPI.Jobs[jobIndex].shared.upgrades.Length);
             SvManager.Instance.AddNewEntityExisting(player);
         }
 

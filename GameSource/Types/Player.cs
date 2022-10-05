@@ -492,7 +492,7 @@ namespace BrokeProtocol.GameSource.Types
                 if (extra > 0 && (myItem.item.illegal || !(myItem.item is ShWearable w) || player.curWearables[(int)w.type].index != w.index))
                 {
                     removedItems.Add(new InventoryItem(myItem.item, extra));
-                    player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra, true);
+                    player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra);
                 }
             }
 
