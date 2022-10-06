@@ -42,9 +42,9 @@ namespace BrokeProtocol.GameSource.Types
 
             var mount = player.GetControlled;
 
-            if (mount is ShAircraft aircraft)
+            if (player.IsFlying)
             {
-                if (aircraft.HasWeapons && player.svPlayer.SetState(Core.AirAttack.index))
+                if (mount.HasWeapons && player.svPlayer.SetState(Core.AirAttack.index))
                 {
                     return true;
                 }
