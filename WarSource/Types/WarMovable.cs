@@ -54,8 +54,9 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     // Pick a new random spawn territory for NPCs
                     warSourcePlayer.spawnTerritoryIndex = -1;
-                    warSourcePlayer.SetSpawnTerritory();
                 }
+
+                warSourcePlayer.SetSpawnTerritory();
 
                 var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
 
