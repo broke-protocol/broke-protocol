@@ -49,7 +49,7 @@ namespace BrokeProtocol.GameSource.Types
                     return true;
                 }
             }
-            else if(mount is ShMovable)
+            else if(mount is ShMovable && player.IsSeatedFirst)
             {
                 if(player.svPlayer.SetState(Core.Attack.index))
                 {
