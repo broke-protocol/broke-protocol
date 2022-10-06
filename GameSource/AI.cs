@@ -121,6 +121,38 @@ namespace BrokeProtocol.GameSource
         }
     }
 
+    public class StaticAttackState : BaseState
+    {
+        public override bool IsAttacking => true;
+
+        public override bool EnterTest() => base.EnterTest() && IsTargetValid();
+
+        public override bool UpdateState()
+        {
+            if (!base.UpdateState()) return false;
+
+            if (!player.curMount || !IsTargetValid())
+            {
+                player.svPlayer.ResetAI();
+                return false;
+            }
+
+            var delta = player.svPlayer.targetEntity.GetOrigin - player.curMount.GetOrigin;
+
+            if(Vector3.Angle(player.curMount.mainT.forward, delta) > player.curMount.viewAngleLimit)
+            {
+                player.svPlayer.SvDismount(true);
+                return false;
+            }
+
+            player.svPlayer.AimSmart();
+            player.svPlayer.FireLogic();
+
+            return true;
+        }
+    }
+
+
     public class AirAttackState : BaseState
     {
         public override bool IsAttacking => true;
@@ -141,10 +173,7 @@ namespace BrokeProtocol.GameSource
             if (base.EnterTest() && IsTargetValid())
             {
                 aircraft = player.GetControlled as ShAircraft;
-                if (aircraft && aircraft.HasWeapons)
-                {
-                    return true;
-                }
+                return aircraft;
             }
 
             return false;

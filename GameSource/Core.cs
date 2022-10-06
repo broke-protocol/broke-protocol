@@ -10,6 +10,7 @@ namespace BrokeProtocol.GameSource
         public static State Freeze;
         public static State Restrained;
         public static State Wait;
+        public static State StaticAttack;
         public static State AirAttack;
         public static State Unstuck;
         public static State GoTo;
@@ -36,6 +37,7 @@ namespace BrokeProtocol.GameSource
             Freeze = new FreezeState();
             Restrained = new RestrainedState();
             Wait = new WaitState();
+            StaticAttack = new StaticAttackState();
             AirAttack = new AirAttackState();
             Unstuck = new UnstuckState();
             GoTo = new GoToState();
@@ -56,6 +58,7 @@ namespace BrokeProtocol.GameSource
                 Freeze,
                 Restrained,
                 Wait,
+                StaticAttack,
                 AirAttack,
                 Unstuck,
                 GoTo,

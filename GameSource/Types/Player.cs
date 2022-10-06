@@ -40,31 +40,30 @@ namespace BrokeProtocol.GameSource.Types
             var previousTarget = player.svPlayer.targetEntity;
             player.svPlayer.targetEntity = target;
 
-            bool returnState;
+            var mount = player.GetControlled;
 
-            if (player.GetControlled is ShAircraft aircraft)
+            if (mount is ShAircraft aircraft)
             {
-                if (aircraft.HasWeapons)
+                if (aircraft.HasWeapons && player.svPlayer.SetState(Core.AirAttack.index))
                 {
-                    returnState = player.svPlayer.SetState(Core.AirAttack.index);
+                    return true;
                 }
-                else
+            }
+            else if(mount is ShMovable)
+            {
+                if(player.svPlayer.SetState(Core.Attack.index))
                 {
-                    returnState = false;
-                }    
+                    return true;
+                }
             }
-            else
+            else if(player.svPlayer.SetState(Core.StaticAttack.index))
             {
-                returnState = player.svPlayer.SetState(Core.Attack.index);
+                return true;
             }
 
-            if (!returnState)
-            {
-                // Restore previous target on fail
-                player.svPlayer.targetEntity = previousTarget;
-            }
-
-            return returnState;
+            // Restore previous target on fail
+            player.svPlayer.targetEntity = previousTarget;
+            return false;
         }
 
         public bool SetFollowState(ShPlayer leader)
