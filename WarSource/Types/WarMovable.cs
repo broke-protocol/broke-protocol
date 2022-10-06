@@ -1,12 +1,9 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
-using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -81,8 +78,6 @@ namespace BrokeProtocol.GameSource.Types
             ShManager.Instance.StartCoroutine(DeathLoop(destroyable));
             return true;
         }
-
-        
 
         private IEnumerator DeathLoop(ShDestroyable destroyable)
         {

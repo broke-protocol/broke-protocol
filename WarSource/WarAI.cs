@@ -134,4 +134,28 @@ namespace BrokeProtocol.GameSource
             return true;
         }
     }
+
+    public class TimedNullState : BaseState
+    {
+        private float endTime;
+
+        public override void EnterState()
+        {
+            base.EnterState();
+            endTime = Time.time + Random.Range(15f, 30f);
+        }
+
+        public override bool UpdateState()
+        {
+            if (!base.UpdateState()) return false;
+
+            if (Time.time > endTime)
+            {
+                player.svPlayer.ResetAI();
+                return false;
+            }
+
+            return true;
+        }
+    }
 }

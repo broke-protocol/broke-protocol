@@ -75,8 +75,10 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.IsKnockedOut && player.svPlayer.SetState(Core.Null.index)) return true;
             if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
+
+            player.svPlayer.SetBestWeapons();
+
             if (player.svPlayer.leader && warPlayer.SetTimedFollowState(player.svPlayer.leader)) return true;
-            if (player.IsPassenger && player.svPlayer.SetState(Core.Null.index)) return true;
 
             player.svPlayer.job.ResetJobAI();
 

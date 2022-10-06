@@ -47,7 +47,7 @@ namespace BrokeProtocol.GameSource
         protected bool TryFindMount()
         {
             return player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShMountable p && p.IsAccessible(player, true) && !p.occupants[0],
+                (e) => e is ShMountable p && (p is ShMovable || p.HasWeapons) && p.IsAccessible(player, true) && !p.occupants[0],
                 (e) =>
                 {
                     player.svPlayer.targetEntity = e;
@@ -64,35 +64,41 @@ namespace BrokeProtocol.GameSource
 
         public override void ResetJobAI()
         {
-            player.svPlayer.SetBestWeapons();
-
-            if (player.IsFlying || player.IsBoating)
+            if (player.curMount)
             {
-                if (player.svPlayer.currentState.index == WarCore.TimedWaypoint.index)
+                if (!(player.curMount is ShMovable))
                 {
-                    if(!AttackTerritory())
+                    if (player.svPlayer.currentState.index != WarCore.TimedNull.index &&
+                        player.svPlayer.SetState(WarCore.TimedNull.index))
+                        return;
+                }
+                else
+                {
+                    if (player.IsFlying || player.IsBoating)
                     {
-                        player.svPlayer.SvDismount(true);
+                        if (player.svPlayer.currentState.index != WarCore.TimedWaypoint.index &&
+                            player.svPlayer.SetState(WarCore.TimedWaypoint.index))
+                                return;
                     }
-
-                    return;
+                    
+                    if (!player.IsPassenger && AttackTerritory())
+                    {
+                        return;
+                    }
                 }
 
-                if (player.svPlayer.SetState(WarCore.TimedWaypoint.index))
-                    return;
+                player.svPlayer.SvDismount(true);
+                return;
             }
 
-            if (!player.curMount)
+            if (Random.value < 0.3f && TryFindMount())
             {
-                if (Random.value < 0.3f && TryFindMount())
-                {
-                    return;
-                }
+                return;
+            }
 
-                if (!player.svPlayer.leader && Random.value < 0.3f && TryFindLeader()) // Follow a teammate
-                {
-                    return;
-                }
+            if (!player.svPlayer.leader && Random.value < 0.3f && TryFindLeader()) // Follow a teammate
+            {
+                return;
             }
 
             if (AttackTerritory())

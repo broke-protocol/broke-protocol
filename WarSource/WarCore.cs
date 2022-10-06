@@ -16,6 +16,7 @@ namespace BrokeProtocol.GameSource
         public static State TimedFollow;
         public static State TimedGoTo;
         public static State TimedWander;
+        public static State TimedNull;
 
         public WarCore()
         {
@@ -40,6 +41,7 @@ namespace BrokeProtocol.GameSource
             TimedFollow = new TimedFollowState();
             TimedGoTo = new TimedGoToState();
             TimedWander = new TimedWanderState();
+            TimedNull = new TimedNullState();
 
             StatesAdditive = new List<State>
             {
@@ -48,6 +50,7 @@ namespace BrokeProtocol.GameSource
                 TimedFollow,
                 TimedGoTo,
                 TimedWander,
+                TimedNull,
             };
         }
 
