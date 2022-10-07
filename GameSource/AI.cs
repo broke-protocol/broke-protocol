@@ -862,6 +862,7 @@ namespace BrokeProtocol.GameSource
     {
         protected bool hunting;
         protected ShProjectile projectile;
+        protected ShDetonator detonator;
 
         // Don't do hunting behavior if in an unarmed vehicle
         public bool ShouldHunt => !player.curMount || player.curMount.HasWeapons;
@@ -871,6 +872,7 @@ namespace BrokeProtocol.GameSource
             base.EnterState();
             hunting = false;
             projectile = null;
+            detonator = null;
             player.svPlayer.SetBestWeapons();
         }
 
@@ -888,7 +890,11 @@ namespace BrokeProtocol.GameSource
             if (player.CurrentAmmoTotal == 0)
                 player.svPlayer.SetBestWeapons();
 
-            if (!player.curMount)
+            if(player.curMount)
+            {
+                player.svPlayer.SvUpdateMode(StateMoveMode);
+            }
+            else
             {
                 player.svPlayer.SvUpdateMode(player.Perlin(0.4f) < 0.4f ? MoveMode.Zoom : StateMoveMode);
 
@@ -896,13 +902,33 @@ namespace BrokeProtocol.GameSource
                 {
                     if (!player.switching)
                     {
-                        player.Fire(projectile.index);
-                        player.svPlayer.SetBestWeapons();
+                        if (detonator)
+                        {
+                            player.Fire(detonator.index);
+                            player.svPlayer.SetBestWeapons();
+                        }
+                        else
+                        {
+                            player.Fire(projectile.index);
+
+                            if (player.TryGetCachedItem(out detonator))
+                            {
+                                player.svPlayer.SvSetEquipable(detonator);
+                                return true;
+                            }
+                            else
+                            {
+                                player.svPlayer.SetBestWeapons();
+                            }
+                        }
 
                         if (player.svPlayer.SetState(Core.TakeCover.index))
                         {
                             return false;
                         }
+
+                        projectile = null;
+                        detonator = null;
                     }
                 }
                 else
@@ -914,13 +940,11 @@ namespace BrokeProtocol.GameSource
                         var r = Random.value;
 
                         if (!player.curMount && r < 0.005f && player.TryGetCachedItem(out projectile) &&
-                            Util.AimVector(targetEntity.GetOrigin - player.GetOrigin, targetEntity.Velocity - player.Velocity, projectile.WeaponVelocity, projectile.WeaponGravity, out _))
+                            player.Distance(targetEntity) < Util.BallisticRange(projectile.WeaponVelocity, projectile.WeaponGravity))
                         {
-                            player.svPlayer.SvTrySetEquipable(projectile.index);
-                            return true;
+                            player.svPlayer.SvSetEquipable(projectile);
                         }
-
-                        if (r < 0.01f && player.svPlayer.SetState(Core.TakeCover.index))
+                        else if (r < 0.01f && player.svPlayer.SetState(Core.TakeCover.index))
                         {
                             return false;
                         }
@@ -929,10 +953,6 @@ namespace BrokeProtocol.GameSource
                     if (player.stances[(int)StanceIndex.Crouch].input > 0f)
                         player.svPlayer.SvCrouch(player.Perlin(0.1f) < 0.35f);
                 }
-            }
-            else
-            {
-                player.svPlayer.SvUpdateMode(StateMoveMode);
             }
 
             return true;
