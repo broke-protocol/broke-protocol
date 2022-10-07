@@ -32,7 +32,8 @@ namespace BrokeProtocol.GameSource.Types
             if (!target || target == player)
                 return false;
 
-            if (target == player.svPlayer.leader) player.svPlayer.ClearLeader();
+            if (target == player.svPlayer.leader)
+                player.svPlayer.ClearLeader();
 
             if (target == player.svPlayer.targetEntity)
                 return false;
@@ -43,21 +44,28 @@ namespace BrokeProtocol.GameSource.Types
 
             var mount = player.GetControlled;
 
-            if (player.IsFlying)
+            if (mount)
             {
-                if (mount.HasWeapons && player.svPlayer.SetState(Core.AirAttack.index))
+                if (player.IsFlying)
+                {
+                    if (mount.HasWeapons && player.svPlayer.SetState(Core.AirAttack.index))
+                    {
+                        return true;
+                    }
+                }
+                else if (mount is ShMovable && player.IsSeatedFirst)
+                {
+                    if (player.svPlayer.SetState(Core.Attack.index))
+                    {
+                        return true;
+                    }
+                }
+                else if (player.svPlayer.SetState(Core.StaticAttack.index))
                 {
                     return true;
                 }
             }
-            else if(mount is ShMovable && player.IsSeatedFirst)
-            {
-                if(player.svPlayer.SetState(Core.Attack.index))
-                {
-                    return true;
-                }
-            }
-            else if(player.svPlayer.SetState(Core.StaticAttack.index))
+            else if (player.svPlayer.SetState(Core.Attack.index))
             {
                 return true;
             }
