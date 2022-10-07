@@ -177,23 +177,23 @@ namespace BrokeProtocol.GameSource.Types
             {
                 new ClassInfo("Rifleman", new InventoryStruct[] {
                     new InventoryStruct("M4", 1),
-                    new InventoryStruct("AmmoRifle", 150),
+                    new InventoryStruct("AmmoRifle", 180),
                 }),
                 new ClassInfo("Officer", new InventoryStruct[] {
                     new InventoryStruct("MP5SD", 1),
-                    new InventoryStruct("AmmoSMG", 150),
+                    new InventoryStruct("AmmoSMG", 180),
                 }),
                 new ClassInfo("Sniper", new InventoryStruct[] {
                     new InventoryStruct("Winchester", 1),
-                    new InventoryStruct("AmmoRifle", 80),
+                    new InventoryStruct("AmmoRifle", 60),
                 }),
                 new ClassInfo("Support", new InventoryStruct[] {
                     new InventoryStruct("MachineGun", 1),
-                    new InventoryStruct("AmmoMG", 250),
+                    new InventoryStruct("AmmoMG", 300),
                 }),
                 new ClassInfo("Medic", new InventoryStruct[] {
                     new InventoryStruct("Mac", 1),
-                    new InventoryStruct("AmmoSMG", 150),
+                    new InventoryStruct("AmmoSMG", 180),
                     new InventoryStruct("Defibrillator", 1),
                     new InventoryStruct("MedicBox1", 5),
                 }),
@@ -203,28 +203,36 @@ namespace BrokeProtocol.GameSource.Types
                     new InventoryStruct("Bazooka", 1),
                     new InventoryStruct("Rocket", 12),
                 }),
+                new ClassInfo("Demoman", new InventoryStruct[] {
+                    new InventoryStruct("SPAS12", 1),
+                    new InventoryStruct("AmmoRifle", 80),
+                    new InventoryStruct("MineAT", 2),
+                    new InventoryStruct("MineAP", 3),
+                    new InventoryStruct("SatchelCharge", 2),
+                    new InventoryStruct("Detonator", 1),
+                }),
             },
             new ClassInfo[]
             {
                 new ClassInfo("Rifleman", new InventoryStruct[] {
                     new InventoryStruct("AK47", 1),
-                    new InventoryStruct("AmmoRifle", 150),
+                    new InventoryStruct("AmmoRifle", 180),
                 }),
                 new ClassInfo("Officer", new InventoryStruct[] {
                     new InventoryStruct("P90", 1),
-                    new InventoryStruct("AmmoSMG", 150),
+                    new InventoryStruct("AmmoSMG", 200),
                 }),
                 new ClassInfo("Sniper", new InventoryStruct[] {
                     new InventoryStruct("Winchester", 1),
-                    new InventoryStruct("AmmoRifle", 80),
+                    new InventoryStruct("AmmoRifle", 60),
                 }),
                 new ClassInfo("Support", new InventoryStruct[] {
                     new InventoryStruct("PKM", 1),
-                    new InventoryStruct("AmmoMG", 250),
+                    new InventoryStruct("AmmoMG", 300),
                 }),
                 new ClassInfo("Medic", new InventoryStruct[] {
                     new InventoryStruct("Mac", 1),
-                    new InventoryStruct("AmmoSMG", 150),
+                    new InventoryStruct("AmmoSMG", 180),
                     new InventoryStruct("Defibrillator", 1),
                     new InventoryStruct("MedicBox2", 5),
                 }),
@@ -233,6 +241,14 @@ namespace BrokeProtocol.GameSource.Types
                     new InventoryStruct("AmmoRifle", 80),
                     new InventoryStruct("Bazooka", 1),
                     new InventoryStruct("Rocket", 12),
+                }),
+                new ClassInfo("Demoman", new InventoryStruct[] {
+                    new InventoryStruct("Shotgun", 1),
+                    new InventoryStruct("AmmoRifle", 60),
+                    new InventoryStruct("MineAT", 2),
+                    new InventoryStruct("MineAP", 3),
+                    new InventoryStruct("SatchelCharge", 2),
+                    new InventoryStruct("Detonator", 1),
                 }),
             }
         };

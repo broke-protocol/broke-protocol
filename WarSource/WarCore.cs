@@ -62,19 +62,29 @@ namespace BrokeProtocol.GameSource
                 new Upgrades[] {
                     new Upgrades(10,
                         new InventoryStruct[] { 
-                            new InventoryStruct("Machete", 1)}),
+                            new InventoryStruct("Machete", 1),
+                            new InventoryStruct("Flashbang", 2),
+                        }),
                     new Upgrades(20,
                         new InventoryStruct[] {
-                            new InventoryStruct("Smoke", 3)}),
+                            new InventoryStruct("Smoke", 2),
+                            new InventoryStruct("Colt", 1),
+                            new InventoryStruct("AmmoPistol", 35),
+                        }),
                     new Upgrades(30,
                         new InventoryStruct[] {
-                            new InventoryStruct("KevlarVest", 1)}),
+                            new InventoryStruct("KevlarVest", 1),
+                            new InventoryStruct("LaserRed", 1),
+                        }),
                     new Upgrades(40,
                         new InventoryStruct[] {
-                            new InventoryStruct("Grenade", 3)}),
+                            new InventoryStruct("Grenade", 3),
+                            new InventoryStruct("HoloSight", 1)}),
                     new Upgrades(50,
                         new InventoryStruct[] {
-                            new InventoryStruct("HelmetCombat", 1)}),
+                            new InventoryStruct("HelmetCombat", 1),
+                            new InventoryStruct("ACOG", 1),
+                        }),
                     new Upgrades(60,
                         new InventoryStruct[] {
                             new InventoryStruct("AT4", 1),
@@ -87,19 +97,29 @@ namespace BrokeProtocol.GameSource
                 new Upgrades[] {
                     new Upgrades(10,
                         new InventoryStruct[] {
-                            new InventoryStruct("Machete", 1)}),
+                            new InventoryStruct("Machete", 1),
+                            new InventoryStruct("Flashbang", 2),
+                        }),
                     new Upgrades(20,
                         new InventoryStruct[] {
-                            new InventoryStruct("Smoke", 3)}),
+                            new InventoryStruct("Smoke", 2),
+                            new InventoryStruct("Sig", 1),
+                            new InventoryStruct("AmmoPistol", 48),
+                        }),
                     new Upgrades(30,
                         new InventoryStruct[] {
-                            new InventoryStruct("KevlarVest", 1)}),
+                            new InventoryStruct("KevlarVest", 1),
+                            new InventoryStruct("LaserRed", 1),
+                        }),
                     new Upgrades(40,
                         new InventoryStruct[] {
-                            new InventoryStruct("Grenade", 3)}),
+                            new InventoryStruct("Grenade", 3),
+                            new InventoryStruct("KobraSight", 1),
+                        }),
                     new Upgrades(50,
                         new InventoryStruct[] {
-                            new InventoryStruct("HelmetRiot", 1)}),
+                            new InventoryStruct("HelmetRiot", 1),
+                            new InventoryStruct("ACOG", 1),}),
                     new Upgrades(60,
                         new InventoryStruct[] {
                             new InventoryStruct("AT4", 1),
