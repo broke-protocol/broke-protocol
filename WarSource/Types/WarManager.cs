@@ -205,7 +205,7 @@ namespace BrokeProtocol.GameSource.Types
                 }),
                 new ClassInfo("Demoman", new InventoryStruct[] {
                     new InventoryStruct("SPAS12", 1),
-                    new InventoryStruct("AmmoRifle", 80),
+                    new InventoryStruct("AmmoShotgun", 80),
                     new InventoryStruct("MineAT", 2),
                     new InventoryStruct("MineAP", 3),
                     new InventoryStruct("SatchelCharge", 2),
@@ -244,7 +244,7 @@ namespace BrokeProtocol.GameSource.Types
                 }),
                 new ClassInfo("Demoman", new InventoryStruct[] {
                     new InventoryStruct("Shotgun", 1),
-                    new InventoryStruct("AmmoRifle", 60),
+                    new InventoryStruct("AmmoShotgun", 60),
                     new InventoryStruct("MineAT", 2),
                     new InventoryStruct("MineAP", 3),
                     new InventoryStruct("SatchelCharge", 2),
