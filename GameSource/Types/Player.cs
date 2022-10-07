@@ -42,18 +42,16 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.targetEntity = target;
 
-            var mount = player.GetControlled;
-
-            if (mount)
+            if (player.curMount)
             {
                 if (player.IsFlying)
                 {
-                    if (mount.HasWeapons && player.svPlayer.SetState(Core.AirAttack.index))
+                    if (player.curMount.HasWeapons && player.svPlayer.SetState(Core.AirAttack.index))
                     {
                         return true;
                     }
                 }
-                else if (mount is ShMovable && player.IsSeatedFirst)
+                else if (player.curMount is ShMovable && player.IsSeatedFirst)
                 {
                     if (player.svPlayer.SetState(Core.Attack.index))
                     {
