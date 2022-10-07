@@ -7,6 +7,7 @@ namespace BrokeProtocol.GameSource
     public class Core : Plugin
     {
         public static State Null;
+        public static State Look;
         public static State Freeze;
         public static State Restrained;
         public static State Wait;
@@ -33,7 +34,8 @@ namespace BrokeProtocol.GameSource
                 "Base game source used by BP. May be modified.",
                 "https://github.com/broke-protocol/broke-protocol");
 
-            Null = new State();
+            Null = new BaseState();
+            Look = new LookState();
             Freeze = new FreezeState();
             Restrained = new RestrainedState();
             Wait = new WaitState();
@@ -55,6 +57,7 @@ namespace BrokeProtocol.GameSource
             StatesOverride = new List<State>
             {
                 Null,
+                Look,
                 Freeze,
                 Restrained,
                 Wait,

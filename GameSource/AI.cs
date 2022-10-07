@@ -23,7 +23,10 @@ namespace BrokeProtocol.GameSource
         public bool TargetNear => player.GetMount == player.svPlayer.targetEntity.GetMount ||
             player.DistanceSqr(player.svPlayer.targetEntity) < Util.closeRangeSqr ||
             player.CanSeeEntity(player.svPlayer.targetEntity, false, Util.pathfindRange);
+    }
 
+    public class LookState : BaseState
+    {
         public override bool UpdateState()
         {
             if (!base.UpdateState()) return false;
@@ -59,7 +62,7 @@ namespace BrokeProtocol.GameSource
         }
     }
 
-    public class RestrainedState : BaseState
+    public class RestrainedState : LookState
     {
         private float stopRestrainTime;
 
@@ -111,8 +114,7 @@ namespace BrokeProtocol.GameSource
 
             var target = player.svPlayer.targetEntity;
 
-            if (player.CanSeeEntity(target) && 
-                player.GamePlayer().SetAttackState(target))
+            if (player.CanSeeEntity(target) && player.GamePlayer().SetAttackState(target))
             {
                 return false;
             }
@@ -150,6 +152,10 @@ namespace BrokeProtocol.GameSource
             if (player.CanSeeEntity(player.svPlayer.targetEntity) && player.svPlayer.AimSmart())
             {
                 player.svPlayer.FireLogic();
+            }
+            else
+            {
+                player.svPlayer.LookAt(player.curMountT.rotation);
             }
 
             return true;

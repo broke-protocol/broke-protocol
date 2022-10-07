@@ -135,7 +135,7 @@ namespace BrokeProtocol.GameSource
         }
     }
 
-    public class TimedNullState : BaseState
+    public class TimedLookState : LookState
     {
         private float endTime;
 

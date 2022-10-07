@@ -786,7 +786,7 @@ namespace BrokeProtocol.GameSource.Types
             if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
             if (player.svPlayer.leader && pluginPlayer.SetFollowState(player.svPlayer.leader)) return true;
             player.svPlayer.SvTrySetEquipable(player.Hands.index);
-            if (player.IsPassenger && player.svPlayer.SetState(Core.Null.index)) return true;
+            if (player.IsPassenger && player.svPlayer.SetState(Core.Look.index)) return true;
 
             if (player.svPlayer.spawnTarget && pluginPlayer.SetAttackState(player.svPlayer.spawnTarget)) return true;
             player.svPlayer.spawnTarget = null;

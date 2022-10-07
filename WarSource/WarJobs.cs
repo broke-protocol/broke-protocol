@@ -68,8 +68,8 @@ namespace BrokeProtocol.GameSource
             {
                 if (!(player.curMount is ShMovable))
                 {
-                    if (player.svPlayer.currentState.index != WarCore.TimedNull.index &&
-                        player.svPlayer.SetState(WarCore.TimedNull.index))
+                    if (player.svPlayer.currentState.index != WarCore.TimedLook.index &&
+                        player.svPlayer.SetState(WarCore.TimedLook.index))
                         return;
                 }
                 else
