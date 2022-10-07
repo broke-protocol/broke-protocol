@@ -141,7 +141,11 @@ namespace BrokeProtocol.GameSource
 
             if(Vector3.Angle(player.curMount.mainT.forward, delta) > player.curMount.viewAngleLimit)
             {
-                player.svPlayer.SvDismount(true);
+                player.svPlayer.SvDismount();
+                if (!player.GamePlayer().SetAttackState(player.svPlayer.targetEntity))
+                {
+                    player.svPlayer.ResetAI();
+                }
                 return false;
             }
 
