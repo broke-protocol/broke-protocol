@@ -78,7 +78,7 @@ namespace BrokeProtocol.GameSource
                         }),
                     new Upgrades(40,
                         new InventoryStruct[] {
-                            new InventoryStruct("Grenade", 3),
+                            new InventoryStruct("Grenade", 2),
                             new InventoryStruct("HoloSight", 1)}),
                     new Upgrades(50,
                         new InventoryStruct[] {
@@ -113,7 +113,7 @@ namespace BrokeProtocol.GameSource
                         }),
                     new Upgrades(40,
                         new InventoryStruct[] {
-                            new InventoryStruct("Grenade", 3),
+                            new InventoryStruct("Grenade", 2),
                             new InventoryStruct("KobraSight", 1),
                         }),
                     new Upgrades(50,
