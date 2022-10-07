@@ -174,7 +174,9 @@ namespace BrokeProtocol.GameSource
                         if (!player.svPlayer.targetEntity || player.svPlayer.targetEntity == player.svPlayer.leader)
                             return true;
 
-                        return player.DistanceSqr(e) < 0.5f * player.DistanceSqr(player.svPlayer.targetEntity);
+                        var canSeeExistingTarget = player.CanSeeEntity(player.svPlayer.targetEntity);
+
+                        return !canSeeExistingTarget || player.DistanceSqr(e) < 0.5f * player.DistanceSqr(player.svPlayer.targetEntity);
                     }
                     return false;
                 },
