@@ -91,7 +91,7 @@ namespace BrokeProtocol.GameSource
         public override bool IsValidTarget(ShPlayer chaser) => 
             chaser.svPlayer.IsFollower(player) || ((MyJobInfo)chaser.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || (!player.IsRestrained && player.LifePlayer().wantedLevel > 0);
 
-        public override ShUsable GetBestJobWeapon()
+        public override ShUsable GetBestJobEquipable()
         {
             if (((MyJobInfo)info).groupIndex == GroupIndex.LawEnforcement && player.svPlayer.targetEntity is ShPlayer targetPlayer &&
                 targetPlayer.LifePlayer().wantedLevel <= 1 && player.HasItem(targetPlayer.Handcuffs))
