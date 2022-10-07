@@ -79,7 +79,8 @@ namespace BrokeProtocol.GameSource
                     new Upgrades(40,
                         new InventoryStruct[] {
                             new InventoryStruct("Grenade", 2),
-                            new InventoryStruct("HoloSight", 1)}),
+                            new InventoryStruct("HoloSight", 1),
+                        }),
                     new Upgrades(50,
                         new InventoryStruct[] {
                             new InventoryStruct("HelmetCombat", 1),
@@ -88,7 +89,9 @@ namespace BrokeProtocol.GameSource
                     new Upgrades(60,
                         new InventoryStruct[] {
                             new InventoryStruct("AT4", 1),
-                            new InventoryStruct("RocketGuided", 5)})
+                            new InventoryStruct("RocketGuided", 5),
+                            new InventoryStruct("Silencer", 1),
+                        })
                 }),
             new JobInfo(
                 typeof(Army), "OpFor",
@@ -119,11 +122,14 @@ namespace BrokeProtocol.GameSource
                     new Upgrades(50,
                         new InventoryStruct[] {
                             new InventoryStruct("HelmetRiot", 1),
-                            new InventoryStruct("ACOG", 1),}),
+                            new InventoryStruct("ACOG", 1),
+                        }),
                     new Upgrades(60,
                         new InventoryStruct[] {
                             new InventoryStruct("AT4", 1),
-                            new InventoryStruct("RocketGuided", 5)})
+                            new InventoryStruct("RocketGuided", 5),
+                            new InventoryStruct("Silencer", 1),
+                        })
                 }),
             };
     }
