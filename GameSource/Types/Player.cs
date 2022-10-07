@@ -26,7 +26,7 @@ namespace BrokeProtocol.GameSource.Types
             this.player = player;
         }
         
-        public bool SetAttackState(ShEntity target)
+        public virtual bool SetAttackState(ShEntity target)
         {
             // Sanity check
             if (!target || target == player)
@@ -67,7 +67,7 @@ namespace BrokeProtocol.GameSource.Types
             return false;
         }
 
-        public bool SetFollowState(ShPlayer leader)
+        public virtual bool SetFollowState(ShPlayer leader)
         {
             player.svPlayer.leader = leader;
             player.svPlayer.targetEntity = leader;
@@ -82,7 +82,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        public bool SetGoToState(Vector3 position, Quaternion rotation, Transform parent)
+        public virtual bool SetGoToState(Vector3 position, Quaternion rotation, Transform parent)
         {
             player.svPlayer.destinationPosition = position;
             player.svPlayer.destinationRotation = rotation;
@@ -91,7 +91,7 @@ namespace BrokeProtocol.GameSource.Types
             return player.svPlayer.SetState(Core.GoTo.index);
         }
 
-        public bool MountWithinReach(ShEntity target)
+        public virtual bool MountWithinReach(ShEntity target)
         {
             var m = player.GetMount;
             return m && m.Velocity.sqrMagnitude <= Utility.slowSpeedSqr && target.InActionRange(m);

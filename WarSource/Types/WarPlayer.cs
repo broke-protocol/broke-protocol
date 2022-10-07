@@ -21,7 +21,7 @@ namespace BrokeProtocol.GameSource.Types
             this.player = player;
         }
 
-        public bool SetSpawnTerritory()
+        public virtual bool SetSpawnTerritory()
         {
             var curSpawnIndex = spawnTerritoryIndex;
 
@@ -39,7 +39,7 @@ namespace BrokeProtocol.GameSource.Types
             return false;
         }
 
-        public bool SetTimedGoToState(Vector3 position, Quaternion rotation, Transform parent)
+        public virtual bool SetTimedGoToState(Vector3 position, Quaternion rotation, Transform parent)
         {
             player.svPlayer.destinationPosition = position;
             player.svPlayer.destinationRotation = rotation;
@@ -48,7 +48,7 @@ namespace BrokeProtocol.GameSource.Types
             return player.svPlayer.SetState(WarCore.TimedGoTo.index);
         }
 
-        public bool SetTimedFollowState(ShPlayer leader)
+        public virtual bool SetTimedFollowState(ShPlayer leader)
         {
             player.svPlayer.leader = leader;
             player.svPlayer.targetEntity = leader;

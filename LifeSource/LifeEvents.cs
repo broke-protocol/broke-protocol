@@ -11,7 +11,7 @@ namespace BrokeProtocol.GameSource
     {
         public const string crimesMenu = "CrimesMenu";
 
-        private void SendCrimes(ShPlayer player, ShPlayer criminal)
+        public void SendCrimes(ShPlayer player, ShPlayer criminal)
         {
             if (LifeManager.pluginPlayers.TryGetValue(criminal, out var pluginPlayer))
             {

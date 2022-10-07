@@ -35,7 +35,7 @@ namespace BrokeProtocol.GameSource.Types
             this.player = player;
         }
 
-        public void StartJailTimer(float jailtime)
+        public virtual void StartJailTimer(float jailtime)
         {
             if (player.isHuman)
             {
@@ -73,16 +73,16 @@ namespace BrokeProtocol.GameSource.Types
 
         private void JailDone() => jailExitTime = 0f;
 
-        public int GetFineAmount()
+        public virtual int GetFineAmount()
         {
             var fine = 0;
             foreach (var o in offenses.Values) fine += o.crime.fine;
             return fine;
         }
 
-        public void AddWitnessedCriminal(ShPlayer criminal) => witnessedPlayers[criminal] = witnessedPlayers.TryGetValue(criminal, out var value) ? value + 1 : 1;
+        public virtual void AddWitnessedCriminal(ShPlayer criminal) => witnessedPlayers[criminal] = witnessedPlayers.TryGetValue(criminal, out var value) ? value + 1 : 1;
 
-        public ShPlayer GetWitness(ShPlayer victim)
+        public virtual ShPlayer GetWitness(ShPlayer victim)
         {
             if (victim && !victim.IsDead && ((MyJobInfo)victim.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement)
             {
@@ -101,7 +101,7 @@ namespace BrokeProtocol.GameSource.Types
             return w;
         }
 
-        public bool InvalidCrime(CrimeIndex crimeIndex)
+        public virtual bool InvalidCrime(CrimeIndex crimeIndex)
         {
             foreach (var o in offenses.Values)
             {
@@ -114,7 +114,7 @@ namespace BrokeProtocol.GameSource.Types
             return false;
         }
 
-        public void ClearCrimes()
+        public virtual void ClearCrimes()
         {
             foreach (var o in offenses.Values)
             {
@@ -126,7 +126,7 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.SendGameMessage("Crimes Cleared");
         }
 
-        public void ClearWitnessed()
+        public virtual void ClearWitnessed()
         {
             foreach (var criminal in witnessedPlayers.Keys)
             {
@@ -139,7 +139,7 @@ namespace BrokeProtocol.GameSource.Types
             witnessedPlayers.Clear();
         }
 
-        public void RemoveWitness(ShPlayer witness)
+        public virtual void RemoveWitness(ShPlayer witness)
         {
             foreach (var offense in offenses.Values)
             {
@@ -149,7 +149,7 @@ namespace BrokeProtocol.GameSource.Types
             UpdateWantedLevel(false);
         }
 
-        public void UpdateWantedLevel(bool updateDisguised)
+        public virtual void UpdateWantedLevel(bool updateDisguised)
         {
             var totalExpiration = 0f;
 
@@ -189,7 +189,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        public void AddCrime(CrimeIndex crimeIndex, ShPlayer victim)
+        public virtual void AddCrime(CrimeIndex crimeIndex, ShPlayer victim)
         {
             if (player.svPlayer.godMode || InvalidCrime(crimeIndex)) return;
 
@@ -223,14 +223,14 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        public bool ApartmentUnlawful(ShPlayer apartmentOwner) => apartmentOwner != player && LifeManager.pluginPlayers.TryGetValue(apartmentOwner, out var pluginOwner) && 
+        public virtual bool ApartmentUnlawful(ShPlayer apartmentOwner) => apartmentOwner != player && LifeManager.pluginPlayers.TryGetValue(apartmentOwner, out var pluginOwner) && 
             (((MyJobInfo)player.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement || pluginOwner.wantedLevel == 0);
 
-        public bool ApartmentTrespassing(ShPlayer apartmentOwner) => 
+        public virtual bool ApartmentTrespassing(ShPlayer apartmentOwner) => 
             LifeManager.pluginPlayers.TryGetValue(player, out var lifeSourcePlayer) && 
             lifeSourcePlayer.trespassing && ApartmentUnlawful(apartmentOwner);
 
-        public int GoToJail()
+        public virtual int GoToJail()
         {
             if (player.IsDead || !player.IsRestrained || ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner)
             {
@@ -270,7 +270,7 @@ namespace BrokeProtocol.GameSource.Types
             return fine;
         }
 
-        public void CommandHandsUp(ShPlayer source)
+        public virtual void CommandHandsUp(ShPlayer source)
         {
             if (((MyJobInfo)source.svPlayer.job.info).groupIndex != GroupIndex.LawEnforcement &&
                 LifeManager.pluginPlayers.TryGetValue(source, out var pluginSource))
