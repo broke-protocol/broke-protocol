@@ -32,12 +32,13 @@ namespace BrokeProtocol.GameSource.Types
             if (!target || target == player)
                 return false;
 
-            if (target == player.svPlayer.targetEntity && target == player.svPlayer.currentState.IsAttacking)
-                return false;
-
             if (target == player.svPlayer.leader) player.svPlayer.ClearLeader();
 
+            if (target == player.svPlayer.targetEntity)
+                return false;
+
             var previousTarget = player.svPlayer.targetEntity;
+
             player.svPlayer.targetEntity = target;
 
             var mount = player.GetControlled;

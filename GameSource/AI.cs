@@ -123,8 +123,6 @@ namespace BrokeProtocol.GameSource
 
     public class StaticAttackState : BaseState
     {
-        public override bool IsAttacking => true;
-
         public override bool EnterTest() => base.EnterTest() && IsTargetValid();
 
         public override bool UpdateState()
@@ -159,8 +157,6 @@ namespace BrokeProtocol.GameSource
 
     public class AirAttackState : BaseState
     {
-        public override bool IsAttacking => true;
-
         private ShAircraft aircraft;
 
         private enum AirState
@@ -858,8 +854,6 @@ namespace BrokeProtocol.GameSource
     {
         protected bool hunting;
         protected ShProjectile projectile;
-
-        public override bool IsAttacking => true;
 
         // Don't do hunting behavior if in an unarmed vehicle
         public bool ShouldHunt => !player.curMount || player.curMount.HasWeapons;
