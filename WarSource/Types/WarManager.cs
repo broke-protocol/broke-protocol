@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -201,7 +202,7 @@ namespace BrokeProtocol.GameSource.Types
                     new InventoryStruct("Springfield", 1),
                     new InventoryStruct("AmmoRifle", 80),
                     new InventoryStruct("Bazooka", 1),
-                    new InventoryStruct("Rocket", 12),
+                    new InventoryStruct("Rocket", 5),
                 }),
                 new ClassInfo("Demoman", new InventoryStruct[] {
                     new InventoryStruct("SPAS12", 1),
@@ -240,7 +241,7 @@ namespace BrokeProtocol.GameSource.Types
                     new InventoryStruct("Springfield", 1),
                     new InventoryStruct("AmmoRifle", 80),
                     new InventoryStruct("Bazooka", 1),
-                    new InventoryStruct("Rocket", 12),
+                    new InventoryStruct("Rocket", 5),
                 }),
                 new ClassInfo("Demoman", new InventoryStruct[] {
                     new InventoryStruct("Shotgun", 1),
@@ -306,8 +307,6 @@ namespace BrokeProtocol.GameSource.Types
 
             ResetGame();
 
-            SvManager.Instance.StartCoroutine(GameLoop());
-
             return true;
         }
 
@@ -315,32 +314,50 @@ namespace BrokeProtocol.GameSource.Types
         {
             var delay = new WaitForSeconds(1f);
 
+            var sentWarning = false;
+            const float warningLevel = 100f;
+
             while(true)
             {
                 foreach(var team in tickets)
                 {
-                    if(team.Value <= 0f)
+                    if(team.Value <= warningLevel)
                     {
-                        var winner = -1;
-                        var highest = -1f;
-
-                        foreach(var otherTeam in tickets)
+                        if (!sentWarning)
                         {
-                            if(otherTeam.Value > highest)
-                            {
-                                highest = otherTeam.Value;
-                                winner = otherTeam.Key;
-                            }
-                        }
-                        var winnerJobInfo = BPAPI.Jobs[winner].shared;
-                        var victorySB = new StringBuilder();
-                        victorySB.Append("Team ")
-                            .AppendColorText(winnerJobInfo.jobName, winnerJobInfo.GetColor())
-                            .Append(" win the match");
-                        InterfaceHandler.SendTextToAll(victorySB.ToString(), 3f, new Vector2(0.5f, 0.75f));
+                            sentWarning = true;
 
-                        ResetGame();
-                        break;
+                            var warningJob = BPAPI.Jobs[team.Key].shared;
+                            var warningSB = new StringBuilder();
+                            warningSB.Append("Team ")
+                                .AppendColorText(warningJob.jobName, warningJob.GetColor())
+                                .Append($" is down to {(int)warningLevel} tickets!");
+                            InterfaceHandler.SendTextToAll(warningSB.ToString(), 3f, new Vector2(0.5f, 0.75f));
+                        }
+
+                        if (team.Value <= 0f)
+                        {
+                            var winner = -1;
+                            var highest = -1f;
+
+                            foreach (var otherTeam in tickets)
+                            {
+                                if (otherTeam.Value > highest)
+                                {
+                                    highest = otherTeam.Value;
+                                    winner = otherTeam.Key;
+                                }
+                            }
+                            var winnerJobInfo = BPAPI.Jobs[winner].shared;
+                            var victorySB = new StringBuilder();
+                            victorySB.Append("Team ")
+                                .AppendColorText(winnerJobInfo.jobName, winnerJobInfo.GetColor())
+                                .Append(" win the match");
+                            InterfaceHandler.SendTextToAll(victorySB.ToString(), 3f, new Vector2(0.5f, 0.75f));
+
+                            ResetGame();
+                            yield break;
+                        }
                     }
                 }
 
@@ -391,6 +408,8 @@ namespace BrokeProtocol.GameSource.Types
                 pair.Key.svPlayer.SvClearInjuries();
                 pair.Key.svPlayer.Respawn();
             }
+
+            SvManager.Instance.StartCoroutine(GameLoop());
         }
 
         [Execution(ExecutionMode.Additive)]
