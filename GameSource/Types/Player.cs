@@ -300,15 +300,7 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Respawn(ShEntity entity)
         {
             var player = entity.Player;
-
-            if (player.isHuman)
-            {
-                // Back to spectate self on Respawn
-                player.svPlayer.SvSpectate(player);
-            }
-
             player.svPlayer.SvForceEquipable(player.Hands.index);
-
             return true;
         }
 
