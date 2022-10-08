@@ -890,7 +890,7 @@ namespace BrokeProtocol.GameSource.Types
                 return true;
             }
 
-            if (deltaType == DeltaInv.MeToOther)
+            if (deltaType == DeltaInv.MeToShop)
             {
                 multiplier = 1;
                 markup = false;
