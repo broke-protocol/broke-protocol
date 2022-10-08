@@ -4,6 +4,7 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Networking;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,35 +36,38 @@ namespace BrokeProtocol.GameSource.Types
             if (target == player.svPlayer.leader)
                 player.svPlayer.ClearLeader();
 
-            if (target == player.svPlayer.targetEntity)
-                return false;
-
             var previousTarget = player.svPlayer.targetEntity;
 
             player.svPlayer.targetEntity = target;
+
+            State attackState = null;
 
             if (player.curMount)
             {
                 if (player.IsFlying)
                 {
-                    if (player.curMount.HasWeapons && player.svPlayer.SetState(Core.AirAttack.index))
+                    if (player.curMount.HasWeapons)
                     {
-                        return true;
+                        attackState = Core.AirAttack;
                     }
                 }
                 else if (player.curMount is ShMovable && player.IsSeatedFirst)
                 {
-                    if (player.svPlayer.SetState(Core.Attack.index))
-                    {
-                        return true;
-                    }
+                    attackState = Core.Attack;
                 }
                 else if (player.svPlayer.SetState(Core.StaticAttack.index))
                 {
-                    return true;
+                    attackState = Core.StaticAttack;
                 }
             }
             else if (player.svPlayer.SetState(Core.Attack.index))
+            {
+                attackState = Core.Attack;
+            }
+
+            if(attackState != null && 
+                (target != previousTarget || player.svPlayer.currentState != attackState) && 
+                player.svPlayer.SetState(attackState.index))
             {
                 return true;
             }
