@@ -470,29 +470,32 @@ namespace BrokeProtocol.GameSource.Types
                 case DeltaInv.OtherToMe:
                     var otherPlayer = player.otherEntity as ShPlayer;
 
-                    if (((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement)
+                    if (otherPlayer)
                     {
-                        if (SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item) && item.illegal)
+                        if (((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.LawEnforcement)
                         {
-                            if (otherPlayer && otherPlayer.Shop && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                            if (SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item) && item.illegal)
                             {
-                                pluginPlayer.AddCrime(CrimeIndex.Theft, otherPlayer);
+                                if (otherPlayer && otherPlayer.Shop)
+                                {
+                                    player.LifePlayer().AddCrime(CrimeIndex.Theft, otherPlayer);
+                                }
+                            }
+                            else
+                            {
+                                player.LifePlayer().AddCrime(CrimeIndex.Theft, otherPlayer);
                             }
                         }
-                        else if (LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+                        else
                         {
-                            pluginPlayer.AddCrime(CrimeIndex.Theft, otherPlayer);
+                            player.LifePlayer().AddCrime(CrimeIndex.Theft, otherPlayer);
                         }
-                    }
-                    else if (LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
-                    {
-                        pluginPlayer.AddCrime(CrimeIndex.Theft, otherPlayer);
-                    }
 
-                    if (otherPlayer && !otherPlayer.isHuman && Random.value < 0.25f && 
-                        otherPlayer.GamePlayer().SetAttackState(player))
-                    {
-                        player.svPlayer.SvStopInventory(true);
+                        if (!otherPlayer.isHuman && Random.value < 0.25f &&
+                            otherPlayer.GamePlayer().SetAttackState(player))
+                        {
+                            player.svPlayer.SvStopInventory(true);
+                        }
                     }
                     break;
             }
