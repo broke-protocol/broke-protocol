@@ -182,6 +182,7 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             wantedLevel = Mathf.CeilToInt(Mathf.Min(totalExpiration / 360f, LifeUtility.maxWantedLevel));
+            wantedNormalized = (float)wantedLevel / LifeUtility.maxWantedLevel;
 
             for (var i = 1; i <= LifeUtility.maxWantedLevel; i++)
             {

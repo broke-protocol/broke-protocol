@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static System.Collections.Specialized.BitVector32;
 using Random = UnityEngine.Random;
 
 namespace BrokeProtocol.GameSource
@@ -171,8 +172,8 @@ namespace BrokeProtocol.GameSource
             {
                 var rand = Random.value;
 
-                if (rand < 0.003f) TryFindVictim();
-                else if (rand < 0.015f) TryFindInnocent();
+                if (rand < 0.005f) TryFindVictim();
+                else if (rand < 0.03f) TryFindInnocent();
             }
         }
     }
@@ -471,7 +472,7 @@ namespace BrokeProtocol.GameSource
 
             if (!player.isHuman)
             {
-                if (Random.value < 0.02f && player.IsMobile && !player.svPlayer.targetEntity && player.HasItem(player.manager.defibrillator))
+                if (Random.value < 0.05f && player.IsMobile && !player.svPlayer.targetEntity && player.HasItem(player.manager.defibrillator))
                 {
                     TryFindKnockedOut();
                 }
@@ -967,7 +968,8 @@ namespace BrokeProtocol.GameSource
         protected void TryFindCriminal()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && p.IsCapable && p.LifePlayer().wantedLevel >= AttackLevel && player.CanSeeEntity(e, true),
+                (e) => e is ShPlayer p && p.IsCapable && p.LifePlayer().wantedLevel >= AttackLevel 
+                && Random.value < p.LifePlayer().wantedNormalized && player.CanSeeEntity(e, true),
                 (e) => player.GamePlayer().SetAttackState(e));
         }
 
@@ -1236,7 +1238,8 @@ namespace BrokeProtocol.GameSource
 
             if (!player.isHuman)
             {
-                if (!player.svPlayer.targetEntity && player.IsMobile && Random.value > player.svPlayer.SaturationLevel(WaypointType.Player, 30f))
+                if (!player.svPlayer.targetEntity && player.IsMobile &&
+                    Random.value > Mathf.Min(player.svPlayer.sector.controlled.Count / 250f, 0.95f))
                 {
                     TryFindCriminal();
                 }
