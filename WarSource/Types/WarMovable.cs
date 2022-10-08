@@ -30,6 +30,9 @@ namespace BrokeProtocol.GameSource.Types
                         player.TransferItem(DeltaInv.RemoveFromMe, i.Key, i.Value.count);
                     }
                     var newPlayer = WarManager.skinPrefabs[warSourcePlayer.teamIndex].GetRandom();
+
+                    // Don't try this with bots or gamemodes with Login functionality
+                    // wearableIndices will be null (the list of wearables selected from the Register Menu)
                     player.svPlayer.ApplyWearableIndices(newPlayer.wearableOptions);
 
                     // Clamp class if it's outside the range on team change

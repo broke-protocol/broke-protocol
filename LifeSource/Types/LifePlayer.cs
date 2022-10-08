@@ -1228,7 +1228,7 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Deposit(ShPlayer player, int entityID, int amount)
         {
             if (!player.svPlayer.CanUseApp(entityID, AppIndex.Withdraw) || !LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer) ||
-                pluginPlayer.wantedLevel > 0 || amount <= 0 || player.svPlayer.bankBalance < amount)
+                pluginPlayer.wantedLevel > 0 || amount <= 0 || player.MyMoneyCount < amount)
             {
                 player.svPlayer.SendGameMessage("Fraudulent activity detected");
             }
