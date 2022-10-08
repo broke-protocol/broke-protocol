@@ -58,7 +58,8 @@ namespace BrokeProtocol.GameSource
         protected bool TryFindLeader()
         {
             return player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.curMount && !p.svPlayer.follower && p.IsMobile,
+                (e) => e is ShPlayer p && !p.curMount && !p.svPlayer.follower && 
+                p.svPlayer.leader != player && p.IsMobile,
                 (e) => player.WarPlayer().SetTimedFollowState(e as ShPlayer));
         }
 
