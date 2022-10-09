@@ -1,3 +1,33 @@
+## 1.3
+?> The War Update splits the game up into 3 different plugins. GameSource now contains only core logic related to connections, AI, damage, inventories, etc. LifeSource contains everything related to crimes, jails, RP Jobs, and random AI traffic spawning. The new WarSource plugin adds a new territory capture game mode, new login flow, and AI that can battle in team-based combat. Each plugin uses it's own Extended Player class but all its methods are virtual. You can extend these classes in your own plugin or override their existing behavior. If you want to change behavior or add your own hooks to those methods, make sure you Override the PlayerInitialize event and insert your own class into the pluginPlayer dictionary.
+?? Also new are the 'Events' abstract classes. These are ManagerEvents, EntityEvents, MountableEvents, DestroyableEvents, PhysicalEvents, MovableEvents, and PlayerEvents. Override methods in each class to add your own behavior instead of using the old [Target] attributes. This should help you see what's available for modding and their exact parameters. You can use the new [Execution] attribute to change how the methods are called.
+
+### API
+* All core game logic moved to GameSource
+* All crime, jail, and police handling moved to LifeSource
+* Dropping items sets the 'spawner' field on entities (for modding)
+* All object types have a Data field now (use in World Builder and in API)
+* Data string field restored after entity respawns (Thanks @Olivrrr)
+* Player Maintenance loop moved to LifeSource
+* New CustomPacket event for pre-login UI handling
+* API: [Target] attribute deprecated, Override new Events classes for custom handling
+* All Managers and World classes are now Singletons with Instance accessors
+* Manager reference no longer passed to Manager events (use Singleton classes)
+* Null strings are now handled by the network serializer as empty strings
+* BPAPI changed to static class
+* GroupManager -> GroupHandler for consistency with other static classes
+* ChatHandler -> InterfaceHandler
+* BrokeProtocol.API.Types namespace removed
+* Added SetMaxSpeed() to ShMovable class (for modding)
+* Added ExecutionMode.Additive (similar to Override except overridden events are still executed)
+* Removed ExecutionMode.Final (easy to abuse/misuse)
+* Added customData field to ConnectionData for pre-join modding
+* Removed GroupIndex.Gangster (just use 'Criminal' now)
+* API: Must manually call SvDestroyMenu(id) (except when showing a new menu with the same ID)
+* All events can now return a boolean to stop execution further execution on that same event chain
+* Connection related data like deviceID and passwordHash moved to svPlayer.connectData
+* Stop all entity coroutines immediately on destruction (prevent some race conditions)
+
 ## 1.25
 ?> The Locked On Update overhauls how thrown items are handled for projectiles and vehicles. Now they offer multiple weapon sets that can be cycled through so old mods will have to be updated for their weapons to be usable again. Also some hideInterior references for hiding tank turrets, etc is now per-seat instead of per-vehicle. For code changes, GameSource.dll has been renamed to load first and ExecutionModes have been altered slightly though it shouldn't break things in the majority of cases.
 
