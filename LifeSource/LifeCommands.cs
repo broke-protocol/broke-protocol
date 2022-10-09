@@ -9,7 +9,7 @@ namespace BrokeProtocol.GameSource
     {
         public LifeCommands()
         {
-            CommandHandler.RegisterCommand("ClearCrimes", new Action<ShPlayer, ShPlayer>(ClearCrimes));
+            CommandHandler.RegisterCommand("ClearCrimes", new Action<ShPlayer, ShPlayer>(ClearCrimes), null, Utility.adminPermission);
         }
 
         public void ClearCrimes(ShPlayer player, ShPlayer target = null)

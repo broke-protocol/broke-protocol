@@ -30,7 +30,7 @@ namespace BrokeProtocol.GameSource
             CommandHandler.RegisterCommand("ExamplePlayer", new Action<ShPlayer, ShPlayer>(Command4));
             CommandHandler.RegisterCommand("ExampleDiscord", new Action<ShPlayer>(Command5));
             CommandHandler.RegisterCommand("CoinFlip", new Action<ShPlayer>(CoinFlip));
-            CommandHandler.RegisterCommand("SlowMo", new Func<ShPlayer, float, bool>(Events.StartSlowMotion));
+            CommandHandler.RegisterCommand("SlowMo", new Func<ShPlayer, float, bool>(Events.StartSlowMotion), null, Utility.adminPermission);
         }
 
         // Any optional parameters here will be optional with in-game commands too

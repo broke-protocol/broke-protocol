@@ -365,8 +365,8 @@ namespace BrokeProtocol.GameSource.Types
                             victorySB.AppendColorText(winnerJobInfo.jobName, winnerJobInfo.GetColor())
                                 .Append(" win the match");
                             InterfaceHandler.SendTextToAll(victorySB.ToString(), 3f, new Vector2(0.5f, 0.75f));
-
                             ResetGame();
+                            Events.StartSlowMotion(null, 1f);
                             yield break;
                         }
                     }
