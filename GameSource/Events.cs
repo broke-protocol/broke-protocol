@@ -75,16 +75,10 @@ namespace BrokeProtocol.GameSource
         }
 
 
-        private bool voidRunning;
+        
         [CustomTarget]
         public void ButtonPush(ShEntity target, ShPlayer caller)
         {
-            if (voidRunning)
-            {
-                caller.svPlayer.SendGameMessage("Do not challenge the void");
-                return;
-            }
-
             const int cost = 500;
 
             if (caller.MyMoneyCount < cost)
@@ -93,18 +87,30 @@ namespace BrokeProtocol.GameSource
                 return;
             }
 
-            caller.TransferMoney(DeltaInv.RemoveFromMe, cost);
+            if (!StartSlowMotion(caller))
+            {
+                caller.svPlayer.SendGameMessage("Do not challenge the void");
+                return;
+            }
 
-            target.StartCoroutine(EnterTheVoid());
+            caller.TransferMoney(DeltaInv.RemoveFromMe, cost);
         }
 
-        private IEnumerator EnterTheVoid()
+        private static bool slowMotion;
+
+        public static bool StartSlowMotion(ShPlayer caller, float duration = 5f)
         {
-            voidRunning = true;
+            if (slowMotion || duration <= 0f) return false;
+            SceneManager.Instance.StartCoroutine(SlowMotion(duration));
+            return true;
+        }
+
+        private static IEnumerator SlowMotion(float duration)
+        {
+            slowMotion = true;
 
             var delay = new WaitForSecondsRealtime(0.1f);
 
-            var duration = 4f;
             var startTime = Time.time;
 
             var originalTimeScale = Time.timeScale;
@@ -162,7 +168,7 @@ namespace BrokeProtocol.GameSource
                 SvManager.Instance.SvSetWaterColor(originalWater);
             }
 
-            voidRunning = false;
+            slowMotion = false;
         }
     }
 }

@@ -11,7 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -138,7 +137,21 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (captureState >= 1f)
                 {
-                    territory.svTerritory.SvSetTerritory(territory.attackerIndex == transitionTeamIndex ? -1 : territory.attackerIndex);
+                    if(territory.attackerIndex == transitionTeamIndex)
+                    {
+                        territory.svTerritory.SvSetTerritory(-1);
+                    }
+                    else
+                    {
+                        var captureJob = BPAPI.Jobs[territory.attackerIndex].shared;
+                        var captureSB = new StringBuilder();
+                        captureSB.AppendColorText(captureJob.jobName, captureJob.GetColor()).Append($" captured {territory.text}!");
+                        InterfaceHandler.SendTextToAll(captureSB.ToString(), 3f, new Vector2(0.5f, 0.75f));
+                        Events.StartSlowMotion(null, 2.5f);
+
+                        territory.svTerritory.SvSetTerritory(territory.attackerIndex);
+                    }
+                    
                     ResetCaptureState();
                     return;
                 }
@@ -329,8 +342,7 @@ namespace BrokeProtocol.GameSource.Types
 
                             var warningJob = BPAPI.Jobs[team.Key].shared;
                             var warningSB = new StringBuilder();
-                            warningSB.Append("Team ")
-                                .AppendColorText(warningJob.jobName, warningJob.GetColor())
+                            warningSB.AppendColorText(warningJob.jobName, warningJob.GetColor())
                                 .Append($" is down to {(int)warningLevel} tickets!");
                             InterfaceHandler.SendTextToAll(warningSB.ToString(), 3f, new Vector2(0.5f, 0.75f));
                         }
@@ -350,8 +362,7 @@ namespace BrokeProtocol.GameSource.Types
                             }
                             var winnerJobInfo = BPAPI.Jobs[winner].shared;
                             var victorySB = new StringBuilder();
-                            victorySB.Append("Team ")
-                                .AppendColorText(winnerJobInfo.jobName, winnerJobInfo.GetColor())
+                            victorySB.AppendColorText(winnerJobInfo.jobName, winnerJobInfo.GetColor())
                                 .Append(" win the match");
                             InterfaceHandler.SendTextToAll(victorySB.ToString(), 3f, new Vector2(0.5f, 0.75f));
 
