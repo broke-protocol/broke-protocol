@@ -10,8 +10,8 @@ namespace BrokeProtocol.GameSource
     {
         public WarCommands()
         {
-            CommandHandler.RegisterCommand("Team", new Action<ShPlayer>(TeamSelect));
-            CommandHandler.RegisterCommand("Class", new Action<ShPlayer>(ClassSelect));
+            CommandHandler.RegisterCommand("Team", new Action<ShPlayer>(TeamSelect), null, Utility.allPermission);
+            CommandHandler.RegisterCommand("Class", new Action<ShPlayer>(ClassSelect), null, Utility.allPermission);
         }
 
         public void TeamSelect(ShPlayer player)

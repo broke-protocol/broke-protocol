@@ -10,6 +10,7 @@ namespace BrokeProtocol.GameSource
         public const float slowSpeedSqr = 6f * 6f;
 
         public const string adminPermission = "admin";
+        public const string allPermission = "all";
 
         public static GameSourcePlayer GamePlayer(this ShPlayer player) => Manager.pluginPlayers[player];
 
