@@ -29,11 +29,15 @@
 * Stop all entity coroutines immediately on destruction (prevent some race conditions)
 
 ### Mapping
-* Use new single Territory entity to replace the old 3 Territory types
+* Use the new Territory entity to replace the old 3 Territory types
     * Set Owner Index field to jobIndex that you want to give initial ownership
     * Any Owner Index less than 0 or greater that job Count will be set to unowned
-* Use new single Trigger entity to replace ThrowableTarget, RestrictedArea, AreaWarning, Repair, Rearm, etc
+    * Job indices for the 3 gangs in LifeSource are 6, 7, 8
+    * Scale of territories in Default are 200x200x200
+* Use new ServerTriggers to replace ThrowableTarget, RestrictedArea, AreaWarning, Repair, Rearm, etc
     * Add the event name in Enter/Exit Event field in the World Builder ("RestrictedArea" etc. in GameSource)
+    * 1.3 backwards compatible objects will keep your old Trigger entity locations/transforms
+      * But they will be missing the event names, so don't forget to add them
 * To make a War map
     * You just need to place Territories (these are used for spawning and Spawn objects are ignored)
     * You can move, scale, or rotate territoroes, just be mindful of spawning and bot navigation
