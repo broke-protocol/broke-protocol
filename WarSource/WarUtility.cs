@@ -91,17 +91,28 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        private static LabelID[] GetSpawnOptions(ShPlayer player)
+        private static int GetSpawnOptions(ShPlayer player, out LabelID[] options)
         {
-            var options = new List<LabelID>();
+            var optionIndex = -1;
+
+            var optionsList = new List<LabelID>();
+            var index = 0;
             foreach (var territoryIndex in GetTerritories(player.svPlayer.spawnJobIndex))
             {
                 var locationName = GetTerritoryName(territoryIndex);
+                optionsList.Add(new LabelID(locationName, territoryIndex.ToString()));
 
-                options.Add(new LabelID(locationName, territoryIndex.ToString()));
+                if(territoryIndex == player.WarPlayer().spawnTerritoryIndex)
+                {
+                    optionIndex = index;
+                }
+
+                index++;
             }
 
-            return options.ToArray();
+            options = optionsList.ToArray();
+
+            return optionIndex;
         }
 
         public static void SendSpawnMenu(WarSourcePlayer warPlayer)
@@ -109,18 +120,8 @@ namespace BrokeProtocol.GameSource
             if (!warPlayer.player.isHuman)
                 return;
 
-            var sb = new StringBuilder();
-            sb.AppendLine("Spawn Select");
-            sb.AppendLine("Current Spawn:");
-            if (warPlayer.spawnTerritoryIndex >= 0)
-            {
-                sb.AppendLine(GetTerritoryName(warPlayer.spawnTerritoryIndex));
-            }
-            else
-            {
-                sb.AppendLine("None");
-            }
-            warPlayer.player.svPlayer.SendTextPanel(sb.ToString(), spawnMenuID, GetSpawnOptions(warPlayer.player));
+            var optionIndex = GetSpawnOptions(warPlayer.player, out var options);
+            warPlayer.player.svPlayer.SendTextPanel("Spawn Select", spawnMenuID, options, optionIndex);
         }
     }
 }

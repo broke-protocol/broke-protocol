@@ -147,7 +147,7 @@ namespace BrokeProtocol.GameSource.Types
                         var captureSB = new StringBuilder();
                         captureSB.AppendColorText(captureJob.jobName, captureJob.GetColor()).Append($" captured {territory.text}!");
                         InterfaceHandler.SendTextToAll(captureSB.ToString(), 3f, new Vector2(0.5f, 0.75f));
-                        Events.StartSlowMotion(null, 2.5f);
+                        Events.StartSlowMotion(null, 2f);
 
                         territory.svTerritory.SvSetTerritory(territory.attackerIndex);
                     }
