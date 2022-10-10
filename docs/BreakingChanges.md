@@ -28,6 +28,21 @@
 * Connection related data like deviceID and passwordHash moved to svPlayer.connectData
 * Stop all entity coroutines immediately on destruction (prevent some race conditions)
 
+### Mapping
+* Use the new Territory entity to replace the old 3 Territory types
+    * Set Owner Index field to jobIndex that you want to give initial ownership
+    * Any Owner Index less than 0 or greater that job Count will be set to unowned
+    * Job indices for the 3 gangs in LifeSource are 6, 7, 8
+    * Scale of territories in Default are 200x200x200
+* Use new ServerTriggers to replace ThrowableTarget, RestrictedArea, AreaWarning, Repair, Rearm, etc
+    * Add the event name in Enter/Exit Event field in the World Builder ("RestrictedArea" etc. in GameSource)
+    * 1.3 backwards compatible objects will keep your old Trigger entity locations/transforms
+      * But they will be missing the event names, so don't forget to add them
+* To make a War map
+    * You just need to place Territories (these are used for spawning and Spawn objects are ignored)
+    * You can move, scale, or rotate territoroes, just be mindful of spawning and bot navigation
+    * It helps the AI if you place simple Boat and Aircraft waypoints around the map (see DefaultWar)
+
 ## 1.25
 ?> The Locked On Update overhauls how thrown items are handled for projectiles and vehicles. Now they offer multiple weapon sets that can be cycled through so old mods will have to be updated for their weapons to be usable again. Also some hideInterior references for hiding tank turrets, etc is now per-seat instead of per-vehicle. For code changes, GameSource.dll has been renamed to load first and ExecutionModes have been altered slightly though it shouldn't break things in the majority of cases.
 
