@@ -602,6 +602,11 @@ namespace BrokeProtocol.GameSource.Types
             else
             {
                 baseEntity = player;
+
+                if(player.curMount)
+                {
+                    player.svPlayer.SvDismount();
+                }
             }
 
             if (door is ShApartment apartment && sender.ownedApartments.TryGetValue(apartment, out var place))
