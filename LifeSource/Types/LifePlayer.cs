@@ -1231,17 +1231,17 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Deposit(ShPlayer player, int entityID, int amount)
         {
-            if (!player.svPlayer.CanUseApp(entityID, AppIndex.Withdraw) || !LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer) ||
-                pluginPlayer.wantedLevel > 0 || amount <= 0 || player.MyMoneyCount < amount)
+            if (!player.svPlayer.CanUseApp(entityID, AppIndex.Deposit) ||
+                player.LifePlayer().wantedLevel > 0 || amount <= 0 || player.MyMoneyCount < amount)
             {
                 player.svPlayer.SendGameMessage("Fraudulent activity detected");
             }
             else
             {
-                player.TransferMoney(DeltaInv.AddToMe, amount, true);
-                player.svPlayer.bankBalance -= amount;
-                player.svPlayer.AppendTransaction(-amount);
-                player.svPlayer.SvAppWithdraw(entityID);
+                player.TransferMoney(DeltaInv.RemoveFromMe, amount, true);
+                player.svPlayer.bankBalance += amount;
+                player.svPlayer.AppendTransaction(amount);
+                player.svPlayer.SvAppDeposit(entityID);
             }
             return true;
         }
@@ -1249,8 +1249,8 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Withdraw(ShPlayer player, int entityID, int amount)
         {
-            if (!player.svPlayer.CanUseApp(entityID, AppIndex.Withdraw) || !LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer) || 
-                pluginPlayer.wantedLevel > 0 || amount <= 0 || player.svPlayer.bankBalance < amount)
+            if (!player.svPlayer.CanUseApp(entityID, AppIndex.Withdraw) ||
+                player.LifePlayer().wantedLevel > 0 || amount <= 0 || player.svPlayer.bankBalance < amount)
             {
                 player.svPlayer.SendGameMessage("Fraudulent activity detected");
             }
