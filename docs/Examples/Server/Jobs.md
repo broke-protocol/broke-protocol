@@ -34,22 +34,20 @@ One point that does need a little explaination are the Lists of Actions. These a
 The ``Job`` class refers to the instances of Jobs for each player (NPCs and Humans) on the server. It definces both NPC and Human functionality based on callbacks from the game. Here are some of the functions that can be overridden or used in some way when implementing Jobs (more to come):
 
 ```
-public virtual float GetSpawnRate();
-public void Initialize(ShPlayer player, JobInfo info);
-public void MessageAllEmployees(string message);
-public virtual void OnDamageEntity(ShEntity damaged);
-public virtual void OnDestroyEntity(ShEntity destroyed);
-public virtual void OnEmployeeAction(ShPlayer target, string actionID);
-public virtual void OnHealEntity(ShEntity damaged);
-public virtual void OnJailCriminal(ShPlayer criminal, int fine);
-public virtual void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID);
-public virtual void OnRevivePlayer(ShPlayer player);
-public virtual void OnSelfAction(string actionID);
-public virtual void OnSpecialAction(ShEntity target, string actionID);
-public virtual void OnSpawn();
-public virtual void RemoveJob();
-public virtual void ResetJobAI();
-public virtual void SetJob();
+public virtual float GetSpawnRate() => 0f;
+public virtual void ResetJob() { }
+public virtual void SetJob() => info.members.TryAdd(player);
+public virtual void RemoveJob() => info.members.Remove(player);
+public virtual void ResetJobAI() { }
+public virtual bool IsValidTarget(ShPlayer chaser) => true;
+public virtual ShUsable GetBestJobEquipable() => null;
+public virtual void OnSpawn() { }
+public virtual void OnDie() { }
+public virtual void OnRevivePlayer(ShPlayer player) { }
+public virtual void OnHealEntity(ShEntity entity) { }
+public virtual void OnDamageEntity(ShEntity damaged) { }
+public virtual void OnDestroyEntity(ShEntity destroyed) { }
+public virtual void OnOptionMenuAction(int targetID, string id, string optionID, string actionID) { }
 ```
 
 Again, check the GameSource repo for how jobs are managed on a vanilla server as well as how to set up Update loops and send/receive Menu data.
