@@ -11,7 +11,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>BrokeProtocol.GameSource</RootNamespace>
     <AssemblyName>!GameSource</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -40,8 +40,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AstarPathfindingProject">
-      <HintPath>..\..\broke-protocol-game2\Library\ScriptAssemblies\AstarPathfindingProject.dll</HintPath>
+    <Reference Include="AstarPathfindingProject, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\broke-protocol-game2\BrokeProtocol\BrokeProtocol_Data\Managed\AstarPathfindingProject.dll</HintPath>
     </Reference>
     <Reference Include="ENet-CSharp">
       <HintPath>..\..\broke-protocol-game2\Assets\Plugins\Managed\ENet-CSharp.dll</HintPath>
