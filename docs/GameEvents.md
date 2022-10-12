@@ -21,12 +21,12 @@ There's also a special ``Execution`` attribute which will modify how multiple pl
 
 The ``Execution`` attribute takes one of the following ExecutionModes as arguments:
 
-- ``[Execution(ExecutionMode.Test)]`` -> Use this for pre-testing conditions before executing the event. Must return bool type.
-- ``[Execution(ExecutionMode.Additive)]`` -> This is the Default Execution mode if no Execution Attribute is used. Adds your hook onto a list of other plugins hooked on the same event.
-- ``[Execution(ExecutionMode.Override)]`` -> Use this to override (disable) any existing Additive or Override hooks on the same event.
-- ``[Execution(ExecutionMode.Event)]`` -> This method cannot be overriden and will always be called on this event (if all Test methods are passed).
-- ``[Execution(ExecutionMode.PostEvent)]`` -> This event will be called after all other Additive, Override, and Event methods. Cannot be overriden.
+- ``[Execution(ExecutionMode.PreEvent)]`` -> Executed before other event types. Use this for pre-testing conditions (if you return an optional bool).
+- ``[Execution(ExecutionMode.Additive)]`` -> Default ExecutionMode. Adds your method onto a list of other Plugin methods hooked on the same event.
+- ``[Execution(ExecutionMode.Override)]`` -> Override (disable) any existing Additive or Override hooks on the same event.
+- ``[Execution(ExecutionMode.Event)]`` -> Will always be called on this event (if no previous methods return false). Cannot be Overridden.
+- ``[Execution(ExecutionMode.PostEvent)]`` -> Called after all other Additive, Override, and Event methods. Cannot be overriden.
 
-Additionally, any method at all can return a bool type and if it returns false, any following methods on the same event chain will stop execution. So for example a PostEvent method will not run if any methods in Test/Additive/Override/Event Execution return false.
+Additionally, any method at all can return a bool type and if it returns false, any following methods on the same event chain will stop execution. So for example a PostEvent method will not run if any methods in PreEvent/Additive/Override/Event ExecutionModes return false.
 
 See the GameSource repo for entire mods written using these hooks and events.
