@@ -17,7 +17,7 @@ Most are self-explanitory though you can check the LifeSource or WarSource to se
 
 To initialize your custom State class, you must assign them to either the StatesAdditive or StatesOverride in your ``Plugin`` class:
 
-First, I like to Instantiate the States as public static variables, so player.svPlayer.SetState(int stateIndex) can access the State from anywhere"
+First, I like to Instantiate the States as public static variables, so player.svPlayer.SetState(int stateIndex) can access the State from anywhere
 ```cs
 public static State Rob = new RobState();
 public static State PullOver = new PullOverState();
