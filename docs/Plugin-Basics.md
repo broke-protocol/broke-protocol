@@ -112,7 +112,7 @@ public class Core : Plugin // Notice the Plugin here
 {
     public Core()
     {
-        Info = new PluginInfo("ExamplePlugin", "er");
+        Info = new PluginInfo("ExamplePlugin", "example");
     }
 }
 ```
@@ -123,37 +123,9 @@ public PluginInfo(string name, string groupNamespace)
 ```
 
 `Name` is pretty straightforward. This is the `Plugin` name.
-`GroupNamespace` is used within the `GroupManager`. This will be explained in depth in another example.
-Please note that the dlls you place in the `Plugins` directory will be loaded in order by filename. Not the PluginInfo name here.
-Only one subscriber per event is allowed to prevent conflicting plugins and simpler return values, so authors must tune their plugin loading order with care.
+`GroupNamespace` is used for permissions. Any events here will use `GroupNamespace` as your prefix for permissions in the `groups.json` file. See the [Group Manager Docs](/GroupManager?id=permissions) for more info.
+Please note that the dlls you place in the `Plugins` directory will be loaded in order by filename. Not the PluginInfo name here. Multiple Plugins can hook onto the same event, and how they stack or override each other is handled with the `[Execution]` Attribute explained in the next section.
 
 Normally the class that implements the `Plugin` class is named `Core`. **This is not an requirement**. This just makes it clearer to understand for other users reading your codebase.
-
-Now the `PluginInfo` instance exposes a few more properties, as shown here:
-```csharp
-public Core()
-{
-    Info = new PluginInfo("ExamplePlugin", "eq")
-    {
-        Description = "A descrption for the plugin. This is optional, but recommended",
-        Website = "https://github.com/a-github-or-equivalent-link"
-    };
-    RegisterEvents();
-}
-```
-
-Now at the time of writing, we got a few more properties available at your disposal:
-```csharp
-string Name
-string GroupNamespace
-string Description
-string Website
-```
-
-Note that `GroupNamespace` is used for permissions. Any events here will use `GroupNamespace` as your prefix for permissions in the `groups.json` file. See the [Group Manager Docs](/Examples/Server/05_GroupManager#permissions) for more info.
-
-There is also a `ToString` override which outputs `Name`.
-
----
 
 This should be all you need to know to create a simple plugin. Using this knowledge, try to make a plugin that prints a message to the chat when someone joins, and when someone leaves.
