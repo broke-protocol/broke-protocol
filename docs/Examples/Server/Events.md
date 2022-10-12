@@ -9,8 +9,6 @@ In this example we are going to show you how to do the following:
 - Register Custom Events & Call them
 - Subscribe to existing events
 
-!> To learn about CEF and it's implementation with the ``EventsHandler``, check the CEF example.
-
 ## Registering a custom events
 Registering a new custom event is very simple, All you need to do is call the static method ``EventsHandler.Add()``.
 ```csharp
