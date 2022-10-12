@@ -1,6 +1,7 @@
 - [Homepage](/)
 - [Plugin Basics](/Plugin-Basics)
-- [Events](/Events)
+- [Game Events](/GameEvents)
+- [Custom Events](/CustomEvents)
 - [Jobs](/Jobs)
 - [AI States](/AI)
 - [CommandHandler](/CommandHandler)
