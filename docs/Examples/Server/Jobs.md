@@ -52,19 +52,17 @@ public virtual void OnOptionMenuAction(int targetID, string id, string optionID,
 
 Again, check the GameSource repo for how jobs are managed on a vanilla server as well as how to set up Update loops and send/receive Menu data.
 
-To finalize everything, you must assign the Jobs property in your ``Plugin`` class:
+To finalize everything, you must assign it to either the JobsAdditive or JobsOverride property in your ``Plugin`` class:
 ```
 public abstract class Plugin
 {
     protected Plugin();
-
-    public PluginInfo Info { get; set; }
-    public JobInfo[] Jobs { get; set; }
-    public CustomData CustomData { get; set; }
+    public List<JobInfo> JobsOverride { get; set; }
+    public List<JobInfo> JobsAdditive { get; set; }
 }
 ```
 
-So somewhere in your own Plugin class constructor, assign your custom Job definitions to the Jobs array to have it loaded in-game. Plugins are loaded in alphanumeric order so ``zGameSource`` definitions are usually going to be last. If another plugin has Jobs defined, then those will be loaded instead and the vanilla GameSource jobs ignored. Later on, it should be possible to mix job definitions from different Plugins, but for now, only the first non-null definition is loaded.
+So somewhere in your own Plugin class constructor, assign your custom Job definitions to the JobsAdditive or JobsOverride List to have it loaded in-game. Plugins are loaded in alphanumeric order so ``zGameSource`` definitions are usually going to be last. If another plugin has Jobs defined, then those will be loaded instead and the vanilla GameSource jobs ignored. Later on, it should be possible to mix job definitions from different Plugins, but for now, only the first non-null definition is loaded.
 
 ## Adding a Job Example
 Here we will show how to add an additional Job to Broke Protocol. Everything from job parameters, logic, Boss modding, and more will be covered. The example will be a Mechanic job so players can get rewards for vehicle repairs, but nearly anything could be created.
@@ -104,24 +102,19 @@ public class Mechanic : TargetEntityJob
 }
 ```
 
-Also in your Plugin class you want to define your new job within the JobInfo[] Jobs array as seen in https://github.com/broke-protocol/broke-protocol/blob/master/BP-GameSource/Core.cs
+Also in your Plugin class you want to add your new job to the List<JobInfo> JobsAdditive or JobsOverride Lists as seen in https://github.com/broke-protocol/broke-protocol/blob/master/BP-GameSource/Core.cs
 
 ```cs
-new JobInfo(
-        typeof(Mechanic), "Mechanic",
-        "Repair damaged vehicles for cash rewards",
-        0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.9f, 0.9f, 0.9f), 0f, 0,
-        new Transports[] {
-            new Transports(new string[0]),
-            new Transports(new string[0]),
-            new Transports(new string[0])
-        },
-        new Upgrades[] {
-            new Upgrades(
-                new InventoryStruct[] {
-                    new InventoryStruct("Toolkit", 5),
-                    new InventoryStruct("HatBoonieDark", 1)})
-        })
+JobsAdditive.Add(new JobInfo(
+                typeof(Citizen), "Mechanic",
+                "Repair damaged vehicles for cash rewards",
+                CharacterType.Humanoid, 0, new ColorStruct(0.9f, 0.9f, 0.9f),
+                new Upgrades[] {
+                    new Upgrades(10,
+                        new InventoryStruct[] {
+                            new InventoryStruct("Toolkit", 5),
+                            new InventoryStruct("HatBoonieDark", 1)})
+                }));
 ```
 
 Adjust any job items or any other parameters to your liking (See the JobInfo class for more parameter descriptions or look at other jobs to see how they define parameters). Note that all jobs must be defined & assigned in the same plugin. There is no additive mixing of jobs from different plugins (yet).
