@@ -6,6 +6,7 @@
     - [Plugin Basics](/Examples/Server/Plugin-Basics)
     - [Events](/Examples/Server/Events)
     - [Jobs](/Examples/Server/Jobs)
+    - [AI States](/Examples/Server/AI)
     - [CommandHandler](/Examples/Server/CommandHandler)
     - [AssetBundles](/Examples/Server/AssetBundles)
     - [GroupManager](/Examples/Server/GroupManager)
