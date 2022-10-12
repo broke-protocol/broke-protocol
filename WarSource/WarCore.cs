@@ -11,12 +11,12 @@ namespace BrokeProtocol.GameSource
 {
     public class WarCore : Plugin
     {
-        public static State Mount;
-        public static State TimedWaypoint;
-        public static State TimedFollow;
-        public static State TimedGoTo;
-        public static State TimedWander;
-        public static State TimedLook;
+        public static State Mount = new MountState();
+        public static State TimedWaypoint = new TimedWaypointState();
+        public static State TimedFollow = new TimedFollowState();
+        public static State TimedGoTo = new TimedGoToState();
+        public static State TimedWander = new TimedWanderState();
+        public static State TimedLook = new TimedLookState();
 
         public WarCore()
         {
@@ -35,13 +35,6 @@ namespace BrokeProtocol.GameSource
 
             // Use JobsAdditive if you're adding to Default jobs and not replacing them
             JobsOverride = JsonConvert.DeserializeObject<List<JobInfo>>(File.ReadAllText(jobsFilename));
-
-            Mount = new MountState();
-            TimedWaypoint = new TimedWaypointState();
-            TimedFollow = new TimedFollowState();
-            TimedGoTo = new TimedGoToState();
-            TimedWander = new TimedWanderState();
-            TimedLook = new TimedLookState();
 
             StatesAdditive = new List<State>
             {

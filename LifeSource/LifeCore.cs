@@ -11,8 +11,8 @@ namespace BrokeProtocol.GameSource
 {
     public class LifeCore : Plugin
     {
-        public static State Rob;
-        public static State PullOver;
+        public static State Rob = new RobState();
+        public static State PullOver = new PullOverState();
 
         public static int prisonerIndex = -1;
         public static int policeIndex = -1;
@@ -53,9 +53,6 @@ namespace BrokeProtocol.GameSource
                 }
                 index++;
             }
-
-            Rob = new RobState();
-            PullOver = new PullOverState();
 
             StatesAdditive = new List<State>
             {
