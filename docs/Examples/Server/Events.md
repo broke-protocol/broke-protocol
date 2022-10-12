@@ -51,38 +51,33 @@ bool isTrue = EventsHandler.Get<bool>("ExampleEvent", "ExampleArg"); // bool wit
 ```
 
 ## Subscribing to a game event
-Subscribing to a game event is quite different. Any method with a ``Target`` Attribute will be automatically added to the chain of subscribers to the event. No need to call any Add function for the event.
+Overriding game events is the main way Plugins hook into the game and get their functionality called. The Events classes are all in the BrokeProtocol.API namespace and contain all the virtual methods that can be overridden with your own behavior.
 
-Events are listed in ``BrokeProtocol.API.GameSourceEvents`` and the ``Target`` Attribute must have the EventID and ExecutionMode as arguments as such:
+``ManagerEvents`` -> All overarching manager methods, update loops, and events.
 
-``[Target(GameSourceEvent.Example, ExecutionMode.Event)]`` -> This method will always be called on this event (if all Test methods are passed).
+These next Events classes are a hierarchy from top to bottom. With subclasses having a superset of methods of the parent class.
+``EntityEvents``
+``MountableEvents``
+``DestroyableEvents``
+``PhysicalEvents``
+``MovableEvents``
+``PlayerEvents``
+If you hook into the same event at multiple levels of the hierarchy, know that they are always executed from base classes first. For example if you want to change the spawn location during a Respawn event, the Respawn method exists at every level of the heirarchy. But the actual spawn location is selected at the MovableEvents subclass in GameSource if you look at the code. So you should Override the Respawn method in MovableEvents to change the where the spawn location is.
 
-``[Target(GameSourceEvent.Example, ExecutionMode.Override)]`` -> Use this to completely override default GameSource behaviors.
+There's also a special ``Execution`` attribute which will modify how multiple plugins on the same event will react and order themselves with each other. Plugins are always loaded in alphanumeric order, which is why the default plugins start with '!' so they load first. But plugins can either all hook onto the same event or override/disable previously loaded hooks in order to change their behavior according to the following Execution modes.
 
-``[Target(GameSourceEvent.Example, ExecutionMode.Test)]`` -> Use this for pre-testing conditions before executing the event. Must return bool type.
+The ``Execution`` attribute takes one of the following ExecutionModes as arguments:
 
-``[Target(GameSourceEvent.Example, ExecutionMode.PostEvent)]`` -> This event will be called after all other Event and Override Methods.
+``[Execution(ExecutionMode.Test)]`` -> Use this for pre-testing conditions before executing the event. Must return bool type.
 
-```csharp
-// Any other plugins targeting PlayerGlobalChatMessage will be executed
-[Target(GameSourceEvent.PlayerGlobalChatMessage, ExecutionMode.Event)]
-public void OnGlobalChatMessage(ShPlayer player, string message)
-{
-  if (player.health <= 20f) 
-  {
-    player.SendChatMessage("No chit chat, you're low on health!");
-  }
-}
+``[Execution(ExecutionMode.Additive)]`` -> This is the Default Execution mode if no Execution Attribute is used. Adds your hook onto a list of other plugins hooked on the same event.
 
-// ExecutionMode.Override -> This is the final stop - Any plugins loaded after (including zGameSource.dll) won't be executed
-[Target(GameSourceEvent.ManagerSave, ExecutionMode.Override)]
-protected void OnSave(SvManager svManager)
-{
-    ChatHandler.SendToAll("Saving server status..");
-    foreach (ShPlayer player in EntityCollections.Humans)
-    {
-        player.svPlayer.Save();
-    }
-    svManager.database.WriteOut();
-}
-```
+``[Execution(ExecutionMode.Override)]`` -> Use this to override (disable) any existing Additive or Override hooks on the same event.
+
+``[Execution(ExecutionMode.Event)]`` -> This method cannot be overriden and will always be called on this event (if all Test methods are passed).
+
+``[Execution(ExecutionMode.PostEvent)]`` -> This event will be called after all other Additive, Override, and Event methods. Cannot be overriden.
+
+Additionally, any method at all can return a bool type and if it returns false, any following methods on the same event chain will stop execution. So for example a PostEvent method will not run if any methods in Test/Additive/Override/Event Execution return false.
+
+See the GameSource repo for entire mods written using these hooks and events.
