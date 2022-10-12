@@ -14,5 +14,5 @@
 
   - Client
     - [Getting Started](/Examples/Client/Getting-Started)
-    - [CEF](/Examples/Client/CEF)
+    - [UI Elements](/Examples/Client/UI-Elements)
 - [Entity List](/EntityList)
