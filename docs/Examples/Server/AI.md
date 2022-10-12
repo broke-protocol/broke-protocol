@@ -1,135 +1,36 @@
 # AI States
 
-> This example will cover the basics of the ``JobInfo`` and ``Job`` classes in setting up custom Jobs. These classes are used for storing job metadata and functionality respectively.
+> This example will cover the basics of the ``State`` class in setting up AI behaviors. Each state is basically the mode in which the AI is operating. Only a single State is active at any time but a State can be a heirarchy of classes. In this sense, BP uses a Heirarchical Finite State Machine (HFSM) for clear state Entry/Exit events. But it also uses Behavior Tree (BT) decision tree in ResetAI to clearly determine the current state. A continuous loop will call UpdateState() on the AI every 0.1s so you can evaluate and execute the currect AI State or switch to another State.
 
-## What is the ``JobInfo`` class?
-The ``JobInfo`` is the metadata class that defines a job. This includes:
+## What is the ``State`` class?
+The ``State`` is the class that defines what happens when a State is entered, updated, and exited. This includes:
 ```
-public readonly string jobName;
-public readonly string jobDescription;
-public readonly GroupIndex groupIndex;
-public readonly ColorStruct jobColor;
-public readonly List<TypeLabelID> specialActions;
-public readonly List<LabelID> employeeActions;
-public readonly List<LabelID> selfActions;
-public byte jobIndex;
-public Type jobType;
-public int maxCount;
-public int attackLevel;
-public float spawnRate;
-public int poolSize;
-public Transports[] transports;
-public Upgrades[] upgrades;
+public virtual byte StateMoveMode;
+public virtual bool IsBusy;
+public virtual bool EnterTest();
+public virtual void EnterState();
+public virtual bool UpdateState();
+public virtual void ExitState(State nextState);
 ```
 
-Most are self-explanitory though you can check the GameSource to see how all of the default Jobs are defined.
-One point that does need a little explaination are the Lists of Actions. These are the custom Action Menu items that pop up on different entities.
+Most are self-explanitory though you can check the LifeSource or WarSource to see how all the current AI states are defined.
 
-- ``selfActions`` -> List of self-action items when you have the job yourself
-- ``employeeActions`` -> List of action items on other players who hold this job
-- ``specialActions`` -> List of action items on other entities in general (note this has an optional Type parameter if you want to filter on only specific types of Entities, ex. "ShPlayer")
+To initialize your custom states, you must assign them to either the StatesAdditive or StatesOverride in your ``Plugin`` class:
 
-
-## What is the ``Job`` class?
-The ``Job`` class refers to the instances of Jobs for each player (NPCs and Humans) on the server. It definces both NPC and Human functionality based on callbacks from the game. Here are some of the functions that can be overridden or used in some way when implementing Jobs (more to come):
-
-```
-public virtual float GetSpawnRate() => 0f;
-public virtual void ResetJob() { }
-public virtual void SetJob() => info.members.TryAdd(player);
-public virtual void RemoveJob() => info.members.Remove(player);
-public virtual void ResetJobAI() { }
-public virtual bool IsValidTarget(ShPlayer chaser) => true;
-public virtual ShUsable GetBestJobEquipable() => null;
-public virtual void OnSpawn() { }
-public virtual void OnDie() { }
-public virtual void OnRevivePlayer(ShPlayer player) { }
-public virtual void OnHealEntity(ShEntity entity) { }
-public virtual void OnDamageEntity(ShEntity damaged) { }
-public virtual void OnDestroyEntity(ShEntity destroyed) { }
-public virtual void OnOptionMenuAction(int targetID, string id, string optionID, string actionID) { }
+First I like to Instantiate the states as public static variables, so player.svPlayer.SetState(int stateIndex) can access the State from anywhere"
+```cs
+public static State Rob = new RobState();
+public static State PullOver = new PullOverState();
 ```
 
-Again, check the GameSource repo for how jobs are managed on a vanilla server as well as how to set up Update loops and send/receive Menu data.
-
-To finalize everything, you must assign the Jobs property in your ``Plugin`` class:
-```
-public abstract class Plugin
-{
-    protected Plugin();
-
-    public PluginInfo Info { get; set; }
-    public JobInfo[] Jobs { get; set; }
-    public CustomData CustomData { get; set; }
-}
-```
-
-So somewhere in your own Plugin class constructor, assign your custom Job definitions to the Jobs array to have it loaded in-game. Plugins are loaded in alphanumeric order so ``zGameSource`` definitions are usually going to be last. If another plugin has Jobs defined, then those will be loaded instead and the vanilla GameSource jobs ignored. Later on, it should be possible to mix job definitions from different Plugins, but for now, only the first non-null definition is loaded.
-
-## Adding a Job Example
-Here we will show how to add an additional Job to Broke Protocol. Everything from job parameters, logic, Boss modding, and more will be covered. The example will be a Mechanic job so players can get rewards for vehicle repairs, but nearly anything could be created.
-
-The TargetEntity class does a lot of work with marking targets on the map and continually checking if they're valid so we'll use that as the parent class. Define the Mechanic Job in your plugin as its own class like below:
+Then somewhere in your own Plugin class constructor, assign your custom States definitions as a List to either StatesAdditive or StatesOverride. StatesAdditive merely adds your state to the existing list of states from previously loaded Plugins. StatesOverride will remove all previously existing states and start fresh with your current list of states if you want to redefine everything from scratch.
 
 ```cs
-public class Mechanic : TargetEntityJob
+StatesAdditive = new List<State>
 {
-    // How we find a random Transport/Vehicle in-game: Select random from Entities until a ShTransport type is found
-    protected override GetEntityCallback GetTargetHandler() => () => EntityCollections.Entities.ElementAt(Random.Range(0, EntityCollections.Entities.Count)) as ShTransport;
-
-    // Exit conditions and Retargeting checks in a loop
-    public override void Loop()
-    {
-        if (player.IsDead) return;
-
-        if (player.isHuman && !ValidTarget(target)) SetTarget();
-    }
-
-    // What happens when a valid target is found (a damaged vehicle)
-    protected override void FoundTarget()
-    {
-        base.FoundTarget();
-        player.svPlayer.SendGameMessage(target.name + " vehicle is damaged! Check map");
-    }
-
-    // Conditions for a valid target (is Transport and damaged-> health < maxStat)
-    protected override bool ValidTarget(ShEntity target) =>
-        base.ValidTarget(target) && target is ShTransport transport && transport.health < transport.maxStat;
-
-    // What do we do when player heals an entity (reward if entity is target)
-    public override void OnHealEntity(ShEntity entity)
-    {
-        if(entity == target) player.svPlayer.Reward(2, 150);
-    }
-}
+    Rob,
+    PullOver,
+};
 ```
 
-Also in your Plugin class you want to define your new job within the JobInfo[] Jobs array as seen in https://github.com/broke-protocol/broke-protocol/blob/master/BP-GameSource/Core.cs
-
-```cs
-new JobInfo(
-        typeof(Mechanic), "Mechanic",
-        "Repair damaged vehicles for cash rewards",
-        0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.9f, 0.9f, 0.9f), 0f, 0,
-        new Transports[] {
-            new Transports(new string[0]),
-            new Transports(new string[0]),
-            new Transports(new string[0])
-        },
-        new Upgrades[] {
-            new Upgrades(
-                new InventoryStruct[] {
-                    new InventoryStruct("Toolkit", 5),
-                    new InventoryStruct("HatBoonieDark", 1)})
-        })
-```
-
-Adjust any job items or any other parameters to your liking (See the JobInfo class for more parameter descriptions or look at other jobs to see how they define parameters). Note that all jobs must be defined & assigned in the same plugin. There is no additive mixing of jobs from different plugins (yet).
-
-Next, we need a Boss to actually give the job in-game. There is no Boss for this job defined yet in the game so a new one must be modded in. Follow the guide for modding here: https://brokeprotocol.com/modding-guide/.
-
-You should duplicate another Boss in Unity, find a skin for it online (Synty character skins) or create your own and assign your created Material/Texture onto the model. Then set the Spawn Job Index field to the index of your new job (the index/order within the Jobs array in your Plugin).
-
-![Job Modding](https://brokeprotocol.com/wp-content/uploads/JobModding.png)
-
-After you export and add your BPA file to the games AssetBundles directory, you should then be able to place it in your map. And you're all set! That's all it takes to add a new Job to Broke Protocol.
+Now you are ready to Call player.svPlayer.SetState(Rob.index) from anywhere. The most important areas for AI are the Player ResetAI event and the ResetJobAI virtual method in the Job class. These are evaluated every time the AI 'Resets' and you need to evaluate the AI current state and call SetState. See GameSource, LifeSource, and WarSource for implementations of these.
