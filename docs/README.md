@@ -36,7 +36,7 @@ copy /Y "$(TargetFileName)" "D:\BrokeProtocolServer\Plugins"
 ```
 Now every time you build your class library your target file will automatically be copied.
 6. Make sure your dll gets copied correctly after building. If everything seems correctly then every time your run your server from that folder your plugin will be loaded in.
-7. Once you're ready for the next step, go to the Examples page and start with the first one.
+7. Once you're ready for the next step, go to the Plugin Basics page and follow through with the rest of the Docs.
 
 ## Tips
 - Broke Protocol is compatible with Harmany assembly patching. Modify functionality on either the server or client to edit behaviors that aren't yet available in GameSource events. [Official Harmony Github](https://github.com/pardeike/Harmony)
