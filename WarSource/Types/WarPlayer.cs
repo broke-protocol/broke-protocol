@@ -156,8 +156,8 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        // Test Event (disallow losing Exp/Job in PvP)
-        [Execution(ExecutionMode.Test)]
+        // Pre/Test Event (disallow losing Exp/Job in PvP)
+        [Execution(ExecutionMode.PreEvent)]
         public override bool Reward(ShPlayer player, int experienceDelta, int moneyDelta) => 
             experienceDelta >= 0;
 
