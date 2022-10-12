@@ -2,14 +2,14 @@
 
 ## Quickstart
 > Before we can get started, you need to have a few programs installed first.
-- Visual Studio IDE 2019 (Any IDE would work, but VSIDE makes it easier to create a new library.)
-- Broke Protocol installed
+- Visual Studio (You can get VS Community Edition free [here](https://visualstudio.microsoft.com/vs/community/)
+- Broke Protocol game files
 - C# Programming knowledge  
 
 ![alt text](https://brokeprotocol.com/wp-content/uploads/References.png "References")
 
 1. Create a new class library for .NET Framework version `4.7.2` or start with [GameSource](https://github.com/broke-protocol/broke-protocol) as a basis.
-2. Add references to ``UnityEngine.dll``, ``UnityEngine.CoreModule.dll``, ``UnityEngine.PhysicsModule.dll``, ``UnityEngine.UI.dll``, and ``Scripts.dll`` from the ``BrokeProtocol_Data/Managed/`` directory. These are the only *required* dll's, but you might need to import more later.
+2. Add references to ``UnityEngine.dll``, ``UnityEngine.CoreModule.dll``, ``UnityEngine.PhysicsModule.dll``, ``UnityEngine.TextRenderingModule``, ``UnityEngine.UI.dll``, and ``Scripts.dll`` from the ``BrokeProtocol_Data/Managed/`` directory. These are the only *required* dll's, but you might need to import more if you need additional functionality like Pathfinding or Database access.
 3. Create a new class to implement the ``Plugin`` class. In GameSource, this class is called ``Core.cs``, but you can call it whatever you want.
 
 !> You must have a class that implements the ``Plugin`` class. Without one, your resource will not be loaded in.
@@ -24,19 +24,6 @@ public class ExamplePlugin : Plugin
     }
 }
 ```
-
-!> ``GroupNamespace`` **must** be set before the resource gets loaded. (Second argument for the ``PluginInfo`` constructor.) Otherwise the resource will not be loaded in.
-
-``PluginInfo`` has other properties you can change, as seen here:
-```csharp
-Info = new PluginInfo("My Plugin", "mynamespace")
-{
-    Description = "A simple description",
-    Website = "https://mywebsite.com/"
-};
-```
-
-> ``4`` and ``5`` are optional. Do note if you don't do these steps you need to manually copy your dll every time after build to your broke protocol server folder.  
 
 4. Edit your project (csproj) and go to ``Build Events``
 5. Put the following text in ``Post Build Event``
