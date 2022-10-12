@@ -2,7 +2,7 @@
 
 ## Quickstart
 > Before we can get started, you need to have a few programs installed first.
-- Visual Studio (You can get VS Community Edition free [here](https://visualstudio.microsoft.com/vs/community/)
+- Visual Studio (You can get VS Community Edition free [here](https://visualstudio.microsoft.com/vs/community/))
 - Broke Protocol game files
 - C# Programming knowledge  
 
