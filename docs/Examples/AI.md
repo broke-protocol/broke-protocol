@@ -1,6 +1,6 @@
 # AI States
 
-> This example will cover the basics of the ``State`` class in setting up AI behaviors. Each State is basically the mode in which the AI is operating like Attack, Rob, or Wander. Only a single State is active at any time but a State can be a heirarchy of classes. In this sense, BP uses a Heirarchical Finite State Machine (HFSM) for clear state Entry/Exit events. But it also uses Behavior Tree (BT) decision tree in ResetAI/ResetJobAI to evaluate which State to enter. A continuous loop will call UpdateState() on the AI every 0.1s so you can execute the current AI State or transition to another State.
+> This example will cover the basics of the ``State`` class in setting up AI behaviors. Each State is basically the mode in which the AI is operating like Attack, Rob, or Wander. Only a single State is active at any time but a State can be a heirarchy of classes. In this sense, BP uses a Heirarchical Finite State Machine (HFSM) for clear state Entry/Exit events. But it also uses a Behavior Tree (BT) decision tree in ResetAI/ResetJobAI to evaluate which State to enter. A continuous loop will call UpdateState() on the AI every 0.1s so you can execute the current AI State or transition to another State.
 
 ## What is the ``State`` class?
 The ``State`` is the class that defines what happens when a State is entered, updated, and exited. This includes:
