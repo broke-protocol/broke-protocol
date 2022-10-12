@@ -33,3 +33,5 @@ StatesAdditive = new List<State>
 ```
 
 Now you are ready to Call player.svPlayer.SetState(Rob.index) from anywhere. The most important areas for AI are the Player ResetAI event and the ResetJobAI virtual method in the Job class. These are evaluated every time the AI 'Resets' and you need to Re-evaluate your AI decision tree and call SetState on the most suitable State. See GameSource, LifeSource, and WarSource for implementations of these.
+
+> Important note: If at any time in your UpdateState() implementation, you call ResetAI() or SetState(), then return `false`. And check the return state of base.UpdateState() so you can guard against running subclass code of the State after the State has already changed.
