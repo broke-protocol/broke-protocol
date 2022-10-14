@@ -1064,5 +1064,28 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.UpdateStatsAndRemoveConsumable(consumable);
             return true;
         }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool Dismount(ShPlayer player)
+        {
+            if (player.IsDriving)
+            {
+                // Send serverside transport position to override client-side predicted location while it was driven
+                player.curMount.svMountable.SvRepositionSelf();
+            }
+
+            player.SetStance(StanceIndex.Stand);
+            player.Dismount();
+
+            // Start locking behavior after exiting vehicle
+            if (player.curEquipable.ThrownHasGuidance)
+            {
+                player.svPlayer.StartLocking(player.curEquipable);
+            }
+
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
+
+            return true;
+        }
     }
 }
