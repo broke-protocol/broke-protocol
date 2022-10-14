@@ -53,7 +53,7 @@ namespace BrokeProtocol.GameSource
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Humanoid, 0, new ColorStruct("#eb9a14"),
                 new Upgrades[] {
-                    new Upgrades(10,
+                    new Upgrades(5,
                         new InventoryStruct[] { 
                             new InventoryStruct("Machete", 1),
                             new InventoryStruct("Flashbang", 2),
@@ -64,22 +64,22 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Colt", 1),
                             new InventoryStruct("AmmoPistol", 35),
                         }),
-                    new Upgrades(10,
+                    new Upgrades(15,
                         new InventoryStruct[] {
                             new InventoryStruct("KevlarVest", 1),
                             new InventoryStruct("LaserRed", 1),
                         }),
-                    new Upgrades(10,
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("Grenade", 2),
                             new InventoryStruct("HoloSight", 1),
                         }),
-                    new Upgrades(10,
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("HelmetCombat", 1),
                             new InventoryStruct("ACOG", 1),
                         }),
-                    new Upgrades(10,
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("AT4", 1),
                             new InventoryStruct("RocketGuided", 5),
@@ -91,7 +91,7 @@ namespace BrokeProtocol.GameSource
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Humanoid, 0, new ColorStruct("#3673c9"),
                 new Upgrades[] {
-                    new Upgrades(10,
+                    new Upgrades(5,
                         new InventoryStruct[] {
                             new InventoryStruct("Machete", 1),
                             new InventoryStruct("Flashbang", 2),
@@ -102,22 +102,22 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("Sig", 1),
                             new InventoryStruct("AmmoPistol", 48),
                         }),
-                    new Upgrades(10,
+                    new Upgrades(15,
                         new InventoryStruct[] {
                             new InventoryStruct("KevlarVest", 1),
                             new InventoryStruct("LaserRed", 1),
                         }),
-                    new Upgrades(10,
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("Grenade", 2),
                             new InventoryStruct("KobraSight", 1),
                         }),
-                    new Upgrades(10,
+                    new Upgrades(25,
                         new InventoryStruct[] {
                             new InventoryStruct("HelmetRiot", 1),
                             new InventoryStruct("ACOG", 1),
                         }),
-                    new Upgrades(10,
+                    new Upgrades(30,
                         new InventoryStruct[] {
                             new InventoryStruct("AT4", 1),
                             new InventoryStruct("RocketGuided", 5),
