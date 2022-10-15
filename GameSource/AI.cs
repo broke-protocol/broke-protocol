@@ -149,9 +149,12 @@ namespace BrokeProtocol.GameSource
                 return false;
             }
 
-            if (player.CanSeeEntity(player.svPlayer.targetEntity) && player.svPlayer.AimSmart())
+            if (player.CanSeeEntity(player.svPlayer.targetEntity))
             {
-                player.svPlayer.FireLogic();
+                if (player.svPlayer.AimSmart())
+                {
+                    player.svPlayer.FireLogic();
+                }
             }
             else
             {
