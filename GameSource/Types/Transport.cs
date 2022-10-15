@@ -1,14 +1,15 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Utility;
-using UnityEngine;
-using System.Collections;
 using BrokeProtocol.Required;
+using BrokeProtocol.Utility;
+using System.Collections;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
     public class Transport : TransportEvents
     {
+        [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
             var t = entity as ShTransport;
@@ -17,7 +18,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        public IEnumerator AbandonedCheck(ShTransport transport)
+        protected IEnumerator AbandonedCheck(ShTransport transport)
         {
             var timeStarted = false;
             var respawnTime = 0f;
@@ -47,7 +48,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        public IEnumerator CheckHazardDamage(ShTransport transport)
+        protected IEnumerator CheckHazardDamage(ShTransport transport)
         {
             // Don't damge during the spawn phase
             var delay = new WaitForSeconds(2f);
