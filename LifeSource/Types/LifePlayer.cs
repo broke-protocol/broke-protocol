@@ -889,9 +889,12 @@ namespace BrokeProtocol.GameSource.Types
                             var options = new List<LabelID>();
                             foreach (var clone in apartment.svApartment.clones)
                             {
-                                options.Add(new LabelID($"{clone.svOwner.username} - Difficulty: {clone.svSecurity.ToPercent()}", clone.svOwner.username));
+                                if (clone.svOwner)
+                                {
+                                    options.Add(new LabelID($"{clone.svOwner.username} - Difficulty: {clone.svSecurity.ToPercent()}", clone.svOwner.username));
+                                }
                             }
-                            player.svPlayer.DestroyMenu(hackPanel);
+                            player.svPlayer.DestroyMenu(securityPanel);
                             player.svPlayer.SendOptionMenu("&7Places", targetID, hackPanel, options.ToArray(), new LabelID[] { new LabelID("Hack", string.Empty) });
                             break;
                     }
@@ -901,6 +904,7 @@ namespace BrokeProtocol.GameSource.Types
                     var hackingContainer = new HackingContainer(player, targetID, optionID);
                     if (hackingContainer.IsValid())
                     {
+                        player.svPlayer.DestroyMenu(hackPanel);
                         player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.GetPlace.svSecurity);
                         player.StartCoroutine(CheckValidMinigame(hackingContainer));
                     }
