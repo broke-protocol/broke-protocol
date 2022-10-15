@@ -95,6 +95,7 @@
     <Compile Include="Events.cs" />
     <Compile Include="Types\Physical.cs" />
     <Compile Include="Types\Player.cs" />
+    <Compile Include="Types\Transport.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
