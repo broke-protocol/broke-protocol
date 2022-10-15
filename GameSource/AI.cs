@@ -851,6 +851,7 @@ namespace BrokeProtocol.GameSource
 
             player.svPlayer.FireLogic();
 
+            // Check again here because player or target might be killed in FireLogic
             if (!IsTargetValid())
             {
                 player.svPlayer.ResetAI();

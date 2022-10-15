@@ -12,9 +12,11 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
-            var t = entity as ShTransport;
-            entity.StartCoroutine(AbandonedCheck(t));
-            entity.StartCoroutine(CheckHazardDamage(t));
+            if (entity is ShTransport t)
+            {
+                t.StartCoroutine(AbandonedCheck(t));
+                t.StartCoroutine(CheckHazardDamage(t));
+            }
             return true;
         }
 
