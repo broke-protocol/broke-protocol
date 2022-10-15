@@ -304,6 +304,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
+
         [Execution(ExecutionMode.Additive)]
         public override bool Reward(ShPlayer player, int experienceDelta, int moneyDelta)
         {
@@ -323,43 +324,48 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.svPlayer.job.info.shared.upgrades.Length <= 1) return true;
 
-            var experience = player.experience + experienceDelta;
-
-            var previousMaxExperience = player.GetMaxExperience();
-
-            if (experience >= previousMaxExperience)
+            while (experienceDelta > 0)
             {
-                if (player.rank + 1 >= player.svPlayer.job.info.shared.upgrades.Length)
+                var previousMaxExperience = player.GetMaxExperience();
+
+                var newExperience = Mathf.Clamp(player.experience + experienceDelta, -1, previousMaxExperience);
+
+                experienceDelta -= newExperience - player.experience;
+
+                if (newExperience >= previousMaxExperience)
                 {
-                    if (player.experience != previousMaxExperience)
+                    if (player.rank + 1 >= player.svPlayer.job.info.shared.upgrades.Length)
                     {
-                        player.svPlayer.SetExperience(previousMaxExperience, true);
+                        if (player.experience != previousMaxExperience)
+                        {
+                            player.svPlayer.SetExperience(previousMaxExperience, true);
+                        }
+                    }
+                    else
+                    {
+                        var newRank = player.rank + 1;
+                        player.svPlayer.AddJobItems(player.svPlayer.job.info, newRank, false);
+                        player.svPlayer.SetRank(newRank);
+                        player.svPlayer.SetExperience(newExperience - previousMaxExperience, false);
+                    }
+                }
+                else if (newExperience < 0)
+                {
+                    if (player.rank <= 0)
+                    {
+                        player.svPlayer.SendGameMessage("You lost your job");
+                        player.svPlayer.SvResetJob();
+                    }
+                    else
+                    {
+                        player.svPlayer.SetRank(player.rank - 1);
+                        player.svPlayer.SetExperience(newExperience + player.GetMaxExperience(), false);
                     }
                 }
                 else
                 {
-                    var newRank = player.rank + 1;
-                    player.svPlayer.AddJobItems(player.svPlayer.job.info, newRank, false);
-                    player.svPlayer.SetRank(newRank);
-                    player.svPlayer.SetExperience(experience - previousMaxExperience, false);
+                    player.svPlayer.SetExperience(newExperience, true);
                 }
-            }
-            else if (experience < 0)
-            {
-                if (player.rank <= 0)
-                {
-                    player.svPlayer.SendGameMessage("You lost your job");
-                    player.svPlayer.SvResetJob();
-                }
-                else
-                {
-                    player.svPlayer.SetRank(player.rank - 1);
-                    player.svPlayer.SetExperience(experience + player.GetMaxExperience(), false);
-                }
-            }
-            else
-            {
-                player.svPlayer.SetExperience(experience, true);
             }
 
             return true;

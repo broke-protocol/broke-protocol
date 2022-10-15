@@ -15,6 +15,7 @@ namespace BrokeProtocol.GameSource.Types
         public int spawnTerritoryIndex;
         public int teamIndex;
         public int classIndex;
+        public int cachedRank = -1; // To force defaultItems update
 
         public WarSourcePlayer(ShPlayer player)
         {
@@ -156,10 +157,9 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        // Pre/Test Event (disallow losing Exp/Job in PvP)
+        // Pre/Test Event (disallow losing Job in PvP)
         [Execution(ExecutionMode.PreEvent)]
-        public override bool Reward(ShPlayer player, int experienceDelta, int moneyDelta) => 
-            experienceDelta >= 0;
+        public override bool Reward(ShPlayer player, int experienceDelta, int moneyDelta) => experienceDelta >= 0;
 
         [Execution(ExecutionMode.Additive)]
         public override bool OptionAction(ShPlayer player, int targetID, string id, string optionID, string actionID)
