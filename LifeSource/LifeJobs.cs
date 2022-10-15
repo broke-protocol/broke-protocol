@@ -739,7 +739,7 @@ namespace BrokeProtocol.GameSource
                 {
                     removeKeys.Add(requesterName);
                 }
-                else if (!player.isHuman && info.members.Count == 0) 
+                else if (!player.isHuman && info.members.Count <= 1) 
                 {
                     // AI will accept all item requests if no human Mayor present
                     ResultHandle(requesterName, accept);
