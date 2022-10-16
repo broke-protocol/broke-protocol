@@ -32,6 +32,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         player.svPlayer.spawnJobIndex = warPlayer.teamIndex;
                         warPlayer.cachedRank = 0;
+                        player.svPlayer.SvResetJob();
                     }
 
                     // Remove all inventory (will be re-added either here or on spawn)
@@ -68,7 +69,15 @@ namespace BrokeProtocol.GameSource.Types
                         foreach (var item in upgrades)
                         {
                             var index = item.itemName.GetPrefabIndex();
-                            player.svPlayer.defaultItems.Add(index, new InventoryItem(SceneManager.Instance.GetEntity<ShItem>(index), item.count));
+
+                            if (player.svPlayer.defaultItems.TryGetValue(index, out var existing))
+                            {
+                                existing.count += item.count;
+                            }
+                            else
+                            {
+                                player.svPlayer.defaultItems.Add(index, new InventoryItem(SceneManager.Instance.GetEntity<ShItem>(index), item.count));
+                            }
                         }
                     }
 

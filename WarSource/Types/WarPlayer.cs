@@ -119,9 +119,6 @@ namespace BrokeProtocol.GameSource.Types
                 player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
             }
 
-            // Need to call this before spawn to set up items and stuff
-            entity.Player.svPlayer.SvResetJob();
-
             return true;
         }
 

@@ -52,22 +52,30 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            var player = entity.Player;
-
-            if (player && player.isHuman)
-            {
-                var newSpawn = Manager.spawnLocations.GetRandom().mainT;
-                player.svPlayer.originalPosition = newSpawn.position;
-                player.svPlayer.originalRotation = newSpawn.rotation;
-                player.svPlayer.originalParent = newSpawn.parent;
-            }
-
             if (entity.svEntity.randomSpawn)
             {
                 entity.svEntity.Despawn(true);
             }
             else
             {
+                var player = entity.Player;
+
+                if (player)
+                {
+                    if (player.isHuman)
+                    {
+                        var newSpawn = Manager.spawnLocations.GetRandom().mainT;
+                        player.svPlayer.originalPosition = newSpawn.position;
+                        player.svPlayer.originalRotation = newSpawn.rotation;
+                        player.svPlayer.originalParent = newSpawn.parent;
+                    }
+                    else
+                    {
+                        // Reset Job for NPCs so items and spawn info is correct
+                        player.svPlayer.SvResetJob();
+                    }
+                }
+
                 entity.svEntity.SpawnOriginal();
             }
 
