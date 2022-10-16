@@ -51,13 +51,6 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
                     }
-
-                    if (player.WarPlayer().cachedRank != player.rank)
-                    {
-                        player.WarPlayer().cachedRank = player.rank;
-                        // Set null so it will be reset on Spawn
-                        player.svPlayer.defaultItems = null;
-                    }
                 }
 
                 if(!player.isHuman)

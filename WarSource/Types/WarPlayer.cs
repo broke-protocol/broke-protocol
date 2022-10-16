@@ -151,7 +151,14 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
-            entity.Player.svPlayer.SetBestEquipable();
+            var player = entity.Player;
+            if (player.WarPlayer().cachedRank != player.rank)
+            {
+                player.WarPlayer().cachedRank = player.rank;
+                // Set null so it will be reset on Spawn
+                player.svPlayer.defaultItems = null;
+            }
+            player.svPlayer.SetBestEquipable();
             return true;
         }
 
