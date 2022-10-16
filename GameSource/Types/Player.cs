@@ -340,6 +340,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             player.svPlayer.SetExperience(previousMaxExperience, true);
                         }
+                        return true;
                     }
                     else
                     {
@@ -355,6 +356,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         player.svPlayer.SendGameMessage("You lost your job");
                         player.svPlayer.SvResetJob();
+                        return true;
                     }
                     else
                     {
