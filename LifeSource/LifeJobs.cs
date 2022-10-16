@@ -1071,7 +1071,7 @@ namespace BrokeProtocol.GameSource
             deliveryItem = SceneManager.Instance.consumablesCollection.GetRandom().Value;
             player.TransferItem(DeltaInv.AddToMe, deliveryItem);
             timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
-            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
+            player.svPlayer.SendTimer(timeDeadline - Time.time, Utility.defaultAnchor);
         }
 
         public override void Loop()
@@ -1200,7 +1200,7 @@ namespace BrokeProtocol.GameSource
 
                     timeDeadline = Time.time + player.Distance(destination.transform.position) * 0.1f + 20f;
 
-                    player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
+                    player.svPlayer.SendTimer(timeDeadline - Time.time, Utility.defaultAnchor);
                 }
             }
         }
@@ -1404,7 +1404,7 @@ namespace BrokeProtocol.GameSource
                             player.svPlayer.StartGoalMarker(targetPlayer);
                             player.svPlayer.SendGameMessage($"Reach {targetPlayer.username} in time");
                             timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
-                            player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ShowTimer, timeDeadline - Time.time);
+                            player.svPlayer.SendTimer(timeDeadline - Time.time, Utility.defaultAnchor);
                         }
                         break;
 

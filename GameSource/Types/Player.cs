@@ -290,7 +290,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.isHuman)
             {
-                player.svPlayer.SendTimer(player.svPlayer.RespawnTime, new Vector2(0.5f, 0.15f));
+                player.svPlayer.SendTimer(player.svPlayer.RespawnTime, Utility.defaultAnchor);
             }
             return true;
         }
@@ -407,7 +407,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.bomb.index);
 
-            player.svPlayer.SendTimer(vault.svVault.bombTimer, new Vector2(0.5f, 0.15f));
+            player.svPlayer.SendTimer(vault.svVault.bombTimer, Utility.defaultAnchor);
 
             vault.svVault.SvSetVault(VaultState.Bombing);
             vault.svVault.instigator = player;
