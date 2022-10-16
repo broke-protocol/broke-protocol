@@ -1,4 +1,5 @@
 ﻿using BrokeProtocol.API;
+using BrokeProtocol.Client.UI;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
@@ -838,10 +839,13 @@ namespace BrokeProtocol.GameSource
             {
                 requests[requester.username] = itemName;
                 requester.svPlayer.SendGameMessage("Request successfully sent");
-                var mayor = info.members.FirstOrDefault();
-                if (mayor)
+
+                foreach (var p in info.members)
                 {
-                    mayor.svPlayer.SendGameMessage(requester.username + " requesting a " + item.itemName);
+                    if (p.isHuman)
+                    {
+                        p.svPlayer.SendGameMessage(requester.username + " requesting a " + item.itemName);
+                    }
                 }
             }
         }

@@ -115,8 +115,6 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Initialize(ShEntity entity)
         {
             Manager.pluginPlayers.Add(entity, new GameSourcePlayer(entity.Player));
-            // Need to call this before spawn to set up items and stuff
-            entity.Player.svPlayer.SvResetJob();
             return true;
         }
 
