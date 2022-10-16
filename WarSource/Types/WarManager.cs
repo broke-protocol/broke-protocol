@@ -410,7 +410,7 @@ namespace BrokeProtocol.GameSource.Types
             tickets.Clear();
             foreach(var t in BPAPI.Jobs)
             {
-                tickets.Add(t.shared.jobIndex, 2000f);
+                tickets.Add(t.shared.jobIndex, 250f);
             }
 
             foreach(var pair in pluginPlayers)

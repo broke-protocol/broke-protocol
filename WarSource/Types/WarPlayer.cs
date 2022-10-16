@@ -3,6 +3,7 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
+using BrokeProtocol.Utility.Jobs;
 using System.Linq;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace BrokeProtocol.GameSource.Types
         public int spawnTerritoryIndex;
         public int teamIndex;
         public int classIndex;
-        public int cachedRank = -1; // To force defaultItems update
+        public int cachedRank = -1;
 
         public WarSourcePlayer(ShPlayer player)
         {
@@ -114,6 +115,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 warSourcePlayer.teamIndex = teamIndex;
                 warSourcePlayer.classIndex = classIndex;
+                warSourcePlayer.cachedRank = player.rank;
 
                 foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
                 {
@@ -147,26 +149,10 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
-            var player = entity.Player;
-            if (player.WarPlayer().cachedRank != player.rank)
-            {
-                player.WarPlayer().cachedRank = player.rank;
-                // Set null so it will be reset on Spawn
-                player.svPlayer.defaultItems = null;
-            }
-            player.svPlayer.SetBestEquipable();
-            return true;
-        }
-
-        // Override because we don't want to switch back to Hands
-        [Execution(ExecutionMode.Override)]
-        public override bool Respawn(ShEntity entity)
-        {
-            entity.svEntity.Restock(); // Will put on any suitable clothing
+            entity.Player.svPlayer.SetBestEquipable();
             return true;
         }
 

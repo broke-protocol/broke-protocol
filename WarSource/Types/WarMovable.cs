@@ -23,45 +23,66 @@ namespace BrokeProtocol.GameSource.Types
             
             if (player)
             {
-                var warSourcePlayer = player.WarPlayer();
-                if (warSourcePlayer.changePending)
+                var warPlayer = player.WarPlayer();
+                if (warPlayer.changePending)
                 {
-                    warSourcePlayer.changePending = false;
+                    warPlayer.changePending = false;
 
-                    player.svPlayer.spawnJobIndex = warSourcePlayer.teamIndex;
+                    player.svPlayer.spawnJobIndex = warPlayer.teamIndex;
 
                     // Remove all inventory (will be re-added either here or on spawn)
                     foreach (var i in player.myItems.ToArray())
                     {
                         player.TransferItem(DeltaInv.RemoveFromMe, i.Key, i.Value.count);
                     }
-                    var newPlayer = WarManager.skinPrefabs[warSourcePlayer.teamIndex].GetRandom();
+                    var newPlayer = WarManager.skinPrefabs[warPlayer.teamIndex].GetRandom();
 
                     // Don't try this with bots or gamemodes with Login functionality
                     // wearableIndices will be null (the list of wearables selected from the Register Menu)
                     player.svPlayer.ApplyWearableIndices(newPlayer.wearableOptions);
 
                     // Clamp class if it's outside the range on team change
-                    warSourcePlayer.classIndex = Mathf.Clamp(
-                        warSourcePlayer.classIndex,
+                    warPlayer.classIndex = Mathf.Clamp(
+                        warPlayer.classIndex,
                         0,
-                        WarManager.classes[warSourcePlayer.teamIndex].Count - 1);
+                        WarManager.classes[warPlayer.teamIndex].Count - 1);
 
-                    foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
+                    foreach (var i in WarManager.classes[warPlayer.teamIndex][warPlayer.classIndex].equipment)
                     {
                         player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
                     }
+
+                    player.svPlayer.defaultItems = null;
+                    warPlayer.cachedRank = 0;
                 }
 
-                if(!player.isHuman)
+                if (warPlayer.cachedRank != player.rank)
+                {
+                    for (int i = warPlayer.cachedRank + 1; i <= player.rank; i++)
+                    {
+                        var upgrades = player.svPlayer.job.info.shared.upgrades[i].items;
+
+                        foreach (var item in upgrades)
+                        {
+                            var index = item.itemName.GetPrefabIndex();
+                            player.svPlayer.defaultItems.Add(index, new InventoryItem(SceneManager.Instance.GetEntity<ShItem>(index), item.count));
+                        }
+                    }
+
+                    warPlayer.cachedRank = player.rank;
+                }
+
+                player.svPlayer.Restock(); // Will put on any suitable clothing
+
+                if (!player.isHuman)
                 {
                     // Pick a new random spawn territory for NPCs
-                    warSourcePlayer.spawnTerritoryIndex = -1;
+                    warPlayer.spawnTerritoryIndex = -1;
                 }
 
-                warSourcePlayer.SetSpawnTerritory();
+                warPlayer.SetSpawnTerritory();
 
-                var territoryIndex = warSourcePlayer.spawnTerritoryIndex;
+                var territoryIndex = warPlayer.spawnTerritoryIndex;
 
                 if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var position, out var rotation, out var place))
                 {
