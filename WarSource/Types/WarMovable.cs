@@ -28,7 +28,11 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     warPlayer.changePending = false;
 
-                    player.svPlayer.spawnJobIndex = warPlayer.teamIndex;
+                    if(player.svPlayer.spawnJobIndex != warPlayer.teamIndex)
+                    {
+                        player.svPlayer.spawnJobIndex = warPlayer.teamIndex;
+                        warPlayer.cachedRank = 0;
+                    }
 
                     // Remove all inventory (will be re-added either here or on spawn)
                     foreach (var i in player.myItems.ToArray())
@@ -53,10 +57,9 @@ namespace BrokeProtocol.GameSource.Types
                     }
 
                     player.svPlayer.defaultItems = null;
-                    warPlayer.cachedRank = 0;
                 }
 
-                if (warPlayer.cachedRank != player.rank)
+                if (player.svPlayer.defaultItems != null && warPlayer.cachedRank != player.rank)
                 {
                     for (int i = warPlayer.cachedRank + 1; i <= player.rank; i++)
                     {

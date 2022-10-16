@@ -149,12 +149,17 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
+        // Override the GameSource Player Respawn event to cancel equipping Hands
+        [Execution(ExecutionMode.Override)]
+        public override bool Respawn(ShEntity entity) => true;
+
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
             entity.Player.svPlayer.SetBestEquipable();
             return true;
         }
+
 
         // Pre/Test Event (disallow losing Job in PvP)
         [Execution(ExecutionMode.PreEvent)]
