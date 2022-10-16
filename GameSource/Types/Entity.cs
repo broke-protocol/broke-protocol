@@ -2,9 +2,8 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
-using UnityEngine;
 using System.Collections;
-using BrokeProtocol.Utility;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {

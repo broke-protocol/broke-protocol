@@ -3,7 +3,6 @@ using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
-using BrokeProtocol.Utility.Jobs;
 using System.Linq;
 using UnityEngine;
 
@@ -98,30 +97,31 @@ namespace BrokeProtocol.GameSource.Types
         {
             var player = entity.Player;
 
-            if (player)
+            var warSourcePlayer = new WarSourcePlayer(player);
+
+            WarManager.pluginPlayers.Add(player, warSourcePlayer);
+
+            if (!player.isHuman ||
+                !SvManager.Instance.connections.TryGetValue(player.svPlayer.connection, out var connectData) ||
+                !connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) ||
+                !connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
             {
-                var warSourcePlayer = new WarSourcePlayer(player);
-
-                WarManager.pluginPlayers.Add(player, warSourcePlayer);
-
-                if (!player.isHuman ||
-                    !SvManager.Instance.connections.TryGetValue(player.svPlayer.connection, out var connectData) ||
-                    !connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) ||
-                    !connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
-                {
-                    teamIndex = player.svPlayer.spawnJobIndex;
-                    classIndex = Random.Range(0, WarManager.classes[teamIndex].Count);
-                }
-
-                warSourcePlayer.teamIndex = teamIndex;
-                warSourcePlayer.classIndex = classIndex;
-                warSourcePlayer.cachedRank = player.rank;
-
-                foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
-                {
-                    player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
-                }
+                teamIndex = player.svPlayer.spawnJobIndex;
+                classIndex = Random.Range(0, WarManager.classes[teamIndex].Count);
             }
+
+            warSourcePlayer.teamIndex = teamIndex;
+            warSourcePlayer.classIndex = classIndex;
+            warSourcePlayer.cachedRank = player.rank;
+
+            foreach (var i in WarManager.classes[warSourcePlayer.teamIndex][warSourcePlayer.classIndex].equipment)
+            {
+                player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
+            }
+
+            // Need to call this before spawn to set up items and stuff
+            entity.Player.svPlayer.SvResetJob();
+
             return true;
         }
 
