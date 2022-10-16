@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
+using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using System.Linq;
 using UnityEngine;
@@ -67,6 +68,11 @@ namespace BrokeProtocol.GameSource.Types
     
     public class WarPlayer : PlayerEvents
     {
+        // PreEvent test to disable Friendly Fire
+        [Execution(ExecutionMode.PreEvent)]
+        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint) =>
+            !WarDestroyable.FriendlyFire(destroyable, attacker);
+
         [Execution(ExecutionMode.Override)]
         public override bool ResetAI(ShPlayer player)
         {

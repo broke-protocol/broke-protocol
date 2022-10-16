@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
+using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using System.Collections;
 using System.Linq;
@@ -10,6 +11,11 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class WarMovable : MovableEvents
     {
+        // PreEvent test to disable Friendly Fire
+        [Execution(ExecutionMode.PreEvent)]
+        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint) =>
+            !WarDestroyable.FriendlyFire(destroyable, attacker);
+
         [Execution(ExecutionMode.Override)]
         public override bool Respawn(ShEntity entity)
         {

@@ -85,6 +85,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Types\WarDestroyable.cs" />
     <Compile Include="WarAI.cs" />
     <Compile Include="WarCommands.cs" />
     <Compile Include="WarUtility.cs" />
