@@ -18,6 +18,8 @@ namespace BrokeProtocol.GameSource
         public static State TimedWander = new TimedWanderState();
         public static State TimedLook = new TimedLookState();
 
+        private const string jobDescription = "Kill and take enemy territories to burn down their tickets and win the battle";
+
         public WarCore()
         {
             Info = new PluginInfo(
@@ -50,7 +52,7 @@ namespace BrokeProtocol.GameSource
         private List<JobInfo> GetJobs => new List<JobInfo> {
             new JobInfo(
                 typeof(Army), "SpecOps",
-                "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
+                jobDescription,
                 CharacterType.Humanoid, 0, new ColorStruct("#eb9a14"),
                 new Upgrades[] {
                     new Upgrades(5,
@@ -88,7 +90,7 @@ namespace BrokeProtocol.GameSource
                 }),
             new JobInfo(
                 typeof(Army), "OpFor",
-                "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
+                jobDescription,
                 CharacterType.Humanoid, 0, new ColorStruct("#3673c9"),
                 new Upgrades[] {
                     new Upgrades(5,
