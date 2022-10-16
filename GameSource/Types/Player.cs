@@ -324,7 +324,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.svPlayer.job.info.shared.upgrades.Length <= 1) return true;
 
-            while (experienceDelta > 0)
+            while (experienceDelta != 0)
             {
                 var previousMaxExperience = player.GetMaxExperience();
 
