@@ -80,18 +80,18 @@ namespace BrokeProtocol.GameSource.Types
                         amount *= 0.5f;
                     }
 
+                    // Only do amount reductions for non-Null types of damage
+                    amount -= amount * (player.armorLevel / 200f);
+                    if (!player.isHuman)
+                    {
+                        amount /= SvManager.Instance.settings.difficulty;
+                    }
+
                     if (effect != BodyEffect.Null)
                     {
                         player.svPlayer.SvAddInjury(part, effect, (byte)Random.Range(10, 50));
                     }
                 }
-
-                if (!player.isHuman)
-                {
-                    amount /= SvManager.Instance.settings.difficulty;
-                }
-
-                amount -= amount * (player.armorLevel / 200f);
             }
 
             destroyable.health -= amount;
@@ -118,10 +118,9 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool DestroySelf(ShDestroyable destroyable)
         {
-            // Overkill damage due to armor, but don't use float.maxValue because of underflow
             var player = destroyable.Player;
             if(!player || !player.isHuman || !player.IsRestrained || !player.IsUp)
-                destroyable.svDestroyable.Damage(DamageIndex.Null, destroyable.health * 10f);
+                destroyable.svDestroyable.Damage(DamageIndex.Null, destroyable.health);
             return true;
         }
 
