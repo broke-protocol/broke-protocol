@@ -20,8 +20,6 @@ namespace BrokeProtocol.GameSource
 
         public static LimitQueue<string> tryRegister = new(0, 5f);
 
-        public static LimitQueue<ShPlayer> healed = new(3, 60f);
-
         public static LimitQueue<ShPlayer> unstuck = new(1, 45f);
     }
 }
