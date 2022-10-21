@@ -1275,7 +1275,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.svPlayer.SendGameMessage("You're not the correct mob type for this job");
             }
-            else if (((MyJobInfo)employer.svPlayer.job.info).groupIndex == GroupIndex.Criminal && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer) && pluginPlayer.wantedLevel > 0)
+            else if (((MyJobInfo)employer.svPlayer.job.info).groupIndex != GroupIndex.Criminal && player.LifePlayer().wantedLevel > 0)
             {
                 player.svPlayer.SendGameMessage("We don't accept wanted criminals");
             }
