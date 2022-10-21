@@ -230,7 +230,7 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
             var player = destroyable.Player;
-            if (destroyable.IsDead || player.svPlayer.godMode) return false;
+            if (player.IsDead || player.svPlayer.godMode) return false;
 
             // Still alive, do knockdown and AI retaliation
             if (player.stance.setable)
