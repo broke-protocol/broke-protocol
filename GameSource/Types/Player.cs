@@ -1015,6 +1015,65 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Additive)]
+        public override bool Consume(ShPlayer player, ShConsumable consumable, ShPlayer healer)
+        {
+            if (player.IsDead) return false;
+
+            if (consumable.canRevive)
+            {
+                if (!healer) return false;
+
+                if (player.IsKnockedOut)
+                {
+                    player.svPlayer.StartRecover();
+                    healer.svPlayer.job.OnRevivePlayer(player);
+                }
+                else
+                {
+                    player.svPlayer.Damage(consumable.DamageProperty, 1f, healer);
+                    return false; // Don't heal after hurting!
+                }
+            }
+
+            if (consumable.healedEffects.Length > 0)
+            {
+                if (player.svPlayer.HealFromConsumable(consumable))
+                {
+                    if (healer) healer.svPlayer.job.OnHealEntity(player);
+                }
+                else if (healer)
+                {
+                    healer.svPlayer.SendGameMessage("No related injury");
+                    return false;
+                }
+            }
+
+            if (consumable.healthBoost > 0f)
+            {
+                if (player.CanHeal)
+                {
+                    if (healer && Utility.healed.Limit(player))
+                    {
+                        const string message = "Heal Limit Reached!";
+                        player.svPlayer.SendGameMessage(message);
+                        healer.svPlayer.SendGameMessage(message);
+                        return false;
+                    }
+
+                    player.svPlayer.Heal(consumable.healthBoost, healer);
+                }
+                else if (healer) return false;
+            }
+            else if (consumable.healthBoost < 0f)
+            {
+                player.svPlayer.Damage(consumable.DamageProperty, -consumable.healthBoost, healer);
+            }
+
+            player.svPlayer.UpdateStatsAndRemoveConsumable(consumable);
+            return true;
+        }
+
+        [Execution(ExecutionMode.Additive)]
         public override bool Dismount(ShPlayer player)
         {
             if (player.IsDriving)
