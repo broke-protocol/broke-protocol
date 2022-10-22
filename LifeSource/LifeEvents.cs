@@ -25,7 +25,7 @@ namespace BrokeProtocol.GameSource
                         pair.Key.ToString())); // Send offense HashCode for lookup later
                 }
 
-                player.svPlayer.SendOptionMenu($"{criminal}'s Criminal Record: ${pluginPlayer.GetFineAmount()}", criminal.ID, crimesMenu, options.ToArray(), new LabelID[] { new LabelID("Get Details", string.Empty) });
+                player.svPlayer.SendOptionMenu($"{criminal.username}'s Criminal Record: ${pluginPlayer.GetFineAmount()}", criminal.ID, crimesMenu, options.ToArray(), new LabelID[] { new LabelID("Get Details", string.Empty) });
             }
         }
 
