@@ -374,7 +374,7 @@ namespace BrokeProtocol.GameSource
         private Vector3 lastCheckPosition;
         private float nextCheckTime;
 
-        public bool BadPath => player.svPlayer.lastPathState != PathCompleteState.Complete;
+        public bool BadPath => player.svPlayer.lastPathState < PathCompleteState.Complete;
 
         private void UpdateChecks()
         {
