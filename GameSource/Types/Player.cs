@@ -92,11 +92,19 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        public virtual bool SetGoToState(Vector3 position, Quaternion rotation, Transform parent)
+        public Vector3 goToPosition;
+        public Quaternion goToRotation;
+
+        public bool OnDestination()
         {
-            player.svPlayer.destinationPosition = position;
-            player.svPlayer.destinationRotation = rotation;
-            player.svPlayer.destinationParent = parent;
+            var controlled = player.GetControlled;
+            return controlled.DistanceSqr2D(goToPosition) < controlled.svMountable.NavRangeSqr;
+        }
+
+        public virtual bool SetGoToState(Vector3 position, Quaternion rotation)
+        {
+            goToPosition = position;
+            goToRotation = rotation;
 
             return player.svPlayer.SetState(Core.GoTo.index);
         }
@@ -731,7 +739,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
                 player.svPlayer.follower.svPlayer.SvDismount();
-                player.svPlayer.follower.GamePlayer().SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition), player.GetParent);
+                player.svPlayer.follower.GamePlayer().SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition));
             }
 
             return true;

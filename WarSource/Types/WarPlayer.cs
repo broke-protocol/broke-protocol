@@ -41,11 +41,10 @@ namespace BrokeProtocol.GameSource.Types
             return false;
         }
 
-        public virtual bool SetTimedGoToState(Vector3 position, Quaternion rotation, Transform parent)
+        public virtual bool SetTimedGoToState(Vector3 position, Quaternion rotation)
         {
-            player.svPlayer.destinationPosition = position;
-            player.svPlayer.destinationRotation = rotation;
-            player.svPlayer.destinationParent = parent;
+            player.GamePlayer().goToPosition = position;
+            player.GamePlayer().goToRotation = rotation;
 
             return player.svPlayer.SetState(WarCore.TimedGoTo.index);
         }

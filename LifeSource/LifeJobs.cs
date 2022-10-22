@@ -72,8 +72,7 @@ namespace BrokeProtocol.GameSource
                 player.svPlayer.SvDismount();
                 if (player.GamePlayer().SetGoToState(
                     player.svPlayer.originalPosition,
-                    player.svPlayer.originalRotation,
-                    player.svPlayer.originalParent))
+                    player.svPlayer.originalRotation))
                     return;
             }
 

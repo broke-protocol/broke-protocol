@@ -135,7 +135,7 @@ namespace BrokeProtocol.GameSource
             {
                 // Overwatch a territory
                 if (Random.value < 0.5f && player.svPlayer.GetOverwatchBest(pos, out var best) &&
-                    player.WarPlayer().SetTimedGoToState(best, rot, place.mTransform))
+                    player.WarPlayer().SetTimedGoToState(best, rot))
                 {
                     return true;
                 }
@@ -155,7 +155,7 @@ namespace BrokeProtocol.GameSource
                     tBounds.Encapsulate(t.TransformPoint( 0f, 1f, 1f));
 
                     if (player.svPlayer.GetOverwatchSafe(pos, tBounds, out var safe) &&
-                        player.WarPlayer().SetTimedGoToState(safe, rot, place.mTransform))
+                        player.WarPlayer().SetTimedGoToState(safe, rot))
                     {
                         return true;
                     }

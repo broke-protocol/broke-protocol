@@ -453,7 +453,7 @@ namespace BrokeProtocol.GameSource
             onDestination = false;
             if (!player.IsFlying)
             {
-                player.svPlayer.GetPath(player.svPlayer.destinationPosition);
+                player.svPlayer.GetPath(player.GamePlayer().goToPosition);
             }
         }
 
@@ -463,9 +463,9 @@ namespace BrokeProtocol.GameSource
 
             if (onDestination)
             {
-                if (player.svPlayer.OnDestination)
+                if (player.GamePlayer().OnDestination())
                 {
-                    player.svPlayer.LookTactical(player.svPlayer.destinationRotation * Vector3.forward);
+                    player.svPlayer.LookTactical(player.GamePlayer().goToRotation * Vector3.forward);
                 }
                 else if (player.svPlayer.SetState(index)) // Restart state
                 {
@@ -474,7 +474,7 @@ namespace BrokeProtocol.GameSource
             }
             else if(player.IsFlying)
             {
-                if(player.svPlayer.OnDestination)
+                if(player.GamePlayer().OnDestination())
                 {
                     player.svPlayer.SvDismount(true);
                     return false;
@@ -482,8 +482,8 @@ namespace BrokeProtocol.GameSource
                 else
                 {
                     var aircraft = player.curMount;
-                    player.svPlayer.LookAt(player.svPlayer.destinationPosition - aircraft.GetPosition);
-                    aircraft.svMountable.MoveTo(player.svPlayer.destinationPosition);
+                    player.svPlayer.LookAt(player.GamePlayer().goToPosition - aircraft.GetPosition);
+                    aircraft.svMountable.MoveTo(player.GamePlayer().goToPosition);
                 }
             }
             else if(BadPath)
