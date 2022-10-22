@@ -376,6 +376,8 @@ namespace BrokeProtocol.GameSource
 
         public bool BadPath => player.svPlayer.lastPathState < PathCompleteState.Complete;
 
+        public bool IncompletePath => player.svPlayer.lastPathState != PathCompleteState.Complete;
+
         private void UpdateChecks()
         {
             var mountable = player.GetMount;
@@ -970,7 +972,7 @@ namespace BrokeProtocol.GameSource
                 hunting = false;
             }
 
-            if ((hunting || BadPath || Random.value < 0.25f)
+            if ((hunting || IncompletePath || Random.value < 0.25f)
                 && ShouldHunt
                 && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
             {
@@ -987,7 +989,7 @@ namespace BrokeProtocol.GameSource
 
         protected override bool HandleNearTarget()
         {
-            if(BadPath && ShouldHunt && !hunting)
+            if(IncompletePath && ShouldHunt && !hunting)
             {
                 PathToTarget();
             }
@@ -1002,7 +1004,7 @@ namespace BrokeProtocol.GameSource
 
         protected override bool HandleDistantTarget()
         {
-            if (BadPath && ShouldHunt && !hunting)
+            if (IncompletePath && ShouldHunt && !hunting)
             {
                 PathToTarget();
             }
