@@ -99,13 +99,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libraries\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\UnityEngine.UIElementsModule.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>copy /Y "$(TargetDir)$(AssemblyName).dll" "$(SolutionDir)Libraries\$(AssemblyName).dll"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(TargetDir)$(AssemblyName).dll" "$(SolutionDir)Libraries\$(AssemblyName).dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

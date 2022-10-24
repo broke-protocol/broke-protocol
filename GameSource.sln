@@ -6,8 +6,14 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameSource", "GameSource\GameSource.csproj", "{C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarSource", "WarSource\WarSource.csproj", "{F298DC33-203C-41DF-9235-18008892BEBB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB} = {C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeSource", "LifeSource\LifeSource.csproj", "{2706A6D6-BD0F-43D6-9159-54E8DBB4BC32}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB} = {C0DE0D18-ABA6-4BA0-946F-6FE5DED716CB}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
