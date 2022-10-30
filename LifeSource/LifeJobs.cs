@@ -132,7 +132,7 @@ namespace BrokeProtocol.GameSource
 
                 if (victim.isHuman && player.isHuman)
                 {
-                    victim.svPlayer.SendGameMessage(player.username + " murdered " + victim.username);
+                    InterfaceHandler.SendGameMessageToAll(player.username + " murdered " + victim.username);
                 }
             }
         }
