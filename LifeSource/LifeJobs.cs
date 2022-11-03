@@ -39,6 +39,8 @@ namespace BrokeProtocol.GameSource
         public readonly float spawnRate;
         public readonly int poolSize;
         public Transports[] transports;
+
+        [NonSerialized]
         public HashSet<ShEntity>[] randomEntities;
 
         public MyJobInfo(
