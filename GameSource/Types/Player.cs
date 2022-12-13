@@ -1082,6 +1082,23 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Additive)]
+        public override bool Mount(ShPlayer player, ShMountable mount, byte seat)
+        {
+            player.svPlayer.SvDismount();
+            player.Mount(mount, seat);
+            player.SetStance(mount.seats[seat].stanceIndex);
+
+            if (!player.isHuman)
+            {
+                player.svPlayer.ResetAI();
+            }
+
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.CurrentClip);
+
+            return true;
+        }
+
+        [Execution(ExecutionMode.Additive)]
         public override bool Dismount(ShPlayer player)
         {
             if (player.IsDriving)
