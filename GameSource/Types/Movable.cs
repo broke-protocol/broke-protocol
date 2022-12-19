@@ -10,13 +10,6 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Movable : MovableEvents
     {
-        [Execution(ExecutionMode.Additive)]
-        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
-        {
-            destroyable.svDestroyable.UpdateHealth(source, hitPoint);
-            return true;
-        }
-
         private IEnumerator RespawnDelay(ShDestroyable destroyable)
         {
             var respawnTime = Time.time + destroyable.svDestroyable.RespawnTime;

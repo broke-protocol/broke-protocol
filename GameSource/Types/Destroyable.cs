@@ -112,6 +112,8 @@ namespace BrokeProtocol.GameSource.Types
                 attacker.svPlayer.job.OnDamageEntity(destroyable);
             }
 
+            destroyable.svDestroyable.UpdateHealth(source, hitPoint);
+
             return true;
         }
 
