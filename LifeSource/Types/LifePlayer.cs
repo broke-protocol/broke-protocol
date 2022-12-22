@@ -17,15 +17,15 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class LifeSourcePlayer
     {
-        ShPlayer player;
+        private readonly ShPlayer player;
 
         public bool trespassing;
 
         public float jailExitTime;
 
-        public readonly Dictionary<int, Offense> offenses = new Dictionary<int, Offense>();
+        public readonly Dictionary<int, Offense> offenses = new();
 
-        public readonly Dictionary<ShPlayer, int> witnessedPlayers = new Dictionary<ShPlayer, int>();
+        public readonly Dictionary<ShPlayer, int> witnessedPlayers = new();
 
         public int wantedLevel;
         public float wantedNormalized;
@@ -656,7 +656,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 title += ": Level " + apartmentPlace.svSecurity.ToPercent();
                 if (apartmentPlace.svSecurity < securityCutoff)
-                    options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.svSecurity).ToString()})", upgradeSecurity));
+                    options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.svSecurity)})", upgradeSecurity));
             }
 
             player.svPlayer.SendOptionMenu(title, apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });

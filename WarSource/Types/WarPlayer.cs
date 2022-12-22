@@ -10,7 +10,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class WarSourcePlayer
     {
-        public ShPlayer player;
+        private readonly ShPlayer player;
 
         public bool changePending;
         public int spawnTerritoryIndex;
@@ -43,8 +43,10 @@ namespace BrokeProtocol.GameSource.Types
 
         public virtual bool SetTimedGoToState(Vector3 position, Quaternion rotation)
         {
-            player.GamePlayer().goToPosition = position;
-            player.GamePlayer().goToRotation = rotation;
+            var gamePlayer = player.GamePlayer();
+
+            gamePlayer.goToPosition = position;
+            gamePlayer.goToRotation = rotation;
 
             return player.svPlayer.SetState(WarCore.TimedGoTo.index);
         }

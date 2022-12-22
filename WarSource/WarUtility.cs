@@ -1,11 +1,10 @@
-﻿using BrokeProtocol.GameSource.Types;
-using BrokeProtocol.Utility;
-using BrokeProtocol.Required;
-using UnityEngine;
-using BrokeProtocol.Entities;
-using System.Collections.Generic;
-using System.Text;
+﻿using BrokeProtocol.Entities;
+using BrokeProtocol.GameSource.Types;
 using BrokeProtocol.Managers;
+using BrokeProtocol.Required;
+using BrokeProtocol.Utility;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource
 {
@@ -115,13 +114,13 @@ namespace BrokeProtocol.GameSource
             return optionIndex;
         }
 
-        public static void SendSpawnMenu(WarSourcePlayer warPlayer)
+        public static void SendSpawnMenu(ShPlayer player)
         {
-            if (!warPlayer.player.isHuman)
+            if (!player.isHuman)
                 return;
 
-            var optionIndex = GetSpawnOptions(warPlayer.player, out var options);
-            warPlayer.player.svPlayer.SendTextPanel("Spawn Select", spawnMenuID, options, optionIndex);
+            var optionIndex = GetSpawnOptions(player, out var options);
+            player.svPlayer.SendTextPanel("Spawn Select", spawnMenuID, options, optionIndex);
         }
     }
 }

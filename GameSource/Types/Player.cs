@@ -16,7 +16,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class GameSourcePlayer
     {
-        ShPlayer player;
+        private readonly ShPlayer player;
 
         public Coroutine jobCoroutine;
 
@@ -210,7 +210,7 @@ namespace BrokeProtocol.GameSource.Types
             // 'true' if message starts with command prefix
             if (CommandHandler.OnEvent(player, message)) return true;
 
-            player.svPlayer.Send(SvSendType.All, Channel.Reliable, ClPacket.GlobalChatMessage, player.ID, message);
+            player.svPlayer.Send(SvSendType.All, Channel.Reliable, ClPacket.ChatGlobal, player.ID, message);
 
             return true;
         }
@@ -229,7 +229,7 @@ namespace BrokeProtocol.GameSource.Types
             // 'true' if message starts with command prefix
             if (CommandHandler.OnEvent(player, message)) return true;
 
-            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.LocalChatMessage, player.ID, message);
+            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.ChatLocal, player.ID, message);
 
             return true;
         }
@@ -507,7 +507,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
 
                 // Remove everything except legal items currently worn
-                if (extra > 0 && (myItem.item.illegal || !(myItem.item is ShWearable w) || player.curWearables[(int)w.type].index != w.index))
+                if (extra > 0 && (myItem.item.illegal || myItem.item is not ShWearable w || player.curWearables[(int)w.type].index != w.index))
                 {
                     removedItems.Add(new InventoryItem(myItem.item, extra));
                     player.TransferItem(DeltaInv.RemoveFromMe, myItem.item.index, extra);
@@ -942,7 +942,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool TransferTrade(ShPlayer player, byte deltaType, int itemIndex, int amount)
         {
-            if (!(player.otherEntity is ShPlayer otherPlayer)) return true;
+            if (player.otherEntity is not ShPlayer otherPlayer) return true;
 
             player.TransferItem(deltaType, itemIndex, amount);
 

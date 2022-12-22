@@ -25,8 +25,8 @@ namespace BrokeProtocol.GameSource.Types
         public ShTerritory territory;
         public float lastSpeed;
         public float captureState;
-        public IDCollection<ShPlayer> players = new IDCollection<ShPlayer>();
-        public Dictionary<int, int> attackerCounts = new Dictionary<int, int>();
+        public IDCollection<ShPlayer> players = new();
+        public Dictionary<int, int> attackerCounts = new();
 
         public TerritoryState(ShTerritory territory)
         {

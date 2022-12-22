@@ -123,7 +123,7 @@ namespace BrokeProtocol.GameSource.Types
             if(destroyable.Player &&
                 WarManager.pluginPlayers.TryGetValue(destroyable.Player, out var warSourcePlayer))
             {
-                WarUtility.SendSpawnMenu(warSourcePlayer);
+                WarUtility.SendSpawnMenu(destroyable.Player);
             }
             else
             {
@@ -136,7 +136,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (warSourcePlayer != null && warSourcePlayer.SetSpawnTerritory())
                 {
-                    WarUtility.SendSpawnMenu(warSourcePlayer);
+                    WarUtility.SendSpawnMenu(destroyable.Player);
                 }
 
                 if (Time.time >= respawnTime)

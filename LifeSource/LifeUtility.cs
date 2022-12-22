@@ -142,7 +142,7 @@ namespace BrokeProtocol.GameSource
     {
         public static LifeSourcePlayer LifePlayer(this ShPlayer player) => LifeManager.pluginPlayers[player];
 
-        public static LimitQueue<ShPlayer> trySell = new LimitQueue<ShPlayer>(0, 5f);
+        public static LimitQueue<ShPlayer> trySell = new(0, 5f);
 
         public const int maxWantedLevel = 5;
         public const string starName = "Star";
