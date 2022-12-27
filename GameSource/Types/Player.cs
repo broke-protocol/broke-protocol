@@ -195,23 +195,22 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-
+        private bool ChatBoilerplate(ShPlayer player, string message, out string cleanMessage)
+        {
+            cleanMessage = message.CleanMessage();
+            Debug.Log($"[CHAT] {player.username}:{cleanMessage}");
+            return !Utility.chatted.Limit(player) && 
+                !string.IsNullOrWhiteSpace(cleanMessage) && 
+                !CommandHandler.OnEvent(player, cleanMessage);
+        }
 
         [Execution(ExecutionMode.Additive)]
         public override bool ChatGlobal(ShPlayer player, string message)
         {
-            if (Utility.chatted.Limit(player)) return true;
-
-            message = message.CleanMessage();
-
-            if (string.IsNullOrWhiteSpace(message)) return true;
-
-            Debug.Log($"[CHAT] {player.username}:{message}");
-
-            // 'true' if message starts with command prefix
-            if (CommandHandler.OnEvent(player, message)) return true;
-
-            player.svPlayer.Send(SvSendType.All, Channel.Reliable, ClPacket.ChatGlobal, player.ID, message);
+            if (ChatBoilerplate(player, message, out var cleanMessage))
+            {
+                player.svPlayer.Send(SvSendType.All, Channel.Reliable, ClPacket.ChatGlobal, player.ID, cleanMessage);
+            }
 
             return true;
         }
@@ -219,37 +218,32 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool ChatLocal(ShPlayer player, string message)
         {
-            if (Utility.chatted.Limit(player)) return true;
-
-            message = message.CleanMessage();
-
-            if (string.IsNullOrWhiteSpace(message)) return true;
-
-            Debug.Log($"[CHAT LOCAL] {player.username}:{message}");
-
-            switch (player.chatMode)
+            if (ChatBoilerplate(player, message, out var cleanMessage))
             {
-                case ChatMode.Local:
-                    player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.ChatLocal, player.ID, message);
-                    break;
-                case ChatMode.Job:
-                    foreach (var p in player.svPlayer.job.info.members)
-                    {
-                        if (p.isHuman)
+                switch (player.chatMode)
+                {
+                    case ChatMode.Local:
+                        player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.ChatLocal, player.ID, cleanMessage);
+                        break;
+                    case ChatMode.Job:
+                        foreach (var p in player.svPlayer.job.info.members)
                         {
-                            p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, message);
+                            if (p.isHuman)
+                            {
+                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, cleanMessage);
+                            }
                         }
-                    }
-                    break;
-                case ChatMode.Channel:
-                    foreach(var p in EntityCollections.Humans)
-                    {
-                        if(p.chatChannel == player.chatChannel)
+                        break;
+                    case ChatMode.Channel:
+                        foreach (var p in EntityCollections.Humans)
                         {
-                            p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, message);
+                            if (p.chatChannel == player.chatChannel)
+                            {
+                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, cleanMessage);
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
             }
 
             return true;
