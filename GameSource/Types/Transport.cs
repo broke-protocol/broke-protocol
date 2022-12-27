@@ -57,7 +57,7 @@ namespace BrokeProtocol.GameSource.Types
             yield return delay;
             while (!transport.IsDead)
             {
-                if (Time.time - transport.svTransport.collisionTime < 0.1f && transport.mainT.up.y < 0.3f || transport.isUnderwater && !(transport is ShBoat))
+                if (Time.time - transport.svTransport.collisionTime < 0.1f && transport.mainT.up.y < 0.3f || transport.isUnderwater && transport is not ShBoat)
                 {
                     transport.svTransport.Damage(DamageIndex.Null, transport.maxStat * 0.25f);
                 }

@@ -12,7 +12,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            if (!(player.svPlayer.targetEntity is ShMountable mount) || !mount.IsAccessible(player, true) || mount.occupants[0])
+            if (player.svPlayer.targetEntity is not ShMountable mount || !mount.IsAccessible(player, true) || mount.occupants[0])
             {
                 player.svPlayer.ResetAI();
                 return false;

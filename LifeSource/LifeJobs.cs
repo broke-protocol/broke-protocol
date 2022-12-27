@@ -633,7 +633,7 @@ namespace BrokeProtocol.GameSource
 
         public override void OnDamageEntity(ShEntity damaged)
         {
-            if (!(damaged is ShPlayer victim) || !IsEnemyGangster(victim))
+            if (damaged is not ShPlayer victim || !IsEnemyGangster(victim))
                 base.OnDamageEntity(damaged);
         }
 
@@ -1048,7 +1048,7 @@ namespace BrokeProtocol.GameSource
         }
 
         protected override bool ValidTarget(ShEntity target) => 
-            base.ValidTarget(target) && (target is ShPlayer p) && !p.curMount && !(p.svPlayer.job is Prisoner);
+            base.ValidTarget(target) && (target is ShPlayer p) && !p.curMount && p.svPlayer.job is not Prisoner;
 
         public override void ResetTarget()
         {
@@ -1128,7 +1128,7 @@ namespace BrokeProtocol.GameSource
 
         override protected bool ValidTarget(ShEntity target)
         {
-            if (base.ValidTarget(target) && target.IsOutside && target is ShPlayer p && p.IsMobile && !(p.svPlayer.job is Prisoner))
+            if (base.ValidTarget(target) && target.IsOutside && target is ShPlayer p && p.IsMobile && p.svPlayer.job is not Prisoner)
             {
                 if (destinationMarker)
                     return p.curMount && p.curMount == player.curMount;
@@ -1281,7 +1281,7 @@ namespace BrokeProtocol.GameSource
 
         override protected bool ValidTarget(ShEntity target)
         {
-            if (base.ValidTarget(target) && target is ShPlayer p && !(p.svPlayer.job is Prisoner))
+            if (base.ValidTarget(target) && target is ShPlayer p && p.svPlayer.job is not Prisoner)
             {
                 switch (stage)
                 {

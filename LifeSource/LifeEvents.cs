@@ -65,7 +65,7 @@ namespace BrokeProtocol.GameSource
         [CustomTarget]
         public void DrugTest(ShEntity target, ShPlayer player)
         {
-            if (!(player.svPlayer.job is Police) || !(target is ShPlayer testee) || testee.IsDead)
+            if (player.svPlayer.job is not Police || target is not ShPlayer testee || testee.IsDead)
                 return;
 
             foreach (var i in testee.injuries)

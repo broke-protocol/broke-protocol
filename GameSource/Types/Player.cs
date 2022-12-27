@@ -857,7 +857,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     if (garage is ShApartment apartment && player.ownedApartments.TryGetValue(apartment, out var place))
                     {
-                        if (ShManager.Instance.PlaceItemCount(place) >= apartment.limit ||
+                        if (SceneManager.PlaceItemCount(place) >= apartment.limit ||
                             !transport.svTransport.TryParking(place.mainDoor))
                         {
                             player.svPlayer.SendGameMessage("Cannot park in private garage");

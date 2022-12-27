@@ -537,7 +537,7 @@ namespace BrokeProtocol.GameSource
         public override void ExitState(State nextState)
         {
             base.ExitState(nextState);
-            if (!(nextState is WaypointState))
+            if (nextState != this)
             {
                 player.svPlayer.onWaypoints = false;
             }
@@ -835,7 +835,7 @@ namespace BrokeProtocol.GameSource
                 player.svPlayer.ResetAI();
                 return false;
             }
-            else if (!(player.svPlayer.targetEntity is ShPlayer targetPlayer) || !targetPlayer.IsRestrained)
+            else if (player.svPlayer.targetEntity is not ShPlayer targetPlayer || !targetPlayer.IsRestrained)
             {
                 player.svPlayer.ResetAI();
                 return false;
@@ -1050,7 +1050,7 @@ namespace BrokeProtocol.GameSource
             if (!base.UpdateState()) return false;
 
             if (player.curEquipable.index != ShManager.Instance.defibrillator.index ||
-                !(player.svPlayer.targetEntity is ShPlayer targetPlayer) || !targetPlayer.IsKnockedOut)
+                player.svPlayer.targetEntity is not ShPlayer targetPlayer || !targetPlayer.IsKnockedOut)
             {
                 player.svPlayer.ResetAI();
                 return false;
@@ -1073,7 +1073,7 @@ namespace BrokeProtocol.GameSource
             if (!base.UpdateState()) return false;
 
             if (player.curEquipable.index != ShManager.Instance.healthPack.index ||
-                !(player.svPlayer.targetEntity is ShPlayer targetPlayer) || (targetPlayer.health >= targetPlayer.maxStat))
+                player.svPlayer.targetEntity is not ShPlayer targetPlayer || (targetPlayer.health >= targetPlayer.maxStat))
             {
                 player.svPlayer.ResetAI();
                 return false;
