@@ -1,6 +1,7 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
+using BrokeProtocol.Utility.Networking;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using Pathfinding;
@@ -303,7 +304,7 @@ namespace BrokeProtocol.GameSource
             }
 
 #if TEST
-            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.LocalChatMessage, player.ID, airState.ToString());
+            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.ChatLocal, player.ID, airState.ToString());
 #endif
 
             return true;

@@ -197,7 +197,7 @@ namespace BrokeProtocol.GameSource.Types
 
 
         [Execution(ExecutionMode.Additive)]
-        public override bool GlobalChatMessage(ShPlayer player, string message)
+        public override bool ChatGlobal(ShPlayer player, string message)
         {
             if (Utility.chatted.Limit(player)) return true;
 
@@ -216,7 +216,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Additive)]
-        public override bool LocalChatMessage(ShPlayer player, string message)
+        public override bool ChatLocal(ShPlayer player, string message)
         {
             if (Utility.chatted.Limit(player)) return true;
 
