@@ -1,4 +1,5 @@
 ﻿using BrokeProtocol.API;
+using BrokeProtocol.Client.UI;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
@@ -224,85 +225,73 @@ namespace BrokeProtocol.GameSource.Types
 
             if (string.IsNullOrWhiteSpace(message)) return true;
 
-            Debug.Log($"[CHAT] {player.username}:{message}");
+            Debug.Log($"[CHAT LOCAL] {player.username}:{message}");
 
-            // 'true' if message starts with command prefix
-            if (CommandHandler.OnEvent(player, message)) return true;
-
-            player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.ChatLocal, player.ID, message);
-
-            return true;
-        }
-
-        [Execution(ExecutionMode.Additive)]
-        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
-        {
-            var player = destroyable.Player;
-            if (player.IsDead || player.svPlayer.godMode) return false;
-
-            // Still alive, do knockdown and AI retaliation
-            if (player.stance.setable)
+            switch (player.chatMode)
             {
-                if (player.isHuman && player.health < 15f)
-                {
-                    player.svPlayer.SvForceStance(StanceIndex.KnockedOut);
-                    // If knockout AI, set AI state Null
-                }
-                else if (Random.value < player.manager.damageTypes[(int)damageIndex].fallChance)
-                {
-                    player.StartCoroutine(player.svPlayer.KnockedDown());
-                }
-            }
-
-            if (attacker && attacker != player)
-            {
-                if (!player.isHuman)
-                {
-                    player.GamePlayer().SetAttackState(attacker);
-                }
-                else if (player.svPlayer.follower && attacker != player.svPlayer.follower)
-                {
-                    player.svPlayer.follower.GamePlayer().SetAttackState(attacker);
-                }
-
-                if (attacker.svPlayer.follower)
-                {
-                    attacker.svPlayer.follower.GamePlayer().SetAttackState(player);
-                }
+                case ChatMode.Local:
+                    player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.ChatLocal, player.ID, message);
+                    break;
+                case ChatMode.Job:
+                    foreach (var p in player.svPlayer.job.info.members)
+                    {
+                        if (p.isHuman)
+                        {
+                            p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, message);
+                        }
+                    }
+                    break;
+                case ChatMode.Channel:
+                    foreach(var p in EntityCollections.Humans)
+                    {
+                        if(p.chatChannel == player.chatChannel)
+                        {
+                            p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, message);
+                        }
+                    }
+                    break;
             }
 
             return true;
         }
 
-        private IEnumerator SpectateDelay(ShPlayer player, ShPlayer target)
-        {
-            yield return new WaitForSeconds(2f);
-            player.svPlayer.SvSpectate(target);
-        }
-
         [Execution(ExecutionMode.Additive)]
-        public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
+        public override bool ChatVoice(ShPlayer player, byte[] voiceData)
         {
-            var player = destroyable.Player;
-
-            if (attacker && attacker != player)
+            if (player.svPlayer.callTarget && player.svPlayer.callActive)
             {
-                if (player.isHuman) player.StartCoroutine(SpectateDelay(player, attacker));
-
-                player.svPlayer.RemoveItemsDeath(true);
+                player.svPlayer.callTarget.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceDirect, player.ID, voiceData);
             }
             else
             {
-                player.svPlayer.RemoveItemsDeath(false);
+                switch (player.chatMode)
+                {
+                    case ChatMode.Local:
+                        player.svPlayer.Send(SvSendType.LocalOthers, Channel.Unreliable, ClPacket.ChatVoice, player.ID, voiceData);
+                        break;
+                    case ChatMode.Job:
+                        foreach (var p in player.svPlayer.job.info.members)
+                        {
+                            if (p.isHuman && p != player)
+                            {
+                                p.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceDirect, player.ID, voiceData);
+                            }
+                        }
+                        break;
+                    case ChatMode.Channel:
+                        foreach (var p in EntityCollections.Humans)
+                        {
+                            if (p.chatChannel == player.chatChannel && p != player)
+                            {
+                                p.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceDirect, player.ID, voiceData);
+                            }
+                        }
+                        break;
+                }
             }
 
-            if (player.isHuman)
-            {
-                player.svPlayer.SendTimer(player.svPlayer.RespawnTime, Utility.defaultAnchor);
-            }
             return true;
         }
-
 
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
@@ -1118,6 +1107,75 @@ namespace BrokeProtocol.GameSource.Types
 
             player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
 
+            return true;
+        }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
+        {
+            var player = destroyable.Player;
+            if (player.IsDead || player.svPlayer.godMode) return false;
+
+            // Still alive, do knockdown and AI retaliation
+            if (player.stance.setable)
+            {
+                if (player.isHuman && player.health < 15f)
+                {
+                    player.svPlayer.SvForceStance(StanceIndex.KnockedOut);
+                    // If knockout AI, set AI state Null
+                }
+                else if (Random.value < player.manager.damageTypes[(int)damageIndex].fallChance)
+                {
+                    player.StartCoroutine(player.svPlayer.KnockedDown());
+                }
+            }
+
+            if (attacker && attacker != player)
+            {
+                if (!player.isHuman)
+                {
+                    player.GamePlayer().SetAttackState(attacker);
+                }
+                else if (player.svPlayer.follower && attacker != player.svPlayer.follower)
+                {
+                    player.svPlayer.follower.GamePlayer().SetAttackState(attacker);
+                }
+
+                if (attacker.svPlayer.follower)
+                {
+                    attacker.svPlayer.follower.GamePlayer().SetAttackState(player);
+                }
+            }
+
+            return true;
+        }
+
+        private IEnumerator SpectateDelay(ShPlayer player, ShPlayer target)
+        {
+            yield return new WaitForSeconds(2f);
+            player.svPlayer.SvSpectate(target);
+        }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool Death(ShDestroyable destroyable, ShPlayer attacker)
+        {
+            var player = destroyable.Player;
+
+            if (attacker && attacker != player)
+            {
+                if (player.isHuman) player.StartCoroutine(SpectateDelay(player, attacker));
+
+                player.svPlayer.RemoveItemsDeath(true);
+            }
+            else
+            {
+                player.svPlayer.RemoveItemsDeath(false);
+            }
+
+            if (player.isHuman)
+            {
+                player.svPlayer.SendTimer(player.svPlayer.RespawnTime, Utility.defaultAnchor);
+            }
             return true;
         }
     }
