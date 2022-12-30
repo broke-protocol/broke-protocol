@@ -219,11 +219,9 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (ChatBoilerplate(player, message, out var cleanMessage))
             {
-                var taggedMessage = $"<{player.chatMode}> {cleanMessage}";
-
                 switch (player.chatMode)
                 {
-                    case ChatMode.Local:
+                    case ChatMode.Public:
                         player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.ChatLocal, player.ID, cleanMessage);
                         break;
                     case ChatMode.Job:
@@ -231,7 +229,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             if (p.isHuman)
                             {
-                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, taggedMessage);
+                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatJob, player.ID, cleanMessage);
                             }
                         }
                         break;
@@ -240,7 +238,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             if (p.chatChannel == player.chatChannel)
                             {
-                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, taggedMessage);
+                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatChannel, player.ID, cleanMessage);
                             }
                         }
                         break;
@@ -261,7 +259,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 switch (player.chatMode)
                 {
-                    case ChatMode.Local:
+                    case ChatMode.Public:
                         player.svPlayer.Send(SvSendType.LocalOthers, Channel.Unreliable, ClPacket.ChatVoice, player.ID, voiceData);
                         break;
                     case ChatMode.Job:
