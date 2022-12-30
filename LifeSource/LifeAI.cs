@@ -1,5 +1,4 @@
-﻿using BrokeProtocol.GameSource.Types;
-using BrokeProtocol.Utility;
+﻿using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using System.Linq;
 using UnityEngine;
@@ -44,8 +43,7 @@ namespace BrokeProtocol.GameSource
                     {
                         if (Random.value < 0.25f)
                         {
-                            var randomCount = Random.Range(1, i.count);
-                            player.TransferItem(DeltaInv.OtherToMe, i.item, randomCount);
+                            player.TransferItem(DeltaInv.OtherToMe, i.item, Random.Range(1, i.count + 1));
                         }
                     }
                     player.otherEntity = null;

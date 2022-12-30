@@ -1,5 +1,4 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.Client.UI;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
@@ -220,6 +219,8 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (ChatBoilerplate(player, message, out var cleanMessage))
             {
+                var taggedMessage = $"<{player.chatMode}> {cleanMessage}";
+
                 switch (player.chatMode)
                 {
                     case ChatMode.Local:
@@ -230,7 +231,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             if (p.isHuman)
                             {
-                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, cleanMessage);
+                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, taggedMessage);
                             }
                         }
                         break;
@@ -239,7 +240,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             if (p.chatChannel == player.chatChannel)
                             {
-                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, cleanMessage);
+                                p.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.ChatGlobal, player.ID, taggedMessage);
                             }
                         }
                         break;
@@ -254,7 +255,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.svPlayer.callTarget && player.svPlayer.callActive)
             {
-                player.svPlayer.callTarget.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceDirect, player.ID, voiceData);
+                player.svPlayer.callTarget.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceCall, player.ID, voiceData);
             }
             else
             {
@@ -268,7 +269,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             if (p.isHuman && p != player)
                             {
-                                p.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceDirect, player.ID, voiceData);
+                                p.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceJob, player.ID, voiceData);
                             }
                         }
                         break;
@@ -277,7 +278,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             if (p.chatChannel == player.chatChannel && p != player)
                             {
-                                p.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceDirect, player.ID, voiceData);
+                                p.svPlayer.Send(SvSendType.Self, Channel.Unreliable, ClPacket.ChatVoiceChannel, player.ID, voiceData);
                             }
                         }
                         break;
