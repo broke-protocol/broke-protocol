@@ -222,7 +222,7 @@ namespace BrokeProtocol.GameSource.Types
                 switch (player.chatMode)
                 {
                     case ChatMode.Public:
-                        player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.ChatLocal, player.ID, cleanMessage);
+                        player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.ChatLocal, player.ID, cleanMessage);
                         break;
                     case ChatMode.Job:
                         foreach (var p in player.svPlayer.job.info.members)
