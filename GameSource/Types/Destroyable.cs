@@ -20,11 +20,13 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Additive)]
-        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
+        public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
         {
-            if (destroyable.IsDead) return false;
+            if (damageable.IsDead) return false;
 
-            var player = destroyable.Player;
+            var destroyable = damageable as ShDestroyable;
+
+            var player = damageable.Player;
 
             if (player)
             {
@@ -100,16 +102,16 @@ namespace BrokeProtocol.GameSource.Types
             {
                 destroyable.Die(attacker);
             }
-            else if (attacker && attacker != destroyable)
+            else if (attacker && attacker != damageable)
             {
-                var controller = destroyable.Controller;
+                var controller = damageable.Controller;
 
-                if (controller && controller != destroyable && !controller.isHuman && !controller.svPlayer.currentState.IsBusy)
+                if (controller && controller != damageable && !controller.isHuman && !controller.svPlayer.currentState.IsBusy)
                 {
                     controller.GamePlayer().SetAttackState(attacker);
                 }
                 
-                attacker.svPlayer.job.OnDamageEntity(destroyable);
+                attacker.svPlayer.job.OnDamageEntity(damageable);
             }
 
             destroyable.svDestroyable.UpdateHealth(source, hitPoint);

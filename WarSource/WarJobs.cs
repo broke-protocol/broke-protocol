@@ -44,24 +44,18 @@ namespace BrokeProtocol.GameSource
 
         protected bool IsEnemy(ShPlayer target) => this != target.svPlayer.job;
 
-        protected bool TryFindMount()
-        {
-            return player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShMountable p && (p is ShMovable || p.HasWeapons) && p.IsAccessible(player, true) && !p.occupants[0],
-                (e) =>
+        protected bool TryFindMount() => player.svPlayer.LocalEntitiesOne(
+                e => e is ShMountable p && (p is ShMovable || p.HasWeapons) && p.IsAccessible(player, true) && !p.occupants[0],
+                e =>
                 {
                     player.svPlayer.targetEntity = e;
                     return player.svPlayer.SetState(WarCore.Mount.index);
                 });
-        }
 
-        protected bool TryFindLeader()
-        {
-            return player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.curMount && !p.svPlayer.follower && 
+        protected bool TryFindLeader() => player.svPlayer.LocalEntitiesOne(
+                e => e is ShPlayer p && !p.curMount && !p.svPlayer.follower &&
                 p.svPlayer.leader != player && p.IsMobile,
-                (e) => player.WarPlayer().SetTimedFollowState(e as ShPlayer));
-        }
+                e => player.WarPlayer().SetTimedFollowState(e as ShPlayer));
 
         public override void ResetJobAI()
         {
@@ -166,7 +160,7 @@ namespace BrokeProtocol.GameSource
         }
 
         public void TryFindEnemy() => player.svPlayer.LocalEntitiesOne(
-                (e) =>
+                e =>
                 {
                     var p = e.Player;
                     if (p && p.IsCapable && IsEnemy(p) && player.CanSeeEntity(e, true))
@@ -181,7 +175,7 @@ namespace BrokeProtocol.GameSource
                     }
                     return false;
                 },
-                (e) => player.GamePlayer().SetAttackState(e));
+                e => player.GamePlayer().SetAttackState(e));
 
         public override void OnDestroyEntity(ShEntity destroyed)
         {

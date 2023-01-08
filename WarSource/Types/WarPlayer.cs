@@ -71,8 +71,8 @@ namespace BrokeProtocol.GameSource.Types
     {
         // PreEvent test to disable Friendly Fire
         [Execution(ExecutionMode.PreEvent)]
-        public override bool Damage(ShDestroyable destroyable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint) =>
-            !WarDestroyable.FriendlyFire(destroyable, attacker);
+        public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint) =>
+            !WarDestroyable.FriendlyFire(damageable, attacker);
 
         [Execution(ExecutionMode.Override)]
         public override bool ResetAI(ShPlayer player)

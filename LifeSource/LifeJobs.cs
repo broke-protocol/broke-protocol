@@ -144,27 +144,21 @@ namespace BrokeProtocol.GameSource
 
     public class Citizen : JobLife
     {
-        protected void TryFindInnocent()
-        {
-            player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.curMount && !p.IsDead && p.IsRestrained && p.LifePlayer().wantedLevel == 0 && player.CanSeeEntity(e),
-                (e) =>
+        protected void TryFindInnocent() => player.svPlayer.LocalEntitiesOne(
+                e => e is ShPlayer p && !p.curMount && !p.IsDead && p.IsRestrained && p.LifePlayer().wantedLevel == 0 && player.CanSeeEntity(e),
+                e =>
                 {
                     player.svPlayer.targetEntity = e;
                     return player.svPlayer.SetState(Core.Free.index);
                 });
-        }
 
-        public void TryFindVictim()
-        {
-            player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && !p.curMount && p.IsCapable && player.CanSeeEntity(e),
-                (e) =>
+        public void TryFindVictim() => player.svPlayer.LocalEntitiesOne(
+                e => e is ShPlayer p && !p.curMount && p.IsCapable && player.CanSeeEntity(e),
+                e =>
                 {
                     player.svPlayer.targetEntity = e;
                     return player.svPlayer.SetState(LifeCore.Rob.index);
                 });
-        }
 
         public override void Loop()
         {
@@ -213,11 +207,9 @@ namespace BrokeProtocol.GameSource
             base.RemoveJob();
         }
 
-        protected void TryFindBounty()
-        {
-            player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e, true),
-                (e) =>
+        protected void TryFindBounty() => player.svPlayer.LocalEntitiesOne(
+                e => e is ShPlayer p && (p.svPlayer.job is SpecOps || bounties.ContainsKey(p.username)) && player.CanSeeEntity(e, true),
+                e =>
                 {
                     // Add random crimes to ensure high wanted level (targetable by SpecOps)
                     while (player.LifePlayer().wantedLevel < 3)
@@ -226,7 +218,6 @@ namespace BrokeProtocol.GameSource
                     }
                     return player.GamePlayer().SetAttackState(e);
                 });
-        }
 
         public override void OnDestroyEntity(ShEntity destroyed)
         {
@@ -456,16 +447,13 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        protected void TryFindKnockedOut()
-        {
-            player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && p.IsKnockedOut,
-                (e) =>
+        protected void TryFindKnockedOut() => player.svPlayer.LocalEntitiesOne(
+                e => e is ShPlayer p && p.IsKnockedOut,
+                e =>
                 {
                     player.svPlayer.targetEntity = e;
                     return player.svPlayer.SetState(Core.Revive.index);
                 });
-        }
 
         public override void Loop()
         {
@@ -509,16 +497,13 @@ namespace BrokeProtocol.GameSource
 
     public class Firefighter : TargetEntityJob
     {
-        public void TryFindFire()
-        {
-            player.svPlayer.LocalEntitiesOne(
-                (e) => e.gameObject.layer == LayerIndex.fire && player.CanSeeEntity(e),
-                (e) =>
+        public void TryFindFire() => player.svPlayer.LocalEntitiesOne(
+                e => e.gameObject.layer == LayerIndex.fire && player.CanSeeEntity(e),
+                e =>
                 {
                     player.svPlayer.targetEntity = e;
                     return player.svPlayer.SetState(Core.Extinguish.index);
                 });
-        }
 
         public override void Loop()
         {
@@ -576,13 +561,10 @@ namespace BrokeProtocol.GameSource
     {
         protected int gangstersKilled;
 
-        public void TryFindEnemyGang()
-        {
-            player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && p.IsCapable && p.svPlayer.job is Gangster &&
+        public void TryFindEnemyGang() => player.svPlayer.LocalEntitiesOne(
+                e => e is ShPlayer p && p.IsCapable && p.svPlayer.job is Gangster &&
                         p.svPlayer.job.info.shared.jobIndex != info.shared.jobIndex && player.CanSeeEntity(e, true),
-                (e) => player.GamePlayer().SetAttackState(e));
-        }
+                e => player.GamePlayer().SetAttackState(e));
 
         public override void Loop()
         {
@@ -972,9 +954,9 @@ namespace BrokeProtocol.GameSource
         protected void TryFindCriminal()
         {
             player.svPlayer.LocalEntitiesOne(
-                (e) => e is ShPlayer p && p.IsCapable && p.LifePlayer().wantedLevel >= AttackLevel 
+                e => e is ShPlayer p && p.IsCapable && p.LifePlayer().wantedLevel >= AttackLevel 
                 && Random.value < p.LifePlayer().wantedNormalized && player.CanSeeEntity(e, true),
-                (e) => player.GamePlayer().SetAttackState(e));
+                e => player.GamePlayer().SetAttackState(e));
         }
 
         protected override void FoundTarget(bool startGoalMarker)
