@@ -17,6 +17,8 @@ namespace BrokeProtocol.GameSource.Types
             if (damageIndex == DamageIndex.Gun)
                 radius *= 10f;
 
+            radius = Mathf.Min(8, radius); // Clamp damage radius to reduce calculations
+
             voxel.DamageVoxels(voxel.GetSphere(ShVoxel.ToInt3(voxel.mainT.InverseTransformPoint(hitPoint + 0.001f * (hitPoint - source).normalized)), radius), amount);
 
             return true;
