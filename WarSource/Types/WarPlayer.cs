@@ -141,6 +141,7 @@ namespace BrokeProtocol.GameSource.Types
                     Manager.territories[index].ownerIndex == player.svPlayer.spawnJobIndex)
                 {
                     player.WarPlayer().spawnTerritoryIndex = index;
+                    WarUtility.SendSpawnMenu(player);
                 }
             }
 

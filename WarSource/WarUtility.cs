@@ -120,7 +120,8 @@ namespace BrokeProtocol.GameSource
                 return;
 
             var optionIndex = GetSpawnOptions(player, out var options);
-            player.svPlayer.SendTextPanel("Spawn Select", spawnMenuID, options, optionIndex);
+
+            player.svPlayer.SendTextPanel("Spawn Select:\n" + GetTerritoryName(player.WarPlayer().spawnTerritoryIndex), spawnMenuID, options, optionIndex);
         }
     }
 }
