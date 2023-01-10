@@ -19,7 +19,7 @@ namespace BrokeProtocol.GameSource.Types
 
             radius = Mathf.Min(8, radius); // Clamp damage radius to reduce calculations
 
-            voxel.DamageVoxels(voxel.GetSphere(ShVoxel.ToInt3(voxel.mainT.InverseTransformPoint(hitPoint + 0.001f * (hitPoint - source).normalized)), radius), amount);
+            voxel.DamageVoxels(voxel.GetSphere(ShVoxel.ToInt3(voxel.mainT.InverseTransformPoint(hitPoint + 0.01f * (hitPoint - source).normalized)), radius), amount);
 
             return true;
         }
