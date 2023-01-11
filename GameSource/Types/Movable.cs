@@ -47,7 +47,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (entity.svEntity.randomSpawn)
             {
-                entity.svEntity.Despawn(true);
+                entity.svEntity.Deactivate(true);
             }
             else
             {

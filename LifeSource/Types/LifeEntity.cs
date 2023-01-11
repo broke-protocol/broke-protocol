@@ -44,7 +44,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (e.svEntity.randomSpawn && e.svEntity.spectators.Count == 0 && (!e.Player || !e.Player.svPlayer.currentState.IsBusy) && !e.svEntity.sector.HumanControlled())
             {
-                e.svEntity.Despawn(true);
+                e.svEntity.Deactivate(true);
             }
 
             return true;
