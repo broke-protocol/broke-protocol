@@ -20,7 +20,7 @@ namespace BrokeProtocol.GameSource
             
             // Don't use SvTryMount since it will just enter the closest seat
             // Do it this way to force driver's seat
-            if(player.CanMount(mount, true, true, out _) && player.InActionRange(mount))
+            if(player.InActionRange(mount))
             {
                 player.svPlayer.SvMount(mount, 0);
                 return false;
