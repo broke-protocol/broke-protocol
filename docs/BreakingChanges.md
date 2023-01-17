@@ -1,3 +1,23 @@
+## 1.35
+?> The Destruction Update adds a new class of events for Voxels. Also there's a public API on the new ShVoxel class if you want to manipulate them at runtime. Chat handling is also changed to account for a new ChatMode set for each player that decides whether their voice/message will go Public, Job, or Private Channel when using LocalChat.
+
+### API
+* New Voxel event class added (More events coming later)
+* Fixed some missing namespaces
+* Use HashSet for command lookups
+* Mount event implementation moved to GameSource
+* Some ShGun parameters/functions moved up to ShWeapon base class
+* Global/LocalChatMessage events & packets renamed to ChatGlobal/Local
+* New ChatVoice event added
+* New handling for ChatLocal messages depending on SvPlayer.chatMode
+* SvPlayer.ResetZoom renamed to ResetMode
+* Net serializer now supports ushort, int3, and Color32 for new features
+* PlaceItemCount moved to SceneManager
+* Heightmaps data update ('pngBytes'->'heightmapData' to update old maps)
+* New 'Always Visible' Entity parameter (entities always loaded on clients)
+* SvEntity.Despawn() renamed to Deactivate() for consistency
+* GameSource fix for dead NPCs stuck in vehicles
+
 ## 1.3
 ?> The War Update splits the game up into 3 different plugins. GameSource now contains only core logic related to connections, AI, damage, inventories, etc. LifeSource contains everything related to crimes, jails, RP Jobs, and random AI traffic spawning. The new WarSource plugin adds a new territory capture game mode, new login flow, and AI that can battle in team-based combat. Each plugin uses it's own Extended Player class but all its methods are virtual. You can extend these classes in your own plugin or override their existing behavior. If you want to change behavior or add your own hooks to those methods, make sure you Override the PlayerInitialize event and insert your own class into the pluginPlayer dictionary.
 ?? Also new are the 'Events' abstract classes. These are ManagerEvents, EntityEvents, MountableEvents, DestroyableEvents, PhysicalEvents, MovableEvents, and PlayerEvents. Override methods in each class to add your own behavior instead of using the old [Target] attributes. This should help you see what's available for modding and their exact parameters. You can use the new [Execution] attribute to change how the methods are called.
