@@ -194,10 +194,10 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        private bool ChatBoilerplate(ShPlayer player, string message, out string cleanMessage)
+        private bool ChatBoilerplate(ShPlayer player, string prefix, string message, out string cleanMessage)
         {
+            Debug.Log($"{prefix} {player.username}: {message}");
             cleanMessage = message.CleanMessage();
-            Debug.Log($"[CHAT] {player.username}:{cleanMessage}");
             return !Utility.chatted.Limit(player) && 
                 !string.IsNullOrWhiteSpace(cleanMessage) && 
                 !CommandHandler.OnEvent(player, cleanMessage);
@@ -206,18 +206,19 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool ChatGlobal(ShPlayer player, string message)
         {
-            if (ChatBoilerplate(player, message, out var cleanMessage))
+            if (ChatBoilerplate(player, "[GLOBAL]", message, out var cleanMessage))
             {
                 player.svPlayer.Send(SvSendType.All, Channel.Reliable, ClPacket.ChatGlobal, player.ID, cleanMessage);
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         [Execution(ExecutionMode.Additive)]
         public override bool ChatLocal(ShPlayer player, string message)
         {
-            if (ChatBoilerplate(player, message, out var cleanMessage))
+            if (ChatBoilerplate(player, "[LOCAL]", message, out var cleanMessage))
             {
                 switch (player.chatMode)
                 {
@@ -243,9 +244,10 @@ namespace BrokeProtocol.GameSource.Types
                         }
                         break;
                 }
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         [Execution(ExecutionMode.Additive)]
