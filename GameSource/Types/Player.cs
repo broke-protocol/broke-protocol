@@ -196,8 +196,8 @@ namespace BrokeProtocol.GameSource.Types
 
         private bool ChatBoilerplate(ShPlayer player, string prefix, string message, out string cleanMessage)
         {
-            Debug.Log($"{prefix} {player.username}: {message}");
             cleanMessage = message.CleanMessage();
+            Debug.Log($"{prefix} {player.username}: {cleanMessage}");
             return !Utility.chatted.Limit(player) && 
                 !string.IsNullOrWhiteSpace(cleanMessage) && 
                 !CommandHandler.OnEvent(player, cleanMessage);
@@ -1093,14 +1093,13 @@ namespace BrokeProtocol.GameSource.Types
 
             player.SetStance(StanceIndex.Stand);
             player.Dismount();
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
 
             // Start locking behavior after exiting vehicle
             if (player.curEquipable.ThrownHasGuidance)
             {
                 player.svPlayer.StartLocking(player.curEquipable);
             }
-
-            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
 
             return true;
         }
