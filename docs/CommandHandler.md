@@ -2,7 +2,7 @@
 
 This document will explain how to create a command, register one, and use it along with the GroupManager to only allow it for specific groups.
 
-See `CustomEvents.cs` in [GameSource](https://github.com/broke-protocol/source/blob/master/BP-GameSource/Types/CustomEvents.cs) for an example.
+See `Commands.cs` in [GameSource](https://github.com/broke-protocol/broke-protocol/blob/master/GameSource/Commands.cs) for an example.
 
 Define your custom commands within an IScript class. The first input parameter must be an ShPlayer type (since the command will always send the calling player as a parameter). Optional/Default parameters you define will also be optional in-game. Any string parameters with spaces should start and end with double-quotes when called: `/ban "John Smith" "Some Reason"`.
 
