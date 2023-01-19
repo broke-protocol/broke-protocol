@@ -74,26 +74,26 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-
-        
+        // Return value isn't used anywhere, just for testing API support
         [CustomTarget]
-        public void ButtonPush(ShEntity target, ShPlayer caller)
+        public bool ButtonPush(ShEntity target, ShPlayer caller)
         {
             const int cost = 500;
 
             if (caller.MyMoneyCount < cost)
             {
                 caller.svPlayer.SendGameMessage("Not enough cash");
-                return;
+                return false;
             }
 
             if (!StartSlowMotion(caller))
             {
                 caller.svPlayer.SendGameMessage("Do not challenge the void");
-                return;
+                return false;
             }
 
             caller.TransferMoney(DeltaInv.RemoveFromMe, cost);
+            return true;
         }
 
         private static bool slowMotion;
