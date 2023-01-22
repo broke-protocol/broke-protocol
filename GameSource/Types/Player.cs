@@ -6,6 +6,7 @@ using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using BrokeProtocol.Utility.Networking;
+using ENet;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -285,6 +286,22 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
+            return true;
+        }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool SetChatMode(ShPlayer player, ChatMode chatMode)
+        {
+            player.chatMode = chatMode;
+            player.svPlayer.Send(SvSendType.Self, PacketFlags.Reliable, ClPacket.SetChatMode, (byte)player.chatMode);
+            return true;
+        }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool SetChatChannel(ShPlayer player, ushort channel)
+        {
+            player.chatChannel = channel;
+            player.svPlayer.Send(SvSendType.Self, PacketFlags.Reliable, ClPacket.SetChatChannel, channel);
             return true;
         }
 
