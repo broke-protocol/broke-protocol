@@ -1,3 +1,11 @@
+## 1.36
+?> The UI Update adds events related to changing ChatMode and ChatChannel so the server can override or block that behavior. Also, some old client packets were removed to prevent misuse (by me). But the gap in the ClPacket enum changed a bunch of packet IDs so any plugin sending packets directly (SvPlayer.Send(...)) will likely need rebuilding.
+
+### API
+* Removed old SerializedAttachments/Wearables client packets
+* Modded Underbarrel Attachments can adjust default 'Setting'
+* SetChatChannel and SetChatMode events added to GameSource
+
 ## 1.35
 ?> The Destruction Update adds a new class of events for Voxels. Also there's a public API on the new ShVoxel class if you want to manipulate them at runtime. Chat handling is also changed to account for a new ChatMode set for each player that decides whether their voice/message will go Public, Job, or Private Channel when using LocalChat.
 
@@ -182,85 +190,3 @@
     - Vehicles don't need to be updated (automatically handled)
 - Clothing/Wearables don't need colliders set anymore
     - It's fine if old mods have them though they will be duplicated
-
-## 1.12
-?> The Apartment Raiding Update changes some API related to Jails, Animation functions/packets, and AI states but most changes just add new functionality. New events related to Inventories and DestroySelf (suicide) could be useful. Servers can now request to open URLs on clients and a new class of ShSecurity items are added.
-
-### API
-- Multiple jails support: SceneManager.Instance.jail => svManager.jails
-    - Use svManager.jails.GetRandom() to pick randomly from all jails
-- Added svPlayer.SvOpenURL(string url, string title)
-- Added svPlayer.StartHackingMenu(string title, int targetID, string menuID, string optionID, float difficulty)
-- Renamed all SvAnimate*() functions to SvAnimator*() for consistency
-- Removed trySell and chatted LimitQueues for cooldown timers, define your own like in GameSource
-- SvAnimator*() functions moved to SvEntity base class so it can be called on any Entity with an Animator component
-- SvAnimatorEnabled(bool enabled) function added
-- Added GameSource Events:
-    - DestroyableDestroySelf
-    - PlayerDestroySelf (Suicide)
-    - EntityTransferItem
-    - PlayerTransferItem
-    - PlayerHackFinished
-
-### MODDING
-- ProcessOptions now also take an equipableName for auto-checking/equiping an item during a Processing (leave blank to use 'Hands', backwards compatible)
-- Added vehicle/mount stances for modding: StandStill, CrouchStill, StandFixed, CrouchFixed
-
-### Misc
-- BUG: Players invited to Apartments will trigger trespassing crimes if detected by Security items. Will fix soon.
-
-## 1.12 Hotfix #3
-?> Coroutines (loops that perform continuous non-blocking work) on Entities were piling up on every respawn. The effect was server performance degration after significant uptime. Now all coroutines on Entities are cleared at the start of every Spawn() call. So if you had job coroutines or similar started on an Entities before, use Respawn events or the new Job.OnSpawn() callback to start them fresh each time.
-
-### API
-- Added Job.OnSpawn() virtual method
-- ShPlayer.RemoveItemsJail() -> SvPlayer.RemoveItemsJail()
-- ShPlayer.RemoveItemsDeath() -> SvPlayer.RemoveItemsDeath(bool dropItems)
-- Briefcase drop logic moved from PlayerDeath event to PlayerRemoveItemsDeath event
-- Job.OnDamageEntity and Job.OnDestroyEntity have their crime handling added to GameSource
-
-## 1.12
-?> The 2021 Update introduces a jumble of minor changes and additions. Adds API around user input: Apartment Security Panel code in GameSource serves as an example. New animation Packets/Functions to run custom character animations on clients. New GameSource events and functions around spectate functionality added.
-
-### API
-- Removed Channel.Fragmented: Channel.Reliable can now support large packets in the same way
-- Added svPlayer.SvSpectate(ShPlayer target)
-- Added svPlayer.SendInputMenu(...)
-- player.looking -> player.pointing
-- Added GameSource Player Events:
-    - OnSubmitInput: When a player submits input via the new text input API
-    - OnPoint: When a player starts/stops pointing (point location as argument)
-    - OnAlert: When a player hits the alert button (whistling/beeping)
-    - OnReady: When player is first spawned and ready (Sends ServerInfo window in GameSource)
-
-### MODDING
-- Custom Player animation parameters can now be set on clients to trigger custom animations
-    - SvPlayer.SvAnimateFloat(string parameterName, float value)
-    - SvPlayer.SvAnimateInt(string parameterName, int value)
-    - SvPlayer.SvAnimateBool(string parameterName, bool value)
-    - SvPlayer.SvAnimateTrigger(string parameterName)
-- Support for poisonous consumable mods (set negative health boost)
-
-### Misc
-- SvRestore has new optional interior/parent argument
-
-## 1.11
-?> The AI Overhaul Update. Adds API methods and Events around player display names. Minor naming changes and useful helper functions added as well.
-
-### API
-- Added GameSource Player Event: OnDisplayName -> Custom formatting for displayed names across playerlist, overhead, and chat on join
-- Added svPlayer.SvUpdateDisplayName() -> Change and sync display name updates at runtime to all clients - Color codes supported
-- Helper functions to iterate and test local entities (Used in GameSource Jobs as an example)
-    - svEntity.LocalEntitiesAll(Test, Action) -> Perform Test and Action (if true) on all entities in rendering range
-    - svEntity.LocalEntitiesOne(Test, Action) -> Same as above but stops at the first entity that Test == true
-- entity.GetVelocity() -> entity.Velocity
-- player.fullname -> player.displayName
-
-### MODDING
-- Fixed longstanding issues with splines and heightmaps - loaded correctly now
-- Larger map/asset sizes are supported now
-
-### Misc
-- Color codes for OptionMenu and TextMenu are supported across all options and menu titles too
-- Don't use svPlayer.SetState(StateIndex.Attack) anymore
-    - Use svPlayer.SetAttackState() and svPlayer.SetFollowState() helper functions
