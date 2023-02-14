@@ -943,8 +943,9 @@ namespace BrokeProtocol.GameSource
         {
             var target = player.svPlayer.spawner;
 
-            if (target && target.IsOutside && target.LifePlayer().wantedLevel >= AttackLevel &&
-                Random.value < target.LifePlayer().wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
+            // Use TryGetValue since spawner mightve exited server but 'target' reference is not destroyed until a frame later
+            if (target && target.IsOutside && LifeManager.pluginPlayers.TryGetValue(target, out var lifePlayer) && lifePlayer.wantedLevel >= AttackLevel &&
+                Random.value < lifePlayer.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
             {
                 return player.GamePlayer().SetAttackState(target);
             }
