@@ -15,7 +15,7 @@ namespace BrokeProtocol.GameSource.Types
 
         // PreEvent test to disable Friendly Fire
         [Execution(ExecutionMode.PreEvent)]
-        public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint) => 
+        public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 hitPoint, Vector3 hitNormal) => 
             !FriendlyFire(damageable, attacker);
     }
 }

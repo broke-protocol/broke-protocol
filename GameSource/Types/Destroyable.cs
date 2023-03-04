@@ -2,6 +2,7 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
+using BrokeProtocol.Utility;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -20,7 +21,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Additive)]
-        public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 source, Vector3 hitPoint)
+        public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 hitPoint, Vector3 hitNormal)
         {
             if (damageable.IsDead) return false;
 
@@ -114,7 +115,18 @@ namespace BrokeProtocol.GameSource.Types
                 attacker.svPlayer.job.OnDamageEntity(damageable);
             }
 
-            destroyable.svDestroyable.UpdateHealth(source, hitPoint);
+            var damageSourceType = Util.DamageSourceMap[(int)damageIndex];
+
+            Vector3 source;
+
+            if (damageSourceType == Util.DamageSource.HitPoint)
+                source = hitPoint;
+            else if (damageSourceType == Util.DamageSource.Attacker && attacker)
+                source = attacker.GetOrigin;
+            else
+                source = default;
+
+            destroyable.svDestroyable.UpdateHealth(source);
 
             return true;
         }
