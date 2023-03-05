@@ -18,15 +18,9 @@ namespace BrokeProtocol.GameSource.Types
             if (damageIndex == DamageIndex.Gun)
                 radius *= 10f;
 
-            radius = Mathf.Clamp(radius, 0f, 8f);
+            radius = Mathf.Min(radius, 8f);
 
-            var localNormal = voxel.mainT.InverseTransformDirection(hitNormal) * Util.SQRT3 / 3f;
-            localNormal.Scale(new Vector3(
-                Mathf.Abs(voxel.mainT.localScale.x),
-                Mathf.Abs(voxel.mainT.localScale.y),
-                Mathf.Abs(voxel.mainT.localScale.z)));
-
-            voxel.DamageVoxels(voxel.GetSphere(ShVoxel.ToInt3(voxel.mainT.InverseTransformPoint(hitPoint - voxel.mainT.TransformDirection(localNormal))), radius), amount);
+            voxel.DamageVoxels(voxel.GetSphere(voxel.GetHitPoint(hitPoint, hitNormal, -0.5f), radius), amount);
 
             return true;
         }
