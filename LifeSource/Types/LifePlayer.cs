@@ -17,7 +17,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class LifeSourcePlayer
     {
-        private readonly ShPlayer player;
+        public readonly ShPlayer player;
 
         public bool trespassing;
 
