@@ -1,7 +1,6 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
 using BrokeProtocol.Required;
-using BrokeProtocol.Utility;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types

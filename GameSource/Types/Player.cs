@@ -878,6 +878,45 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
+        [Execution(ExecutionMode.Additive)]
+        public override bool Tow(ShPlayer player, bool setting)
+        {
+            var transport = player.GetControlled as ShTransport;
+
+            if (transport)
+            {
+                if (setting)
+                {
+                    if (transport && transport.FindTowable(out var towable))
+                    {
+                        if (towable.positionRB.mass > transport.positionRB.mass)
+                        {
+                            player.svPlayer.SendGameMessage("Towable vehicle is too heavy");
+                        }
+                        else if(transport.svTransport.TryTowing(towable))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            player.svPlayer.SendGameMessage("Towable vehicle cannot be positioned");
+                        }
+                    }
+                    else
+                    {
+                        player.svPlayer.SendGameMessage("No valid towable");
+                    }
+                }
+                else // Stop towing
+                {
+                    transport.Tow(null);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private bool IsDoorAccessible(ShPlayer player, ShDoor door)
         {
             if (door.svDoor.key && !player.HasItem(door.svDoor.key))
