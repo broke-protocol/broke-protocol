@@ -560,22 +560,19 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
 
-                if (player.IsDriving && player.curMount is ShEmergencyVehicle vehicle && vehicle.siren &&
+                if (player.IsDriving(out var mount) && mount is ShEmergencyVehicle vehicle && vehicle.siren &&
                     Physics.Raycast(
                         vehicle.mainT.TransformPoint(vehicle.svTransport.frontOffset),
                         vehicle.mainT.forward,
                         out var raycastHit,
                         50f,
-                        MaskIndex.physical))
+                        MaskIndex.physical) && raycastHit.collider.TryGetComponent(out ShTransport otherTransport))
                 {
-                    if (raycastHit.collider.TryGetComponent(out ShTransport otherTransport))
+                    var otherDriver = otherTransport.controller;
+                    if (otherDriver && !otherDriver.isHuman && !otherDriver.svPlayer.targetEntity &&
+                        otherDriver.svPlayer.currentState.index != LifeCore.PullOver.index)
                     {
-                        var otherDriver = otherTransport.controller;
-                        if (otherDriver && !otherDriver.isHuman && !otherDriver.svPlayer.targetEntity &&
-                            otherDriver.svPlayer.currentState.index != LifeCore.PullOver.index)
-                        {
-                            otherDriver.svPlayer.SetState(LifeCore.PullOver.index);
-                        }
+                        otherDriver.svPlayer.SetState(LifeCore.PullOver.index);
                     }
                 }
 

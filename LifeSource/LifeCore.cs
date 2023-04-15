@@ -93,7 +93,8 @@ namespace BrokeProtocol.GameSource
                 }),
             */
 
-        private List<MyJobInfo> GetJobs => new List<MyJobInfo> {
+        private List<MyJobInfo> GetJobs => new()
+        {
             new MyJobInfo(
                 typeof(Citizen), "Citizen",
                 "Get money by robbing, looting, and trading with NPCs and players or get a job by visiting map icons",

@@ -31,10 +31,10 @@ namespace BrokeProtocol.GameSource.Types
 
     public class WaypointGroup
     {
-        private WaypointType waypointType;
-        private float spawnRate;
+        private readonly WaypointType waypointType;
+        private readonly float spawnRate;
 
-        public readonly Dictionary<ValueTuple<int, Vector2Int>, List<Spawn>> spawns = new Dictionary<ValueTuple<int, Vector2Int>, List<Spawn>>();
+        public readonly Dictionary<ValueTuple<int, Vector2Int>, List<Spawn>> spawns = new();
 
 
         public WaypointGroup(WaypointType waypointType, float spawnRate)
@@ -174,7 +174,7 @@ namespace BrokeProtocol.GameSource.Types
 
     public class LifeManager : ManagerEvents
     {
-        public static Dictionary<ShEntity, LifeSourcePlayer> pluginPlayers = new Dictionary<ShEntity, LifeSourcePlayer>();
+        public static Dictionary<ShEntity, LifeSourcePlayer> pluginPlayers = new();
 
         public static readonly WaypointGroup[] worldWaypoints = new WaypointGroup[]
         {
@@ -185,7 +185,7 @@ namespace BrokeProtocol.GameSource.Types
         };
         
         [NonSerialized]
-        public static List<ServerTrigger> jails = new List<ServerTrigger>();
+        public static List<ServerTrigger> jails = new();
 
         private static float endTime;
         private static int attackerLimit;

@@ -31,7 +31,8 @@ namespace BrokeProtocol.GameSource
         public override bool UpdateState()
         {
             if (!base.UpdateState()) return false;
-            if (player.IsPassenger) player.svPlayer.LookAt(player.curMountT.rotation);
+            if (player.IsPassenger(out _))
+                player.svPlayer.LookAt(player.curMountT.rotation);
             return true;
         }
     }
@@ -399,7 +400,7 @@ namespace BrokeProtocol.GameSource
 
             var controlled = player.GetControlled;
 
-            if (!player.IsPassenger && Time.time > nextCheckTime)
+            if (!player.IsPassenger(out _) && Time.time > nextCheckTime)
             {
                 if (Mathf.Abs(player.input.x) > 0.1f && controlled.DistanceSqr(lastCheckPosition) <= controlled.maxSpeed * 0.4f)
                 {
@@ -454,7 +455,7 @@ namespace BrokeProtocol.GameSource
         {
             base.EnterState();
             onDestination = false;
-            if (!player.IsFlying)
+            if (!player.IsFlying(out _))
             {
                 player.svPlayer.GetPath(player.GamePlayer().goToPosition);
             }
@@ -475,7 +476,7 @@ namespace BrokeProtocol.GameSource
                     return false;
                 }
             }
-            else if(player.IsFlying)
+            else if(player.IsFlying(out _))
             {
                 if(player.GamePlayer().OnDestination())
                 {
@@ -784,7 +785,8 @@ namespace BrokeProtocol.GameSource
         {
             base.EnterState();
 
-            if (player.IsDriving) player.svPlayer.SvSetSiren(true);
+            if (player.IsDriving(out _))
+                player.svPlayer.SvSetSiren(true);
         }
 
         protected override bool HandleNearTarget()
@@ -820,7 +822,8 @@ namespace BrokeProtocol.GameSource
         {
             base.ExitState(nextState);
 
-            if (player.IsDriving) player.svPlayer.SvSetSiren(false);
+            if (player.IsDriving(out _))
+                player.svPlayer.SvSetSiren(false);
         }
     }
 

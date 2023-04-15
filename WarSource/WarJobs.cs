@@ -69,14 +69,14 @@ namespace BrokeProtocol.GameSource
                 }
                 else
                 {
-                    if (player.IsFlying || player.IsBoating)
+                    if (player.IsFlying(out _) || player.IsBoating(out _))
                     {
                         if (player.svPlayer.currentState.index != WarCore.TimedWaypoint.index &&
                             player.svPlayer.SetState(WarCore.TimedWaypoint.index))
                                 return;
                     }
                     
-                    if (!player.IsPassenger && AttackTerritory())
+                    if (!player.IsPassenger(out _) && AttackTerritory())
                     {
                         return;
                     }
@@ -125,7 +125,7 @@ namespace BrokeProtocol.GameSource
 
             var territoryIndex = territories.GetRandom();
 
-            if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out var place))
+            if (WarUtility.GetValidTerritoryPosition(territoryIndex, out var pos, out var rot, out _))
             {
                 // Overwatch a territory
                 if (Random.value < 0.5f && player.svPlayer.GetOverwatchBest(pos, out var best) &&

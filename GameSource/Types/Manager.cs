@@ -12,14 +12,14 @@ namespace BrokeProtocol.GameSource.Types
 
     public class Manager : ManagerEvents
     {
-        public static Dictionary<ShEntity, GameSourcePlayer> pluginPlayers = new Dictionary<ShEntity, GameSourcePlayer>();
+        public static Dictionary<ShEntity, GameSourcePlayer> pluginPlayers = new();
 
         public static List<ShPlayer> skinPrefabs;
 
         [NonSerialized]
-        public static List<SpawnLocation> spawnLocations = new List<SpawnLocation>();
+        public static List<SpawnLocation> spawnLocations = new();
         [NonSerialized]
-        public static List<ShTerritory> territories = new List<ShTerritory>();
+        public static List<ShTerritory> territories = new();
 
         public static bool TryGetTerritory(ShEntity entity, out ShTerritory territory)
         {

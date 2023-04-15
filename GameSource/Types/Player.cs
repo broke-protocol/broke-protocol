@@ -45,14 +45,14 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.curMount)
             {
-                if (player.IsFlying)
+                if (player.IsFlying(out _))
                 {
                     if (player.curMount.HasWeapons)
                     {
                         attackState = Core.AirAttack;
                     }
                 }
-                else if (player.curMount is ShMovable && player.IsSeatedFirst)
+                else if (player.curMount is ShMovable && player.IsMountController)
                 {
                     attackState = Core.Attack;
                 }
@@ -810,7 +810,7 @@ namespace BrokeProtocol.GameSource.Types
             if (player.IsRestrained && player.svPlayer.SetState(Core.Restrained.index)) return true;
             if (player.svPlayer.leader && pluginPlayer.SetFollowState(player.svPlayer.leader)) return true;
             player.svPlayer.SvTrySetEquipable(player.Hands.index);
-            if (player.IsPassenger && player.svPlayer.SetState(Core.Look.index)) return true;
+            if (player.IsPassenger(out _) && player.svPlayer.SetState(Core.Look.index)) return true;
 
             if (player.svPlayer.spawnTarget && pluginPlayer.SetAttackState(player.svPlayer.spawnTarget)) return true;
             player.svPlayer.spawnTarget = null;
@@ -1141,7 +1141,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Dismount(ShPlayer player)
         {
-            if (player.IsDriving)
+            if (player.IsDriving(out _))
             {
                 // Send serverside transport position to override client-side predicted location while it was driven
                 player.curMount.svMountable.SvRepositionSelf();

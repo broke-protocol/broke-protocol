@@ -176,7 +176,7 @@ namespace BrokeProtocol.GameSource
     public class Hitman : JobLife
     {
         public const string bountiesKey = "bounties";
-        public static readonly Dictionary<string, DateTimeOffset> bounties = new Dictionary<string, DateTimeOffset>();
+        public static readonly Dictionary<string, DateTimeOffset> bounties = new();
         public static ShPlayer aiTarget;
 
         public const string placeBountyMenu = "PlaceBounty";
@@ -680,9 +680,10 @@ namespace BrokeProtocol.GameSource
 
     public class Mayor : JobLife
     {
-        private static readonly Dictionary<string, string> requests = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> requests = new();
 
-        private readonly HashSet<string> requestItems = new HashSet<string>{
+        private readonly HashSet<string> requestItems = new()
+        {
             "LicenseGun",
             "LicenseDrivers",
             "LicensePilots",
@@ -1144,7 +1145,7 @@ namespace BrokeProtocol.GameSource
         {
             if (player.isHuman && !player.IsDead)
             {
-                if (!player.IsDriving)
+                if (!player.IsDriving(out _))
                 {
                     ResetTarget();
                 }
