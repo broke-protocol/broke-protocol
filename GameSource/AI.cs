@@ -455,7 +455,7 @@ namespace BrokeProtocol.GameSource
         {
             base.EnterState();
             onDestination = false;
-            if (!player.IsFlying(out _))
+            if (!player.IsMount<ShAircraft>(out _))
             {
                 player.svPlayer.GetPath(player.GamePlayer().goToPosition);
             }
@@ -476,7 +476,7 @@ namespace BrokeProtocol.GameSource
                     return false;
                 }
             }
-            else if(player.IsFlying(out _))
+            else if(player.IsMount<ShAircraft>(out _))
             {
                 if(player.GamePlayer().OnDestination())
                 {
@@ -784,9 +784,7 @@ namespace BrokeProtocol.GameSource
         public override void EnterState()
         {
             base.EnterState();
-
-            if (player.IsDriving(out _))
-                player.svPlayer.SvSetSiren(true);
+            player.svPlayer.SvSetSiren(true);
         }
 
         protected override bool HandleNearTarget()
@@ -821,9 +819,7 @@ namespace BrokeProtocol.GameSource
         public override void ExitState(State nextState)
         {
             base.ExitState(nextState);
-
-            if (player.IsDriving(out _))
-                player.svPlayer.SvSetSiren(false);
+            player.svPlayer.SvSetSiren(false);
         }
     }
 

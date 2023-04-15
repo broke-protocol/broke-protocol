@@ -69,7 +69,7 @@ namespace BrokeProtocol.GameSource
                 }
                 else
                 {
-                    if (player.IsFlying(out _) || player.IsBoating(out _))
+                    if (player.IsMount<ShAircraft>(out _) || player.IsMount<ShBoat>(out _))
                     {
                         if (player.svPlayer.currentState.index != WarCore.TimedWaypoint.index &&
                             player.svPlayer.SetState(WarCore.TimedWaypoint.index))

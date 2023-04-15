@@ -45,7 +45,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.curMount)
             {
-                if (player.IsFlying(out _))
+                if (player.IsMount<ShAircraft>(out _))
                 {
                     if (player.curMount.HasWeapons)
                     {
@@ -1141,7 +1141,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Dismount(ShPlayer player)
         {
-            if (player.IsDriving(out _))
+            if (player.IsMount<ShMovable>(out _))
             {
                 // Send serverside transport position to override client-side predicted location while it was driven
                 player.curMount.svMountable.SvRepositionSelf();

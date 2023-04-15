@@ -560,7 +560,7 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
 
-                if (player.IsDriving(out var mount) && mount is ShEmergencyVehicle vehicle && vehicle.siren &&
+                if (player.IsMount<ShMovable>(out var mount) && mount is ShEmergencyVehicle vehicle && vehicle.siren &&
                     Physics.Raycast(
                         vehicle.mainT.TransformPoint(vehicle.svTransport.frontOffset),
                         vehicle.mainT.forward,

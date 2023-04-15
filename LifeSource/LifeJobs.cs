@@ -1145,7 +1145,7 @@ namespace BrokeProtocol.GameSource
         {
             if (player.isHuman && !player.IsDead)
             {
-                if (!player.IsDriving(out _))
+                if (!player.IsMount<ShMovable>(out _))
                 {
                     ResetTarget();
                 }
