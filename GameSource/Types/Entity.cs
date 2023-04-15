@@ -44,7 +44,7 @@ namespace BrokeProtocol.GameSource.Types
         public override bool MissileLocked(ShEntity entity, ShThrown missile)
         {
             const float alertDelay = 1f;
-            var controller = entity.Controller;
+            var controller = entity.controller;
 
             if (controller && Time.time - controller.GamePlayer().lastAlertTime > alertDelay)
             {

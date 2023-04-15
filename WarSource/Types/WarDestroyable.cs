@@ -9,7 +9,7 @@ namespace BrokeProtocol.GameSource.Types
     {
         public static bool FriendlyFire(ShDamageable damageable, ShPlayer attacker)
         {
-            var controller = damageable.Controller;
+            var controller = damageable.controller;
             return controller && attacker && controller != attacker && attacker.svPlayer.job == controller.svPlayer.job;
         }
 

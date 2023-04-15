@@ -105,7 +105,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else if (attacker && attacker != damageable)
             {
-                var controller = damageable.Controller;
+                var controller = damageable.controller;
 
                 if (controller && controller != damageable && !controller.isHuman && !controller.svPlayer.currentState.IsBusy)
                 {
