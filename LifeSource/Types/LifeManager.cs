@@ -1,4 +1,5 @@
 ﻿using BrokeProtocol.API;
+using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.LiteDB;
 using BrokeProtocol.Managers;
@@ -131,20 +132,35 @@ namespace BrokeProtocol.GameSource.Types
                                 var spawnBot = spawnEntity.Player;
                                 if (spawnBot && spawnBot.characterType == CharacterType.Humanoid && ((MyJobInfo)BPAPI.Jobs[jobIndex]).transports[((int)waypointType) - 1].transports.Length > 0)
                                 {
-                                    var spawnTransport = LifeManager.GetAvailable(jobIndex, waypointType) as ShTransport;
+                                    var transport = LifeManager.GetAvailable(jobIndex, waypointType) as ShTransport;
 
-                                    if (spawnTransport && spawnTransport.CanSpawn(s.position, s.rotation))
+                                    if (transport && transport.CanSpawn(s.position, s.rotation))
                                     {
-                                        spawnTransport.Spawn(s.position, s.rotation, SceneManager.Instance.ExteriorT);
-                                        spawnTransport.SetVelocity(0.5f * spawnTransport.maxSpeed * spawnTransport.mainT.forward);
+                                        transport.Spawn(s.position, s.rotation, SceneManager.Instance.ExteriorT);
+                                        transport.SetVelocity(0.5f * transport.maxSpeed * transport.mainT.forward);
                                         spawnBot.svPlayer.SpawnBot(
                                             s.position,
                                             s.rotation,
                                             SceneManager.Instance.ExteriorPlace,
                                             s.nextWaypoint,
                                             spawner,
-                                            spawnTransport,
+                                            transport,
                                             null);
+
+
+                                        while(transport.svTransport.TryGetTowOption(out var towable))
+                                        {
+                                            var towed = SvManager.Instance.AddNewEntity(towable, transport.GetPlace, Vector3.zero, Quaternion.identity, null);
+                                            if(transport.svTransport.TryTowing(towed))
+                                            {
+                                                transport = towed;
+                                            }
+                                            else
+                                            {
+                                                towed.Destroy();
+                                                break;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -272,11 +288,6 @@ namespace BrokeProtocol.GameSource.Types
             EndGangWar(warTerritory.ownerIndex);
         }
 
-
-
-
-
-
         public static ShEntity GetAvailable(int jobIndex, WaypointType type = WaypointType.Player)
         {
             var jobInfo = BPAPI.Jobs[jobIndex];
@@ -335,13 +346,6 @@ namespace BrokeProtocol.GameSource.Types
             jobIndex = 0;
             return null;
         }
-
-
-
-
-
-
-
 
         [Execution(ExecutionMode.Additive)]
         public override bool Start()
