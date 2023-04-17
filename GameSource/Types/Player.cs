@@ -893,6 +893,10 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             player.svPlayer.SendGameMessage("Towable vehicle is too heavy");
                         }
+                        else if(Quaternion.Angle(transport.GetRotation, towable.GetRotation) > 45f)
+                        {
+                            player.svPlayer.SendGameMessage("Vehicle misalignment");
+                        }
                         else if(transport.svTransport.TryTowing(towable))
                         {
                             return true;
