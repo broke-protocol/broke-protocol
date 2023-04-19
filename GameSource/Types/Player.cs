@@ -887,7 +887,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (setting)
                 {
-                    if (transport && transport.FindTowable(out var towable))
+                    if (transport.FindTowable(out var towable))
                     {
                         if (towable.positionRB.mass > transport.positionRB.mass)
                         {
@@ -899,6 +899,12 @@ namespace BrokeProtocol.GameSource.Types
                         }
                         else if(transport.svTransport.TryTowing(towable))
                         {
+                            var towableDriver = towable.controller;
+                            if (towableDriver && !towableDriver.isHuman)
+                            {
+                                towableDriver.svPlayer.SvDismount();
+                                towableDriver.GamePlayer().SetAttackState(player);
+                            }
                             return true;
                         }
                         else
@@ -913,7 +919,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
                 else // Stop towing
                 {
-                    transport.Tow(null);
+                    transport.svTransport.SvTow(null);
                     return true;
                 }
             }
