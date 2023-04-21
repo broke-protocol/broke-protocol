@@ -73,7 +73,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         var spawnPosition = ray.GetPoint(i);
 
-                        var floor = SvManager.Instance.GetSectorFloor(spawnPosition);
+                        var floor = Util.GetSectorFloor(spawnPosition);
 
                         var tuple = (SceneManager.Instance.ExteriorT.GetHashCode(), floor);
                         if (!spawns.ContainsKey(tuple))
@@ -134,7 +134,7 @@ namespace BrokeProtocol.GameSource.Types
                                 {
                                     var transport = LifeManager.GetAvailable(jobIndex, waypointType) as ShTransport;
 
-                                    if (transport && transport.CanSpawn(s.position, s.rotation))
+                                    if (transport && transport.CanSpawn(s.position, s.rotation, new ShEntity[] { }))
                                     {
                                         transport.Spawn(s.position, s.rotation, SceneManager.Instance.ExteriorT);
                                         transport.SetVelocity(0.5f * transport.maxSpeed * transport.mainT.forward);
