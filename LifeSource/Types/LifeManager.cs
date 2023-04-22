@@ -1,5 +1,4 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.LiteDB;
 using BrokeProtocol.Managers;
@@ -17,12 +16,14 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Spawn
     {
+        public Place place;
         public Vector3 position;
         public Quaternion rotation;
         public Waypoint nextWaypoint;
 
-        public Spawn(Vector3 position, Quaternion rotation, Waypoint nextWaypoint)
+        public Spawn(Place place, Vector3 position, Quaternion rotation, Waypoint nextWaypoint)
         {
+            this.place = place;
             this.position = position;
             this.rotation = rotation;
             this.nextWaypoint = nextWaypoint;
@@ -33,69 +34,59 @@ namespace BrokeProtocol.GameSource.Types
     {
         private readonly WaypointType waypointType;
         private readonly float spawnRate;
+        private readonly List<Waypoint> waypoints = new();
 
-        public readonly Dictionary<ValueTuple<int, Vector2Int>, List<Spawn>> spawns = new();
-
+        public readonly Dictionary<ValueTuple<Place, Vector2Int>, List<Spawn>> spawns = new();
 
         public WaypointGroup(WaypointType waypointType, float spawnRate)
         {
             this.waypointType = waypointType;
             this.spawnRate = spawnRate;
-        }
 
-        private List<Waypoint> GetWaypointArray => SceneManager.Instance.ExteriorPlace.waypoints[waypointType];
-
-        private float AdjustedSpawnRate(Vector2Int position, float limit, WaypointType type)
-        {
-            if (SvManager.Instance.sectors.TryGetValue((SceneManager.Instance.ExteriorT.GetHashCode(), position), out var sector))
+            foreach (var p in SceneManager.Instance.places)
             {
-                var count = sector.AreaTypeCount(type);
-
-                return (1f - (count / limit)) * spawnRate;
+                waypoints.AddRange(p.waypoints[waypointType]);
             }
 
-            return spawnRate;
-        }
-
-        public void Initialize()
-        {
             const float spawnGap = 12f;
 
-            foreach (var node in GetWaypointArray)
+            foreach (var node in waypoints)
             {
                 foreach (var neighbor in node.neighbors)
                 {
                     var delta = node.Delta(neighbor);
                     var ray = new Ray(node.mainT.position, delta);
-                    float distance = delta.magnitude;
+                    var distance = delta.magnitude;
 
                     for (var i = spawnGap; i < distance - spawnGap; i += spawnGap)
                     {
                         var spawnPosition = ray.GetPoint(i);
 
                         var floor = Util.GetSectorFloor(spawnPosition);
-
-                        var tuple = (SceneManager.Instance.ExteriorT.GetHashCode(), floor);
+                        var tuple = (node.GetPlace, floor);
                         if (!spawns.ContainsKey(tuple))
                         {
                             spawns[tuple] = new List<Spawn>();
                         }
 
-                        spawns[tuple].Add(new Spawn(spawnPosition, Quaternion.LookRotation(ray.direction), neighbor));
+                        spawns[tuple].Add(new Spawn(node.GetPlace, spawnPosition, Quaternion.LookRotation(ray.direction), neighbor));
                     }
                 }
             }
         }
 
+        private float AdjustedSpawnRate(Sector sector, float limit, WaypointType type) => 
+            (1f - (sector.AreaTypeCount(type) / limit)) * spawnRate;
+
         public void SpawnRandom(ShPlayer spawner, Sector sector)
         {
-            if (spawns.TryGetValue((SceneManager.Instance.ExteriorT.GetHashCode(), sector.position), out var sectorSpawns))
+            if (spawns.TryGetValue((sector.place, sector.position), out var sectorSpawns))
             {
                 if (waypointType == WaypointType.Player)
                 {
                     foreach (var s in sectorSpawns)
                     {
-                        if (UnityEngine.Random.value < AdjustedSpawnRate(sector.position, 16, waypointType))
+                        if (UnityEngine.Random.value < AdjustedSpawnRate(sector, 16, waypointType))
                         {
                             var spawnEntity = LifeManager.GetAvailable(spawner, s.position, out _, waypointType);
 
@@ -108,7 +99,7 @@ namespace BrokeProtocol.GameSource.Types
                                     spawnBot.svPlayer.SpawnBot(
                                         s.position,
                                         s.rotation,
-                                        SceneManager.Instance.ExteriorPlace,
+                                        s.place,
                                         s.nextWaypoint,
                                         spawner,
                                         null,
@@ -123,7 +114,7 @@ namespace BrokeProtocol.GameSource.Types
                     //VehicleWaypointGroup
                     foreach (var s in sectorSpawns)
                     {
-                        if (UnityEngine.Random.value < AdjustedSpawnRate(sector.position, 8, waypointType))
+                        if (UnityEngine.Random.value < AdjustedSpawnRate(sector, 8, waypointType))
                         {
                             var spawnEntity = LifeManager.GetAvailable(spawner, s.position, out var jobIndex, WaypointType.Player);
 
@@ -136,21 +127,20 @@ namespace BrokeProtocol.GameSource.Types
 
                                     if (transport && transport.CanSpawn(s.position, s.rotation, new ShEntity[] { }))
                                     {
-                                        transport.Spawn(s.position, s.rotation, SceneManager.Instance.ExteriorT);
+                                        transport.Spawn(s.position, s.rotation, sector.place.mTransform);
                                         transport.SetVelocity(0.5f * transport.maxSpeed * transport.mainT.forward);
                                         spawnBot.svPlayer.SpawnBot(
                                             s.position,
                                             s.rotation,
-                                            SceneManager.Instance.ExteriorPlace,
+                                            s.place,
                                             s.nextWaypoint,
                                             spawner,
                                             transport,
                                             null);
 
-
                                         while(transport.svTransport.TryGetTowOption(out var towable))
                                         {
-                                            var towed = SvManager.Instance.AddNewEntity(towable, transport.GetPlace, Vector3.zero, Quaternion.identity, null);
+                                            var towed = SvManager.Instance.AddNewEntity(towable, transport.GetPlace, Vector3.zero, Quaternion.identity, false);
                                             if(transport.svTransport.TryTowing(towed))
                                             {
                                                 transport = towed;
@@ -176,13 +166,7 @@ namespace BrokeProtocol.GameSource.Types
     {
         public static Dictionary<ShEntity, LifeSourcePlayer> pluginPlayers = new();
 
-        public static readonly WaypointGroup[] worldWaypoints = new WaypointGroup[]
-        {
-            new WaypointGroup(WaypointType.Player, 0.08f),
-            new WaypointGroup(WaypointType.Vehicle, 0.06f),
-            new WaypointGroup(WaypointType.Aircraft, 0.003f),
-            new WaypointGroup(WaypointType.Boat, 0.01f),
-        };
+        public static List<WaypointGroup> worldWaypoints = new ();
         
         [NonSerialized]
         public static List<ServerTrigger> jails = new();
@@ -360,7 +344,10 @@ namespace BrokeProtocol.GameSource.Types
 
             if (jails.Count == 0) Debug.LogWarning("[SVR] No jails found");
 
-            foreach (var g in worldWaypoints) g.Initialize();
+            worldWaypoints.Add(new WaypointGroup(WaypointType.Player, 0.08f));
+            worldWaypoints.Add(new WaypointGroup(WaypointType.Vehicle, 0.06f));
+            worldWaypoints.Add(new WaypointGroup(WaypointType.Aircraft, 0.003f));
+            worldWaypoints.Add(new WaypointGroup(WaypointType.Boat, 0.01f));
 
             var waypointTypes = Enum.GetValues(typeof(WaypointType)).Length;
 
@@ -372,13 +359,13 @@ namespace BrokeProtocol.GameSource.Types
 
                 myInfo.randomEntities = new HashSet<ShEntity>[waypointTypes];
 
-                for (int i = 0; i < waypointTypes; i++)
+                for (var i = 0; i < waypointTypes; i++)
                 {
                     myInfo.randomEntities[i] = new HashSet<ShEntity>();
                 }
 
-                int count = 0;
-                int limit = 0;
+                var count = 0;
+                var limit = 0;
                 while (count < myInfo.poolSize && limit < 100)
                 {
                     var randomSkin = Manager.skinPrefabs.GetRandom();

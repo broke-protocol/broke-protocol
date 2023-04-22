@@ -1176,8 +1176,8 @@ namespace BrokeProtocol.GameSource
 
                     destinationMarker = SvManager.Instance.AddNewEntity(
                         SvManager.Instance.markerGoalPrefab,
-                        SceneManager.Instance.ExteriorPlace,
-                        destination.transform.position,
+                        destination.GetPlace,
+                        destination.GetPosition,
                         Quaternion.identity,
                         new IDCollection<ShPlayer> { player });
 
@@ -1291,7 +1291,7 @@ namespace BrokeProtocol.GameSource
                                 {
                                     worldItem = SvManager.Instance.AddNewEntity(
                                         p.myItems.GetRandom().Value.item,
-                                        SceneManager.Instance.ExteriorPlace,
+                                        randomSpawn.place,
                                         randomSpawn.position,
                                         randomSpawn.rotation,
                                         false);
