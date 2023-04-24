@@ -1195,8 +1195,6 @@ namespace BrokeProtocol.GameSource
         }
     }
 
-
-
     public class LawEnforcement : TargetPlayerJob
     {
         public const string sendToJail = "SendToJail";
@@ -1244,8 +1242,6 @@ namespace BrokeProtocol.GameSource
             }
         }
     }
-
-
 
     public class Retriever : TargetPlayerJob
     {

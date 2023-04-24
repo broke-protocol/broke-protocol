@@ -61,11 +61,13 @@ namespace BrokeProtocol.GameSource
             };
         }
 
-        /*
-            new JobInfo(
+        private List<MyJobInfo> GetJobs => new()
+        {
+            /*
+            new MyJobInfo(
                 typeof(Citizen), "Job Name",
                 "Job Description",
-                CharacterType.Human, 0, GroupIndex.Citizen, null, null, null, 0, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
+                CharacterType.All, 0, GroupIndex.Citizen, new ColorStruct(0.75f, 0.75f, 0.75f), 1f, 28,
                 new Transports[] {
                     new Transports(new string[] {
                         "Car1",
@@ -75,26 +77,30 @@ namespace BrokeProtocol.GameSource
                         "Aircraft2" }),
                     new Transports(new string[] {
                         "Boat1",
-                        "Boat2" })
+                        "Boat2" }),
+                    new Transports(new string[] {
+                        "Train1",
+                        "Train2" }),
+                    new Transports(new string[] {
+                        "Towable1",
+                        "Towable2" }),
                 },
                 new Upgrades[] {
-                    new Upgrades(
+                    new Upgrades(10,
                         new InventoryStruct[] {
                             new InventoryStruct("Item1", 1),
                             new InventoryStruct("Item2", 1)}),
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("Item1", 1),
                             new InventoryStruct("Item2", 1)}),
-                    new Upgrades(
+                    new Upgrades(20,
                         new InventoryStruct[] {
                             new InventoryStruct("Item1", 1),
                             new InventoryStruct("Item2", 1)})
                 }),
             */
 
-        private List<MyJobInfo> GetJobs => new()
-        {
             new MyJobInfo(
                 typeof(Citizen), "Citizen",
                 "Get money by robbing, looting, and trading with NPCs and players or get a job by visiting map icons",
@@ -149,7 +155,18 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[] {
                         "Boat1",
                         "Boat2",
-                        "Boat3"})
+                        "Boat3"}),
+                    new Transports(new string[] {}),
+                    new Transports(new string[] {
+                        "Car1",
+                        "Car2",
+                        "Car3",
+                        "Trailer",
+                        "TrailerContainer1",
+                        "TrailerContainer2",
+                        "TrailerContainer3",
+                        "TrailerContainer4",
+                    })
                 },
                 new Upgrades[0]),
             new MyJobInfo(
@@ -159,7 +176,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(0,
@@ -173,7 +192,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -200,8 +221,10 @@ namespace BrokeProtocol.GameSource
                 CharacterType.Humanoid, 0, GroupIndex.LawEnforcement, new ColorStruct(0f, 1f, 1f), 0.03f, 10,
                 new Transports[] {
                     new Transports(new string[] { "CarPolice" }),
-                    new Transports(new string[0]),
-                    new Transports(new string[] { "PoliceBoat" })
+                    new Transports(new string[] { }),
+                    new Transports(new string[] { "PoliceBoat" }),
+                    new Transports(new string[] { }),
+                    new Transports(new string[] { }),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -237,7 +260,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[] {"Ambulance"}),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -265,7 +290,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[] {"FireTruck"}),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -292,7 +319,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -317,7 +346,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -342,7 +373,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -369,7 +402,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(0,
@@ -390,7 +425,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -414,7 +451,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -455,7 +494,9 @@ namespace BrokeProtocol.GameSource
                         "Fighter2",
                         "FighterBig1",
                         "FighterBig2"}),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -484,7 +525,9 @@ namespace BrokeProtocol.GameSource
                 new Transports[] {
                     new Transports(new string[0]),
                     new Transports(new string[0]),
-                    new Transports(new string[0])
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,

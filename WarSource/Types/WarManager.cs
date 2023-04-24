@@ -115,8 +115,6 @@ namespace BrokeProtocol.GameSource.Types
                 newSpeed = -newSpeed;
             }
 
-            //Debug.Log(territory.ID + " " + territory.ownerIndex + " " + territory.attackerIndex + " " + newSpeed + " " + captureState + " " + players.Count);
-
             if (newSpeed <= 0f && captureState == 0f)
             {
                 return;

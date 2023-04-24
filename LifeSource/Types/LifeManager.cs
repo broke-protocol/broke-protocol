@@ -75,7 +75,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        private float AdjustedSpawnRate(Sector sector, float limit, WaypointType type) => 
+        private float AdjustedSpawnRate(Sector sector, float limit, WaypointType type) =>
             (1f - (sector.AreaTypeCount(type) / limit)) * spawnRate;
 
         public void SpawnRandom(ShPlayer spawner, Sector sector)
@@ -88,23 +88,18 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         if (UnityEngine.Random.value < AdjustedSpawnRate(sector, 16, waypointType))
                         {
-                            var spawnEntity = LifeManager.GetAvailable(spawner, s.position, out _, waypointType);
+                            var spawnBot = LifeManager.GetAvailable<ShPlayer>(spawner, s.position, out _, waypointType);
 
-                            if (spawnEntity)
+                            if (spawnBot)
                             {
-                                var spawnBot = spawnEntity.Player;
-
-                                if (spawnBot)
-                                {
-                                    spawnBot.svPlayer.SpawnBot(
-                                        s.position,
-                                        s.rotation,
-                                        s.place,
-                                        s.nextWaypoint,
-                                        spawner,
-                                        null,
-                                        null);
-                                }
+                                spawnBot.svPlayer.SpawnBot(
+                                    s.position,
+                                    s.rotation,
+                                    s.place,
+                                    s.nextWaypoint,
+                                    spawner,
+                                    null,
+                                    null);
                             }
                         }
                     }
@@ -116,36 +111,36 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         if (UnityEngine.Random.value < AdjustedSpawnRate(sector, 8, waypointType))
                         {
-                            var spawnEntity = LifeManager.GetAvailable(spawner, s.position, out var jobIndex, WaypointType.Player);
+                            var spawnBot = LifeManager.GetAvailable<ShPlayer>(spawner, s.position, out var jobIndex, WaypointType.Player);
 
-                            if (spawnEntity)
+                            if (spawnBot && spawnBot.characterType == CharacterType.Humanoid && ((MyJobInfo)BPAPI.Jobs[jobIndex]).transports[((int)waypointType) - 1].transports.Length > 0)
                             {
-                                var spawnBot = spawnEntity.Player;
-                                if (spawnBot && spawnBot.characterType == CharacterType.Humanoid && ((MyJobInfo)BPAPI.Jobs[jobIndex]).transports[((int)waypointType) - 1].transports.Length > 0)
+                                var transport = LifeManager.GetAvailable<ShTransport>(jobIndex, waypointType);
+
+                                if (transport && transport.CanSpawn(s.position, s.rotation, new ShEntity[] { }))
                                 {
-                                    var transport = LifeManager.GetAvailable(jobIndex, waypointType) as ShTransport;
+                                    transport.Spawn(s.position, s.rotation, sector.place.mTransform);
+                                    transport.SetVelocity(0.5f * transport.maxSpeed * transport.mainT.forward);
+                                    spawnBot.svPlayer.SpawnBot(
+                                        s.position,
+                                        s.rotation,
+                                        s.place,
+                                        s.nextWaypoint,
+                                        spawner,
+                                        transport,
+                                        null);
 
-                                    if (transport && transport.CanSpawn(s.position, s.rotation, new ShEntity[] { }))
+                                    while (transport.svTransport.TryGetTowOption(out var towable))
                                     {
-                                        transport.Spawn(s.position, s.rotation, sector.place.mTransform);
-                                        transport.SetVelocity(0.5f * transport.maxSpeed * transport.mainT.forward);
-                                        spawnBot.svPlayer.SpawnBot(
-                                            s.position,
-                                            s.rotation,
-                                            s.place,
-                                            s.nextWaypoint,
-                                            spawner,
-                                            transport,
-                                            null);
+                                        var spawnTowable = LifeManager.GetAvailable<ShTransport>(jobIndex, WaypointType.Towable, e => e.index == towable.index);
 
-                                        while(transport.svTransport.TryGetTowOption(out var towable))
+                                        if (spawnTowable && transport.svTransport.TryTowing(spawnTowable))
                                         {
-                                            var spawnTowable = LifeManager.GetAvailable(jobIndex, WaypointType.Towable, e => e.index == towable.index) as ShTransport;
-
-                                            if(transport.svTransport.TryTowing(spawnTowable))
-                                            {
-                                                transport = spawnTowable;
-                                            }
+                                            transport = spawnTowable;
+                                        }
+                                        else
+                                        {
+                                            break;
                                         }
                                     }
                                 }
@@ -174,7 +169,7 @@ namespace BrokeProtocol.GameSource.Types
         public static int defendersKilled;
         public static ShTerritory warTerritory;
 
-        public void AddRandomSpawn<T>(T prefab, int randomJobIndex) where T : ShEntity
+        public void AddRandomSpawn<T>(T prefab, int jobIndex, int waypointIndex) where T : ShEntity
         {
             T newEntity = GameObject.Instantiate(prefab, SceneManager.Instance.ExteriorT);
             newEntity.name = prefab.name;
@@ -182,13 +177,13 @@ namespace BrokeProtocol.GameSource.Types
 
             if (newEntity is ShPlayer player)
             {
-                player.svPlayer.spawnJobIndex = randomJobIndex;
-                player.svPlayer.spawnJobRank = Random.Range(0, BPAPI.Jobs[randomJobIndex].shared.upgrades.Length);
+                player.svPlayer.spawnJobIndex = jobIndex;
+                player.svPlayer.spawnJobRank = Random.Range(0, BPAPI.Jobs[jobIndex].shared.upgrades.Length);
             }
 
             SvManager.Instance.AddNewEntityExisting(newEntity);
 
-            ((MyJobInfo)BPAPI.Jobs[randomJobIndex]).randomEntities[(int)newEntity.svEntity.WaypointProperty].Add(newEntity);
+            ((MyJobInfo)BPAPI.Jobs[jobIndex]).randomEntities[waypointIndex].Add(newEntity);
         }
 
         public static void StartGangWar(ShTerritory startT, int attackerJob)
@@ -268,9 +263,9 @@ namespace BrokeProtocol.GameSource.Types
             EndGangWar(warTerritory.ownerIndex);
         }
 
-        public static ShEntity GetAvailable(int jobIndex, WaypointType type) => GetAvailable(jobIndex, type, e => true);
+        public static T GetAvailable<T>(int jobIndex, WaypointType type) where T : ShEntity => GetAvailable<T>(jobIndex, type, e => true);
 
-        public static ShEntity GetAvailable(int jobIndex, WaypointType type, Predicate<ShEntity> predicate)
+        public static T GetAvailable<T>(int jobIndex, WaypointType type, Predicate<T> predicate) where T : ShEntity
         {
             var randomEntities = ((MyJobInfo)BPAPI.Jobs[jobIndex]).randomEntities[(int)type];
 
@@ -283,9 +278,8 @@ namespace BrokeProtocol.GameSource.Types
             var i = start;
 
             do
-            {
-                var randomEntity = randomEntities.ElementAt(i);
-                if (!randomEntity.isActiveAndEnabled && predicate(randomEntity))
+            { 
+                if (randomEntities.ElementAt(i) is T randomEntity && !randomEntity.isActiveAndEnabled && predicate(randomEntity))
                 {
                     return randomEntity;
                 }
@@ -295,14 +289,14 @@ namespace BrokeProtocol.GameSource.Types
             return null;
         }
 
-        public static ShEntity GetAvailable(ShPlayer spawner, Vector3 position, out int jobIndex, WaypointType type = WaypointType.Player)
+        public static T GetAvailable<T>(ShPlayer spawner, Vector3 position, out int jobIndex, WaypointType type = WaypointType.Player) where T : ShEntity
         {
             var options = new List<Tuple<float, int, ShEntity>>();
 
             var total = 0f;
             foreach (var j in BPAPI.Jobs)
             {
-                var entity = GetAvailable(j.shared.jobIndex, type);
+                var entity = GetAvailable<T>(j.shared.jobIndex, type);
 
                 if (entity)
                 {
@@ -324,7 +318,7 @@ namespace BrokeProtocol.GameSource.Types
                 if (spawnValue < p.Item1)
                 {
                     jobIndex = p.Item2;
-                    return p.Item3;
+                    return p.Item3 as T;
                 }
             }
 
@@ -373,7 +367,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     if (info.characterType == CharacterType.All || randomSkin.characterType == info.characterType)
                     {
-                        AddRandomSpawn(randomSkin, jobIndex);
+                        AddRandomSpawn(randomSkin, jobIndex, 0);
                         count++;
                     }
                     else
@@ -382,14 +376,15 @@ namespace BrokeProtocol.GameSource.Types
                     }
                 }
 
-                foreach (var transportArray in myInfo.transports)
+                for (var waypointType = 0; waypointType < myInfo.transports.Length; ++waypointType)
                 {
+                    var transportArray = myInfo.transports[waypointType];
                     if (transportArray.transports.Length > 0)
                     {
-                        for (int i = 0; i < myInfo.poolSize; i++)
+                        for (var index = 0; index < myInfo.poolSize; index++)
                         {
                             if (SceneManager.Instance.TryGetEntity<ShTransport>(transportArray.transports.GetRandom(), out var t))
-                                AddRandomSpawn(t, jobIndex);
+                                AddRandomSpawn(t, jobIndex, waypointType + 1);
                         }
                     }
                 }

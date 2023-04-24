@@ -582,28 +582,24 @@ namespace BrokeProtocol.GameSource.Types
 
         public ShPlayer SpawnInterior(ShPlayer target)
         {
-            var spawnEntity = LifeManager.GetAvailable(LifeCore.policeIndex, WaypointType.Player);
+            var spawnBot = LifeManager.GetAvailable<ShPlayer>(LifeCore.policeIndex, WaypointType.Player);
 
-            if (spawnEntity)
+            if (spawnBot)
             {
-                var spawnBot = spawnEntity.Player;
-                if (spawnBot)
+                var spawnT = target.svEntity.GetDoor.spawnPoint;
+
+                if (spawnT)
                 {
-                    var spawnT = target.svEntity.GetDoor.spawnPoint;
+                    spawnBot.svPlayer.SpawnBot(
+                        spawnT.position,
+                        spawnT.rotation,
+                        target.GetPlace,
+                        null,
+                        target,
+                        null,
+                        target);
 
-                    if (spawnT)
-                    {
-                        spawnBot.svPlayer.SpawnBot(
-                            spawnT.position,
-                            spawnT.rotation,
-                            target.GetPlace,
-                            null,
-                            target,
-                            null,
-                            target);
-
-                        return spawnBot;
-                    }
+                    return spawnBot;
                 }
             }
 
