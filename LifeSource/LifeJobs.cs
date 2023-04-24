@@ -1,5 +1,4 @@
 ﻿using BrokeProtocol.API;
-using BrokeProtocol.Client.UI;
 using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
@@ -7,7 +6,6 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.Jobs;
-using BrokeProtocol.Utility.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;

@@ -140,15 +140,11 @@ namespace BrokeProtocol.GameSource.Types
 
                                         while(transport.svTransport.TryGetTowOption(out var towable))
                                         {
-                                            var towed = SvManager.Instance.AddNewEntity(towable, transport.GetPlace, Vector3.zero, Quaternion.identity, false);
-                                            if(transport.svTransport.TryTowing(towed))
+                                            var spawnTowable = LifeManager.GetAvailable(jobIndex, WaypointType.Towable, e => e.index == towable.index) as ShTransport;
+
+                                            if(transport.svTransport.TryTowing(spawnTowable))
                                             {
-                                                transport = towed;
-                                            }
-                                            else
-                                            {
-                                                towed.Destroy();
-                                                break;
+                                                transport = spawnTowable;
                                             }
                                         }
                                     }
@@ -272,24 +268,29 @@ namespace BrokeProtocol.GameSource.Types
             EndGangWar(warTerritory.ownerIndex);
         }
 
-        public static ShEntity GetAvailable(int jobIndex, WaypointType type = WaypointType.Player)
+        public static ShEntity GetAvailable(int jobIndex, WaypointType type) => GetAvailable(jobIndex, type, e => true);
+
+        public static ShEntity GetAvailable(int jobIndex, WaypointType type, Predicate<ShEntity> predicate)
         {
-            var jobInfo = BPAPI.Jobs[jobIndex];
+            var randomEntities = ((MyJobInfo)BPAPI.Jobs[jobIndex]).randomEntities[(int)type];
 
-            var randomEntities = ((MyJobInfo)jobInfo).randomEntities[(int)type];
+            var count = randomEntities.Count;
 
-            if (randomEntities.Count == 0) return null;
+            if (count == 0)
+                return null;
 
-            for (int i = 0; i < 5; i++) // Try just a few times to find an available Random Entity
+            var start = Random.Range(0, count);
+            var i = start;
+
+            do
             {
-                var index = Random.Range(0, randomEntities.Count);
-
-                var randomEntity = randomEntities.ElementAt(index);
-                if (!randomEntity.isActiveAndEnabled)
+                var randomEntity = randomEntities.ElementAt(i);
+                if (!randomEntity.isActiveAndEnabled && predicate(randomEntity))
                 {
                     return randomEntity;
                 }
-            }
+                i = Util.Mod(i + 1, count);
+            } while (i != start);
 
             return null;
         }

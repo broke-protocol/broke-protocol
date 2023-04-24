@@ -582,7 +582,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public ShPlayer SpawnInterior(ShPlayer target)
         {
-            var spawnEntity = LifeManager.GetAvailable(LifeCore.policeIndex);
+            var spawnEntity = LifeManager.GetAvailable(LifeCore.policeIndex, WaypointType.Player);
 
             if (spawnEntity)
             {
