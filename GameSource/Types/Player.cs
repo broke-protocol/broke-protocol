@@ -99,7 +99,7 @@ namespace BrokeProtocol.GameSource.Types
         public bool OnDestination()
         {
             var controlled = player.GetControlled;
-            return controlled.DistanceSqr2D(goToPosition) < controlled.svMountable.NavRangeSqr;
+            return controlled.DistanceSqr2D(goToPosition) < controlled.svMovable.NavRangeSqr;
         }
 
         public virtual bool SetGoToState(Vector3 position, Quaternion rotation)
