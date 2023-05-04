@@ -520,13 +520,8 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        protected override GetEntityCallback GetTargetHandler() => () =>
-        {
-            if (SvManager.Instance.fires.Count > 0)
-                return SvManager.Instance.fires.ToArray().GetRandom();
-            else
-                return null;
-        };
+        protected override GetEntityCallback GetTargetHandler() => 
+            () => (SvManager.Instance.fires.Count > 0) ? SvManager.Instance.fires.ToArray().GetRandom() : null;
 
         protected override void FoundTarget(bool startGoalMarker)
         {
@@ -968,13 +963,9 @@ namespace BrokeProtocol.GameSource
         protected override bool ValidTarget(ShEntity target) => 
             base.ValidTarget(target) && LifeManager.pluginPlayers.TryGetValue(target, out var pluginTarget) && pluginTarget.wantedLevel >= AttackLevel;
 
-        protected override GetEntityCallback GetTargetHandler()
-        {
-            if (EntityCollections.Humans.Count >= 3)
-                return () => EntityCollections.RandomHuman;
-            
-            return () => EntityCollections.RandomNPC;
-        }
+        protected override GetEntityCallback GetTargetHandler() => 
+            EntityCollections.Humans.Count >= 3 ? 
+            () => EntityCollections.RandomHuman : () => EntityCollections.RandomNPC;
 
         public override void ResetTarget()
         {
