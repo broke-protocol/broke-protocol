@@ -950,7 +950,7 @@ namespace BrokeProtocol.GameSource.Types
             if (!shop || !shop.Shop || !SceneManager.Instance.TryGetEntity<ShItem>(itemIndex, out var item) || !shop.ShopCanBuy(item))
             {
                 player.svPlayer.SendGameMessage("Not suitable");
-                return true;
+                return false;
             }
 
             if (deltaType == DeltaInv.MeToShop)
@@ -960,12 +960,17 @@ namespace BrokeProtocol.GameSource.Types
                 source = player;
                 target = shop;
             }
-            else
+            else if (deltaType == DeltaInv.ShopToMe)
             {
                 multiplier = -1;
                 markup = true;
                 source = shop;
                 target = player;
+            }
+            else
+            {
+                Debug.Log("[SVR] Invalid DeltaInv in TransferShop");
+                return false;
             }
 
             var totalTransferValue = 0;
@@ -992,7 +997,17 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool TransferTrade(ShPlayer player, byte deltaType, int itemIndex, int amount)
         {
-            if (player.otherEntity is not ShPlayer otherPlayer) return true;
+            if (player.otherEntity is not ShPlayer otherPlayer)
+            {
+                Debug.Log("[SVR] Invalid trading partner");
+                return false;
+            }
+
+            if (deltaType != DeltaInv.MeToTrade && deltaType != DeltaInv.TradeToMe)
+            {
+                Debug.Log("[SVR] Invalid DeltaInv in TransferTrade");
+                return false;
+            }
 
             player.TransferItem(deltaType, itemIndex, amount);
 
@@ -1164,7 +1179,7 @@ namespace BrokeProtocol.GameSource.Types
             // Start locking behavior after exiting vehicle
             if (player.curEquipable.ThrownHasGuidance)
             {
-                player.svPlayer.StartLocking(player.curEquipable);
+                player.svPlayer.StartLockOn(player.curEquipable);
             }
 
             return true;
