@@ -1,3 +1,28 @@
+## 1.37
+?> Most API changes in the Truck Simulator Update are related to the new Towing functionality in 1.37. This includes a new TowT transform reference and a list of TowOptions on each vehicle for random spawning. Important to note an overall simplification to accessing specific Mount types and Controllers since it was getting confusing with all the different Properties. Also in continuing to simplify the class heirarchy, ShWheeled class is merged into parent ShTransport so even boats and planes can have animated wheels, skidmarks, particles, etc. This opens to door to amphibious vehicles later on and potentially better wheel damage/blowout modelling too.
+
+### API
+* ShWheeled class removed (all Transports can use wheel skidding particles/audio/models)
+* Damage event source parameter replaced with hitNormal
+* New PlayerTow event added
+* IsDriving, IsFlying, IsBoating, IsDragging, etc replaced with generic IsMount<T>(out T)
+* 'Controller' virtual property removed, access 'controller' field directly
+* OutsideController property only available on ShPlayer now
+* GetSectorFloor moved from SvManager to Util static class
+* CanSpawn() moved up to ShEntity and now takes parameter ShEntity[] ignoreArray
+* SvPlayer.StartLocking() -> StartLockOn() to distingish from vehicle locking functions
+
+### MODDING
+* All Aircraft and Boats mods need these parameters multiplied by 0.04 (divide by 25) and re-exported due to physics fixes and updates
+   * Boats:
+      * engineFactor
+      * turnFactor
+      * stabilityFactor
+   * Aircraft:
+      * uprightStrength
+      * stabilityStrength
+   * You can simply add "/25" after each number in the inspector and Unity will calculate the result when you Enter or Tab out
+
 ## 1.36
 ?> The UI Update adds events related to changing ChatMode and ChatChannel so the server can override or block that behavior. Also, some old client packets were removed to prevent misuse (by me). But the gap in the ClPacket enum changed a bunch of packet IDs so any plugin sending packets directly (SvPlayer.Send(...)) will likely need rebuilding.
 
