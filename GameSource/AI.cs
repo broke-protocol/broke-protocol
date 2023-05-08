@@ -1,7 +1,6 @@
 ﻿using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
-using BrokeProtocol.Utility.Networking;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
 using Pathfinding;
@@ -199,14 +198,11 @@ namespace BrokeProtocol.GameSource
 
             var minAltitude = Mathf.Lerp(20f, 140f, distance / Util.visibleRange);
 
-            if (Physics.SphereCast(aircraft.GetPosition, 10f, delta, out var hit, distance, MaskIndex.world))
-            {
-                return new Vector3(movePos.x, hit.point.y + minAltitude, movePos.z);
-            }
-            else
-            {
-                return new Vector3(movePos.x, Mathf.Max(movePos.y, minAltitude), movePos.z);
-            }
+            return new Vector3(
+                movePos.x,
+                Physics.SphereCast(aircraft.GetPosition, 10f, delta, out var hit, distance, MaskIndex.world) ? 
+                hit.point.y + minAltitude : Mathf.Max(movePos.y, minAltitude),
+                movePos.z);
         }
 
         private void FlySmart()
@@ -742,10 +738,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            if (TargetNear)
-                return HandleNearTarget();
-            
-            return HandleDistantTarget();
+            return TargetNear ? HandleNearTarget() : HandleDistantTarget();
         }
     }
 
