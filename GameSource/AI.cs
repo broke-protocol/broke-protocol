@@ -372,10 +372,6 @@ namespace BrokeProtocol.GameSource
         private Vector3 lastCheckPosition;
         private float nextCheckTime;
 
-        public bool BadPath => player.svPlayer.lastPathState < PathCompleteState.Complete;
-
-        public bool IncompletePath => player.svPlayer.lastPathState != PathCompleteState.Complete;
-
         private void UpdateChecks()
         {
             var mountable = player.GetMount;
@@ -486,7 +482,7 @@ namespace BrokeProtocol.GameSource
                     aircraft.svMountable.MoveTo(player.GamePlayer().goToPosition);
                 }
             }
-            else if(BadPath)
+            else if(player.svPlayer.BadPath)
             {
                 player.svPlayer.ResetAI();
                 return false;
@@ -519,7 +515,7 @@ namespace BrokeProtocol.GameSource
             {
                 player.svPlayer.MoveLookWaypointPath();
             }
-            else if (BadPath)
+            else if (player.svPlayer.BadPath)
             {
                 player.svPlayer.ResetAI();
                 return false;
@@ -669,7 +665,7 @@ namespace BrokeProtocol.GameSource
 
                 player.svPlayer.LookAt(coverOrientation);
             }
-            else if(BadPath)
+            else if(player.svPlayer.BadPath)
             {
                 player.GamePlayer().SetAttackState(player.svPlayer.targetEntity);
                 return false;
@@ -725,7 +721,7 @@ namespace BrokeProtocol.GameSource
             {
                 PathToTarget();
             }
-            else if (BadPath || !player.svPlayer.MoveLookNavPath())
+            else if (player.svPlayer.BadPath || !player.svPlayer.MoveLookNavPath())
             {
                 // This is handled better in AttackState, but little we can do here
                 player.svPlayer.ResetAI();
@@ -864,7 +860,7 @@ namespace BrokeProtocol.GameSource
         protected ShDetonator detonator;
 
         // Don't do hunting behavior if in an unarmed vehicle
-        public bool ShouldHunt => !player.curMount || player.curMount.HasWeapons;
+        public bool CanHunt => !player.curMount || player.curMount.HasWeapons;
 
         public override void EnterState()
         {
@@ -965,8 +961,7 @@ namespace BrokeProtocol.GameSource
                 hunting = false;
             }
 
-            if ((hunting || IncompletePath || Random.value < 0.25f)
-                && ShouldHunt
+            if ((hunting || player.svPlayer.IncompletePath || Random.value < 0.25f) && CanHunt
                 && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
             {
                 player.svPlayer.GetPathAvoidance(huntPosition);
@@ -982,7 +977,7 @@ namespace BrokeProtocol.GameSource
 
         protected override bool HandleNearTarget()
         {
-            if(IncompletePath && ShouldHunt && !hunting)
+            if(player.svPlayer.IncompletePath && CanHunt && !hunting)
             {
                 PathToTarget();
             }
@@ -997,7 +992,7 @@ namespace BrokeProtocol.GameSource
 
         protected override bool HandleDistantTarget()
         {
-            if (IncompletePath && ShouldHunt && !hunting)
+            if (player.svPlayer.IncompletePath && CanHunt && !hunting)
             {
                 PathToTarget();
             }
