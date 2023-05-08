@@ -961,23 +961,27 @@ namespace BrokeProtocol.GameSource
                 hunting = false;
             }
 
-            if ((hunting || player.svPlayer.IncompletePath || Random.value < 0.25f) && CanHunt
-                && player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
+            if ((hunting || player.svPlayer.IncompletePath || Random.value < 0.25f) && CanHunt)
             {
-                player.svPlayer.GetPathAvoidance(huntPosition);
-                ResetTargetPosition();
                 hunting = true;
+                if (player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
+                {
+                    player.svPlayer.GetPathAvoidance(huntPosition);
+                    ResetTargetPosition();
+                    return;
+                }
             }
             else
             {
-                base.PathToTarget();
                 hunting = false;
             }
+
+            base.PathToTarget();
         }
 
         protected override bool HandleNearTarget()
         {
-            if(player.svPlayer.IncompletePath && CanHunt && !hunting)
+            if (player.svPlayer.IncompletePath && CanHunt && !hunting)
             {
                 PathToTarget();
             }
@@ -986,7 +990,7 @@ namespace BrokeProtocol.GameSource
                 base.HandleNearTarget();
                 hunting = false;
             }
-            
+
             return true;
         }
 
