@@ -3,7 +3,6 @@ using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
 using BrokeProtocol.Utility;
 using BrokeProtocol.Utility.AI;
-using Pathfinding;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -502,8 +501,8 @@ namespace BrokeProtocol.GameSource
 
         public override void EnterState()
         {
-            base.EnterState();
             player.svPlayer.GetPathToWaypoints();
+            base.EnterState();
         }
 
         public override bool UpdateState()
@@ -704,9 +703,9 @@ namespace BrokeProtocol.GameSource
 
         public override void EnterState()
         {
-            base.EnterState();
             ResetTargetPosition();
             PathToTarget();
+            base.EnterState();
         }
 
         protected virtual bool HandleNearTarget()
@@ -772,8 +771,8 @@ namespace BrokeProtocol.GameSource
     {
         public override void EnterState()
         {
-            base.EnterState();
             player.svPlayer.SvSetSiren(true);
+            base.EnterState();
         }
 
         protected override bool HandleNearTarget()
@@ -864,11 +863,11 @@ namespace BrokeProtocol.GameSource
 
         public override void EnterState()
         {
-            base.EnterState();
             hunting = false;
             projectile = null;
             detonator = null;
             player.svPlayer.SetBestWeapons();
+            base.EnterState();
         }
 
         public override void ExitState(State nextState)

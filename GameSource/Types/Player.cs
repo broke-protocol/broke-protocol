@@ -52,16 +52,16 @@ namespace BrokeProtocol.GameSource.Types
                         attackState = Core.AirAttack;
                     }
                 }
-                else if (player.curMount is ShMovable && player.IsMountController)
+                else if (player.IsMount<ShMovable>(out _))
                 {
                     attackState = Core.Attack;
                 }
-                else if (player.svPlayer.SetState(Core.StaticAttack.index))
+                else
                 {
                     attackState = Core.StaticAttack;
                 }
             }
-            else if (player.svPlayer.SetState(Core.Attack.index))
+            else
             {
                 attackState = Core.Attack;
             }

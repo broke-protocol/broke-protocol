@@ -49,7 +49,8 @@ namespace BrokeProtocol.GameSource
             };
         }
 
-        private List<JobInfo> GetJobs => new List<JobInfo> {
+        private List<JobInfo> GetJobs => new()
+        {
             new JobInfo(
                 typeof(Army), "SpecOps",
                 jobDescription,
