@@ -35,8 +35,7 @@ namespace BrokeProtocol.GameSource
         [CustomTarget]
         public void HandsUp(ShEntity target, ShPlayer player)
         {
-            if (target is ShPlayer playerTarget && playerTarget.isActiveAndEnabled && 
-                playerTarget.IsMobile)
+            if (target is ShPlayer playerTarget && playerTarget.isActiveAndEnabled && playerTarget.IsMobile)
             {
                 playerTarget.LifePlayer().CommandHandsUp(player);
             }

@@ -1010,7 +1010,7 @@ namespace BrokeProtocol.GameSource
             {
                 // Guard clause because MoveLookNavPath might kill the player if it's a bad path
                 // TODO: Find a more elegent solution for this
-                if(!player.isActiveAndEnabled || player.IsDead || !player.svPlayer.targetEntity)
+                if(!player.IsCapable || !player.svPlayer.targetEntity)
                 {
                     return false;
                 }
