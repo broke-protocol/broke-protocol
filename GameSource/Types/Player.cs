@@ -607,7 +607,7 @@ namespace BrokeProtocol.GameSource.Types
             if (!forceEnter)
             {
                 if (!IsDoorAccessible(player, door) || player.IsRestrained || !player.InActionRange(door))
-                    return true;
+                    return false;
             }
 
             ShMountable baseEntity;
@@ -1169,7 +1169,7 @@ namespace BrokeProtocol.GameSource.Types
             if (player.IsMount<ShPhysical>(out var mount) && !mount.towParent)
             {
                 // Send serverside transport position to override client-side predicted location while it was driven
-                mount.svMountable.SvRepositionSelf();
+                mount.svPhysical.SvRelocateSelf();
             }
 
             player.SetStance(StanceIndex.Stand);
