@@ -16,17 +16,19 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Spawn
     {
-        public Place place;
         public Vector3 position;
         public Quaternion rotation;
+        public Waypoint prevWaypoint;
         public Waypoint nextWaypoint;
+        public Place place;
 
-        public Spawn(Place place, Vector3 position, Quaternion rotation, Waypoint nextWaypoint)
+        public Spawn(Vector3 position, Quaternion rotation, Waypoint prevWaypoint, Waypoint nextWaypoint)
         {
-            this.place = place;
             this.position = position;
             this.rotation = rotation;
+            this.prevWaypoint = prevWaypoint;
             this.nextWaypoint = nextWaypoint;
+            place = nextWaypoint.GetPlace;
         }
     }
 
@@ -69,7 +71,7 @@ namespace BrokeProtocol.GameSource.Types
                             spawns[tuple] = new List<Spawn>();
                         }
 
-                        spawns[tuple].Add(new Spawn(node.GetPlace, spawnPosition, Quaternion.LookRotation(ray.direction), neighbor));
+                        spawns[tuple].Add(new Spawn(spawnPosition, Quaternion.LookRotation(ray.direction), node, neighbor));
                     }
                 }
             }
@@ -77,6 +79,15 @@ namespace BrokeProtocol.GameSource.Types
 
         private float AdjustedSpawnRate(Sector sector, float limit, WaypointType type) =>
             (1f - (sector.AreaTypeCount(type) / limit)) * spawnRate;
+
+        private void SetupTrain(ShTransport transport, Spawn s)
+        {
+            if (transport is ShTrain train)
+            {
+                train.waypoints.Add(s.nextWaypoint);
+                train.waypoints.Add(s.prevWaypoint);
+            }
+        }
 
         public void SpawnRandom(ShPlayer spawner, Sector sector)
         {
@@ -120,6 +131,7 @@ namespace BrokeProtocol.GameSource.Types
                                 if (transport && transport.CanSpawn(s.position, s.rotation, new ShEntity[] { }))
                                 {
                                     transport.Spawn(s.position, s.rotation, sector.place.mTransform);
+                                    SetupTrain(transport, s);
                                     transport.SetVelocity(0.5f * transport.maxSpeed * transport.mainT.forward);
                                     spawnBot.svPlayer.SpawnBot(
                                         s.position,
@@ -137,6 +149,7 @@ namespace BrokeProtocol.GameSource.Types
                                         if (spawnTowable && transport.svTransport.TryTowing(spawnTowable))
                                         {
                                             transport = spawnTowable;
+                                            SetupTrain(transport, s);
                                         }
                                         else
                                         {
