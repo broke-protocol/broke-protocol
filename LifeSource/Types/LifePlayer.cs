@@ -1170,7 +1170,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool SameSector(ShEntity entity)
         {
-            if (entity.isHuman && entity.IsOutside)
+            if (entity.isHuman)
             {
                 foreach (var s in entity.svEntity.localSectors.Values)
                 {
@@ -1187,7 +1187,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool NewSector(ShEntity entity, List<Sector> newSectors)
         {
-            if (entity.isHuman && entity.IsOutside)
+            if (entity.isHuman)
             {
                 foreach (var s in newSectors)
                 {
@@ -1219,7 +1219,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public void SpawnSector(ShPlayer player, Sector sector)
         {
-            foreach (var g in LifeManager.worldWaypoints)
+            foreach (var g in LifeManager.waypointGroups)
             {
                 g.SpawnRandom(player, sector);
             }

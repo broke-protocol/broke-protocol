@@ -54,24 +54,27 @@ namespace BrokeProtocol.GameSource.Types
 
             foreach (var node in waypoints)
             {
-                foreach (var neighbor in node.neighbors)
+                if (node.randomSpawns)
                 {
-                    var delta = node.Delta(neighbor);
-                    var ray = new Ray(node.mainT.position, delta);
-                    var distance = delta.magnitude;
-
-                    for (var i = spawnGap; i < distance - spawnGap; i += spawnGap)
+                    foreach (var neighbor in node.neighbors)
                     {
-                        var spawnPosition = ray.GetPoint(i);
+                        var delta = node.Delta(neighbor);
+                        var ray = new Ray(node.mainT.position, delta);
+                        var distance = delta.magnitude;
 
-                        var floor = Util.GetSectorFloor(spawnPosition);
-                        var tuple = (node.GetPlace, floor);
-                        if (!spawns.ContainsKey(tuple))
+                        for (var i = spawnGap; i < distance - spawnGap; i += spawnGap)
                         {
-                            spawns[tuple] = new List<Spawn>();
-                        }
+                            var spawnPosition = ray.GetPoint(i);
 
-                        spawns[tuple].Add(new Spawn(spawnPosition, Quaternion.LookRotation(ray.direction), node, neighbor));
+                            var floor = Util.GetSectorFloor(spawnPosition);
+                            var tuple = (node.GetPlace, floor);
+                            if (!spawns.ContainsKey(tuple))
+                            {
+                                spawns[tuple] = new List<Spawn>();
+                            }
+
+                            spawns[tuple].Add(new Spawn(spawnPosition, Quaternion.LookRotation(ray.direction), node, neighbor));
+                        }
                     }
                 }
             }
@@ -170,7 +173,7 @@ namespace BrokeProtocol.GameSource.Types
     {
         public static Dictionary<ShEntity, LifeSourcePlayer> pluginPlayers = new();
 
-        public static List<WaypointGroup> worldWaypoints = new ();
+        public static List<WaypointGroup> waypointGroups = new ();
         
         [NonSerialized]
         public static List<ServerTrigger> jails = new();
@@ -352,10 +355,11 @@ namespace BrokeProtocol.GameSource.Types
 
             if (jails.Count == 0) Debug.LogWarning("[SVR] No jails found");
 
-            worldWaypoints.Add(new WaypointGroup(WaypointType.Player, 0.08f));
-            worldWaypoints.Add(new WaypointGroup(WaypointType.Vehicle, 0.06f));
-            worldWaypoints.Add(new WaypointGroup(WaypointType.Aircraft, 0.003f));
-            worldWaypoints.Add(new WaypointGroup(WaypointType.Boat, 0.01f));
+            waypointGroups.Add(new WaypointGroup(WaypointType.Player, 0.08f));
+            waypointGroups.Add(new WaypointGroup(WaypointType.Vehicle, 0.06f));
+            waypointGroups.Add(new WaypointGroup(WaypointType.Aircraft, 0.003f));
+            waypointGroups.Add(new WaypointGroup(WaypointType.Boat, 0.01f));
+            waypointGroups.Add(new WaypointGroup(WaypointType.Train, 0.01f));
 
             var waypointTypes = Enum.GetValues(typeof(WaypointType)).Length;
 

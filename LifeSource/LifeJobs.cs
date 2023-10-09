@@ -1268,7 +1268,7 @@ namespace BrokeProtocol.GameSource
                         }
                         else if (p.myItems.Count > 0)
                         {
-                            if(LifeManager.worldWaypoints[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
+                            if(LifeManager.waypointGroups[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
                             {
                                 var randomSpawn = spawns.GetRandom();
 
