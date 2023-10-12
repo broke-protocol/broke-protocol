@@ -84,6 +84,9 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[] {
                         "Towable1",
                         "Towable2" }),
+                    new Transports(new string[] {
+                        "Train1",
+                        "Train2" }),
                 },
                 new Upgrades[] {
                     new Upgrades(10,
@@ -165,8 +168,9 @@ namespace BrokeProtocol.GameSource
                         "TrailerContainer1",
                         "TrailerContainer2",
                         "TrailerContainer3",
-                        "TrailerContainer4",
-                    })
+                        "TrailerContainer4",}),
+                    new Transports(new string[] {
+                        "Metro"}),
                 },
                 new Upgrades[0]),
             new MyJobInfo(
@@ -174,6 +178,7 @@ namespace BrokeProtocol.GameSource
                 "The prison door can be bombed and the guard might have a key",
                 CharacterType.Humanoid, 0, GroupIndex.Prisoner, new ColorStruct(1f, 0.5f, 0f), 0f, 0,
                 new Transports[] {
+                    new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -190,6 +195,7 @@ namespace BrokeProtocol.GameSource
                 "Assasinate designated targets to earn bounty rewards",
                 CharacterType.Humanoid, 0, GroupIndex.Criminal, new ColorStruct(0f, 0f, 0f), 0.01f, 3,
                 new Transports[] {
+                    new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -221,10 +227,11 @@ namespace BrokeProtocol.GameSource
                 CharacterType.Humanoid, 0, GroupIndex.LawEnforcement, new ColorStruct(0f, 1f, 1f), 0.03f, 10,
                 new Transports[] {
                     new Transports(new string[] { "CarPolice" }),
-                    new Transports(new string[] { }),
+                    new Transports(new string[0]),
                     new Transports(new string[] { "PoliceBoat" }),
-                    new Transports(new string[] { }),
-                    new Transports(new string[] { }),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -263,6 +270,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -289,6 +297,7 @@ namespace BrokeProtocol.GameSource
                 CharacterType.Humanoid, 0, GroupIndex.Citizen, new ColorStruct(1f, 1f, 0f), 0.01f, 3,
                 new Transports[] {
                     new Transports(new string[] {"FireTruck"}),
+                    new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -322,6 +331,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -349,6 +359,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -371,6 +382,7 @@ namespace BrokeProtocol.GameSource
                 "Kill enemy gangs to start a turf war and defeat enemy waves to capture territory",
                 CharacterType.Humanoid, 0, GroupIndex.Criminal, new ColorStruct(0f, 0f, 1f), 0.1f, 8,
                 new Transports[] {
+                    new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -405,6 +417,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(0,
@@ -423,6 +436,7 @@ namespace BrokeProtocol.GameSource
                 "Deliver food to hungry players and NPCs on your map (M) for rewards",
                 CharacterType.Humanoid, 0, GroupIndex.Citizen, new ColorStruct(0.5f, 0.25f, 0f), 0f, 0,
                 new Transports[] {
+                    new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -449,6 +463,7 @@ namespace BrokeProtocol.GameSource
                 "Bring NPCs to destinations on your map (M) for rewards",
                 CharacterType.Humanoid, 0, GroupIndex.Citizen, new ColorStruct(0f, 0f, 0.5f), 0f, 0,
                 new Transports[] {
+                    new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
@@ -497,6 +512,7 @@ namespace BrokeProtocol.GameSource
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
+                    new Transports(new string[0]),
                 },
                 new Upgrades[] {
                     new Upgrades(20,
@@ -523,6 +539,7 @@ namespace BrokeProtocol.GameSource
                 "Return lost or dropped items to their rightful owner in time for rewards",
                 CharacterType.Mob, 0, GroupIndex.Citizen, new ColorStruct(0.25f, 0.75f, 0.25f), 0f, 0,
                 new Transports[] {
+                    new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),
                     new Transports(new string[0]),

@@ -1,5 +1,4 @@
-﻿using BrokeProtocol.GameSource.Types;
-using BrokeProtocol.Utility.Jobs;
+﻿using BrokeProtocol.Utility.Jobs;
 using System.Collections;
 using UnityEngine;
 
