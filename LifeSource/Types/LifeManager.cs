@@ -198,7 +198,6 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             SvManager.Instance.AddNewEntityExisting(newEntity);
-
             ((MyJobInfo)BPAPI.Jobs[jobIndex]).randomEntities[waypointIndex].Add(newEntity);
         }
 
