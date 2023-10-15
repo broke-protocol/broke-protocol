@@ -87,6 +87,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (transport is ShTrain train)
             {
+                train.waypoints.Clear();
                 train.waypoints.Add(s.nextWaypoint);
                 train.waypoints.Add(s.prevWaypoint);
             }
