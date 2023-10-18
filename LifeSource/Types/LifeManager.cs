@@ -359,7 +359,7 @@ namespace BrokeProtocol.GameSource.Types
             waypointGroups.Add(new WaypointGroup(WaypointType.Vehicle, 0.06f));
             waypointGroups.Add(new WaypointGroup(WaypointType.Aircraft, 0.003f));
             waypointGroups.Add(new WaypointGroup(WaypointType.Boat, 0.01f));
-            waypointGroups.Add(new WaypointGroup(WaypointType.Train, 0.01f));
+            waypointGroups.Add(new WaypointGroup(WaypointType.Train, 0.005f));
 
             var waypointTypes = Enum.GetValues(typeof(WaypointType)).Length;
 

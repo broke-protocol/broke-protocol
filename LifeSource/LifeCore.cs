@@ -166,7 +166,8 @@ namespace BrokeProtocol.GameSource
                         "TrailerContainer1",
                         "TrailerContainer2",
                         "TrailerContainer3",
-                        "TrailerContainer4"}),
+                        "TrailerContainer4",
+                        "MetroCarriage"}),
                 },
                 new Upgrades[0]),
             new MyJobInfo(

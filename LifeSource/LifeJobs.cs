@@ -680,7 +680,8 @@ namespace BrokeProtocol.GameSource
             "LicenseGun",
             "LicenseDrivers",
             "LicensePilots",
-            "LicenseBoating"
+            "LicenseBoating",
+            "LicenseTrain",
         };
 
         private const string requestItemMenu = "RequestItem";
