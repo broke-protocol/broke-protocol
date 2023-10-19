@@ -152,8 +152,8 @@ namespace BrokeProtocol.GameSource.Types
 
                                         if (spawnTowable && transport.svTransport.TryTowing(spawnTowable))
                                         {
+                                            SetupTrain(spawnTowable, s);
                                             transport = spawnTowable;
-                                            SetupTrain(transport, s);
                                         }
                                         else
                                         {
