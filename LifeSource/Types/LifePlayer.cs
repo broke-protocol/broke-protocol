@@ -596,7 +596,6 @@ namespace BrokeProtocol.GameSource.Types
                         target.GetPlace,
                         null,
                         target,
-                        null,
                         target);
 
                     return spawnBot;

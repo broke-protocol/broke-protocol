@@ -93,6 +93,29 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
+        private void AddPassengers(ShPlayer spawner, ShTransport transport, int jobIndex, Spawn s)
+        {
+            for (var seat = (byte)1; seat < transport.seats.Length; ++seat)
+            {
+                if (Random.value < 0.2f)
+                {
+                    var passengerBot = LifeManager.GetAvailable<ShPlayer>(jobIndex, WaypointType.Player);
+
+                    if (passengerBot)
+                    {
+                        passengerBot.svPlayer.SpawnBot(
+                            s.position,
+                            s.rotation,
+                            s.place,
+                            s.nextWaypoint,
+                            spawner,
+                            null);
+                        passengerBot.svPlayer.SvMount(transport, seat);
+                    }
+                }
+            }
+        }
+
         public void SpawnRandom(ShPlayer spawner, Sector sector)
         {
             if (spawns.TryGetValue((sector.place, sector.position), out var sectorSpawns))
@@ -113,7 +136,6 @@ namespace BrokeProtocol.GameSource.Types
                                     s.place,
                                     s.nextWaypoint,
                                     spawner,
-                                    null,
                                     null);
                             }
                         }
@@ -143,8 +165,10 @@ namespace BrokeProtocol.GameSource.Types
                                         s.place,
                                         s.nextWaypoint,
                                         spawner,
-                                        transport,
                                         null);
+                                    spawnBot.svPlayer.SvMount(transport, 0);
+
+                                    AddPassengers(spawner, transport, jobIndex, s);
 
                                     while (transport.svTransport.TryGetTowOption(out var towable))
                                     {
@@ -154,6 +178,8 @@ namespace BrokeProtocol.GameSource.Types
                                         {
                                             SetupTrain(spawnTowable, s);
                                             transport = spawnTowable;
+
+                                            AddPassengers(spawner, spawnTowable, jobIndex, s);
                                         }
                                         else
                                         {
