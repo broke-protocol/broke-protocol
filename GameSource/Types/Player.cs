@@ -1039,7 +1039,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool UpdateTextDisplay(ShPlayer player, ShTextDisplay textDisplay)
         {
-            if (textDisplay.editableLength > 0)
+            if (textDisplay && textDisplay.editableLength > 0)
             {
                 player.svPlayer.SendInputMenu(
                     $"Update Text (${textDisplay.value})",
