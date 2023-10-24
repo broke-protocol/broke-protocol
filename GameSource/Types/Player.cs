@@ -1166,7 +1166,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Dismount(ShPlayer player)
         {
-            if (player.IsMountController && player.curMount is ShPhysical physicalMount && !physicalMount.towParent)
+            if (player.IsMount<ShPhysical>(out var physicalMount))
             {
                 // Send serverside transport position to override client-side predicted location while it was driven
                 physicalMount.svPhysical.SvRelocateSelf();
