@@ -65,8 +65,8 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            if (spawnLocations.Count == 0) Debug.LogWarning("[SVR] No spawn locations found");
-            if (territories.Count == 0) Debug.LogWarning("[SVR] No territories found");
+            if (spawnLocations.Count == 0) Util.Log("No spawn locations found", LogLevel.Warn);
+            if (territories.Count == 0) Util.Log("No territories found", LogLevel.Warn);
 
             return true;
         }

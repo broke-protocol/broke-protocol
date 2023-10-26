@@ -379,7 +379,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            if (jails.Count == 0) Debug.LogWarning("[SVR] No jails found");
+            if (jails.Count == 0) Util.Log("No jails found", LogLevel.Warn);
 
             waypointGroups.Add(new WaypointGroup(WaypointType.Player, 0.08f));
             waypointGroups.Add(new WaypointGroup(WaypointType.Vehicle, 0.06f));

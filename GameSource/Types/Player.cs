@@ -198,7 +198,7 @@ namespace BrokeProtocol.GameSource.Types
         private bool ChatBoilerplate(ShPlayer player, string prefix, string message, out string cleanMessage)
         {
             cleanMessage = message.CleanMessage();
-            Debug.Log($"{prefix} {player.username}: {cleanMessage}");
+            Util.Log($"{prefix} {player.username}: {cleanMessage}");
             return !Utility.chatted.Limit(player) && 
                 !string.IsNullOrWhiteSpace(cleanMessage) && 
                 !CommandHandler.OnEvent(player, cleanMessage);
@@ -969,7 +969,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else
             {
-                Debug.Log("[SVR] Invalid DeltaInv in TransferShop");
+                Util.Log("Invalid DeltaInv in TransferShop", LogLevel.Warn);
                 return false;
             }
 
@@ -999,13 +999,13 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.otherEntity is not ShPlayer otherPlayer)
             {
-                Debug.Log("[SVR] Invalid trading partner");
+                Util.Log("Invalid trading partner", LogLevel.Warn);
                 return false;
             }
 
             if (deltaType != DeltaInv.MeToTrade && deltaType != DeltaInv.TradeToMe)
             {
-                Debug.Log("[SVR] Invalid DeltaInv in TransferTrade");
+                Util.Log("Invalid DeltaInv in TransferTrade", LogLevel.Warn);
                 return false;
             }
 

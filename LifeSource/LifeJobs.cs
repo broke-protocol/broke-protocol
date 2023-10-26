@@ -316,7 +316,7 @@ namespace BrokeProtocol.GameSource
             var requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if (!requester)
             {
-                Debug.LogError("[SVR] Requester not found");
+                Util.Log("Requester not found", LogLevel.Warn);
                 return;
             }
 
@@ -347,7 +347,7 @@ namespace BrokeProtocol.GameSource
             var requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if (!requester)
             {
-                Debug.LogError("[SVR] Requester not found");
+                Util.Log("Requester not found", LogLevel.Warn);
                 return;
             }
 
@@ -783,21 +783,21 @@ namespace BrokeProtocol.GameSource
         {
             if (!requestItems.Contains(itemName))
             {
-                Debug.LogError("[SVR] Item not valid: " + itemName);
+                Util.Log("Item not valid: " + itemName, LogLevel.Warn);
                 return;
             }
 
             var item = SceneManager.Instance.GetEntity<ShItem>(itemName);
             if (!item)
             {
-                Debug.LogError("[SVR] Item not found: " + itemName);
+                Util.Log("Item not found: " + itemName, LogLevel.Warn);
                 return;
             }
 
             var requester = EntityCollections.FindByID<ShPlayer>(sourceID);
             if(!requester)
             {
-                Debug.LogError("[SVR] Requester not found");
+                Util.Log("Requester not found", LogLevel.Warn);
                 return;
             }
 
@@ -832,7 +832,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!requests.TryGetValue(requesterName, out var itemName))
             {
-                Debug.LogError("[SVR] Requester invalid: " + requesterName);
+                Util.Log("Requester invalid: " + requesterName, LogLevel.Warn);
                 return;
             }
 

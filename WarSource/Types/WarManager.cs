@@ -285,7 +285,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            if (Manager.territories.Count == 0) Debug.LogWarning("[SVR] No territories found");
+            if (Manager.territories.Count == 0) Util.Log("No territories found", LogLevel.Warn);
 
             foreach (var t in Manager.territories)
             {
