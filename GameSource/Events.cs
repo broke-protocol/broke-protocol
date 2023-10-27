@@ -41,6 +41,10 @@ namespace BrokeProtocol.GameSource
         {
             if (physical is ShTransport transport)
             {
+                if (transport.controller)
+                {
+                    transport.controller.svPlayer.SendGameMessage("Entered Rearm Zone");
+                }
                 transport.StartCoroutine(RearmCoroutine(trigger, transport));
             }
         }
@@ -60,6 +64,10 @@ namespace BrokeProtocol.GameSource
         {
             if (physical is ShTransport transport)
             {
+                if (transport.controller)
+                {
+                    transport.controller.svPlayer.SendGameMessage("Entered Repair Zone");
+                }
                 transport.StartCoroutine(RepairCoroutine(trigger, transport));
             }
         }
