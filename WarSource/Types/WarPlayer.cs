@@ -10,7 +10,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class WarSourcePlayer
     {
-        private readonly ShPlayer player;
+        public readonly ShPlayer player;
 
         public bool changePending;
         public int spawnTerritoryIndex;

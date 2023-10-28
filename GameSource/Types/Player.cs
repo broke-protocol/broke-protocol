@@ -17,7 +17,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class GameSourcePlayer
     {
-        private readonly ShPlayer player;
+        public readonly ShPlayer player;
 
         public Coroutine jobCoroutine;
 
