@@ -342,6 +342,12 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (!base.IsValid()) return false;
 
+            if (!targetEntity.CanCrack(player))
+            {
+                Util.Log($"Invalid crack attempt on {targetEntity} by {player.username}", LogLevel.Warn);
+                return false;
+            }
+
             if (!player.HasItem(player.manager.lockpick))
             {
                 player.svPlayer.SendGameMessage($"Missing {player.manager.lockpick.itemName} item");
