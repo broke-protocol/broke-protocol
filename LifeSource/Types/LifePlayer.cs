@@ -342,7 +342,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (!base.IsValid()) return false;
 
-            if (!targetEntity.CanCrack(player))
+            if (!targetEntity.CanBeCracked(player))
             {
                 Util.Log($"Invalid crack attempt on {targetEntity} by {player.username}", LogLevel.Warn);
                 return false;
