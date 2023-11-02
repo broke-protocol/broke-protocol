@@ -56,6 +56,11 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     attackState = Core.Attack;
                 }
+                else if(player.IsPassenger(out _) && player.curMount.Grounded)
+                {
+                    player.svPlayer.SvDismount();
+                    attackState = Core.Attack;
+                }
                 else
                 {
                     attackState = Core.StaticAttack;
