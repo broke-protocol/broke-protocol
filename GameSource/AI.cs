@@ -530,7 +530,7 @@ namespace BrokeProtocol.GameSource
         public override void ExitState(State nextState)
         {
             base.ExitState(nextState);
-            if (nextState != this)
+            if (nextState is not WaypointState)
             {
                 player.svPlayer.onWaypoints = false;
             }

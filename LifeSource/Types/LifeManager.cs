@@ -107,7 +107,7 @@ namespace BrokeProtocol.GameSource.Types
                             s.position,
                             s.rotation,
                             s.place,
-                            s.nextWaypoint,
+                            null,
                             spawner,
                             null);
                         passengerBot.svPlayer.SvMount(transport, seat);
