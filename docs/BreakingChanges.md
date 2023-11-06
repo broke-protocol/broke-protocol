@@ -1,3 +1,37 @@
+## 1.38
+?> This Update generally appends onto the API but it does still change some methods outlined below. Most important is the new ShTrain class and physics overhaul that might affect some old mods.
+
+### API
+* New ShTrain class for modding
+* Multiple ExitTransforms are supported on vehicles (closest to player is selected)
+  * Old vehicle mods using the single ExitTransform might need updates (mainly important for boats)
+* SvEntity.SvRepositionSelf() -> SvPhysical.SvRelocateSelf()
+* ClPacket.RepositionSelf -> RelocateSelf
+* UI Elements modding API (TheUnishark)
+  * New methods supporting Sliders, Dropdowns, Radio Buttons, Toggles, Etc.
+  * Removed one generic param in the query of ClManager.GetVisualElement<T>()
+  * Fixed ClManager.GetTextFieldText method was sending the wrong packet
+  * Added SvPlayer/ClManager.SetTextElementText(string element, string text)
+  * Solved an issue where disabled/invisible elements were blocking UI clicks
+* Util.Log() is the recommended method for logging now
+* SpawnBot() targetVehicle parameter removed (prefer SvMount() after spawn)
+* CanSee(Vector3 direction, float distance) => CanSee(Vector3 position)
+
+### MODDING
+* Dynamic Towing LineRenderer is supported, see TowTrucks in BPResources for how to setup
+* mobsUpdate backwards compatibility hack removed
+  * Old mods should update their seating position since animal mobs were added
+* exitTransforms is now an array supporting multiple exits
+  * Closest exit is picked
+  * If none defined, a fallback way of picking a safe exit is used
+  * Mods relying on this (like boats and big aircraft) should be rebuilt
+* New Torque parameter
+  * Defines power falloff at high end of speeed
+  * New default value is a 'middle-ground' and can be tweaked
+  * Old mods might need updating
+    * Old surface vehicle mods will be more powerful
+    * Old air vehicle mods will be less powerful 
+
 ## 1.37
 ?> Most API changes in the Truck Simulator Update are related to the new Towing functionality in 1.37. This includes a new TowT transform reference and a list of TowOptions on each vehicle for random spawning. Important to note an overall simplification to accessing specific Mount types and Controllers since it was getting confusing with all the different Properties. Also in continuing to simplify the class heirarchy, ShWheeled class is merged into parent ShTransport so even boats and planes can have animated wheels, skidmarks, particles, etc. This opens to door to amphibious vehicles later on and potentially better wheel damage/blowout modelling too.
 
@@ -194,24 +228,3 @@
     - "bp.videoCustom"
     - "bp.videoStop"
 - Added ConnectionData.deviceID for checking hardware bans or alts during Login/Registration
-
-## 1.14
-?> The Animals Update adds a couple new useful GameSource events and a new character type called Mob (used only for basic animals currently). Most existing mods should be forward compatible with this version although Player character mods and custom Player animations will likely need to be redone and exported with the new BPResources.
-
-### API
-- Additional entity lookup method: 'bool EntityCollections.TryFindEntity(int id, out ShEntity e)'
-- Use new Player.Hands property instead of manager.hands since each characterType can have a different default 'Hands' item
-- svPlayer.NodeNear() returns the actual NavGraph Node instead of just a bool
-- New Animal related crimes:
-    - CrimeIndex.AnimalCruelty
-    - CrimeIndex.AnimalKilling
-- Added GameSource Events:
-    - PlayerHandsUp
-    - PlayerMenuClosed
-
-### MODDING
-- Re-organized Player Character controller (functionality is 99% the same, just a minor jump fix)
-- Player hip origin is different than before for most Sit animations (Player character mods will need to updated for Sit animations)
-    - Vehicles don't need to be updated (automatically handled)
-- Clothing/Wearables don't need colliders set anymore
-    - It's fine if old mods have them though they will be duplicated
