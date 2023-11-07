@@ -530,7 +530,11 @@ namespace BrokeProtocol.GameSource
         public override void ExitState(State nextState)
         {
             base.ExitState(nextState);
-            if (nextState is not WaypointState)
+            // Logic to avoid searching for new waypoint if going from FleeState back to WaypointState
+            // But to find a new one if going from Vehicle waypoints to Pedestrian waypoints for example
+            if (nextState is not WaypointState || 
+                (player.svPlayer.onWaypoints && 
+                player.svPlayer.nextWaypoint.waypointType != player.GetControlled.svMovable.WaypointProperty))
             {
                 player.svPlayer.onWaypoints = false;
             }
