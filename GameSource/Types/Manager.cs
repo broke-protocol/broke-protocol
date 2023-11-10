@@ -172,16 +172,9 @@ namespace BrokeProtocol.GameSource.Types
         {
             // Prepare the map and mapHash before navmesh generation and static analysis
 
-            // Clone all apartments up to the max playerCount (needed for proper AI navigation)
-            var playerCount = SvManager.Instance.settings.players;
-            foreach (var apartment in SvManager.Instance.apartments)
-            {
-                SceneManager.Instance.CloneInterior(apartment.Key, playerCount);
-            }
-
             // MapHash is used for caching on both server and clients
-            SceneManager.Instance.mapHash = SceneManager.Instance.mapData.GetChecksum() + playerCount;
-            // Since playerCounts will affect the navmesh (see loop above) it's included as part of the mapHash
+            SceneManager.Instance.mapHash = SceneManager.Instance.mapData.GetChecksum();
+            // Modify this (or keep static) to determine whether a new navmesh is generated or not
 
             return true;
         }

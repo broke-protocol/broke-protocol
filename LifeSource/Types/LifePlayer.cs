@@ -329,7 +329,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public override bool IsValid() => base.IsValid() && targetPlayer && GetPlace != null;
 
-        public ApartmentPlace GetPlace => targetPlayer.ownedApartments.TryGetValue(targetApartment, out var apartmentPlace) ? apartmentPlace : null;
+        public Place GetPlace => targetPlayer.ownedApartments.TryGetValue(targetApartment, out var apartmentPlace) ? apartmentPlace : null;
     }
 
     public class CrackingContainer : MinigameContainer
@@ -885,7 +885,7 @@ namespace BrokeProtocol.GameSource.Types
                             break;
                         case hackPanel:
                             var options = new List<LabelID>();
-                            foreach (var clone in apartment.svApartment.clones)
+                            foreach (var clone in apartment.GetPlace.clones)
                             {
                                 if (clone.svOwner)
                                 {
@@ -1005,7 +1005,7 @@ namespace BrokeProtocol.GameSource.Types
                 case enterPasscode:
                     var a1 = EntityCollections.FindByID<ShApartment>(targetID);
 
-                    foreach (var a in a1.svApartment.clones)
+                    foreach (var a in a1.GetPlace.clones)
                     {
                         if (a.svPasscode != null && a.svPasscode == input)
                         {
