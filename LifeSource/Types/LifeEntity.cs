@@ -1,6 +1,5 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.Utility;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -10,13 +9,14 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool SecurityTrigger(ShEntity entity, Collider otherCollider)
         {
-            if (entity.GetPlace is ApartmentPlace apartmentPlace && otherCollider.TryGetComponent(out ShPlayer player) && 
-                player != apartmentPlace.svOwner && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            var place = entity.GetPlace;
+            if (place.owner && otherCollider.TryGetComponent(out ShPlayer player) && 
+                player != place.owner && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                apartmentPlace.svOwner.svPlayer.SendGameMessage($"{entity.name} detected {player.username} in apartment");
+                place.owner.svPlayer.SendGameMessage($"{entity.name} detected {player.username} in apartment");
 
-                if (pluginPlayer.ApartmentTrespassing(apartmentPlace.svOwner))
-                    pluginPlayer.AddCrime(CrimeIndex.Trespassing, apartmentPlace.svOwner);
+                if (pluginPlayer.ApartmentTrespassing(place.owner))
+                    pluginPlayer.AddCrime(CrimeIndex.Trespassing, place.owner);
             }
 
             return true;

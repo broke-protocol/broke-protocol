@@ -652,9 +652,9 @@ namespace BrokeProtocol.GameSource.Types
             var title = "&7Security Panel";
             if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
             {
-                title += ": Level " + apartmentPlace.svSecurity.ToPercent();
-                if (apartmentPlace.svSecurity < securityCutoff)
-                    options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.svSecurity)})", upgradeSecurity));
+                title += ": Level " + apartmentPlace.security.ToPercent();
+                if (apartmentPlace.security < securityCutoff)
+                    options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.security)})", upgradeSecurity));
             }
 
             player.svPlayer.SendOptionMenu(title, apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
@@ -859,20 +859,20 @@ namespace BrokeProtocol.GameSource.Types
                         case clearPasscode:
                             if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
                             {
-                                apartmentPlace.svPasscode = null;
+                                apartmentPlace.passcode = null;
                                 player.svPlayer.SendGameMessage("Apartment Passcode Cleared");
                             }
                             else player.svPlayer.SendGameMessage("No Apartment Owned");
                             break;
                         case upgradeSecurity:
-                            if (player.ownedApartments.TryGetValue(apartment, out var securityPlace) && securityPlace.svSecurity < securityCutoff)
+                            if (player.ownedApartments.TryGetValue(apartment, out var securityPlace) && securityPlace.security < securityCutoff)
                             {
-                                var upgradeCost = SecurityUpgradeCost(securityPlace.svSecurity);
+                                var upgradeCost = SecurityUpgradeCost(securityPlace.security);
 
                                 if (player.MyMoneyCount >= upgradeCost)
                                 {
                                     player.TransferMoney(DeltaInv.RemoveFromMe, upgradeCost);
-                                    securityPlace.svSecurity += 0.1f;
+                                    securityPlace.security += 0.1f;
                                     player.svPlayer.SendGameMessage("Apartment Security Upgraded");
                                     player.svPlayer.SvSecurityPanel(apartment.ID);
                                 }
@@ -887,9 +887,9 @@ namespace BrokeProtocol.GameSource.Types
                             var options = new List<LabelID>();
                             foreach (var clone in apartment.GetPlace.clones)
                             {
-                                if (clone.svOwner)
+                                if (clone.owner)
                                 {
-                                    options.Add(new LabelID($"{clone.svOwner.username} - Difficulty: {clone.svSecurity.ToPercent()}", clone.svOwner.username));
+                                    options.Add(new LabelID($"{clone.owner.username} - Difficulty: {clone.security.ToPercent()}", clone.owner.username));
                                 }
                             }
                             player.svPlayer.DestroyMenu(securityPanel);
@@ -903,7 +903,7 @@ namespace BrokeProtocol.GameSource.Types
                     if (hackingContainer.IsValid())
                     {
                         player.svPlayer.DestroyMenu(hackPanel);
-                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.GetPlace.svSecurity);
+                        player.svPlayer.StartHackingMenu("Hack Security Panel", targetID, menuID, optionID, hackingContainer.GetPlace.security);
                         player.StartCoroutine(CheckValidMinigame(hackingContainer));
                     }
                     break;
@@ -1007,9 +1007,9 @@ namespace BrokeProtocol.GameSource.Types
 
                     foreach (var a in a1.GetPlace.clones)
                     {
-                        if (a.svPasscode != null && a.svPasscode == input)
+                        if (a.passcode != null && a.passcode == input)
                         {
-                            player.svPlayer.SvEnterDoor(targetID, a.svOwner, true);
+                            player.svPlayer.SvEnterDoor(targetID, a.owner, true);
                             return true;
                         }
                     }
@@ -1020,7 +1020,7 @@ namespace BrokeProtocol.GameSource.Types
                     var a2 = EntityCollections.FindByID<ShApartment>(targetID);
                     if (a2 && player.ownedApartments.TryGetValue(a2, out var ap2))
                     {
-                        ap2.svPasscode = input;
+                        ap2.passcode = input;
                         player.svPlayer.SendGameMessage("Apartment Passcode Set");
                         return true;
                     }

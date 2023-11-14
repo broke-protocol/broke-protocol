@@ -20,7 +20,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     svEntity.StartDestroyDelay(svEntity.destroyAfter);
                 }
-                else if (!entity.InApartment)
+                else if (!entity.GetPlace.owner)
                 {
                     svEntity.StartDestroyDelay(60f * 60f * 2f);
                 }
