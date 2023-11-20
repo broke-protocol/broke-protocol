@@ -885,7 +885,7 @@ namespace BrokeProtocol.GameSource.Types
                             break;
                         case hackPanel:
                             var options = new List<LabelID>();
-                            foreach (var clone in apartment.GetPlace.clones)
+                            foreach (var clone in apartment.GetPlace.clones.Values)
                             {
                                 if (clone.owner)
                                 {
@@ -1005,7 +1005,7 @@ namespace BrokeProtocol.GameSource.Types
                 case enterPasscode:
                     var a1 = EntityCollections.FindByID<ShApartment>(targetID);
 
-                    foreach (var a in a1.GetPlace.clones)
+                    foreach (var a in a1.GetPlace.clones.Values)
                     {
                         if (a.passcode != null && a.passcode == input)
                         {
