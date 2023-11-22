@@ -1240,7 +1240,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else
             {
-                player.TransferMoney(DeltaInv.RemoveFromMe, amount, true);
+                player.TransferMoney(DeltaInv.RemoveFromMe, amount);
                 player.svPlayer.bankBalance += amount;
                 player.svPlayer.AppendTransaction(amount);
                 player.svPlayer.SvAppDeposit(entityID);
@@ -1258,7 +1258,7 @@ namespace BrokeProtocol.GameSource.Types
             }
             else
             {
-                player.TransferMoney(DeltaInv.AddToMe, amount, true);
+                player.TransferMoney(DeltaInv.AddToMe, amount);
                 player.svPlayer.bankBalance -= amount;
                 player.svPlayer.AppendTransaction(-amount);
                 player.svPlayer.SvAppWithdraw(entityID);

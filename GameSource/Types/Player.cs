@@ -491,16 +491,16 @@ namespace BrokeProtocol.GameSource.Types
         {
             var removedItems = new List<InventoryItem>();
 
+            var upgrades = player.svPlayer.job.info.shared.upgrades;
+
             // Allows players to keep items/rewards from job ranks
             foreach (var myItem in player.myItems.Values.ToArray())
             {
                 var extra = myItem.count;
 
-                var upgrades = player.svPlayer.job.info.shared.upgrades;
-
                 if (upgrades.Length > player.rank)
                 {
-                    for (int rankIndex = player.rank; rankIndex >= 0; rankIndex--)
+                    for (var rankIndex = player.rank; rankIndex >= 0; rankIndex--)
                     {
                         foreach (var i in upgrades[rankIndex].items)
                         {
@@ -989,7 +989,7 @@ namespace BrokeProtocol.GameSource.Types
             if (source.MyItemCount(itemIndex) >= amount && target.MyMoneyCount >= totalTransferValue)
             {
                 player.TransferItem(deltaType, itemIndex, amount);
-                player.TransferMoney(DeltaInv.InverseDelta[deltaType], totalTransferValue, true);
+                player.TransferMoney(DeltaInv.InverseDelta[deltaType], totalTransferValue);
             }
             else
             {
