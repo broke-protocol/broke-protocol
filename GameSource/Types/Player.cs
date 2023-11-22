@@ -331,9 +331,9 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.TransferMoney(DeltaInv.AddToMe, moneyDelta);
             }
-            else if (moneyDelta < 0)
+            else if (moneyDelta < 0 && player.MyMoneyCount > 0)
             {
-                player.TransferMoney(DeltaInv.RemoveFromMe, -moneyDelta);
+                player.TransferMoney(DeltaInv.RemoveFromMe, Mathf.Min(-moneyDelta, player.MyMoneyCount));
             }
 
             if (player.svPlayer.job.info.shared.upgrades.Length <= 1) return true;
