@@ -1198,7 +1198,7 @@ namespace BrokeProtocol.GameSource.Types
             // Still alive, do knockdown and AI retaliation
             if (player.stance.setable)
             {
-                if (player.isHuman && player.health < 15f)
+                if ((player.isHuman || player.svPlayer.randomSpawn) && player.health < 10f)
                 {
                     player.svPlayer.SvForceStance(StanceIndex.KnockedOut);
                     // If knockout AI, set AI state Null
