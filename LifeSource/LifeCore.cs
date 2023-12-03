@@ -417,6 +417,7 @@ namespace BrokeProtocol.GameSource
                             new InventoryStruct("LicenseDrivers", 1),
                             new InventoryStruct("LicenseBoating", 1),
                             new InventoryStruct("LicensePilots", 1),
+                            new InventoryStruct("LicenseTrain", 1),
                             new InventoryStruct("LicenseGun", 1)})
                 }),
             new MyJobInfo(
