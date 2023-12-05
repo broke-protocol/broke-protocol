@@ -369,6 +369,7 @@ namespace BrokeProtocol.GameSource.Types
                 entity.Player.svPlayer.SvAddSelfAction("MyCrimes", "Crimes");
                 entity.Player.svPlayer.SvAddInventoryAction("GetItemValue", "ShItem", ButtonType.Sellable, "Get Sell Value");
                 entity.Player.svPlayer.SvAddTypeAction("HandsUp", "ShPlayer", "Hands Up!");
+                entity.Player.svPlayer.VisualTreeAssetClone("WantedLevel");
             }
 
             return true;
