@@ -258,7 +258,7 @@ namespace BrokeProtocol.GameSource
             var direction = delta / distance;
             var dot = Vector3.Dot(-direction, selfT.forward);
             var enemyDot = Vector3.Dot(direction, enemyRotation);
-            var enemyAirborn = !enemyMount.Grounded;
+            var enemyAirborn = !enemyMount.Ground;
 
             AirState airState;
 
