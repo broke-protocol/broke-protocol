@@ -152,7 +152,7 @@ namespace BrokeProtocol.GameSource.Types
 
             var delay = new WaitForSeconds(5f);
 
-            while (!player.IsDead)
+            while (!player.IsDead && !player.svPlayer.godMode)
             {
                 if (player.GetStanceIndex == StanceIndex.Sleep)
                 {
@@ -459,6 +459,8 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Injury(ShPlayer player, BodyPart part, BodyEffect effect, byte amount)
         {
+            if (player.svPlayer.godMode) return false;
+
             player.AddInjury(part, effect, amount);
             player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.AddInjury, (byte)part, (byte)effect, amount);
 
