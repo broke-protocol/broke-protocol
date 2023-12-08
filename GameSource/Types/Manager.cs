@@ -46,9 +46,6 @@ namespace BrokeProtocol.GameSource.Types
             return false;
         }
 
-        
-
-
         [Execution(ExecutionMode.Additive)]
         public override bool Start()
         {
@@ -78,19 +75,20 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (!SvManager.Instance.TryGetUserData(connectData.username, out var playerData))
                 {
-                    SvManager.Instance.RegisterFail(connectData.connection, "Account not found - Please Register");
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} not found - Please Register");
                 }
                 else if (playerData.PasswordHash != connectData.passwordHash)
                 {
-                    SvManager.Instance.RegisterFail(connectData.connection, "Invalid credentials");
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Invalid credentials for Account {connectData.username}");
                 }
                 else
                 {
                     SvManager.Instance.LoadSavedPlayer(playerData, connectData);
+                    return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
         [Execution(ExecutionMode.Additive)]
@@ -102,20 +100,20 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     if (playerData.PasswordHash != connectData.passwordHash)
                     {
-                        SvManager.Instance.RegisterFail(connectData.connection, "Invalid credentials");
-                        return true;
+                        SvManager.Instance.RegisterFail(connectData.connection, $"Invalid credentials for Account {connectData.username}");
+                        return false;
                     }
 
-                    if (!Utility.tryRegister.Limit(connectData.username))
+                    if (!Utility.accountWipe.Limit(connectData.username))
                     {
-                        SvManager.Instance.RegisterFail(connectData.connection, $"Character {connectData.username} Exists - Sure you want to Register?");
-                        return true;
+                        SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} exists - Sure you want to Register?");
+                        return false;
                     }
                 }
 
                 if (!connectData.username.ValidCredential())
                 {
-                    SvManager.Instance.RegisterFail(connectData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} cannot be registered (check length and characters)");
                 }
                 else if (connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs.Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
                 {
@@ -125,6 +123,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         var location = spawn.mainT;
                         SvManager.Instance.AddNewPlayer(skinPrefabs[connectData.skinIndex], connectData, playerData?.Persistent, location.position, location.rotation, location.parent);
+                        return true;
                     }
                     else
                     {
@@ -137,7 +136,38 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            return true;
+            return false;
+        }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool TryDelete(ConnectData connectData)
+        {
+            if (ValidateUser(connectData))
+            {
+                if (!SvManager.Instance.TryGetUserData(connectData.username, out var playerData))
+                {
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} not found - Please Register");
+                }
+                else if (playerData.PasswordHash != connectData.passwordHash)
+                {
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Invalid credentials for Account {connectData.username}");
+                }
+                else if (!Utility.accountWipe.Limit(connectData.username))
+                {
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Sure you want to delete {connectData.username} account?");
+                }
+                else if (SvManager.Instance.database.Users.Delete(connectData.username))
+                {
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} deleted");
+                    return true;
+                }
+                else
+                {
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} deletion error");
+                }
+            }
+
+            return false;
         }
 
 
@@ -152,14 +182,14 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (!SvManager.Instance.HandleWhitelist(connectData.username))
             {
-                SvManager.Instance.RegisterFail(connectData.connection, "Account not whitelisted");
+                SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} not whitelisted");
                 return false;
             }
 
             // Don't allow multi-boxing, WebAPI doesn't prevent this
             if (EntityCollections.Accounts.ContainsKey(connectData.username))
             {
-                SvManager.Instance.RegisterFail(connectData.connection, "Account still logged in");
+                SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} still logged in");
                 return false;
             }
 
