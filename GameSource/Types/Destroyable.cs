@@ -23,7 +23,9 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 hitPoint, Vector3 hitNormal)
         {
-            if (damageable.IsDead) return false;
+            var controller = damageable.controller;
+
+            if (damageable.IsDead || controller && controller.svPlayer.godMode) return false;
 
             var destroyable = damageable as ShDestroyable;
 
@@ -105,8 +107,6 @@ namespace BrokeProtocol.GameSource.Types
             }
             else if (attacker && attacker != damageable)
             {
-                var controller = damageable.controller;
-
                 if (controller && controller != damageable && !controller.isHuman && !controller.svPlayer.currentState.IsBusy)
                 {
                     controller.GamePlayer().SetAttackState(attacker);
