@@ -504,14 +504,14 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     if (playerData.PasswordHash != connectData.passwordHash)
                     {
-                        SvManager.Instance.RegisterFail(connectData.connection, "Invalid credentials");
+                        SvManager.Instance.RegisterFail(connectData.connection, $"Invalid credentials for Account {connectData.username}");
                         return true;
                     }
                 }
 
                 if (!connectData.username.ValidCredential())
                 {
-                    SvManager.Instance.RegisterFail(connectData.connection, $"Name cannot be registered (min: {Util.minCredential}, max: {Util.maxCredential})");
+                    SvManager.Instance.RegisterFail(connectData.connection, $"Account {connectData.username} cannot be registered (check length and characters)");
                     return true;
                 }
 

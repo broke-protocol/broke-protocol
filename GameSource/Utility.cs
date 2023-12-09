@@ -23,5 +23,8 @@ namespace BrokeProtocol.GameSource
         public static LimitQueue<ShPlayer> healed = new(3, 60f);
 
         public static LimitQueue<ShPlayer> unstuck = new(1, 45f);
+
+        public static bool ValidCredential(this string credential) =>
+            !string.IsNullOrWhiteSpace(credential) && credential.Length >= 3 && credential.Length <= 16;
     }
 }
