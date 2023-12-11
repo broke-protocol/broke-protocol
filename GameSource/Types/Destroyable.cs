@@ -25,15 +25,17 @@ namespace BrokeProtocol.GameSource.Types
         {
             var controller = damageable.controller;
 
-            if (damageable.IsDead || controller && controller.svPlayer.godMode) return false;
+            if (controller && controller.svPlayer.godMode) return false;
+
+            var deadBefore = damageable.IsDead;
 
             var destroyable = damageable as ShDestroyable;
 
             var player = damageable.Player;
 
-            if (player)
+            if (player && !deadBefore)
             {
-                if (player.svPlayer.godMode || player.IsShielded(damageIndex, collider))
+                if (player.IsShielded(damageIndex, collider))
                     return false;
 
                 if (damageIndex != DamageIndex.Null)
@@ -103,7 +105,8 @@ namespace BrokeProtocol.GameSource.Types
 
             if (destroyable.health <= 0f)
             {
-                destroyable.Die(attacker);
+                if(!deadBefore)
+                    destroyable.Die(attacker);
             }
             else if (attacker && attacker != damageable)
             {

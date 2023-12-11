@@ -20,6 +20,17 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
+        [Execution(ExecutionMode.Additive)]
+        public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 hitPoint, Vector3 hitNormal)
+        {
+            if(damageable is ShTransport transport && transport.health < -0.5f * transport.maxStat)
+            {
+                transport.svTransport.Respawn();
+            }
+
+            return true;
+        }
+
         protected IEnumerator AbandonedCheck(ShTransport transport)
         {
             var timeStarted = false;

@@ -9,6 +9,35 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Entity : EntityEvents
     {
+        public static void StartDestroyDelay(ShEntity entity, float delay) => entity.StartCoroutine(DestroyDelay(entity, delay));
+
+        public static IEnumerator DestroyDelay(ShEntity entity, float delay)
+        {
+            //Wait 2 frames so an activate is already sent
+            yield return null;
+            yield return new WaitForSeconds(delay);
+            if (entity.go)
+            {
+                entity.Destroy();
+            }
+        }
+
+        public static IEnumerator RespawnDelay(ShEntity entity)
+        {
+            var respawnTime = Time.time + entity.svEntity.RespawnTime;
+            var delay = new WaitForSeconds(1f);
+
+            while (entity && entity.IsDead)
+            {
+                if (Time.time > respawnTime)
+                {
+                    entity.svEntity.Respawn();
+                    yield break;
+                }
+                yield return delay;
+            }
+        }
+
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
@@ -18,14 +47,28 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (svEntity.destroyAfter > 0f)
                 {
-                    svEntity.StartDestroyDelay(svEntity.destroyAfter);
+                    StartDestroyDelay(entity, svEntity.destroyAfter);
                 }
                 else if (!entity.GetPlace.owner)
                 {
-                    svEntity.StartDestroyDelay(60f * 60f * 2f);
+                    StartDestroyDelay(entity, 60f * 60f * 2f);
                 }
             }
-            else if (!entity.isHuman && entity.HasInventory) entity.StartCoroutine(RestockItems(entity));
+            else if (!entity.isHuman && entity.HasInventory)
+            {
+                entity.StartCoroutine(RestockItems(entity));
+            }
+
+            return true;
+        }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool Respawn(ShEntity entity)
+        {
+            entity.spawnTime = Time.time;
+            if (entity.IsDead) entity.svEntity.SvDestroyEffect();
+            // So players aren't charged with Murder crimes after vehicles reset
+            entity.svEntity.instigator = null;
 
             return true;
         }
