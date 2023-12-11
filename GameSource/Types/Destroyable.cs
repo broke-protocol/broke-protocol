@@ -111,21 +111,17 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     controller.GamePlayer().SetAttackState(attacker);
                 }
-                
+
                 attacker.svPlayer.job.OnDamageEntity(damageable);
             }
 
             var damageSourceType = Util.DamageSourceMap[(int)damageIndex];
-
-            Vector3 source;
-
-            if (damageSourceType == Util.DamageSource.HitPoint)
-                source = hitPoint;
-            else if (damageSourceType == Util.DamageSource.Attacker && attacker)
-                source = attacker.GetOrigin;
-            else
-                source = default;
-
+            var source = damageSourceType switch
+            {
+                Util.DamageSource.HitPoint => hitPoint,
+                Util.DamageSource.Attacker when attacker => attacker.GetOrigin,
+                _ => default,
+            };
             destroyable.svDestroyable.UpdateHealth(source);
 
             return true;

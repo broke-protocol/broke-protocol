@@ -1106,10 +1106,9 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Mount(ShPlayer player, ShMountable mount, byte seat)
         {
-            if (player.isHuman && player.IsMountController && mount.svMountable.mountLicense && !player.HasItem(mount.svMountable.mountLicense) &&
-                LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
+            if (player.isHuman && player.IsMountController && mount.svMountable.mountLicense && !player.HasItem(mount.svMountable.mountLicense))
             {
-                pluginPlayer.AddCrime(CrimeIndex.NoLicense, null);
+                player.LifePlayer().AddCrime(CrimeIndex.NoLicense, null);
             }
 
             return true;
