@@ -13,11 +13,11 @@ namespace BrokeProtocol.GameSource.Types
             if (destroyable.svDestroyable.respawnable)
             {
                 // Must start coroutine on the manager because the movable will be disabled during killcam/spec mode
-                ShManager.Instance.StartCoroutine(Entity.RespawnDelay(destroyable));
+                ShManager.Instance.StartCoroutine(Utility.RespawnDelay(destroyable));
             }
             else
             {
-                Entity.StartDestroyDelay(destroyable, destroyable.svDestroyable.RespawnTime);
+                destroyable.StartDestroyDelay(destroyable.svDestroyable.RespawnTime);
             }
             return true;
         }

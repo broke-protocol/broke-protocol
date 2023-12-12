@@ -644,10 +644,10 @@ namespace BrokeProtocol.GameSource.Types
         {
             var options = new List<LabelID>
             {
-                new LabelID("Enter Passcode", enterPasscode),
-                new LabelID("Set Passcode", setPasscode),
-                new LabelID("Clear Passcode", clearPasscode),
-                new LabelID("Hack Panel", hackPanel)
+                new ("Enter Passcode", enterPasscode),
+                new ("Set Passcode", setPasscode),
+                new ("Clear Passcode", clearPasscode),
+                new ("Hack Panel", hackPanel)
             };
 
             var title = "&7Security Panel";
@@ -658,7 +658,7 @@ namespace BrokeProtocol.GameSource.Types
                     options.Add(new LabelID($"Upgrade Security (Cost: ${SecurityUpgradeCost(apartmentPlace.security)})", upgradeSecurity));
             }
 
-            player.svPlayer.SendOptionMenu(title, apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
+            player.svPlayer.SendOptionMenu(title, apartment.ID, securityPanel, options.ToArray(), new LabelID[] { new ("Select", string.Empty) });
 
             return true;
         }
@@ -688,7 +688,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            player.svPlayer.SendOptionMenu("&7Video Panel", videoEntity.ID, videoPanel, options.ToArray(), new LabelID[] { new LabelID("Select", string.Empty) });
+            player.svPlayer.SendOptionMenu("&7Video Panel", videoEntity.ID, videoPanel, options.ToArray(), new LabelID[] { new ("Select", string.Empty) });
 
             return true;
         }
@@ -894,7 +894,7 @@ namespace BrokeProtocol.GameSource.Types
                                 }
                             }
                             player.svPlayer.DestroyMenu(securityPanel);
-                            player.svPlayer.SendOptionMenu("&7Places", targetID, hackPanel, options.ToArray(), new LabelID[] { new LabelID("Hack", string.Empty) });
+                            player.svPlayer.SendOptionMenu("&7Places", targetID, hackPanel, options.ToArray(), new LabelID[] { new ("Hack", string.Empty) });
                             break;
                     }
                     break;

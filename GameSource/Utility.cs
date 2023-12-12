@@ -2,12 +2,42 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
 using UnityEngine;
+using System.Collections;
 
 namespace BrokeProtocol.GameSource
 {
     public static class Utility
     {
-        public static readonly Vector2 defaultAnchor = new Vector2(0.5f, 0.15f);
+        public static void StartDestroyDelay(this ShEntity entity, float delay) => entity.StartCoroutine(DestroyDelay(entity, delay));
+
+        public static IEnumerator DestroyDelay(this ShEntity entity, float delay)
+        {
+            //Wait 2 frames so an activate is already sent
+            yield return null;
+            yield return new WaitForSeconds(delay);
+            if (entity.go)
+            {
+                entity.Destroy();
+            }
+        }
+
+        public static IEnumerator RespawnDelay(this ShEntity entity)
+        {
+            var respawnTime = Time.time + entity.svEntity.RespawnTime;
+            var delay = new WaitForSeconds(1f);
+
+            while (entity && entity.IsDead)
+            {
+                if (Time.time > respawnTime)
+                {
+                    entity.svEntity.Respawn();
+                    yield break;
+                }
+                yield return delay;
+            }
+        }
+
+        public static readonly Vector2 defaultAnchor = new (0.5f, 0.15f);
 
         public const float slowSpeedSqr = 6f * 6f;
 

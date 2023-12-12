@@ -9,34 +9,7 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Entity : EntityEvents
     {
-        public static void StartDestroyDelay(ShEntity entity, float delay) => entity.StartCoroutine(DestroyDelay(entity, delay));
-
-        public static IEnumerator DestroyDelay(ShEntity entity, float delay)
-        {
-            //Wait 2 frames so an activate is already sent
-            yield return null;
-            yield return new WaitForSeconds(delay);
-            if (entity.go)
-            {
-                entity.Destroy();
-            }
-        }
-
-        public static IEnumerator RespawnDelay(ShEntity entity)
-        {
-            var respawnTime = Time.time + entity.svEntity.RespawnTime;
-            var delay = new WaitForSeconds(1f);
-
-            while (entity && entity.IsDead)
-            {
-                if (Time.time > respawnTime)
-                {
-                    entity.svEntity.Respawn();
-                    yield break;
-                }
-                yield return delay;
-            }
-        }
+        
 
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
@@ -47,11 +20,11 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (svEntity.destroyAfter > 0f)
                 {
-                    StartDestroyDelay(entity, svEntity.destroyAfter);
+                    entity.StartDestroyDelay(svEntity.destroyAfter);
                 }
                 else if (!entity.GetPlace.owner)
                 {
-                    StartDestroyDelay(entity, 60f * 60f * 2f);
+                    entity.StartDestroyDelay(60f * 60f * 2f);
                 }
             }
             else if (!entity.isHuman && entity.HasInventory)

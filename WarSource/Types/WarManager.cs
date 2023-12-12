@@ -187,35 +187,35 @@ namespace BrokeProtocol.GameSource.Types
         private ClassInfo[][] GetClasses => new ClassInfo[][] {
             new ClassInfo[]
             {
-                new ClassInfo("Rifleman", new InventoryStruct[] {
+                new ("Rifleman", new InventoryStruct[] {
                     new ("M4", 1),
                     new ("AmmoRifle", 180),
                 }),
-                new ClassInfo("Officer", new InventoryStruct[] {
+                new ("Officer", new InventoryStruct[] {
                     new ("MP5SD", 1),
                     new ("AmmoSMG", 180),
                 }),
-                new ClassInfo("Sniper", new InventoryStruct[] {
+                new ("Sniper", new InventoryStruct[] {
                     new ("Winchester", 1),
                     new ("AmmoRifle", 60),
                 }),
-                new ClassInfo("Support", new InventoryStruct[] {
+                new ("Support", new InventoryStruct[] {
                     new ("MachineGun", 1),
                     new ("AmmoMG", 300),
                 }),
-                new ClassInfo("Medic", new InventoryStruct[] {
+                new ("Medic", new InventoryStruct[] {
                     new ("Mac", 1),
                     new ("AmmoSMG", 180),
                     new ("Defibrillator", 1),
                     new ("MedicBox1", 5),
                 }),
-                new ClassInfo("Anti-Tank", new InventoryStruct[] {
+                new ("Anti-Tank", new InventoryStruct[] {
                     new ("Springfield", 1),
                     new ("AmmoRifle", 80),
                     new ("Bazooka", 1),
                     new ("Rocket", 5),
                 }),
-                new ClassInfo("Demoman", new InventoryStruct[] {
+                new ("Demoman", new InventoryStruct[] {
                     new ("SPAS12", 1),
                     new ("AmmoShotgun", 80),
                     new ("MineAT", 2),
@@ -226,35 +226,35 @@ namespace BrokeProtocol.GameSource.Types
             },
             new ClassInfo[]
             {
-                new ClassInfo("Rifleman", new InventoryStruct[] {
+                new ("Rifleman", new InventoryStruct[] {
                     new ("AK47", 1),
                     new ("AmmoRifle", 180),
                 }),
-                new ClassInfo("Officer", new InventoryStruct[] {
+                new ("Officer", new InventoryStruct[] {
                     new ("P90", 1),
                     new ("AmmoSMG", 200),
                 }),
-                new ClassInfo("Sniper", new InventoryStruct[] {
+                new ("Sniper", new InventoryStruct[] {
                     new ("Winchester", 1),
                     new ("AmmoRifle", 60),
                 }),
-                new ClassInfo("Support", new InventoryStruct[] {
+                new ("Support", new InventoryStruct[] {
                     new ("PKM", 1),
                     new ("AmmoMG", 300),
                 }),
-                new ClassInfo("Medic", new InventoryStruct[] {
+                new ("Medic", new InventoryStruct[] {
                     new ("Mac", 1),
                     new ("AmmoSMG", 180),
                     new ("Defibrillator", 1),
                     new ("MedicBox2", 5),
                 }),
-                new ClassInfo("Anti-Tank", new InventoryStruct[] {
+                new ("Anti-Tank", new InventoryStruct[] {
                     new ("Springfield", 1),
                     new ("AmmoRifle", 80),
                     new ("Bazooka", 1),
                     new ("Rocket", 5),
                 }),
-                new ClassInfo("Demoman", new InventoryStruct[] {
+                new ("Demoman", new InventoryStruct[] {
                     new ("Shotgun", 1),
                     new ("AmmoShotgun", 60),
                     new ("MineAT", 2),
@@ -557,7 +557,7 @@ namespace BrokeProtocol.GameSource.Types
                 .Append($" ({j.members.Count} players)");
                 options.Add(new LabelID(sb.ToString(), j.shared.jobName));
             }
-            var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
+            var actions = new LabelID[] { new (selectTeam, selectTeam) };
             SvManager.Instance.SendOptionMenu(connection, selectTeam, 0, selectTeam, options.ToArray(), actions, 0.3f, 0.2f, 0.7f, 0.6f);
         }
 
@@ -580,7 +580,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 classIndex++;
             }
-            var actions = new LabelID[] { new LabelID(selectTeam, selectTeam) };
+            var actions = new LabelID[] { new (selectTeam, selectTeam) };
             SvManager.Instance.SendOptionMenu(connection, selectClass, 0, selectClass, options.ToArray(), actions);
         }
 
