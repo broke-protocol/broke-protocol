@@ -95,6 +95,8 @@ namespace BrokeProtocol.GameSource.Types
 
         private void AddPassengers(ShPlayer spawner, ShTransport transport, int jobIndex, Spawn s)
         {
+            var previousPlayer = transport.controller;
+
             for (var seat = (byte)1; seat < transport.seats.Length; ++seat)
             {
                 if (Random.value < 0.2f)
@@ -111,6 +113,9 @@ namespace BrokeProtocol.GameSource.Types
                             spawner,
                             null);
                         passengerBot.svPlayer.SvMount(transport, seat);
+                        if(previousPlayer)
+                            previousPlayer.svPlayer.SvFollower(passengerBot.ID);
+                        previousPlayer = passengerBot;
                     }
                 }
             }

@@ -26,6 +26,8 @@ namespace BrokeProtocol.GameSource
 
     public class LookState : BaseState
     {
+        public override bool IsBusy => false;
+
         public override bool UpdateState()
         {
             if (!base.UpdateState()) return false;
