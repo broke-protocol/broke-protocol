@@ -1,3 +1,20 @@
+## 1.39
+?> This Update adds runtime interior cloning and deletion for modding use, and also updates how UIs are cloned and destroyed. Some extra modding functionality on players and equipables added as well.
+
+### API
+* Unity physics naming changes with related to velocity and drag (angular and linear)
+* ShEntity.Grounded replaced with InWater and Ground Properties
+* SceneManager.Instance.ClonePlace()
+* SceneManager.Instance.DestroyPlace()
+* SvPlayer.VisualTreeAssetClone()
+* SvPlayer.VisualElementRemove()
+
+### MODDING
+* Custom UIs are no longer constructed automatically
+  * Call SvPlayer.VisualTreeAssetClone() to clone custom UIs by name with an optional parent parameter
+* Player jump height is now a moddable property
+* Equipable Attach Bone is now a moddable property ('RightHand' by default)
+
 ## 1.38
 ?> This Update generally appends onto the API but it does still change some methods outlined below. Most important is the new ShTrain class and physics overhaul that might affect some old mods.
 
@@ -190,41 +207,3 @@
 - Hitscan items now support a customFireEffect
 - Added vanilla game Destructibles to BPResources
     - Working and properly modable now
-
-## 1.2
-?> The Multimedia Update has sweeping changes across jobs, animations, vehicle mounting, UI API, and adds some useful new stuff too. Plugins and even some assets are likely to break, and I'll outline the main issues here.
-
-### API
-- SvPlayer.ShowTextPanel(text) -> SvPlayer.SendTextPanel(text, menuID, options)
-- SvPlayer.HideTextPanel() -> SvPlayer.DestroyTextPanel(menuID)
-- Removed SvPlayer.SvMountPrimary()
-- Removed SvPlayer.SvMountBack()
-- Added SvPlayer.SvTryMount() -> Used to find and mount to the closest seat
-    - Or use SvMount() to pick a specific seat
-- New Dynamic Action Menu Methods:
-    - ShEntity.SvAdd/RemoveDynamicAction(eventName, label)
-    - ShPlayer.SvAdd/RemoveSelfAction(eventName, label)
-    - ShPlayer.SvAdd/RemoveTypeAction(eventName, type, label)
-- New Video Methods:
-    - SvEntity.SvStartDefaultVideo(index)
-    - SvEntity.SvStartCustomVideo(url)
-    - SvEntity.SvStopVideo()
-- Added GameSource Event: PlayerSetEquipable
-- Jobs Modding Overhaul
-    - Can accept JSON metadata now
-    - Use new DynamicAction menu methods
-    - Can support multiple plugins with Plugin.JobsAdditive and Plugin.JobsOverride
-    - Too many changes, see Jobs.cs and Core.cs in GameSourse to see how everything works
-
-### MODDING
-- Animator property moved from (Cl)ient class to (Sh)ared class
-    - All player/character mods must have this assigned and re-exported with latest BPResources
-    - If you want to sync mod Animators automatically, check the 'Sync Animator' property in Unity
-- See existing VideoPlayer examples in BPResourses to see how they're set up and assigned
-
-### Misc
-- New Video Permissions
-    - "bp.videoDefault"
-    - "bp.videoCustom"
-    - "bp.videoStop"
-- Added ConnectionData.deviceID for checking hardware bans or alts during Login/Registration
