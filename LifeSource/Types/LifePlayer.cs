@@ -703,9 +703,10 @@ namespace BrokeProtocol.GameSource.Types
             else if (apartment.svApartment.BuyEntity(player))
             {
                 player.svPlayer.BuyApartment(apartment);
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         [Execution(ExecutionMode.Additive)]
@@ -720,9 +721,10 @@ namespace BrokeProtocol.GameSource.Types
                 player.TransferMoney(DeltaInv.AddToMe, apartment.value / 2);
                 player.svPlayer.Send(SvSendType.Self, Channel.Reliable, ClPacket.SellApartment, apartment.ID);
                 player.svPlayer.SellApartment(place);
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         [Execution(ExecutionMode.Additive)]
@@ -740,7 +742,7 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            return true;
+            return false;
         }
 
         [Execution(ExecutionMode.Additive)]
@@ -749,9 +751,10 @@ namespace BrokeProtocol.GameSource.Types
             if (other.isHuman && other.IsUp && player.IsMobile && player.InOwnApartment && other.GetPlace == player.GetPlace)
             {
                 other.svPlayer.SvEnterDoor(other.GetPlace.mainDoor.ID, player, true);
+                return true;
             }
 
-            return true;
+            return false;
         }
 
 
@@ -761,9 +764,10 @@ namespace BrokeProtocol.GameSource.Types
             if (!e.IsOutside && e.svEntity.respawnable && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
                 pluginPlayer.AddCrime(CrimeIndex.Theft, null);
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         [Execution(ExecutionMode.Additive)]
