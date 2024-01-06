@@ -233,7 +233,8 @@ namespace BrokeProtocol.GameSource.Types
 
         public virtual int GoToJail()
         {
-            if (player.IsDead || !player.IsRestrained || ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner)
+            if (player.IsDead || !player.IsRestrained || LifeManager.jails.Count == 0 ||
+                ((MyJobInfo)player.svPlayer.job.info).groupIndex == GroupIndex.Prisoner)
             {
                 return 0;
             }
