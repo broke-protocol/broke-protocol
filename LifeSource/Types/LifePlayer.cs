@@ -848,9 +848,8 @@ namespace BrokeProtocol.GameSource.Types
             switch (menuID)
             {
                 case securityPanel:
-                    var apartment = EntityCollections.FindByID<ShApartment>(targetID);
-
-                    if (!apartment) return true;
+                    if (!EntityCollections.TryFindByID<ShApartment>(targetID, out var apartment))
+                        return false;
 
                     switch (optionID)
                     {
@@ -891,7 +890,7 @@ namespace BrokeProtocol.GameSource.Types
                             break;
                         case hackPanel:
                             var options = new List<LabelID>();
-                            foreach (var clone in apartment.GetPlace.clones.Values)
+                            foreach (var clone in apartment.svApartment.OtherPlace.clones.Values)
                             {
                                 if (clone.owner)
                                 {
@@ -1011,7 +1010,7 @@ namespace BrokeProtocol.GameSource.Types
                 case enterPasscode:
                     var a1 = EntityCollections.FindByID<ShApartment>(targetID);
 
-                    foreach (var a in a1.GetPlace.clones.Values)
+                    foreach (var a in a1.svApartment.OtherPlace.clones.Values)
                     {
                         if (a.passcode != null && a.passcode == input)
                         {
