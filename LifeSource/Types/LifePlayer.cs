@@ -701,9 +701,8 @@ namespace BrokeProtocol.GameSource.Types
             {
                 player.svPlayer.SendGameMessage("Already owned");
             }
-            else if (apartment.svApartment.BuyEntity(player))
+            else if (apartment.svApartment.BuyEntity(player) && player.svPlayer.BuyApartment(apartment) != null)
             {
-                player.svPlayer.BuyApartment(apartment);
                 return true;
             }
 
