@@ -22,7 +22,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     entity.StartDestroyDelay(svEntity.destroyAfter);
                 }
-                else if (!entity.GetPlace.owner)
+                else if (!entity.GetPlace.IsClone)
                 {
                     entity.StartDestroyDelay(60f * 60f * 2f);
                 }
