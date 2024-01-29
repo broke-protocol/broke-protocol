@@ -569,13 +569,13 @@ namespace BrokeProtocol.GameSource.Types
         {
             player.svPlayer.SvSetEquipable(player.Hands);
 
-            if (!player.isHuman)
+            if (player.isHuman)
             {
-                player.svPlayer.SvDismount(true);
+                player.svPlayer.SendGameMessage("You've been freed");
             }
             else
             {
-                player.svPlayer.SendGameMessage("You've been freed");
+                player.svPlayer.SvDismount(true);
             }
 
             return true;
