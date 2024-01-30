@@ -129,6 +129,7 @@ namespace BrokeProtocol.GameSource.Types
         public override bool Initialize(ShEntity entity)
         {
             Manager.pluginPlayers.Add(entity, new GameSourcePlayer(entity.Player));
+            entity.Player.svPlayer.VisualTreeAssetClone("ServerLogoExample");
             return true;
         }
 

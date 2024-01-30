@@ -364,14 +364,11 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Initialize(ShEntity entity)
         {
-            if (entity.Player)
-            {
-                LifeManager.pluginPlayers.Add(entity.Player, new LifeSourcePlayer(entity.Player));
-                entity.Player.svPlayer.SvAddSelfAction("MyCrimes", "Crimes");
-                entity.Player.svPlayer.SvAddInventoryAction("GetItemValue", "ShItem", ButtonType.Sellable, "Get Sell Value");
-                entity.Player.svPlayer.SvAddTypeAction("HandsUp", "ShPlayer", "Hands Up!");
-                entity.Player.svPlayer.VisualTreeAssetClone("WantedLevel");
-            }
+            LifeManager.pluginPlayers.Add(entity.Player, new LifeSourcePlayer(entity.Player));
+            entity.Player.svPlayer.SvAddSelfAction("MyCrimes", "Crimes");
+            entity.Player.svPlayer.SvAddInventoryAction("GetItemValue", "ShItem", ButtonType.Sellable, "Get Sell Value");
+            entity.Player.svPlayer.SvAddTypeAction("HandsUp", "ShPlayer", "Hands Up!");
+            entity.Player.svPlayer.VisualTreeAssetClone("WantedLevel");
 
             return true;
         }
