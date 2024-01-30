@@ -30,11 +30,11 @@ The following UI methods exist on SvPlayer:
 
 The most important are VisualTreeAssetClone and VisualElementRemove which instantiate and remove UI elements respectively.
 
-VisualTreeAssetClone should use the uxml Asset name to clone the element with optional parameters to place under a parent an rename the element (for easier lookup later).
+VisualTreeAssetClone should use the uxml Asset name to clone the element with optional parameters to place under a parent and rename the cloned element (for easier lookup later).
 
-VisualElementRemove will remove the element from the UI. Note if multiple elements share the same name, only the first one in the tree will be removed. So it might be useful to use the `newVisualElementName` parameter from `VisualTreeAssetClone` to give each tree clone a custom name.
+VisualElementRemove will remove the element from the client UI. Note, if multiple elements share the same name, only the first one in the document tree will be removed. So it might be useful to use the `newVisualElementName` parameter from `VisualTreeAssetClone` to give each tree clone a custom name.
 
-AddButtonClickedEventbind a UI Button element with a plugin event. The event in your plugin must have a signature that looks like:
+AddButtonClickedEvent binds a UI Button element with a plugin event. The event in your plugin must have a signature that looks like:
 
 ```cs
 [CustomTarget]
