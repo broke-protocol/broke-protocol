@@ -7,6 +7,7 @@ You can find tutorials and docs on Google and Youtube. There are also some examp
 Exporting these UIs is very similar to exporting normal asset BPA's (just mark the .uxml asset as an AssetBundle in Unity and go to `Window -> Broke Protocol Asset Export`
 
 Make sure your PanelSettings on your UIDocument in Unity look similar to the following image or you'll likely see the UI rendered differently in game clients.
+
 ![alt text](https://brokeprotocol.com/wp-content/uploads/PanelSettings.png "Panel Settings")
 
 The following UI methods exist on SvPlayer:
