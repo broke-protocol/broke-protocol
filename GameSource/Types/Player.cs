@@ -1150,7 +1150,18 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.Damage(consumable.DamageProperty, -consumable.healthBoost, healer);
             }
 
-            player.svPlayer.UpdateStatsAndRemoveConsumable(consumable);
+            if (consumable.illegal)
+            {
+                player.svPlayer.SvAddInjury(BodyPart.Head, BodyEffect.Drugged, (byte)consumable.healthBoost);
+                player.svPlayer.SvAddInjury(BodyPart.Arms, BodyEffect.Drugged, (byte)consumable.healthBoost);
+            }
+
+            player.svPlayer.UpdateStatsDelta(
+                consumable.hungerBoost / player.maxStat,
+                consumable.thirstBoost / player.maxStat,
+                consumable.energyBoost / player.maxStat);
+
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Consume, player.ID, consumable.index);
             return true;
         }
 
