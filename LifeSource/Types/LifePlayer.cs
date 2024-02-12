@@ -916,7 +916,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         player.svPlayer.SendGameMessage("Only direct video links supported - Can upload to Imgur or Discord and link that");
                         player.svPlayer.DestroyMenu(videoPanel);
-                        player.svPlayer.SendInputMenu("Direct MP4/WEBM URL", targetID, customVideo, InputField.ContentType.Standard, 128);
+                        player.svPlayer.SendInputMenu("Direct MP4/WEBM URL", targetID, customVideo, InputField.ContentType.Standard, 256);
                     }
                     else if (optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
                     {
