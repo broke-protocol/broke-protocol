@@ -22,6 +22,22 @@ namespace BrokeProtocol.GameSource
         public bool TargetNear => player.GetMount == player.svPlayer.targetEntity.GetMount ||
             player.DistanceSqr(player.svPlayer.targetEntity) < Util.closeRangeSqr ||
             player.CanSeeEntity(player.svPlayer.targetEntity, false, Util.pathfindRange);
+
+        protected Vector3 SafePos(Vector3 movePos)
+        {
+            var position = player.GetControlled.GetPosition;
+            var delta = movePos - position;
+            var distance = delta.magnitude;
+
+            var minAltitude = Mathf.Lerp(20f, 140f, distance / Util.visibleRange);
+
+            return new Vector3(
+                movePos.x,
+                Physics.SphereCast(position, 10f, delta, out var hit, distance, MaskIndex.world) ?
+                hit.point.y + minAltitude : Mathf.Max(movePos.y, minAltitude),
+                movePos.z);
+        }
+
     }
 
     public class LookState : BaseState
@@ -192,20 +208,7 @@ namespace BrokeProtocol.GameSource
             return false;
         }
 
-        private Vector3 SafePos(Vector3 movePos)
-        {
-            var delta = movePos - aircraft.GetPosition;
-            var distance = delta.magnitude;
-
-            var minAltitude = Mathf.Lerp(20f, 140f, distance / Util.visibleRange);
-
-            return new Vector3(
-                movePos.x,
-                Physics.SphereCast(aircraft.GetPosition, 10f, delta, out var hit, distance, MaskIndex.world) ? 
-                hit.point.y + minAltitude : Mathf.Max(movePos.y, minAltitude),
-                movePos.z);
-        }
-
+        
         private void FlySmart()
         {
             Vector3 safePos;
@@ -469,19 +472,16 @@ namespace BrokeProtocol.GameSource
                     return false;
                 }
             }
-            else if(player.IsMount<ShAircraft>(out _))
+            else if(player.IsMount<ShAircraft>(out var aircraft))
             {
-                if(player.GamePlayer().OnDestination())
+                /*if(player.GamePlayer().OnDestination())
                 {
                     player.svPlayer.SvDismount(true);
                     return false;
-                }
-                else
-                {
-                    var aircraft = player.curMount;
-                    player.svPlayer.LookAt(player.GamePlayer().goToPosition - aircraft.GetPosition);
-                    aircraft.svMountable.MoveTo(player.GamePlayer().goToPosition);
-                }
+                }*/
+                var goal = player.GamePlayer().goToPosition;
+                player.svPlayer.LookAt(goal - aircraft.GetPosition);
+                aircraft.svTransport.MoveTo(SafePos(goal));
             }
             else if(player.svPlayer.BadPath)
             {
