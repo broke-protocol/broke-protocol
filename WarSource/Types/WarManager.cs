@@ -144,7 +144,7 @@ namespace BrokeProtocol.GameSource.Types
                         var captureJob = BPAPI.Jobs[territory.attackerIndex].shared;
                         var captureSB = new StringBuilder();
                         captureSB.AppendColorText(captureJob.jobName, captureJob.GetColor()).Append($" captured {territory.text}!");
-                        InterfaceHandler.SendTextToAll(captureSB.ToString(), 3f, new Vector2(0.5f, 0.75f));
+                        InterfaceHandler.SendTextToAll(captureSB.ToString(), 3f);
                         Events.StartSlowMotion(null, 2f);
 
                         territory.svTerritory.SvSetTerritory(territory.attackerIndex);
@@ -342,7 +342,7 @@ namespace BrokeProtocol.GameSource.Types
                             var warningSB = new StringBuilder();
                             warningSB.AppendColorText(warningJob.jobName, warningJob.GetColor())
                                 .Append($" is down to {(int)warningLevel} tickets!");
-                            InterfaceHandler.SendTextToAll(warningSB.ToString(), 3f, new Vector2(0.5f, 0.75f));
+                            InterfaceHandler.SendTextToAll(warningSB.ToString(), 3f);
                         }
 
                         if (team.Value <= 0f)
@@ -362,7 +362,7 @@ namespace BrokeProtocol.GameSource.Types
                             var victorySB = new StringBuilder();
                             victorySB.AppendColorText(winnerJobInfo.jobName, winnerJobInfo.GetColor())
                                 .Append(" win the match");
-                            InterfaceHandler.SendTextToAll(victorySB.ToString(), 3f, new Vector2(0.5f, 0.75f));
+                            InterfaceHandler.SendTextToAll(victorySB.ToString(), 3f);
                             ResetGame();
                             Events.StartSlowMotion(null, 1f);
                             yield break;
@@ -374,10 +374,13 @@ namespace BrokeProtocol.GameSource.Types
                 foreach (var team in tickets)
                 {
                     var jobInfo = BPAPI.Jobs[team.Key].shared;
-                    scoreSB.Append("   ").
-                        AppendColorText(((int)team.Value).ToString(), jobInfo.GetColor());
+                    scoreSB.Append("   ").AppendColorText(((int)team.Value).ToString(), jobInfo.GetColor());
                 }
-                InterfaceHandler.SendTextToAll(scoreSB.ToString(), 3f, new Vector2(1f, 0.265f), "Score", 28, TextAnchor.LowerRight);
+
+                foreach(var player in EntityCollections.Humans)
+                {
+                    player.svPlayer.SetTextElementText("WarScore", scoreSB.ToString().Trim());
+                }
 
                 var territoriesSB = new StringBuilder();
                 var index = 0;

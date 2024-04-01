@@ -120,6 +120,8 @@ namespace BrokeProtocol.GameSource.Types
                 player.TransferItem(DeltaInv.AddToMe, i.itemName.GetPrefabIndex(), i.count);
             }
 
+            entity.Player.svPlayer.VisualTreeAssetClone("WarScore");
+
             return true;
         }
 

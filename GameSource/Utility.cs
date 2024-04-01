@@ -37,8 +37,6 @@ namespace BrokeProtocol.GameSource
             }
         }
 
-        public static readonly Vector2 defaultAnchor = new (0.5f, 0.15f);
-
         public const float slowSpeedSqr = 6f * 6f;
 
         public const string adminPermission = "admin";

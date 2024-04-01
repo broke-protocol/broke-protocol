@@ -68,7 +68,7 @@ namespace BrokeProtocol.GameSource.Types
 
                 if (controller.isHuman)
                 {
-                    controller.svPlayer.SendText("&cMISSILE LOCKED", alertDelay, new Vector2(0.5f, 0.75f));
+                    controller.svPlayer.SendText("&cMISSILE LOCKED", alertDelay);
                 }
                 else if (controller.IsMountArmed)
                 {

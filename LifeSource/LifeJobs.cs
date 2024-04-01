@@ -279,7 +279,7 @@ namespace BrokeProtocol.GameSource
             }
 
             // Negative playerID means job action is called on the employee with that ID, not self
-            requester.svPlayer.SendOptionMenu("&6Players", -player.ID, placeBountyMenu, options.ToArray(), new LabelID[] { new LabelID($"Place Bounty ${placeCost}", place) });
+            requester.svPlayer.SendOptionMenu("&6Players", -player.ID, placeBountyMenu, options.ToArray(), new LabelID[] { new($"Place Bounty ${placeCost}", place) });
         }
 
         public void BountyListAction(ShPlayer requester)
@@ -292,7 +292,7 @@ namespace BrokeProtocol.GameSource
                 options.Add(new LabelID($"{pair.Key}: {bountyLimitHours - (Util.CurrentTime - pair.Value).Hours} Hours{online}", pair.Key));
             }
 
-            requester.svPlayer.SendOptionMenu("&6Bounties", -player.ID, bountyListMenu, options.ToArray(), new LabelID[] { new LabelID($"Cancel Bounty ${cancelCost}", cancel) });
+            requester.svPlayer.SendOptionMenu("&6Bounties", -player.ID, bountyListMenu, options.ToArray(), new LabelID[] { new ($"Cancel Bounty ${cancelCost}", cancel) });
         }
 
         public override void OnOptionMenuAction(int targetID, string menuID, string optionID, string actionID)
@@ -743,7 +743,7 @@ namespace BrokeProtocol.GameSource
             }
 
             // Negative playerID means job action is called on the employer with that ID, not self
-            target.svPlayer.SendOptionMenu("&7Items", -player.ID, requestItemMenu, options.ToArray(), new LabelID[] { new LabelID("Request", string.Empty) }); 
+            target.svPlayer.SendOptionMenu("&7Items", -player.ID, requestItemMenu, options.ToArray(), new LabelID[] { new ("Request", string.Empty) }); 
         }
 
         public void RequestListAction()
@@ -759,7 +759,7 @@ namespace BrokeProtocol.GameSource
                 }
             }
 
-            player.svPlayer.SendOptionMenu("&7Requests", player.ID, requestListMenu, options.ToArray(), new LabelID[] { new LabelID("Accept", accept), new LabelID("Deny", deny) });
+            player.svPlayer.SendOptionMenu("&7Requests", player.ID, requestListMenu, options.ToArray(), new LabelID[] { new ("Accept", accept), new ("Deny", deny) });
         }
 
 
@@ -1046,7 +1046,7 @@ namespace BrokeProtocol.GameSource
             deliveryItem = SceneManager.Instance.consumablesCollection.GetRandom().Value;
             player.TransferItem(DeltaInv.AddToMe, deliveryItem);
             timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
-            player.svPlayer.SendTimer(timeDeadline - Time.time, Utility.defaultAnchor);
+            player.svPlayer.SendTimer(timeDeadline - Time.time);
         }
 
         public override void Loop()
@@ -1175,7 +1175,7 @@ namespace BrokeProtocol.GameSource
 
                     timeDeadline = Time.time + player.Distance(destination.transform.position) * 0.1f + 20f;
 
-                    player.svPlayer.SendTimer(timeDeadline - Time.time, Utility.defaultAnchor);
+                    player.svPlayer.SendTimer(timeDeadline - Time.time);
                 }
             }
         }
@@ -1375,7 +1375,7 @@ namespace BrokeProtocol.GameSource
                             player.svPlayer.StartGoalMarker(targetPlayer);
                             player.svPlayer.SendGameMessage($"Reach {targetPlayer.username} in time");
                             timeDeadline = Time.time + (player.Distance(targetPlayer) * 0.1f) + 20f;
-                            player.svPlayer.SendTimer(timeDeadline - Time.time, Utility.defaultAnchor);
+                            player.svPlayer.SendTimer(timeDeadline - Time.time);
                         }
                         break;
 

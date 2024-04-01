@@ -422,7 +422,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             player.TransferItem(DeltaInv.RemoveFromMe, ShManager.Instance.bomb.index);
 
-            player.svPlayer.SendTimer(vault.svVault.bombTimer, Utility.defaultAnchor);
+            player.svPlayer.SendTimer(vault.svVault.bombTimer);
 
             vault.svVault.SvSetVault(VaultState.Bombing);
             vault.svVault.instigator = player;
@@ -1053,7 +1053,6 @@ namespace BrokeProtocol.GameSource.Types
                     $"Update Text (${textDisplay.value})",
                     textDisplay.ID,
                     updateTextMenu,
-                    InputField.ContentType.Standard,
                     textDisplay.editableLength);
             }
             return true;
@@ -1267,7 +1266,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.isHuman)
             {
-                player.svPlayer.SendTimer(player.svPlayer.RespawnTime, Utility.defaultAnchor);
+                player.svPlayer.SendTimer(player.svPlayer.RespawnTime);
             }
             return true;
         }

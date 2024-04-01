@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace BrokeProtocol.GameSource.Types
 {
@@ -39,7 +38,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (player.isHuman)
             {
-                player.svPlayer.SendTimer(jailtime, Utility.defaultAnchor);
+                player.svPlayer.SendTimer(jailtime);
             }
             player.StartCoroutine(JailTimer(jailtime));
         }
@@ -282,7 +281,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.isHuman)
             {
-                player.svPlayer.SendText("Hands Up!", 2f, new Vector2(0.5f, 0.75f));
+                player.svPlayer.SendText("Hands Up!", 2f);
             }
             else if (!player.svPlayer.currentState.IsBusy)
             {
@@ -851,11 +850,11 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         case enterPasscode:
                             player.svPlayer.DestroyMenu(securityPanel);
-                            player.svPlayer.SendInputMenu("Enter Passcode", targetID, enterPasscode, InputField.ContentType.Password);
+                            player.svPlayer.SendInputMenu("Enter Passcode", targetID, enterPasscode);
                             break;
                         case setPasscode:
                             player.svPlayer.DestroyMenu(securityPanel);
-                            player.svPlayer.SendInputMenu("Set Passcode", targetID, setPasscode, InputField.ContentType.Password);
+                            player.svPlayer.SendInputMenu("Set Passcode", targetID, setPasscode);
                             break;
                         case clearPasscode:
                             if (player.ownedApartments.TryGetValue(apartment, out var apartmentPlace))
@@ -916,7 +915,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         player.svPlayer.SendGameMessage("Only direct video links supported - Can upload to Imgur or Discord and link that");
                         player.svPlayer.DestroyMenu(videoPanel);
-                        player.svPlayer.SendInputMenu("Direct MP4/WEBM URL", targetID, customVideo, InputField.ContentType.Standard, 512);
+                        player.svPlayer.SendInputMenu("Direct MP4/WEBM URL", targetID, customVideo, 512);
                     }
                     else if (optionID == stopVideo && VideoPermission(player, videoEntity, PermEnum.VideoStop))
                     {
