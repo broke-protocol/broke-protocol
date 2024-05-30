@@ -1066,11 +1066,11 @@ namespace BrokeProtocol.GameSource.Types
                 case updateTextMenu:
                     var textDisplay = EntityCollections.FindByID<ShTextDisplay>(targetID);
 
-                    if (textDisplay && textDisplay.editableLength > 0)
+                    if (textDisplay && textDisplay.editableLength > 0 && player.InActionRange(textDisplay))
                     {
                         var text = input.Trim();
 
-                        if (text.Length > 0 && text.Length <= textDisplay.editableLength)
+                        if (text.Length <= textDisplay.editableLength)
                         {
                             if (player.MyMoneyCount >= textDisplay.value)
                             {
