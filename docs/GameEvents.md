@@ -9,12 +9,12 @@ Overriding game events is the main way Plugins hook into the game and get their 
 These next Events classes are a hierarchy from top to bottom. With subclasses having a superset of methods of the parent class.
 
 - ``EntityEvents``
-- ``MountableEvents``
-- ``DestroyableEvents``
-- ``PhysicalEvents``
-- ``MovableEvents``
-  - ``PlayerEvents``
-  - ``TransportEvents``
+  - ``MountableEvents``
+    - ``DestroyableEvents``
+      - ``PhysicalEvents``
+        - ``MovableEvents``
+          - ``PlayerEvents``
+          - ``TransportEvents``
 
 If you hook into the same event at multiple levels of the hierarchy, know that they are always executed from base classes first. For example if you want to change the spawn location during a Respawn event, the Respawn method exists at every level of the heirarchy. But the actual spawn location is selected at the MovableEvents subclass in GameSource if you look at the code. So you should Override the Respawn method in MovableEvents to change the where the spawn location is.
 
