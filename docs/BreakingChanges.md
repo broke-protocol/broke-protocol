@@ -1,3 +1,16 @@
+## 1.40
+?> This Update should have minor effects on modding. Mostly old/deprecated types and parameters removed. Some World Builder changes mean vehicles should have their ForSale state updated on maps.
+
+### API
+* UI ShowText API: Removed some screen anchoring and sizing parameters from old UI system
+* Removed custom Callback delegates, now using System.Action/Func
+* Moved all Consume code into GameSource event
+
+### MODDING
+* Player weight limits are now moddable per character
+* FlareEffectiveness is a moddable property of SvThrown entities
+* Vehicles now have all 3 States available in the World Builder: Unlocked/Locked/ForSale
+
 ## 1.39
 ?> This Update adds runtime interior cloning and deletion for modding use, and also updates how UIs are cloned and destroyed. Some extra modding functionality on players and equipables added as well.
 
