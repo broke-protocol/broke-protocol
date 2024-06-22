@@ -38,7 +38,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            entity.respawnFrame = Time.frameCount;
             if (entity.IsDead) entity.svEntity.SvDestroyEffect();
             // So players aren't charged with Murder crimes after vehicles reset
             entity.svEntity.instigator = null;
