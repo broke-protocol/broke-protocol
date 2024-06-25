@@ -9,8 +9,6 @@ namespace BrokeProtocol.GameSource.Types
 {
     public class Entity : EntityEvents
     {
-        
-
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {
