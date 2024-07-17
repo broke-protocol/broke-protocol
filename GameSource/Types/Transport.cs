@@ -25,7 +25,14 @@ namespace BrokeProtocol.GameSource.Types
         {
             if(damageable is ShTransport transport && transport.health < -0.5f * transport.maxStat)
             {
-                transport.svTransport.Respawn();
+                if (transport.svTransport.respawnable)
+                {
+                    transport.svTransport.Respawn();
+                }
+                else
+                {
+                    transport.svTransport.Destroy();
+                }
             }
 
             return true;
