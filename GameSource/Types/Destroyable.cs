@@ -2,7 +2,6 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
-using BrokeProtocol.Utility;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -118,11 +117,11 @@ namespace BrokeProtocol.GameSource.Types
                 attacker.svPlayer.job.OnDamageEntity(damageable);
             }
 
-            var damageSourceType = Util.DamageSourceMap[(int)damageIndex];
+            var damageSourceType = Utility.DamageSourceMap[(int)damageIndex];
             var source = damageSourceType switch
             {
-                Util.DamageSource.HitPoint => hitPoint,
-                Util.DamageSource.Attacker when attacker => attacker.GetOrigin,
+                DamageSource.HitPoint => hitPoint,
+                DamageSource.Attacker when attacker => attacker.GetOrigin,
                 _ => default,
             };
             destroyable.svDestroyable.UpdateHealth(source);

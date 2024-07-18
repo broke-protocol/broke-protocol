@@ -1,13 +1,30 @@
 ﻿using BrokeProtocol.Collections;
 using BrokeProtocol.Entities;
 using BrokeProtocol.GameSource.Types;
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 namespace BrokeProtocol.GameSource
 {
+    public enum DamageSource
+    {
+        None,
+        Attacker,
+        HitPoint
+    }
+
     public static class Utility
     {
+        public static DamageSource[] DamageSourceMap =
+        {
+            DamageSource.None, //Null
+            DamageSource.Attacker, //Melee
+            DamageSource.Attacker, //Gun
+            DamageSource.HitPoint, //Random
+            DamageSource.HitPoint, //Collision
+            DamageSource.Attacker //Stun
+        };
+
         public static void StartDestroyDelay(this ShEntity entity, float delay) => entity.StartCoroutine(DestroyDelay(entity, delay));
 
         public static IEnumerator DestroyDelay(this ShEntity entity, float delay)
