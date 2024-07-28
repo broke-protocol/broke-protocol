@@ -10,5 +10,4 @@
 - [Database](/Database)
 - [UI Elements](/UI-Elements)
 - [Changelog](/BreakingChanges)
-- [Entity List](/EntityList)
 - [API Reference](https://brokeprotocol.com/api/index.html)
