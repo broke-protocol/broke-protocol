@@ -9,7 +9,7 @@
 	* Can combine descendant/child/name/class lookups in a path
 * Moved some DamageSource / DamageSourceMap types to GameSource
 * ShGun.reloading now public
-* Added ShPlayer.OnFoot property (true for InWater too
+* Added ShPlayer.OnFoot property (true for InWater too)
 
 ### MODDING
 * Remove any previous Newtonsoft Json Unity Package (new BPResources has one)
