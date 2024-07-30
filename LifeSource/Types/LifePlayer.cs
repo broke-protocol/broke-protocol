@@ -390,7 +390,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(offensesKey, out string offensesJSON))
+                if (player.svPlayer.CustomData.TryFetchCustomData(offensesKey, out string offensesJSON))
                 {
                     var offensesList = JsonConvert.DeserializeObject<List<CrimeSave>>(offensesJSON);
                     var wearables = new ShWearable[player.curWearables.Length];
@@ -433,7 +433,7 @@ namespace BrokeProtocol.GameSource.Types
                     pluginPlayer.UpdateWantedLevel(true);
                 }
 
-                if (player.svPlayer.PlayerData.Character.CustomData.TryFetchCustomData(jailtimeKey, out float jailtime) && jailtime > 0f)
+                if (player.svPlayer.CustomData.TryFetchCustomData(jailtimeKey, out float jailtime) && jailtime > 0f)
                 {
                     pluginPlayer.StartJailTimer(jailtime);
                 }
@@ -456,7 +456,7 @@ namespace BrokeProtocol.GameSource.Types
                     offensesList.Add(new CrimeSave(offense.crime.index, offense.wearables, Time.time - offense.commitTime, offense.witness));
                 }
 
-                var CustomData = player.svPlayer.PlayerData.Character.CustomData;
+                var CustomData = player.svPlayer.CustomData;
 
                 CustomData.AddOrUpdate(offensesKey, JsonConvert.SerializeObject(offensesList));
                 CustomData.AddOrUpdate(jailtimeKey, Mathf.Max(0f, pluginPlayer.jailExitTime - Time.time));
