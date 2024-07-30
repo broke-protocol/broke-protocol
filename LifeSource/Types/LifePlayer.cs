@@ -1189,7 +1189,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         [Execution(ExecutionMode.Additive)]
-        public override bool NewSector(ShEntity entity, List<Sector> newSectors)
+        public override bool NewSector(ShEntity entity, List<NetSector> newSectors)
         {
             if (entity.isHuman)
             {
@@ -1221,7 +1221,7 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        public void SpawnSector(ShPlayer player, Sector sector)
+        public void SpawnSector(ShPlayer player, NetSector sector)
         {
             foreach (var g in LifeManager.waypointGroups)
             {

@@ -66,21 +66,21 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             var spawnPosition = ray.GetPoint(i);
 
-                            var floor = Util.GetSectorFloor(spawnPosition);
-                            var tuple = (node.GetPlace, floor);
-                            if (!spawns.ContainsKey(tuple))
+                            var sector = SvManager.Instance.GetSector(node.GetPlace, spawnPosition);
+
+                            if (!spawns.ContainsKey(sector.tuple))
                             {
-                                spawns[tuple] = new List<Spawn>();
+                                spawns[sector.tuple] = new List<Spawn>();
                             }
 
-                            spawns[tuple].Add(new Spawn(spawnPosition, Quaternion.LookRotation(ray.direction), node, neighbor));
+                            spawns[sector.tuple].Add(new Spawn(spawnPosition, Quaternion.LookRotation(ray.direction), node, neighbor));
                         }
                     }
                 }
             }
         }
 
-        private float AdjustedSpawnRate(Sector sector, float limit, WaypointType type) =>
+        private float AdjustedSpawnRate(NetSector sector, float limit, WaypointType type) =>
             (1f - (sector.AreaTypeCount(type) / limit)) * spawnRate;
 
         private void SetupTrain(ShTransport transport, Spawn s)
@@ -121,7 +121,7 @@ namespace BrokeProtocol.GameSource.Types
             }
         }
 
-        public void SpawnRandom(ShPlayer spawner, Sector sector)
+        public void SpawnRandom(ShPlayer spawner, NetSector sector)
         {
             if (spawns.TryGetValue((sector.place, sector.position), out var sectorSpawns))
             {

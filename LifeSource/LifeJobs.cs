@@ -661,7 +661,7 @@ namespace BrokeProtocol.GameSource
             var target = player.svPlayer.spawner;
 
             if (target && target.IsOutside && target.svPlayer.job is Gangster &&
-                target.svPlayer.job != this && player.DistanceSqr(target) <= Util.visibleRangeSqr &&
+                target.svPlayer.job != this && player.DistanceSqr(target) <= Util.netVisibleRangeSqr &&
                 Manager.TryGetTerritory(target, out var territory) && territory.ownerIndex == info.shared.jobIndex &&
                 territory.attackerIndex >= 0 && player.GamePlayer().SetAttackState(target))
             {
@@ -940,7 +940,7 @@ namespace BrokeProtocol.GameSource
 
             // Use TryGetValue since spawner mightve exited server but 'target' reference is not destroyed until a frame later
             if (target && target.IsOutside && LifeManager.pluginPlayers.TryGetValue(target, out var lifePlayer) && lifePlayer.wantedLevel >= AttackLevel &&
-                Random.value < lifePlayer.wantedNormalized && player.DistanceSqr(target) <= Util.visibleRangeSqr)
+                Random.value < lifePlayer.wantedNormalized && player.DistanceSqr(target) <= Util.netVisibleRangeSqr)
             {
                 return player.GamePlayer().SetAttackState(target);
             }
