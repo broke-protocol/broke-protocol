@@ -29,7 +29,7 @@ namespace BrokeProtocol.GameSource
             var delta = movePos - position;
             var distance = delta.magnitude;
 
-            var minAltitude = Mathf.Lerp(20f, 140f, distance / Util.visibleRange);
+            var minAltitude = Mathf.Lerp(20f, 140f, distance / Util.netVisibleRange);
 
             return new Vector3(
                 movePos.x,
@@ -273,7 +273,7 @@ namespace BrokeProtocol.GameSource
             }
             else if (dot < threatLimit) // Enemy outside front quarter
             {
-                if (distance <= Util.visibleRange * 0.3f)
+                if (distance <= Util.netVisibleRange * 0.3f)
                 {
                     // Enemy in rear quarter and aiming
                     if (enemyAirborn && dot < -threatLimit && enemyDot > 0.8f)

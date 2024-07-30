@@ -743,7 +743,7 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Point, player.ID, pointing);
 
             if (pointing && player.svPlayer.follower &&
-                Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.visibleRange, MaskIndex.hard) &&
+                Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.netVisibleRange, MaskIndex.hard) &&
                 player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
                 player.svPlayer.follower.svPlayer.SvDismount();
