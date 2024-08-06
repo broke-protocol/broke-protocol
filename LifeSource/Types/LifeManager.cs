@@ -38,7 +38,7 @@ namespace BrokeProtocol.GameSource.Types
         private readonly float spawnRate;
         private readonly List<Waypoint> waypoints = new();
 
-        public readonly Dictionary<ValueTuple<Place, Vector2Int>, List<Spawn>> spawns = new();
+        public readonly Dictionary<ValueTuple<int, Vector2Int>, List<Spawn>> spawns = new();
 
         public WaypointGroup(WaypointType waypointType, float spawnRate)
         {
@@ -66,7 +66,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             var spawnPosition = ray.GetPoint(i);
 
-                            var sector = SvManager.Instance.GetSector(node.GetPlace, spawnPosition);
+                            var sector = SvManager.Instance.GetSector(node.GetPlaceIndex, spawnPosition);
 
                             if (!spawns.ContainsKey(sector.tuple))
                             {
@@ -123,7 +123,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public void SpawnRandom(ShPlayer spawner, NetSector sector)
         {
-            if (spawns.TryGetValue((sector.place, sector.position), out var sectorSpawns))
+            if (spawns.TryGetValue((sector.placeIndex, sector.position), out var sectorSpawns))
             {
                 if (waypointType == WaypointType.Player)
                 {
@@ -151,7 +151,7 @@ namespace BrokeProtocol.GameSource.Types
                     //VehicleWaypointGroup
                     foreach (var s in sectorSpawns)
                     {
-                        if (UnityEngine.Random.value < AdjustedSpawnRate(sector, 8, waypointType))
+                        if (Random.value < AdjustedSpawnRate(sector, 8, waypointType))
                         {
                             var spawnBot = LifeManager.GetAvailable<ShPlayer>(spawner, s.position, out var jobIndex, WaypointType.Player);
 
@@ -161,7 +161,7 @@ namespace BrokeProtocol.GameSource.Types
 
                                 if (transport && transport.CanSpawn(s.position, s.rotation, new ShEntity[] { }))
                                 {
-                                    transport.Spawn(s.position, s.rotation, sector.place.mTransform);
+                                    transport.Spawn(s.position, s.rotation, SceneManager.Instance.places[sector.placeIndex].mTransform);
                                     SetupTrain(transport, s);
                                     transport.SetVelocity(0.5f * transport.maxSpeed * transport.mainT.forward);
                                     spawnBot.svPlayer.SpawnBot(
