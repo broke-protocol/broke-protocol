@@ -6,9 +6,8 @@ Creating these UI's involves Unity's built-in UI Builder and the workflow is ver
 You can find tutorials and docs on Google and Youtube. There are also some example assets (wanted_stars, server_logo_example, and war_score) in BPResources.
 Exporting these UIs is very similar to exporting normal asset BPA's (just mark the .uxml asset as an AssetBundle in Unity and go to `Window -> Broke Protocol Asset Export`
 
-Make sure your PanelSettings on your UIDocument in Unity look similar to the following image or you'll likely see the UI rendered differently in game clients.
-
-![alt text](https://brokeprotocol.com/wp-content/uploads/PanelSettings.png "Panel Settings")
+I suggest setting your top-level element Canvas Size to 1280x720 so it matches the base game resolution exactly. With this setup, you can do all your sizing/margins/padding in pixels since the game will scale everything automatically according to in-game resolution.
+![alt text](https://brokeprotocol.com/wp-content/uploads/CanvasSize.png "Canvas Size")
 
 The following UI methods exist on SvPlayer:
 * public void VisualTreeAssetClone(string visualTreeAssetName, string parentVisualElementName = "", string newVisualElementName = "")
