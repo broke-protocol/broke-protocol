@@ -60,7 +60,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     timeStarted = false;
                 }
-                else if (Time.time > respawnTime && (transport.svTransport.randomSpawn || !transport.svTransport.OnOrigin))
+                else if (Time.time > respawnTime && (transport.GameEntity().randomSpawn || !transport.svTransport.OnOrigin))
                 {
                     timeStarted = false;
                     transport.svTransport.Respawn();

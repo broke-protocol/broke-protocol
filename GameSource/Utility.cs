@@ -59,6 +59,7 @@ namespace BrokeProtocol.GameSource
         public const string adminPermission = "admin";
         public const string allPermission = "all";
 
+        public static GameSourceEntity GameEntity(this ShEntity entity) => Manager.pluginEntities[entity];
         public static GameSourcePlayer GamePlayer(this ShPlayer player) => Manager.pluginPlayers[player];
 
         public static LimitQueue<ShPlayer> chatted = new(8, 20f);

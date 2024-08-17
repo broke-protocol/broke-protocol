@@ -25,7 +25,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            if (entity.svEntity.randomSpawn)
+            if (entity.GameEntity().randomSpawn)
             {
                 entity.svEntity.Deactivate(true);
             }
