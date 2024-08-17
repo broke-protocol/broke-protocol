@@ -1102,7 +1102,7 @@ namespace BrokeProtocol.GameSource
 
         override protected bool ValidTarget(ShEntity target)
         {
-            if (base.ValidTarget(target) && target.IsOutside && target.svEntity.randomSpawn && target is ShPlayer p && p.IsMobile && p.svPlayer.job is not Prisoner)
+            if (base.ValidTarget(target) && target.IsOutside && target.GameEntity().randomSpawn && target is ShPlayer p && p.IsMobile && p.svPlayer.job is not Prisoner)
             {
                 if (destinationMarker)
                     return p.curMount && p.curMount == player.curMount;

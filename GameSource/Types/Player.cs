@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
-    public class GameSourcePlayer
+    public class GameSourcePlayer : GameSourceEntity
     {
         public readonly ShPlayer player;
 
@@ -22,7 +22,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public float lastAlertTime;
 
-        public GameSourcePlayer(ShPlayer player)
+        public GameSourcePlayer(ShPlayer player) : base(player)
         {
             this.player = player;
         }
@@ -127,8 +127,12 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Initialize(ShEntity entity)
         {
-            Manager.pluginPlayers.Add(entity, new GameSourcePlayer(entity.Player));
             entity.Player.svPlayer.VisualTreeAssetClone("ServerLogoExample");
+            Manager.pluginPlayers.Add(entity, new GameSourcePlayer(entity.Player));
+            if (entity.GameEntity().randomSpawn)
+            {
+                entity.Player.svPlayer.stop = false; // Done to allow merchants or mods as skins
+            }
             return true;
         }
 
@@ -1210,7 +1214,7 @@ namespace BrokeProtocol.GameSource.Types
             // Still alive, do knockdown and AI retaliation
             if (player.stance.setable)
             {
-                if ((player.isHuman || player.svPlayer.randomSpawn) && player.health < 10f)
+                if ((player.isHuman || player.GameEntity().randomSpawn) && player.health < 10f)
                 {
                     player.svPlayer.SvForceStance(StanceIndex.KnockedOut);
                     // If knockout AI, set AI state Null

@@ -7,8 +7,35 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
 {
+    public class GameSourceEntity
+    {
+        public readonly ShEntity entity;
+        public readonly bool randomSpawn;
+
+        public GameSourceEntity(ShEntity entity)
+        {
+            this.entity = entity;
+            // RandomSpawns are inactive during initialization
+            randomSpawn = !entity.go.activeSelf;
+        }
+    }
+
     public class Entity : EntityEvents
     {
+        [Execution(ExecutionMode.Additive)]
+        public override bool Initialize(ShEntity entity)
+        {
+            Manager.pluginEntities.Add(entity, new GameSourceEntity(entity));
+            return true;
+        }
+
+        [Execution(ExecutionMode.Additive)]
+        public override bool Destroy(ShEntity entity)
+        {
+            Manager.pluginEntities.Remove(entity);
+            return true;
+        }
+
         [Execution(ExecutionMode.Additive)]
         public override bool Spawn(ShEntity entity)
         {

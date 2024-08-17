@@ -22,27 +22,25 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        [Execution(ExecutionMode.Additive)]
+        /* Shouldn't be destroying the random pool entities anyway
+        [Execution(ExecutionMode.PreEvent)]
         public override bool Destroy(ShEntity entity)
         {
-            if (entity.svEntity.randomSpawn)
+            var waypointIndex = (int)entity.svEntity.WaypointProperty;
+
+            // Entity should only be part of 1 job's array but check all just in case
+            foreach (var info in BPAPI.Jobs)
             {
-                var waypointIndex = (int)entity.svEntity.WaypointProperty;
-
-                // Entity should only be part of 1 job's array but check all just in case
-                foreach (var info in BPAPI.Jobs)
-                {
-                    ((MyJobInfo)info).randomEntities[waypointIndex].Remove(entity);
-                }
+                ((MyJobInfo)info).randomEntities[waypointIndex].Remove(entity);
             }
-
             return true;
         }
+        */
 
         [Execution(ExecutionMode.Additive)]
         public override bool SameSector(ShEntity e)
         {
-            if (e.svEntity.randomSpawn && e.svEntity.spectators.Count == 0 && (!e.Player || !e.Player.svPlayer.currentState.IsBusy) && !e.svEntity.sector.HumanControlled())
+            if (e.GameEntity().randomSpawn && e.svEntity.spectators.Count == 0 && (!e.Player || !e.Player.svPlayer.currentState.IsBusy) && !e.svEntity.sector.HumanControlled())
             {
                 e.svEntity.Deactivate(true);
             }

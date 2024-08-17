@@ -129,7 +129,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     foreach (var s in sectorSpawns)
                     {
-                        if (UnityEngine.Random.value < AdjustedSpawnRate(sector, 16, waypointType))
+                        if (Random.value < AdjustedSpawnRate(sector, 16, waypointType))
                         {
                             var spawnBot = LifeManager.GetAvailable<ShPlayer>(spawner, s.position, out _, waypointType);
 
@@ -221,7 +221,6 @@ namespace BrokeProtocol.GameSource.Types
         {
             T newEntity = GameObject.Instantiate(prefab, SceneManager.Instance.ExteriorT);
             newEntity.name = prefab.name;
-            newEntity.svEntity.randomSpawn = true;
 
             if (newEntity is ShPlayer player)
             {
@@ -229,6 +228,7 @@ namespace BrokeProtocol.GameSource.Types
                 player.svPlayer.spawnJobRank = Random.Range(0, BPAPI.Jobs[jobIndex].shared.upgrades.Length);
             }
 
+            newEntity.go.SetActive(false); // Set random spawns to inactive to prevent spawning prematurely
             SvManager.Instance.AddNewEntityExisting(newEntity);
             ((MyJobInfo)BPAPI.Jobs[jobIndex]).randomEntities[waypointIndex].Add(newEntity);
         }
@@ -326,7 +326,7 @@ namespace BrokeProtocol.GameSource.Types
 
             do
             { 
-                if (randomEntities.ElementAt(i) is T randomEntity && !randomEntity.isActiveAndEnabled && predicate(randomEntity))
+                if (randomEntities.ElementAt(i) is T randomEntity && !randomEntity.isActiveAndEnabled && !randomEntity.svEntity.RespawnedThisFrame && predicate(randomEntity))
                 {
                     return randomEntity;
                 }

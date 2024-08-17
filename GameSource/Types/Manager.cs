@@ -12,6 +12,7 @@ namespace BrokeProtocol.GameSource.Types
 
     public class Manager : ManagerEvents
     {
+        public static Dictionary<ShEntity, GameSourceEntity> pluginEntities = new();
         public static Dictionary<ShEntity, GameSourcePlayer> pluginPlayers = new();
 
         public static List<ShPlayer> skinPrefabs;
