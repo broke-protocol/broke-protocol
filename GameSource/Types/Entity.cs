@@ -2,6 +2,7 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
+using BrokeProtocol.Utility;
 using System.Collections;
 using UnityEngine;
 
@@ -17,6 +18,11 @@ namespace BrokeProtocol.GameSource.Types
             this.entity = entity;
             // RandomSpawns are inactive during initialization
             randomSpawn = !entity.go.activeSelf;
+
+            if(randomSpawn)
+            {
+                Util.Log("RandomSpawn " + entity);
+            }
         }
     }
 

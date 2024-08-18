@@ -1271,15 +1271,15 @@ namespace BrokeProtocol.GameSource
                         {
                             if(LifeManager.waypointGroups[0].spawns.TryGetValue(player.svPlayer.sector.tuple, out var spawns))
                             {
-                                var randomSpawn = spawns.GetRandom();
+                                var randomSpawnLocation = spawns.GetRandom();
 
-                                if (randomSpawn != null)
+                                if (randomSpawnLocation != null)
                                 {
                                     worldItem = SvManager.Instance.AddNewEntity(
                                         p.myItems.GetRandom().Value.item,
-                                        randomSpawn.place,
-                                        randomSpawn.position,
-                                        randomSpawn.rotation,
+                                        randomSpawnLocation.place,
+                                        randomSpawnLocation.position,
+                                        randomSpawnLocation.rotation,
                                         false);
 
                                     if (worldItem)
