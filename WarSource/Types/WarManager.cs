@@ -271,7 +271,7 @@ namespace BrokeProtocol.GameSource.Types
             player.name = prefab.name;
             player.svPlayer.spawnJobIndex = jobIndex;
             player.svPlayer.spawnJobRank = Random.Range(0, BPAPI.Jobs[jobIndex].shared.upgrades.Length);
-            SvManager.Instance.AddNewEntityExisting(player);
+            SvManager.Instance.AddNewEntityExisting(player, true);
         }
 
         [Execution(ExecutionMode.Override)]

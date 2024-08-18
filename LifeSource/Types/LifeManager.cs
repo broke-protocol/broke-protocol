@@ -81,7 +81,7 @@ namespace BrokeProtocol.GameSource.Types
         }
 
         private float AdjustedSpawnRate(NetSector sector, float limit, WaypointType type) =>
-            (1f - (sector.AreaTypeCount(type) / limit)) * spawnRate;
+            (1f - (sector.controlled.Where(e => e.GameEntity().randomSpawn && e.svEntity.WaypointProperty == type).Count() / limit)) * spawnRate;
 
         private void SetupTrain(ShTransport transport, Spawn s)
         {
@@ -229,7 +229,7 @@ namespace BrokeProtocol.GameSource.Types
             }
 
             newEntity.go.SetActive(false); // Set random spawns to inactive to prevent spawning prematurely
-            SvManager.Instance.AddNewEntityExisting(newEntity);
+            SvManager.Instance.AddNewEntityExisting(newEntity, true);
             ((MyJobInfo)BPAPI.Jobs[jobIndex]).randomEntities[waypointIndex].Add(newEntity);
         }
 

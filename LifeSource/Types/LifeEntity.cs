@@ -1,5 +1,7 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
+using BrokeProtocol.Utility;
+using System.Linq;
 using UnityEngine;
 
 namespace BrokeProtocol.GameSource.Types
@@ -22,25 +24,20 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        /* Shouldn't be destroying the random pool entities anyway
         [Execution(ExecutionMode.PreEvent)]
         public override bool Destroy(ShEntity entity)
         {
-            var waypointIndex = (int)entity.svEntity.WaypointProperty;
-
-            // Entity should only be part of 1 job's array but check all just in case
-            foreach (var info in BPAPI.Jobs)
+            if (entity.GameEntity().randomSpawn)
             {
-                ((MyJobInfo)info).randomEntities[waypointIndex].Remove(entity);
+                Util.Log($"RandomSpawn Entity {entity} being destroyed", LogLevel.Warn);
             }
             return true;
         }
-        */
 
         [Execution(ExecutionMode.Additive)]
         public override bool SameSector(ShEntity e)
         {
-            if (e.GameEntity().randomSpawn && e.svEntity.spectators.Count == 0 && (!e.Player || !e.Player.svPlayer.currentState.IsBusy) && !e.svEntity.sector.HumanControlled())
+            if (e.GameEntity().randomSpawn && e.svEntity.spectators.Count == 0 && (!e.Player || !e.Player.svPlayer.currentState.IsBusy) && !e.svEntity.sector.controlled.Any(e => e.isHuman))
             {
                 e.svEntity.Deactivate(true);
             }
