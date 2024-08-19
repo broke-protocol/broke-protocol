@@ -129,10 +129,9 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     foreach (var s in sectorSpawns)
                     {
-                        if (Random.value < AdjustedSpawnRate(sector, 16, waypointType))
+                        if (Random.value < AdjustedSpawnRate(sector, 24, waypointType))
                         {
                             var spawnBot = LifeManager.GetAvailable<ShPlayer>(spawner, s.position, out _, waypointType);
-
                             if (spawnBot)
                             {
                                 spawnBot.svPlayer.SpawnBot(
@@ -151,7 +150,7 @@ namespace BrokeProtocol.GameSource.Types
                     //VehicleWaypointGroup
                     foreach (var s in sectorSpawns)
                     {
-                        if (Random.value < AdjustedSpawnRate(sector, 8, waypointType))
+                        if (Random.value < AdjustedSpawnRate(sector, 6, waypointType))
                         {
                             var spawnBot = LifeManager.GetAvailable<ShPlayer>(spawner, s.position, out var jobIndex, WaypointType.Player);
 
