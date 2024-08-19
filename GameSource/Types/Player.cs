@@ -188,7 +188,14 @@ namespace BrokeProtocol.GameSource.Types
                         player.svPlayer.SvStopInventory(true);
                     }
                 }
-                else if (Random.value < 0.1f)
+                else if (player.IsKnockedOut)
+                {
+                    if (Random.value < 1f/30f)
+                    {
+                        player.svPlayer.StartRecover();
+                    }
+                }
+                else if (Random.value < 1f/10f)
                 {
                     if (player.injuries.Count > 0)
                     {

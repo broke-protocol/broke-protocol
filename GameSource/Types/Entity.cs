@@ -18,11 +18,6 @@ namespace BrokeProtocol.GameSource.Types
             this.entity = entity;
             // RandomSpawns are inactive during initialization
             randomSpawn = !entity.go.activeSelf;
-
-            if(randomSpawn)
-            {
-                Util.Log("RandomSpawn " + entity);
-            }
         }
     }
 
