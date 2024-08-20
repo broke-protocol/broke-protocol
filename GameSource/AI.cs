@@ -701,8 +701,12 @@ namespace BrokeProtocol.GameSource
 
         public virtual void PathToTarget()
         {
-            player.svPlayer.GetPathAvoidance(player.svPlayer.targetEntity.GetPosition);
-            ResetTargetPosition();
+            var target = player.svPlayer.targetEntity.GetMount ?? player.svPlayer.targetEntity;
+            if (target.Ground)
+            {
+                player.svPlayer.GetPathAvoidance(target.GetPosition);
+                ResetTargetPosition();
+            }
         }
 
         public override byte StateMoveMode => MoveMode.Normal;
