@@ -1,6 +1,5 @@
 ﻿using BrokeProtocol.API;
 using BrokeProtocol.Entities;
-using BrokeProtocol.GameSource.Types;
 using System;
 
 namespace BrokeProtocol.GameSource
