@@ -699,13 +699,19 @@ namespace BrokeProtocol.GameSource
 
         public bool TargetMoved => player.svPlayer.targetEntity.DistanceSqr(lastTargetPosition) > Util.pathfindRangeSqr;
 
+        public ShEntity TargetMount => player.svPlayer.targetEntity.GetMount ?? player.svPlayer.targetEntity;
+
         public virtual void PathToTarget()
         {
-            var target = player.svPlayer.targetEntity.GetMount ?? player.svPlayer.targetEntity;
+            var target = TargetMount;
             if (target.Ground)
             {
                 player.svPlayer.GetPathAvoidance(target.GetPosition);
                 ResetTargetPosition();
+            }
+            else
+            {
+                player.svPlayer.ResetPath();
             }
         }
 
@@ -1009,6 +1015,10 @@ namespace BrokeProtocol.GameSource
             {
                 PathToTarget();
             }
+            else if(!TargetMount.Ground) // Don't fall through below and get stuck in MoveLookNavPath/DestroySelf
+            {
+                player.ZeroInputs();
+            }
             else if (TargetMoved &&
                  (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
@@ -1017,7 +1027,6 @@ namespace BrokeProtocol.GameSource
             else if (!player.svPlayer.MoveLookNavPath())
             {
                 // Guard clause because MoveLookNavPath might kill the player if it's a bad path
-                // TODO: Find a more elegent solution for this
                 if(!player.IsCapable || !player.svPlayer.targetEntity)
                 {
                     return false;
