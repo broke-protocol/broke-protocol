@@ -699,11 +699,9 @@ namespace BrokeProtocol.GameSource
 
         public bool TargetMoved => player.svPlayer.targetEntity.DistanceSqr(lastTargetPosition) > Util.pathfindRangeSqr;
 
-        public ShEntity TargetMount => player.svPlayer.targetEntity.GetMount ?? player.svPlayer.targetEntity;
-
         public virtual void PathToTarget()
         {
-            var target = TargetMount;
+            var target = player.svPlayer.TargetMount;
             if (target.Ground)
             {
                 player.svPlayer.GetPathAvoidance(target.GetPosition);
@@ -730,9 +728,24 @@ namespace BrokeProtocol.GameSource
             return true;
         }
 
+        protected bool HandleAirborneTarget()
+        {
+            if (!player.svPlayer.TargetMount.Ground) // Don't fall through below and get stuck in MoveLookNavPath/DestroySelf
+            {
+                player.svPlayer.LookTarget();
+                player.ZeroInputs();
+                return true;
+            }
+            return false;
+        }
+
         protected virtual bool HandleDistantTarget()
         {
-            if (TargetMoved)
+            if (HandleAirborneTarget()) // Don't fall through below and get stuck in MoveLookNavPath/DestroySelf
+            {
+                //
+            }
+            else if (TargetMoved)
             {
                 PathToTarget();
             }
@@ -1015,9 +1028,9 @@ namespace BrokeProtocol.GameSource
             {
                 PathToTarget();
             }
-            else if(!TargetMount.Ground) // Don't fall through below and get stuck in MoveLookNavPath/DestroySelf
+            else if (HandleAirborneTarget())
             {
-                player.ZeroInputs();
+                //
             }
             else if (TargetMoved &&
                  (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || player.CanSeeEntity(player.svPlayer.targetEntity)))
