@@ -68,12 +68,12 @@ namespace BrokeProtocol.GameSource.Types
 
                             var sector = SvManager.Instance.GetSector(node.GetPlaceIndex, spawnPosition);
 
-                            if (!spawns.ContainsKey(sector.tuple))
+                            if (!spawns.ContainsKey(sector.key))
                             {
-                                spawns[sector.tuple] = new List<Spawn>();
+                                spawns[sector.key] = new List<Spawn>();
                             }
 
-                            spawns[sector.tuple].Add(new Spawn(spawnPosition, Quaternion.LookRotation(ray.direction), node, neighbor));
+                            spawns[sector.key].Add(new Spawn(spawnPosition, Quaternion.LookRotation(ray.direction), node, neighbor));
                         }
                     }
                 }
@@ -123,7 +123,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public void SpawnRandom(ShPlayer spawner, NetSector sector)
         {
-            if (spawns.TryGetValue((sector.placeIndex, sector.position), out var sectorSpawns))
+            if (spawns.TryGetValue(sector.key, out var sectorSpawns))
             {
                 if (waypointType == WaypointType.Player)
                 {
@@ -160,7 +160,7 @@ namespace BrokeProtocol.GameSource.Types
 
                                 if (transport && transport.CanSpawn(s.position, s.rotation, new ShEntity[] { }))
                                 {
-                                    transport.Spawn(s.position, s.rotation, SceneManager.Instance.places[sector.placeIndex].mTransform);
+                                    transport.Spawn(s.position, s.rotation, SceneManager.Instance.places[sector.key.Item1].mTransform);
                                     SetupTrain(transport, s);
                                     transport.SetVelocity(0.5f * transport.maxSpeed * transport.mainT.forward);
                                     spawnBot.svPlayer.SpawnBot(
