@@ -1,3 +1,31 @@
+## 1.42
+?> New moddable HUD and other UI assets in BPResources. New way to Bind Cursor to UI elements for automatic cleanup. Most other 'Sector' related API changes are due to addition of level streaming but shouldn't affect too many plugins.
+
+### API
+- Default menus will try to clone Custom UIs with the same UXML name if available
+- svPlayer.VisualElementCursorVisibility(string elementName)
+  - Binds cursor visibility to a VisualElement
+  - Disables Cursor automatically when element destroyed
+- SvPlayer.randomSpawn moved to GameSourceEntity type
+- EntityCollections.RandomNPC returns any NPC now, not just randomSpawns
+- Added SvPlayer.ResetPath() to clear pathing data
+- Added SvPlayer.LookTarget() for aiming/shooting at target separate from movement
+- SvManager.Instance.AddNewEntityExisting(..)
+  - respawnable parameter no longer optional
+- SvPlayer.PlayerData removed
+  - Use SvPlayer.CustomData directly
+- Sector -> NetSector
+- sectorRange -> netSectorRange
+- visibleRange -> netVisibleRange
+- visibleRangeSqr -> netVisibleRangeSqr
+- manhattanRange -> netPerpendicularRange
+- Some Sector methods removed
+  - Reimplemented in GameSource where needed
+
+### MODDING
+- New Destructible Effects supported
+  - Custom Destroy Effects can be set similar to thrown Destroy effects
+
 ## 1.41
 ?> Modders can now use complex paths to Get/Set VisualElements using the UI API methods. Similar (but not identical) to querySelector() in JavaScript.
 
@@ -103,31 +131,3 @@
       * uprightStrength
       * stabilityStrength
    * You can simply add "/25" after each number in the inspector and Unity will calculate the result when you Enter or Tab out
-
-## 1.36
-?> The UI Update adds events related to changing ChatMode and ChatChannel so the server can override or block that behavior. Also, some old client packets were removed to prevent misuse (by me). But the gap in the ClPacket enum changed a bunch of packet IDs so any plugin sending packets directly (SvPlayer.Send(...)) will likely need rebuilding.
-
-### API
-* Removed old SerializedAttachments/Wearables client packets
-* Modded Underbarrel Attachments can adjust default 'Setting'
-* SetChatChannel and SetChatMode events added to GameSource
-
-## 1.35
-?> The Destruction Update adds a new class of events for Voxels. Also there's a public API on the new ShVoxel class if you want to manipulate them at runtime. Chat handling is also changed to account for a new ChatMode set for each player that decides whether their voice/message will go Public, Job, or Private Channel when using LocalChat.
-
-### API
-* New Voxel event class added (More events coming later)
-* Fixed some missing namespaces
-* Use HashSet for command lookups
-* Mount event implementation moved to GameSource
-* Some ShGun parameters/functions moved up to ShWeapon base class
-* Global/LocalChatMessage events & packets renamed to ChatGlobal/Local
-* New ChatVoice event added
-* New handling for ChatLocal messages depending on SvPlayer.chatMode
-* SvPlayer.ResetZoom renamed to ResetMode
-* Net serializer now supports ushort, int3, and Color32 for new features
-* PlaceItemCount moved to SceneManager
-* Heightmaps data update ('pngBytes'->'heightmapData' to update old maps)
-* New 'Always Visible' Entity parameter (entities always loaded on clients)
-* SvEntity.Despawn() renamed to Deactivate() for consistency
-* GameSource fix for dead NPCs stuck in vehicles
