@@ -390,7 +390,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.svPlayer.CustomData.TryFetchCustomData(offensesKey, out string offensesJSON))
+                if (player.svPlayer.CustomData.TryGetValue(offensesKey, out string offensesJSON))
                 {
                     var offensesList = JsonConvert.DeserializeObject<List<CrimeSave>>(offensesJSON);
                     var wearables = new ShWearable[player.curWearables.Length];
@@ -433,7 +433,7 @@ namespace BrokeProtocol.GameSource.Types
                     pluginPlayer.UpdateWantedLevel(true);
                 }
 
-                if (player.svPlayer.CustomData.TryFetchCustomData(jailtimeKey, out float jailtime) && jailtime > 0f)
+                if (player.svPlayer.CustomData.TryGetValue(jailtimeKey, out float jailtime) && jailtime > 0f)
                 {
                     pluginPlayer.StartJailTimer(jailtime);
                 }
@@ -458,8 +458,8 @@ namespace BrokeProtocol.GameSource.Types
 
                 var CustomData = player.svPlayer.CustomData;
 
-                CustomData.AddOrUpdate(offensesKey, JsonConvert.SerializeObject(offensesList));
-                CustomData.AddOrUpdate(jailtimeKey, Mathf.Max(0f, pluginPlayer.jailExitTime - Time.time));
+                CustomData.Add(offensesKey, JsonConvert.SerializeObject(offensesList));
+                CustomData.Add(jailtimeKey, Mathf.Max(0f, pluginPlayer.jailExitTime - Time.time));
             }
 
             return true;
@@ -590,14 +590,14 @@ namespace BrokeProtocol.GameSource.Types
 
             if (spawnBot)
             {
-                var spawnT = target.svEntity.GetDoor.spawnPoint;
+                var spawnT = target.svEntity.GetDoor().spawnPoint;
 
                 if (spawnT)
                 {
                     spawnBot.svPlayer.SpawnBot(
                         spawnT.position,
                         spawnT.rotation,
-                        target.GetPlace,
+                        target.Place,
                         null,
                         target,
                         target);
@@ -744,9 +744,9 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool KickOut(ShPlayer player, ShPlayer other)
         {
-            if (other.isHuman && other.IsUp && player.IsMobile && player.InOwnApartment && other.GetPlace == player.GetPlace)
+            if (other.isHuman && other.IsUp && player.IsMobile && player.InOwnApartment && other.Place == player.Place)
             {
-                other.svPlayer.SvEnterDoor(other.GetPlace.mainDoor.ID, player, true);
+                other.svPlayer.SvEnterDoor(other.Place.mainDoor.ID, player, true);
                 return true;
             }
 

@@ -518,7 +518,7 @@ namespace BrokeProtocol.GameSource.Types
                     return true;
                 }
 
-                if (connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex) && connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs[teamIndex].Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
+                if (connectData.customData.TryGetValue(teamIndexKey, out int teamIndex) && connectData.skinIndex >= 0 && connectData.skinIndex < skinPrefabs[teamIndex].Count && connectData.wearableIndices?.Length == ShManager.Instance.nullWearable.Length)
                 {
                     var territories = WarUtility.GetTerritories(teamIndex);
 
@@ -626,7 +626,7 @@ namespace BrokeProtocol.GameSource.Types
                                 {
                                     if (c.shared.jobName == optionID)
                                     {
-                                        connectData.customData.AddOrUpdate(teamIndexKey, teamIndex);
+                                        connectData.customData.Add(teamIndexKey, teamIndex);
                                         SvManager.Instance.DestroyMenu(connectData.connection, selectTeam);
                                         SendClassSelectMenu(connectData.connection, teamIndex);
                                         break;
@@ -638,14 +638,14 @@ namespace BrokeProtocol.GameSource.Types
 
                         case selectClass:
                             {
-                                if (connectData.customData.TryFetchCustomData(teamIndexKey, out int teamIndex))
+                                if (connectData.customData.TryGetValue(teamIndexKey, out int teamIndex))
                                 {
                                     int classIndex = 0;
                                     foreach(var c in classes[teamIndex])
                                     {
                                         if(c.className == optionID)
                                         {
-                                            connectData.customData.AddOrUpdate(classIndexKey, classIndex);
+                                            connectData.customData.Add(classIndexKey, classIndex);
                                             SvManager.Instance.DestroyMenu(connectData.connection, selectClass);
                                             SvManager.Instance.SendRegisterMenu(connectData.connection, false, skinPrefabs[teamIndex]);
                                             break;

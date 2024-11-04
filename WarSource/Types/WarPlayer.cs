@@ -104,8 +104,8 @@ namespace BrokeProtocol.GameSource.Types
 
             if (!player.isHuman ||
                 !SvManager.Instance.connections.TryGetValue(player.svPlayer.connection, out var connectData) ||
-                !connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex) ||
-                !connectData.customData.TryFetchCustomData(WarManager.classIndexKey, out int classIndex))
+                !connectData.customData.TryGetValue(WarManager.teamIndexKey, out int teamIndex) ||
+                !connectData.customData.TryGetValue(WarManager.classIndexKey, out int classIndex))
             {
                 teamIndex = player.svPlayer.spawnJobIndex;
                 classIndex = Random.Range(0, WarManager.classes[teamIndex].Count);

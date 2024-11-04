@@ -102,7 +102,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public bool OnDestination()
         {
-            var controlled = player.GetControlled;
+            var controlled = player.GetControlled();
             return controlled.DistanceSqr2D(goToPosition) < controlled.svMovable.NavRangeSqr;
         }
 
@@ -116,7 +116,7 @@ namespace BrokeProtocol.GameSource.Types
 
         public virtual bool MountWithinReach(ShEntity target)
         {
-            var m = player.GetMount;
+            var m = player.GetMount();
             return m && m.Velocity.sqrMagnitude <= Utility.slowSpeedSqr && target.InActionRange(m);
         }
     }
@@ -158,7 +158,7 @@ namespace BrokeProtocol.GameSource.Types
 
             while (!player.IsDead && !player.svPlayer.godMode)
             {
-                if (player.GetStanceIndex == StanceIndex.Sleep)
+                if (player.StanceIndex == StanceIndex.Sleep)
                 {
                     player.svPlayer.UpdateStatsDelta(0f, 0f, 0.02f);
                 }
@@ -651,7 +651,7 @@ namespace BrokeProtocol.GameSource.Types
             else
             {
                 var otherDoor = door.svDoor.other;
-                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.GetPlace.mTransform);
+                baseEntity.svMountable.SvRelocate(otherDoor.spawnPoint, otherDoor.Place.mTransform);
             }
 
             return true;
@@ -754,11 +754,11 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.Send(SvSendType.LocalOthers, Channel.Reliable, ClPacket.Point, player.ID, pointing);
 
             if (pointing && player.svPlayer.follower &&
-                Physics.Raycast(player.GetOrigin, player.GetRotationT.forward, out var hit, Util.netVisibleRange, MaskIndex.hard) &&
+                Physics.Raycast(player.Origin, player.RotationT.forward, out var hit, Util.netVisibleRange, MaskIndex.hard) &&
                 player.svPlayer.follower.svPlayer.NodeNear(hit.point) != null)
             {
                 player.svPlayer.follower.svPlayer.SvDismount();
-                player.svPlayer.follower.GamePlayer().SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.GetPosition));
+                player.svPlayer.follower.GamePlayer().SetGoToState(hit.point, Quaternion.LookRotation(hit.point - player.svPlayer.follower.Position));
             }
 
             return true;
@@ -794,7 +794,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 SvManager.Instance.AddNewEntityDelay(
                     placeableEntity,
-                    player.GetPlace,
+                    player.Place,
                     position,
                     rotation,
                     Vector3.one,
@@ -806,7 +806,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 SvManager.Instance.AddNewEntity(
                     placeableEntity,
-                    player.GetPlace,
+                    player.Place,
                     position,
                     rotation,
                     false);
@@ -876,7 +876,7 @@ namespace BrokeProtocol.GameSource.Types
 
                     if (garage is ShApartment apartment && player.ownedApartments.TryGetValue(apartment, out var place))
                     {
-                        if (SceneManager.PlaceItemCount(place) >= apartment.limit ||
+                        if (place.GetItemCount() >= apartment.limit ||
                             !transport.svTransport.TryParking(place.mainDoor))
                         {
                             player.svPlayer.SendGameMessage("Cannot park in private garage");
@@ -899,7 +899,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Tow(ShPlayer player, bool setting)
         {
-            var transport = player.GetControlled as ShTransport;
+            var transport = player.GetControlled() as ShTransport;
 
             if (transport)
             {
@@ -911,7 +911,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             player.svPlayer.SendGameMessage("Towable vehicle is too heavy");
                         }
-                        else if(Quaternion.Angle(transport.GetRotation, towable.GetRotation) > 45f)
+                        else if(Quaternion.Angle(transport.Rotation, towable.Rotation) > 45f)
                         {
                             player.svPlayer.SendGameMessage("Vehicle misalignment");
                         }

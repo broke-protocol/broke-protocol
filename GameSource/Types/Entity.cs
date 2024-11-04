@@ -48,7 +48,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     entity.StartDestroyDelay(svEntity.destroyAfter);
                 }
-                else if (!entity.GetPlace.IsClone)
+                else if (!entity.Place.IsClone)
                 {
                     entity.StartDestroyDelay(60f * 60f * 2f);
                 }
@@ -106,7 +106,7 @@ namespace BrokeProtocol.GameSource.Types
                     {
                         var index = 0;
 
-                        var mount = controller.GetMount;
+                        var mount = controller.GetMount();
                         foreach (var w in mount.weaponSets)
                         {
                             if (SceneManager.Instance.TryGetEntity<ShThrown>(w.thrownName, out var thrown) && thrown.CompareTag(ObjectTag.flareTag))

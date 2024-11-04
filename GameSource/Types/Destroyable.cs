@@ -121,7 +121,7 @@ namespace BrokeProtocol.GameSource.Types
             var source = damageSourceType switch
             {
                 DamageSource.HitPoint => hitPoint,
-                DamageSource.Attacker when attacker => attacker.GetOrigin,
+                DamageSource.Attacker when attacker => attacker.Origin,
                 _ => default,
             };
             destroyable.svDestroyable.UpdateHealth(source);

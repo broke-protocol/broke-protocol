@@ -11,7 +11,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool SecurityTrigger(ShEntity entity, Collider otherCollider)
         {
-            var place = entity.GetPlace;
+            var place = entity.Place;
             if (place.owner && otherCollider.TryGetComponent(out ShPlayer player) && 
                 player != place.owner && LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {

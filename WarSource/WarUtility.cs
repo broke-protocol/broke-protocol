@@ -49,7 +49,7 @@ namespace BrokeProtocol.GameSource
             {
                 var t = territory.mainT;
                 const float offset = 0.5f;
-                place = territory.GetPlace;
+                place = territory.Place;
 
                 for (var i = 0; i < 10; i++)
                 {

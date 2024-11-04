@@ -28,7 +28,7 @@ namespace BrokeProtocol.GameSource.Types
             this.rotation = rotation;
             this.prevWaypoint = prevWaypoint;
             this.nextWaypoint = nextWaypoint;
-            place = nextWaypoint.GetPlace;
+            place = nextWaypoint.Place;
         }
     }
 
@@ -66,7 +66,7 @@ namespace BrokeProtocol.GameSource.Types
                         {
                             var spawnPosition = ray.GetPoint(i);
 
-                            var sector = SvManager.Instance.GetSector(node.GetPlaceIndex, spawnPosition);
+                            var sector = SvManager.Instance.GetSector(node.GetPlaceIndex(), spawnPosition);
 
                             if (!spawns.ContainsKey(sector.key))
                             {
@@ -325,7 +325,7 @@ namespace BrokeProtocol.GameSource.Types
 
             do
             { 
-                if (randomEntities.ElementAt(i) is T randomEntity && !randomEntity.isActiveAndEnabled && !randomEntity.svEntity.RespawnedThisFrame && predicate(randomEntity))
+                if (randomEntities.ElementAt(i) is T randomEntity && !randomEntity.isActiveAndEnabled && !randomEntity.svEntity.DestroyedThisFrame && predicate(randomEntity))
                 {
                     return randomEntity;
                 }
@@ -451,7 +451,7 @@ namespace BrokeProtocol.GameSource.Types
                 // Only save bounties targeting Humans
                 if (!Hitman.aiTarget || Hitman.aiTarget.username != bounty.Key)
                 {
-                    bountyData.CustomData[bounty.Key] = bounty.Value;
+                    bountyData.CustomData.Add(bounty.Key, bounty.Value);
                 }
             }
             SvManager.Instance.database.Data.Upsert(bountyData);
@@ -466,7 +466,7 @@ namespace BrokeProtocol.GameSource.Types
 
             if (bountyData != null)
             {
-                foreach (var bounty in bountyData.CustomData.Data)
+                foreach (var bounty in bountyData.CustomData)
                 {
                     Hitman.bounties.Add(bounty.Key, CustomData.ConvertData<DateTimeOffset>(bounty.Value));
                 }

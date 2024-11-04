@@ -19,13 +19,13 @@ namespace BrokeProtocol.GameSource
             return false;
         }
 
-        public bool TargetNear => player.GetMount == player.svPlayer.targetEntity.GetMount ||
+        public bool TargetNear => player.GetMount() == player.svPlayer.targetEntity.GetMount() ||
             player.DistanceSqr(player.svPlayer.targetEntity) < Util.closeRangeSqr ||
             player.CanSeeEntity(player.svPlayer.targetEntity, false, Util.pathfindRange);
 
         protected Vector3 SafePos(Vector3 movePos)
         {
-            var position = player.GetControlled.GetPosition;
+            var position = player.GetControlled().Position;
             var delta = movePos - position;
             var distance = delta.magnitude;
 
@@ -155,7 +155,7 @@ namespace BrokeProtocol.GameSource
                 return false;
             }
 
-            var delta = player.svPlayer.targetEntity.GetOrigin - player.curMount.GetOrigin;
+            var delta = player.svPlayer.targetEntity.Origin - player.curMount.Origin;
 
             if(Vector3.Angle(player.curMount.mainT.forward, delta) > player.curMount.viewAngleLimit)
             {
@@ -201,7 +201,7 @@ namespace BrokeProtocol.GameSource
         {
             if (base.EnterTest() && IsTargetValid())
             {
-                aircraft = player.GetControlled as ShAircraft;
+                aircraft = player.GetControlled() as ShAircraft;
                 return aircraft;
             }
 
@@ -222,7 +222,7 @@ namespace BrokeProtocol.GameSource
             }
             else
             {
-                safePos = SafePos(player.svPlayer.targetEntity.GetOrigin);
+                safePos = SafePos(player.svPlayer.targetEntity.Origin);
             }
 
             aircraft.svMountable.MoveTo(safePos);
@@ -232,7 +232,7 @@ namespace BrokeProtocol.GameSource
         {
             var safePos = SafePos(movePos);
             aircraft.svMountable.MoveTo(safePos);
-            player.svPlayer.LookAt(safePos - player.GetOrigin);
+            player.svPlayer.LookAt(safePos - player.Origin);
         }
 
         public override bool UpdateState()
@@ -245,7 +245,7 @@ namespace BrokeProtocol.GameSource
                 return false;
             }
 
-            var enemyMount = player.svPlayer.targetEntity.GetMount;
+            var enemyMount = player.svPlayer.targetEntity.GetMount();
 
             if (!enemyMount)
             {
@@ -256,7 +256,7 @@ namespace BrokeProtocol.GameSource
             var enemyPosition = enemyMount.GetWeaponPosition();
             var enemyRotation = enemyMount.GetWeaponVector();
             const float threatLimit = 0.35f;
-            var selfT = aircraft.GetRotationT;
+            var selfT = aircraft.RotationT;
             var selfPosition = selfT.position;
             var delta = selfPosition - enemyPosition;
             var distance = delta.magnitude;
@@ -378,8 +378,8 @@ namespace BrokeProtocol.GameSource
 
         private void UpdateChecks()
         {
-            var mountable = player.GetMount;
-            lastCheckPosition = mountable.GetPosition;
+            var mountable = player.GetMount();
+            lastCheckPosition = mountable.Position;
             nextCheckTime = Time.time + 5f;
         }
 
@@ -394,7 +394,7 @@ namespace BrokeProtocol.GameSource
         {
             if (!base.UpdateState()) return false;
 
-            var controlled = player.GetControlled;
+            var controlled = player.GetControlled();
 
             if (!player.IsPassenger(out _) && Time.time > nextCheckTime)
             {
@@ -480,7 +480,7 @@ namespace BrokeProtocol.GameSource
                     return false;
                 }*/
                 var goal = player.GamePlayer().goToPosition;
-                player.svPlayer.LookAt(goal - aircraft.GetPosition);
+                player.svPlayer.LookAt(goal - aircraft.Position);
                 aircraft.svTransport.MoveTo(SafePos(goal));
             }
             else if(player.svPlayer.BadPath)
@@ -536,7 +536,7 @@ namespace BrokeProtocol.GameSource
             // But to find a new one if going from Vehicle waypoints to Pedestrian waypoints for example
             if (nextState is not WaypointState || 
                 (player.svPlayer.onWaypoints && 
-                player.svPlayer.nextWaypoint.waypointType != player.GetControlled.svMovable.WaypointProperty))
+                player.svPlayer.nextWaypoint.waypointType != player.GetControlled().svMovable.WaypointProperty))
             {
                 player.svPlayer.onWaypoints = false;
             }
@@ -599,20 +599,20 @@ namespace BrokeProtocol.GameSource
         {
             if (base.EnterTest())
             {
-                var controlled = player.GetControlled;
+                var controlled = player.GetControlled();
 
                 var offset = controlled.bounds.size.x * 2f;
 
-                var targetPosition = player.svPlayer.targetEntity.GetPosition;
+                var targetPosition = player.svPlayer.targetEntity.Position;
 
-                var delta = targetPosition - controlled.GetPosition;
+                var delta = targetPosition - controlled.Position;
 
                 var normal = delta.normalized;
 
                 int i = 1;
                 while (i < 6)
                 {
-                    var startPos = controlled.GetPosition - (Mathf.Abs(i) * offset * normal) + Vector3.Cross(i * offset * normal, Vector3.up);
+                    var startPos = controlled.Position - (Mathf.Abs(i) * offset * normal) + Vector3.Cross(i * offset * normal, Vector3.up);
 
                     if (Util.SafePosition(startPos, out var startHit))
                     {
@@ -695,7 +695,7 @@ namespace BrokeProtocol.GameSource
     {
         public Vector3 lastTargetPosition;
 
-        public void ResetTargetPosition() => lastTargetPosition = player.svPlayer.targetEntity.GetPosition;
+        public void ResetTargetPosition() => lastTargetPosition = player.svPlayer.targetEntity.Position;
 
         public bool TargetMoved => player.svPlayer.targetEntity.DistanceSqr(lastTargetPosition) > Util.pathfindRangeSqr;
 
@@ -704,7 +704,7 @@ namespace BrokeProtocol.GameSource
             var target = player.svPlayer.TargetMount;
             if (target.Ground)
             {
-                player.svPlayer.GetPathAvoidance(target.GetPosition);
+                player.svPlayer.GetPathAvoidance(target.Position);
                 ResetTargetPosition();
             }
             else
@@ -724,7 +724,7 @@ namespace BrokeProtocol.GameSource
 
         protected virtual bool HandleNearTarget()
         {
-            player.svPlayer.LookTactical(player.svPlayer.targetEntity.GetOrigin - player.GetOrigin);
+            player.svPlayer.LookTactical(player.svPlayer.targetEntity.Origin - player.Origin);
             return true;
         }
 
@@ -777,7 +777,7 @@ namespace BrokeProtocol.GameSource
             if (TargetNear) player.ZeroInputs();
 
             var target = player.svPlayer.targetEntity;
-            var targetMount = target.GetMount;
+            var targetMount = target.GetMount();
 
             if (targetMount && targetMount != target)
             {
@@ -823,7 +823,7 @@ namespace BrokeProtocol.GameSource
                     player.svPlayer.SvDismount();
                 }
 
-                var range = Mathf.Min(0.5f * player.ActiveWeapon.Range + player.GetRotationT.localPosition.z, 25f);
+                var range = Mathf.Min(0.5f * player.ActiveWeapon.Range + player.RotationT.localPosition.z, 25f);
                 player.TrySetInput(
                     Mathf.Clamp((player.Distance(targetEntity) - range) * 0.5f, -1f, 1f),
                     0f,
@@ -992,7 +992,7 @@ namespace BrokeProtocol.GameSource
             if ((hunting || player.svPlayer.IncompletePath || Random.value < 0.25f) && CanHunt)
             {
                 hunting = true;
-                if (player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.GetPosition, out var huntPosition))
+                if (player.svPlayer.GetOverwatchNear(player.svPlayer.targetEntity.Position, out var huntPosition))
                 {
                     player.svPlayer.GetPathAvoidance(huntPosition);
                     ResetTargetPosition();
@@ -1033,7 +1033,7 @@ namespace BrokeProtocol.GameSource
                 //
             }
             else if (TargetMoved &&
-                 (player.GetPlaceIndex != player.svPlayer.targetEntity.GetPlaceIndex || player.CanSeeEntity(player.svPlayer.targetEntity)))
+                 (player.GetPlaceIndex() != player.svPlayer.targetEntity.GetPlaceIndex() || player.CanSeeEntity(player.svPlayer.targetEntity)))
             {
                 PathToTarget();
             }

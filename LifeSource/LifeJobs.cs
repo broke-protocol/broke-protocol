@@ -1166,8 +1166,8 @@ namespace BrokeProtocol.GameSource
 
                     destinationMarker = SvManager.Instance.AddNewEntity(
                         SvManager.Instance.markerGoalPrefab,
-                        destination.GetPlace,
-                        destination.GetPosition,
+                        destination.Place,
+                        destination.Position,
                         Quaternion.identity,
                         new IDCollection<ShPlayer> { player });
 

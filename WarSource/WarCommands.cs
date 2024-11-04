@@ -22,7 +22,7 @@ namespace BrokeProtocol.GameSource
         public void ClassSelect(ShPlayer player)
         {
             if(SvManager.Instance.connections.TryGetValue(player.svPlayer.connection, out var connectData) &&
-                connectData.customData.TryFetchCustomData(WarManager.teamIndexKey, out int teamIndex))
+                connectData.customData.TryGetValue(WarManager.teamIndexKey, out int teamIndex))
             {
                 WarManager.SendClassSelectMenu(player.svPlayer.connection, teamIndex);
             }
