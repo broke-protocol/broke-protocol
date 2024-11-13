@@ -2,7 +2,6 @@
 using BrokeProtocol.Entities;
 using BrokeProtocol.Managers;
 using BrokeProtocol.Required;
-using BrokeProtocol.Utility;
 using System.Collections;
 using UnityEngine;
 
@@ -64,7 +63,6 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Respawn(ShEntity entity)
         {
-            if (entity.IsDead) entity.svEntity.SvDestroyEffect();
             // So players aren't charged with Murder crimes after vehicles reset
             entity.svEntity.instigator = null;
 

@@ -41,7 +41,6 @@ namespace BrokeProtocol.GameSource
         public static IEnumerator RespawnDelay(this ShEntity entity)
         {
             var respawnTime = Time.time + entity.svEntity.RespawnTime;
-            var delay = new WaitForSeconds(1f);
 
             while (entity && entity.IsDead)
             {
@@ -50,7 +49,7 @@ namespace BrokeProtocol.GameSource
                     entity.svEntity.Respawn();
                     yield break;
                 }
-                yield return delay;
+                yield return null;
             }
         }
 
