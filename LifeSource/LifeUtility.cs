@@ -9,40 +9,41 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource
 {
-    [Serializable]
-    public struct CrimeSave
+    public class CrimeSave
     {
+        public CrimeIndex CrimeIndex { get; set; }
+        public int[] Wearables { get; set; }
+        public float TimeSinceLast { get; set; }
+        public string WitnessPlayerAccount { get; set; }
+        public int WitnessBotID { get; set; }
+
+        public CrimeSave() { }
+
         public CrimeSave(CrimeIndex crimeIndex, int[] wearables, float timeSinceLast, ShPlayer witness)
         {
-            this.crimeIndex = crimeIndex;
-            this.wearables = wearables;
-            this.timeSinceLast = timeSinceLast;
+            CrimeIndex = crimeIndex;
+            Wearables = wearables;
+            TimeSinceLast = timeSinceLast;
 
             if (witness)
             {
                 if (witness.isHuman)
                 {
-                    witnessPlayerAccount = witness.username;
-                    witnessBotID = 0;
+                    WitnessPlayerAccount = witness.username;
+                    WitnessBotID = 0;
                 }
                 else
                 {
-                    witnessPlayerAccount = null;
-                    witnessBotID = witness.ID;
+                    WitnessPlayerAccount = null;
+                    WitnessBotID = witness.ID;
                 }
             }
             else
             {
-                witnessPlayerAccount = null;
-                witnessBotID = 0;
+                WitnessPlayerAccount = null;
+                WitnessBotID = 0;
             }
         }
-
-        public CrimeIndex crimeIndex;
-        public int[] wearables;
-        public float timeSinceLast;
-        public string witnessPlayerAccount;
-        public int witnessBotID;
     }
 
     // Store as a string for future change compatibility

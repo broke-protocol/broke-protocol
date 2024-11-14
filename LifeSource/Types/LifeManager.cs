@@ -451,7 +451,7 @@ namespace BrokeProtocol.GameSource.Types
                 // Only save bounties targeting Humans
                 if (!Hitman.aiTarget || Hitman.aiTarget.username != bounty.Key)
                 {
-                    bountyData.CustomData.Add(bounty.Key, bounty.Value);
+                    bountyData.CustomData[bounty.Key] = bounty.Value;
                 }
             }
             SvManager.Instance.database.Data.Upsert(bountyData);

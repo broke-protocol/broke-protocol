@@ -626,7 +626,7 @@ namespace BrokeProtocol.GameSource.Types
                                 {
                                     if (c.shared.jobName == optionID)
                                     {
-                                        connectData.customData.Add(teamIndexKey, teamIndex);
+                                        connectData.customData[teamIndexKey] = teamIndex;
                                         SvManager.Instance.DestroyMenu(connectData.connection, selectTeam);
                                         SendClassSelectMenu(connectData.connection, teamIndex);
                                         break;
@@ -645,7 +645,7 @@ namespace BrokeProtocol.GameSource.Types
                                     {
                                         if(c.className == optionID)
                                         {
-                                            connectData.customData.Add(classIndexKey, classIndex);
+                                            connectData.customData[classIndexKey] = classIndex;
                                             SvManager.Instance.DestroyMenu(connectData.connection, selectClass);
                                             SvManager.Instance.SendRegisterMenu(connectData.connection, false, skinPrefabs[teamIndex]);
                                             break;
