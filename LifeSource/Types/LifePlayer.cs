@@ -390,16 +390,17 @@ namespace BrokeProtocol.GameSource.Types
         {
             if (LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                if (player.svPlayer.CustomData.TryGetValue(offensesKey, out List<CrimeSave> offenses))
+                if (player.svPlayer.CustomData.TryGetValue(offensesKey, out string offensesJSON))
                 {
+                    var offenses = JsonConvert.DeserializeObject<List<OffenseSave>>(offensesJSON);
                     var wearables = new ShWearable[player.curWearables.Length];
                     foreach (var crimeSave in offenses)
                     {
                         for (var i = 0; i < wearables.Length; i++)
                         {
                             // Future/mod-proofing
-                            if (i < crimeSave.Wearables.Length &&
-                                SceneManager.Instance.TryGetEntity<ShWearable>(crimeSave.Wearables[i], out var w))
+                            if (i < crimeSave.wearables.Length &&
+                                SceneManager.Instance.TryGetEntity<ShWearable>(crimeSave.wearables[i], out var w))
                             {
                                 wearables[i] = w;
                             }
@@ -409,15 +410,15 @@ namespace BrokeProtocol.GameSource.Types
 
                         ShPlayer witness = null;
 
-                        if (crimeSave.WitnessBotID != 0)
+                        if (crimeSave.witnessBotID != 0)
                         {
-                            witness = EntityCollections.FindByID<ShPlayer>(crimeSave.WitnessBotID);
+                            witness = EntityCollections.FindByID<ShPlayer>(crimeSave.witnessBotID);
                         }
-                        else if (!string.IsNullOrWhiteSpace(crimeSave.WitnessPlayerAccount))
+                        else if (!string.IsNullOrWhiteSpace(crimeSave.witnessPlayerAccount))
                         {
                             foreach (var p in EntityCollections.Humans)
                             {
-                                if (p.username == crimeSave.WitnessPlayerAccount)
+                                if (p.username == crimeSave.witnessPlayerAccount)
                                 {
                                     witness = p;
                                     break;
@@ -425,7 +426,7 @@ namespace BrokeProtocol.GameSource.Types
                             }
                         }
 
-                        var offense = new Offense(LifeUtility.crimeTypes[(int)crimeSave.CrimeIndex], wearables, witness, crimeSave.TimeSinceLast);
+                        var offense = new Offense(LifeUtility.crimeTypes[(int)crimeSave.crimeIndex], wearables, witness, crimeSave.timeSinceLast);
                         pluginPlayer.offenses.Add(offense.GetHashCode(), offense);
                     }
 
@@ -441,21 +442,21 @@ namespace BrokeProtocol.GameSource.Types
             return true;
         }
 
-        private const string offensesKey = "OffenseList";
+        private const string offensesKey = "Offenses";
         private const string jailtimeKey = "Jailtime";
 
         [Execution(ExecutionMode.Additive)]
         public override bool Save(ShPlayer player) {
             if (LifeManager.pluginPlayers.TryGetValue(player, out var pluginPlayer))
             {
-                var offenses = new List<CrimeSave>();
+                var offenses = new List<OffenseSave>();
                 foreach (var offense in pluginPlayer.offenses.Values)
                 {
-                    offenses.Add(new CrimeSave(offense.crime.index, offense.wearables, Time.time - offense.commitTime, offense.witness));
+                    offenses.Add(new OffenseSave(offense.crime.index, offense.wearables, Time.time - offense.commitTime, offense.witness));
                 }
 
                 var CustomData = player.svPlayer.CustomData;
-                CustomData[offensesKey] = offenses;
+                CustomData[offensesKey] = JsonConvert.SerializeObject(offenses);
                 CustomData[jailtimeKey] = Mathf.Max(0f, pluginPlayer.jailExitTime - Time.time);
             }
 

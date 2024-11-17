@@ -9,6 +9,43 @@ using UnityEngine;
 
 namespace BrokeProtocol.GameSource
 {
+    [Serializable]
+    public struct OffenseSave
+    {
+        public CrimeIndex crimeIndex;
+        public int[] wearables;
+        public float timeSinceLast;
+        public string witnessPlayerAccount;
+        public int witnessBotID;
+
+        public OffenseSave(CrimeIndex crimeIndex, int[] wearables, float timeSinceLast, ShPlayer witness)
+        {
+            this.crimeIndex = crimeIndex;
+            this.wearables = wearables;
+            this.timeSinceLast = timeSinceLast;
+
+            if (witness)
+            {
+                if (witness.isHuman)
+                {
+                    witnessPlayerAccount = witness.username;
+                    witnessBotID = 0;
+                }
+                else
+                {
+                    witnessPlayerAccount = null;
+                    witnessBotID = witness.ID;
+                }
+            }
+            else
+            {
+                witnessPlayerAccount = null;
+                witnessBotID = 0;
+            }
+        }
+    }
+
+    // TODO: Unused, Delete this later
     public class CrimeSave
     {
         public CrimeIndex CrimeIndex { get; set; }
@@ -95,7 +132,7 @@ namespace BrokeProtocol.GameSource
     }
 
     [Serializable]
-    public sealed class Offense
+    public class Offense
     {
         public Crime crime;
         public ShPlayer witness;
