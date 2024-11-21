@@ -1,3 +1,36 @@
+## 1.43
+?> Significand API changes are outlined below but older methods will still be availabe as deprecated where possible. Asset modding has new proprty for lights object which must be updated.
+
+### API
+- Environment packet has new values for light intensities
+- Deprecated and Renamed Methods
+  - ShEntity.GetPosition -> Serialized.Position
+  - ShEntity.GetRotation -> Serialized.Rotation
+  - ShEntity.GetRotationT -> Serialized.RotationT
+  - ShEntity.GetOrigin -> ShEntity.Origin
+  - ShEntity.GetPlace -> Serialized.Place
+  - ShEntity.GetParent -> Serialized.Parent
+  - ShPhysical.GetStanceIndex -> ShPhysical.StanceIndex
+  - Serialized.GetChildIndex -> Serialized.ChildIndex
+  - Place.GetIndex -> Place.Index
+  - .GetEntranceDoor -> Place.EntranceDoor
+- Renamed Methods
+  - ShEntity.GetPlaceIndex -> Serialized.GetPlaceIndex()
+  - SvEntity.GetDoor -> SvEntity.GetDoor()
+  - ShPlayer.GetControlled -> ShPlayer.GetControlled()
+  - ShPlayer.GetMount -> ShPlayer.GetMount()
+  - ShItem.GetSortableName -> ShItem.SortableName
+  - SvManager.GetMainGraph -> SvManager.MainGraph
+  - Serialized.DirectionIndex() -> Serialized.GetDirectionIndex()
+  - SceneManager.PlaceItemCount() -> Place.GetItemCount()
+  - CustomData class rewritten with new utility methods
+  - Old methods still available as Deprecated 
+
+### MODDING
+- lightsObject property moved from ClTransport to ShTransport for universal day/night handling
+- Maps likely need to be updated with proper night lighting now
+  - Or use environment/lighting commands
+
 ## 1.42
 ?> New moddable HUD and other UI assets in BPResources. New way to Bind Cursor to UI elements for automatic cleanup. Most other 'Sector' related API changes are due to addition of level streaming but shouldn't affect too many plugins.
 
@@ -106,28 +139,3 @@
   * Old mods might need updating
     * Old surface vehicle mods will be more powerful
     * Old air vehicle mods will be less powerful 
-
-## 1.37
-?> Most API changes in the Truck Simulator Update are related to the new Towing functionality in 1.37. This includes a new TowT transform reference and a list of TowOptions on each vehicle for random spawning. Important to note an overall simplification to accessing specific Mount types and Controllers since it was getting confusing with all the different Properties. Also in continuing to simplify the class heirarchy, ShWheeled class is merged into parent ShTransport so even boats and planes can have animated wheels, skidmarks, particles, etc. This opens to door to amphibious vehicles later on and potentially better wheel damage/blowout modelling too.
-
-### API
-* ShWheeled class removed (all Transports can use wheel skidding particles/audio/models)
-* Damage event source parameter replaced with hitNormal
-* New PlayerTow event added
-* IsDriving, IsFlying, IsBoating, IsDragging, etc replaced with generic IsMount<T>(out T)
-* 'Controller' virtual property removed, access 'controller' field directly
-* OutsideController property only available on ShPlayer now
-* GetSectorFloor moved from SvManager to Util static class
-* CanSpawn() moved up to ShEntity and now takes parameter ShEntity[] ignoreArray
-* SvPlayer.StartLocking() -> StartLockOn() to distingish from vehicle locking functions
-
-### MODDING
-* All Aircraft and Boats mods need these parameters multiplied by 0.04 (divide by 25) and re-exported due to physics fixes and updates
-   * Boats:
-      * engineFactor
-      * turnFactor
-      * stabilityFactor
-   * Aircraft:
-      * uprightStrength
-      * stabilityStrength
-   * You can simply add "/25" after each number in the inspector and Unity will calculate the result when you Enter or Tab out
