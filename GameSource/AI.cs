@@ -253,8 +253,8 @@ namespace BrokeProtocol.GameSource
                 return false;
             }
 
-            var enemyPosition = enemyMount.GetWeaponPosition();
-            var enemyRotation = enemyMount.GetWeaponVector();
+            var enemyPosition = enemyMount.GetWeaponPosition(player.seat);
+            var enemyRotation = enemyMount.GetWeaponForward(player.seat);
             const float threatLimit = 0.35f;
             var selfT = aircraft.RotationT;
             var selfPosition = selfT.position;
@@ -263,7 +263,7 @@ namespace BrokeProtocol.GameSource
             var direction = delta / distance;
             var dot = Vector3.Dot(-direction, selfT.forward);
             var enemyDot = Vector3.Dot(direction, enemyRotation);
-            var enemyAirborn = !enemyMount.Ground;
+            var enemyAirborn = !enemyMount.GetGround();
 
             AirState airState;
 
@@ -702,7 +702,7 @@ namespace BrokeProtocol.GameSource
         public virtual void PathToTarget()
         {
             var target = player.svPlayer.TargetMount;
-            if (target.Ground)
+            if (target.GetGround())
             {
                 player.svPlayer.GetPathAvoidance(target.Position);
                 ResetTargetPosition();
@@ -730,7 +730,7 @@ namespace BrokeProtocol.GameSource
 
         protected bool HandleAirborneTarget()
         {
-            if (!player.svPlayer.TargetMount.Ground) // Don't fall through below and get stuck in MoveLookNavPath/DestroySelf
+            if (!player.svPlayer.TargetMount.GetGround()) // Don't fall through below and get stuck in MoveLookNavPath/DestroySelf
             {
                 player.svPlayer.LookTarget();
                 player.ZeroInputs();
@@ -818,12 +818,12 @@ namespace BrokeProtocol.GameSource
 
             if (TargetNear)
             {
-                if (player.curMount && !player.curMount.HasWeapons && targetEntity.Velocity.sqrMagnitude <= Utility.slowSpeedSqr)
+                if (player.curMount && !player.curMount.HasWeaponSet(player.seat) && targetEntity.Velocity.sqrMagnitude <= Utility.slowSpeedSqr)
                 {
                     player.svPlayer.SvDismount();
                 }
 
-                var range = Mathf.Min(0.5f * player.ActiveWeapon.Range + player.RotationT.localPosition.z, 25f);
+                var range = Mathf.Min(0.5f * player.ActiveWeapon.GetRange(player.seat) + player.RotationT.localPosition.z, 25f);
                 player.TrySetInput(
                     Mathf.Clamp((player.Distance(targetEntity) - range) * 0.5f, -1f, 1f),
                     0f,
@@ -888,7 +888,7 @@ namespace BrokeProtocol.GameSource
         protected ShDetonator detonator;
 
         // Don't do hunting behavior if in an unarmed vehicle
-        public bool CanHunt => !player.curMount || player.curMount.HasWeapons;
+        public bool CanHunt => !player.curMount || player.curMount.HasWeaponSet(player.seat);
 
         public override void EnterState()
         {
@@ -963,7 +963,7 @@ namespace BrokeProtocol.GameSource
                         var r = Random.value;
 
                         if (!player.curMount && r < 0.005f && player.TryGetCachedItem(out projectile) &&
-                            player.Distance(targetEntity) < Util.BallisticRange(projectile.WeaponVelocity, projectile.WeaponGravity))
+                            player.Distance(targetEntity) < Util.BallisticRange(projectile.GetWeaponVelocity(player.seat), projectile.GetWeaponGravity(player.seat)))
                         {
                             player.svPlayer.SvSetEquipable(projectile);
                         }

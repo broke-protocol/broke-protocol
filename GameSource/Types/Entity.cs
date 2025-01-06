@@ -105,12 +105,15 @@ namespace BrokeProtocol.GameSource.Types
                         var index = 0;
 
                         var mount = controller.GetMount();
-                        foreach (var w in mount.weaponSets)
+                        foreach (var w in mount.seats[controller.seat].weaponSets)
                         {
                             if (SceneManager.Instance.TryGetEntity<ShThrown>(w.thrownName, out var thrown) && thrown.CompareTag(ObjectTag.flareTag))
                             {
-                                mount.weaponIndex = index;
-                                if (mount.CanUse()) mount.MountFire();
+                                mount.seats[controller.seat].weaponIndex = index;
+                                if (mount.CanUse(controller.seat))
+                                {
+                                    mount.MountFire(controller.seat);
+                                }
                                 controller.svPlayer.SetBestMountWeapon();
                             }
 

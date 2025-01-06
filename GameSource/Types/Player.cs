@@ -46,7 +46,7 @@ namespace BrokeProtocol.GameSource.Types
             {
                 if (player.IsMount<ShAircraft>(out _))
                 {
-                    if (player.curMount.HasWeapons)
+                    if (player.curMount.HasWeaponSet(player.seat))
                     {
                         attackState = Core.AirAttack;
                     }
@@ -55,7 +55,7 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     attackState = Core.Attack;
                 }
-                else if(player.IsPassenger(out _) && player.curMount.Ground)
+                else if(player.IsPassenger(out _) && player.curMount.GetGround())
                 {
                     player.svPlayer.SvDismount();
                     attackState = Core.Attack;
@@ -1181,7 +1181,7 @@ namespace BrokeProtocol.GameSource.Types
             player.Mount(mount, seat);
             player.SetStance(mount.seats[seat].stanceIndex);
             // Send Mount packet before ResetAI or things will be out of order on failure
-            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.CurrentClip);
+            player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.GetCurrentClip(seat));
 
             if (!player.isHuman)
             {
@@ -1204,9 +1204,9 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Dismount, player.ID);
 
             // Start locking behavior after exiting vehicle
-            if (player.curEquipable.ThrownHasGuidance)
+            if (player.curEquipable.ThrownHasGuidance(0))
             {
-                player.svPlayer.StartLockOn(player.curEquipable);
+                player.svPlayer.StartLockOn(player.curEquipable, 0);
             }
 
             return true;

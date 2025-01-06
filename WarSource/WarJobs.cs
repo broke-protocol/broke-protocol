@@ -45,7 +45,7 @@ namespace BrokeProtocol.GameSource
         protected bool IsEnemy(ShPlayer target) => this != target.svPlayer.job;
 
         protected bool TryFindMount() => player.svPlayer.LocalEntitiesOne(
-                e => e is ShMountable p && (p is ShMovable || p.HasWeapons) && p.IsAccessible(player, true) && !p.occupants[0],
+                e => e is ShMountable p && (p is ShMovable || p.HasWeaponSet(0)) && p.IsAccessible(player, true) && !p.occupants[0],
                 e =>
                 {
                     player.svPlayer.targetEntity = e;
