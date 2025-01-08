@@ -1180,6 +1180,13 @@ namespace BrokeProtocol.GameSource.Types
             player.svPlayer.SvDismount();
             player.Mount(mount, seat);
             player.SetStance(mount.seats[seat].stanceIndex);
+
+            // Disable underbarrel if mount is armed already (control conflict)
+            if (!player.CanAltFire() && player.curEquipable.curUnderbarrel.setting)
+            {
+                player.svPlayer.SvAltFire(true);
+            }
+
             // Send Mount packet before ResetAI or things will be out of order on failure
             player.svPlayer.Send(SvSendType.Local, Channel.Reliable, ClPacket.Mount, player.ID, mount.ID, seat, mount.GetCurrentClip(seat));
 
