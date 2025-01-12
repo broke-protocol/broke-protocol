@@ -157,7 +157,7 @@ namespace BrokeProtocol.GameSource
 
             var delta = player.svPlayer.targetEntity.Origin - player.curMount.Origin;
 
-            if(Vector3.Angle(player.curMount.mainT.forward, delta) > player.curMount.viewAngleLimit)
+            if(Vector3.Angle(player.curMount.mainT.forward, delta) > player.ViewAngleLimit)
             {
                 player.svPlayer.SvDismount();
                 if (!player.GamePlayer().SetAttackState(player.svPlayer.targetEntity))
