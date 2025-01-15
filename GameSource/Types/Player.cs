@@ -44,14 +44,14 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.curMount)
             {
-                if (player.IsMount<ShAircraft>(out _))
+                if (player.IsControlledMount<ShAircraft>(out _))
                 {
                     if (player.curMount.HasWeaponSet(player.seat))
                     {
                         attackState = Core.AirAttack;
                     }
                 }
-                else if (player.IsMount<ShMovable>(out _))
+                else if (player.IsControlledMount<ShMovable>(out _))
                 {
                     attackState = Core.Attack;
                 }
@@ -1201,7 +1201,7 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Dismount(ShPlayer player)
         {
-            if (player.IsMount<ShPhysical>(out var physicalMount))
+            if (player.IsControlledMount<ShPhysical>(out var physicalMount))
             {
                 // Send serverside transport position to override client-side predicted location while it was driven
                 physicalMount.svPhysical.SvRelocateSelf();

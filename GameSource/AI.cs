@@ -451,7 +451,7 @@ namespace BrokeProtocol.GameSource
         {
             base.EnterState();
             onDestination = false;
-            if (!player.IsMount<ShAircraft>(out _))
+            if (!player.IsControlledMount<ShAircraft>(out _))
             {
                 player.svPlayer.GetPath(player.GamePlayer().goToPosition);
             }
@@ -472,7 +472,7 @@ namespace BrokeProtocol.GameSource
                     return false;
                 }
             }
-            else if(player.IsMount<ShAircraft>(out var aircraft))
+            else if(player.IsControlledMount<ShAircraft>(out var aircraft))
             {
                 /*if(player.GamePlayer().OnDestination())
                 {
