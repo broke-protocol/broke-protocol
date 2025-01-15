@@ -145,6 +145,12 @@ namespace BrokeProtocol.GameSource
     {
         public override bool EnterTest() => base.EnterTest() && IsTargetValid();
 
+        public override void EnterState()
+        {
+            base.EnterState();
+            player.svPlayer.SetBestWeapons();
+        }
+
         public override bool UpdateState()
         {
             if (!base.UpdateState()) return false;
@@ -166,6 +172,9 @@ namespace BrokeProtocol.GameSource
                 }
                 return false;
             }
+
+            if (player.CurrentAmmoTotal == 0)
+                player.svPlayer.SetBestWeapons();
 
             if (player.CanSeeEntity(player.svPlayer.targetEntity))
             {
