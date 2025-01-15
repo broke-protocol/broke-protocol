@@ -26,7 +26,7 @@ namespace BrokeProtocol.GameSource.Types
         {
             this.player = player;
         }
-        
+
         public virtual bool SetAttackState(ShEntity target)
         {
             // Sanity check
@@ -55,14 +55,17 @@ namespace BrokeProtocol.GameSource.Types
                 {
                     attackState = Core.Attack;
                 }
-                else if(player.IsPassenger(out _) && player.curMount.GetGround())
+                else if (player.IsPassenger(out var mount))
                 {
-                    player.svPlayer.SvDismount();
-                    attackState = Core.Attack;
-                }
-                else
-                {
-                    attackState = Core.StaticAttack;
+                    if (player.CanFire())
+                    {
+                        attackState = Core.StaticAttack;
+                    }
+                    else if (mount.GetGround())
+                    {
+                        player.svPlayer.SvDismount();
+                        attackState = Core.Attack;
+                    }
                 }
             }
             else
@@ -70,8 +73,8 @@ namespace BrokeProtocol.GameSource.Types
                 attackState = Core.Attack;
             }
 
-            if(attackState != null && 
-                (target != previousTarget || player.svPlayer.currentState != attackState) && 
+            if (attackState != null &&
+                (target != previousTarget || player.svPlayer.currentState != attackState) &&
                 player.svPlayer.SetState(attackState.index))
             {
                 return true;
@@ -120,7 +123,6 @@ namespace BrokeProtocol.GameSource.Types
             return m && m.Velocity.sqrMagnitude <= Utility.slowSpeedSqr && target.InActionRange(m);
         }
     }
-
 
     public class Player : PlayerEvents
     {

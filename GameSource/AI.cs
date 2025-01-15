@@ -161,9 +161,10 @@ namespace BrokeProtocol.GameSource
                 return false;
             }
 
-            var delta = player.svPlayer.targetEntity.Origin - player.curMount.Origin;
-
-            if(Vector3.Angle(player.curMount.mainT.forward, delta) > player.ViewAngleLimit)
+            if(player.curMount is not ShMovable &&
+                Vector3.Angle(
+                    player.curMount.mainT.forward,
+                    player.svPlayer.targetEntity.Origin - player.curMount.Origin) > player.ViewAngleLimit)
             {
                 player.svPlayer.SvDismount();
                 if (!player.GamePlayer().SetAttackState(player.svPlayer.targetEntity))
