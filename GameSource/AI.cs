@@ -734,7 +734,7 @@ namespace BrokeProtocol.GameSource
 
         protected virtual bool HandleNearTarget()
         {
-            player.svPlayer.LookTactical(player.svPlayer.targetEntity.Origin - player.Origin);
+            player.svPlayer.LookTactical(player.curMountT ? player.curMountT.forward : player.svPlayer.targetEntity.Origin - player.Origin);
             return true;
         }
 
