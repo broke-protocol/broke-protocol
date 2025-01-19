@@ -22,9 +22,9 @@ namespace BrokeProtocol.GameSource.Types
         [Execution(ExecutionMode.Additive)]
         public override bool Damage(ShDamageable damageable, DamageIndex damageIndex, float amount, ShPlayer attacker, Collider collider, Vector3 hitPoint, Vector3 hitNormal)
         {
-            var controller = damageable.controller;
+            var damagedController = damageable.controller;
 
-            if (controller && controller.svPlayer.godMode) return false;
+            if (damagedController && damagedController.svPlayer.godMode) return false;
 
             var deadBefore = damageable.IsDead;
 
@@ -109,9 +109,22 @@ namespace BrokeProtocol.GameSource.Types
             }
             else if (attacker && attacker != damageable)
             {
-                if (controller && controller != damageable && !controller.isHuman && !controller.svPlayer.currentState.IsBusy)
+                if (damagedController)
                 {
-                    controller.GamePlayer().SetAttackState(attacker);
+                    if (!damagedController.isHuman)
+                    {
+                        damagedController.GamePlayer().SetAttackState(attacker);
+                    }
+
+                    if (damagedController.svPlayer.follower && damagedController.svPlayer.follower != attacker)
+                    {
+                        damagedController.svPlayer.follower.GamePlayer().SetAttackState(attacker);
+                    }
+
+                    if (attacker.svPlayer.follower && attacker.svPlayer.follower != damagedController)
+                    {
+                        attacker.svPlayer.follower.GamePlayer().SetAttackState(damagedController);
+                    }
                 }
 
                 attacker.svPlayer.job.OnDamageEntity(damageable);

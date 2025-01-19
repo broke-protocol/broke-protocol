@@ -1241,23 +1241,6 @@ namespace BrokeProtocol.GameSource.Types
                 }
             }
 
-            if (attacker && attacker != player)
-            {
-                if (!player.isHuman)
-                {
-                    player.GamePlayer().SetAttackState(attacker);
-                }
-                else if (player.svPlayer.follower && attacker != player.svPlayer.follower)
-                {
-                    player.svPlayer.follower.GamePlayer().SetAttackState(attacker);
-                }
-
-                if (attacker.svPlayer.follower)
-                {
-                    attacker.svPlayer.follower.GamePlayer().SetAttackState(player);
-                }
-            }
-
             return true;
         }
 
