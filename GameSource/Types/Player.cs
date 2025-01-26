@@ -44,9 +44,9 @@ namespace BrokeProtocol.GameSource.Types
 
             if (player.curMount)
             {
-                if (player.IsControlledMount<ShAircraft>(out _))
+                if (player.IsControlledMount<ShAircraft>(out var aircraft))
                 {
-                    if (player.curMount.HasWeaponSet(player.seat))
+                    if (aircraft.HasWeaponSet(player.seat))
                     {
                         attackState = Core.AirAttack;
                     }
